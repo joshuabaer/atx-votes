@@ -16,35 +16,32 @@ struct OnboardingFlowView: View {
                 }
 
                 // Phase content
-                TabView(selection: $store.currentPhase) {
-                    WelcomeView()
-                        .tag(InterviewPhase.welcome)
-
-                    IssuesPickerView()
-                        .tag(InterviewPhase.issues)
-
-                    SpectrumPickerView()
-                        .tag(InterviewPhase.spectrum)
-
-                    PolicyDeepDiveView()
-                        .tag(InterviewPhase.policyDeepDive)
-
-                    PoliticianPickerView()
-                        .tag(InterviewPhase.politicians)
-
-                    QualitiesPickerView()
-                        .tag(InterviewPhase.qualities)
-
-                    PrimaryPickerView()
-                        .tag(InterviewPhase.primaryChoice)
-
-                    AddressEntryView()
-                        .tag(InterviewPhase.address)
-
-                    BuildingGuideView()
-                        .tag(InterviewPhase.building)
+                Group {
+                    switch store.currentPhase {
+                    case .welcome:
+                        WelcomeView()
+                    case .issues:
+                        IssuesPickerView()
+                    case .spectrum:
+                        SpectrumPickerView()
+                    case .policyDeepDive:
+                        PolicyDeepDiveView()
+                    case .politicians:
+                        PoliticianPickerView()
+                    case .qualities:
+                        QualitiesPickerView()
+                    case .primaryChoice:
+                        PrimaryPickerView()
+                    case .address:
+                        AddressEntryView()
+                    case .building:
+                        BuildingGuideView()
+                    }
                 }
-                .tabViewStyle(.page(indexDisplayMode: .never))
+                .transition(.asymmetric(
+                    insertion: .move(edge: .trailing).combined(with: .opacity),
+                    removal: .move(edge: .leading).combined(with: .opacity)
+                ))
                 .animation(.easeInOut(duration: 0.35), value: store.currentPhase)
             }
         }
