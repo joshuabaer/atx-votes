@@ -153,6 +153,32 @@ struct DisclaimerBanner: View {
     }
 }
 
+struct SampleDataBanner: View {
+    var body: some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: "info.circle.fill")
+                .foregroundColor(Theme.primaryBlue)
+                .font(.title3)
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Sample Recommendations")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(Theme.textPrimary)
+                Text("These are sample recommendations, not personalized to your profile. Add a Claude API key in the Profile tab to get recommendations tailored to your values.")
+                    .font(Theme.caption)
+                    .foregroundColor(Theme.textSecondary)
+            }
+        }
+        .padding(12)
+        .background(Theme.primaryBlue.opacity(0.08))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadiusSmall))
+        .overlay(
+            RoundedRectangle(cornerRadius: Theme.cornerRadiusSmall)
+                .strokeBorder(Theme.primaryBlue.opacity(0.3), lineWidth: 1)
+        )
+    }
+}
+
 // MARK: - Feedback
 
 enum FeedbackHelper {

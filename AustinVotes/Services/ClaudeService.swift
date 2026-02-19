@@ -1,67 +1,188 @@
 import Foundation
 
-/// Service layer for Claude API integration.
-/// Replace the placeholder API key and customize the prompts as needed.
+// MARK: - Claude Response Types (personalization layer only)
+
+struct ClaudeGuideResponse: Decodable {
+    let profileSummary: String
+    let races: [ClaudeRaceRecommendation]
+    let propositions: [ClaudePropositionRecommendation]
+}
+
+struct ClaudeRaceRecommendation: Decodable {
+    let office: String
+    let district: String?
+    let recommendedCandidate: String
+    let reasoning: String
+    let strategicNotes: String?
+    let caveats: String?
+    let confidence: String
+}
+
+struct ClaudePropositionRecommendation: Decodable {
+    let number: Int
+    let recommendation: String
+    let reasoning: String
+}
+
+// MARK: - Service
+
 actor ClaudeService {
-    private let apiKey: String
     private let baseURL = "https://api.anthropic.com/v1/messages"
     private let model = "claude-sonnet-4-20250514"
+    private static let keychainKey = "claude_api_key"
 
-    init(apiKey: String = "") {
-        // In production, load from Keychain or environment config
-        self.apiKey = apiKey
+    private var apiKey: String? {
+        KeychainHelper.load(key: Self.keychainKey)
     }
 
-    // MARK: - Generate Full Voting Guide
+    static var hasAPIKey: Bool {
+        KeychainHelper.load(key: keychainKey) != nil
+    }
 
-    func generateVotingGuide(profile: VoterProfile) async throws -> Ballot {
-        let prompt = buildGuidePrompt(profile: profile)
+    // MARK: - Generate Personalized Voting Guide
 
-        // If API key is empty, return sample data for development
-        guard !apiKey.isEmpty else {
-            switch profile.primaryBallot {
-            case .democrat: return Ballot.sampleDemocrat
-            case .republican, .undecided: return Ballot.sampleRepublican
+    func generateVotingGuide(profile: VoterProfile) async throws -> (Ballot, String) {
+        let baseBallot = loadBaseBallot(for: profile.primaryBallot)
+
+        guard let apiKey, !apiKey.isEmpty else {
+            let summary = sampleSummary(profile: profile)
+            return (baseBallot, summary)
+        }
+
+        let condensed = buildCondensedBallotDescription(baseBallot)
+        let userPrompt = buildUserPrompt(profile: profile, ballotDescription: condensed, ballot: baseBallot)
+
+        let responseText = try await callClaude(
+            apiKey: apiKey,
+            system: systemPrompt,
+            userMessage: userPrompt
+        )
+
+        let guideResponse = try parseClaudeResponse(responseText)
+        let mergedBallot = merge(recommendations: guideResponse, into: baseBallot)
+        return (mergedBallot, guideResponse.profileSummary)
+    }
+
+    // MARK: - Load Base Ballot
+
+    private func loadBaseBallot(for primary: PrimaryBallot) -> Ballot {
+        switch primary {
+        case .democrat:
+            return Ballot.sampleDemocrat
+        case .republican, .undecided:
+            return Ballot.sampleRepublican
+        }
+    }
+
+    // MARK: - Condensed Ballot Description
+
+    private func buildCondensedBallotDescription(_ ballot: Ballot) -> String {
+        var lines: [String] = []
+        lines.append("ELECTION: \(ballot.electionName)")
+        lines.append("")
+
+        for race in ballot.races.sorted(by: { $0.sortOrder < $1.sortOrder }) {
+            let label = race.district != nil ? "\(race.office) — \(race.district!)" : race.office
+            let contested = race.isContested ? "" : " [UNCONTESTED]"
+            lines.append("RACE: \(label)\(contested)")
+
+            for candidate in race.candidates {
+                let incumbent = candidate.isIncumbent ? " (incumbent)" : ""
+                lines.append("  - \(candidate.name)\(incumbent)")
+                lines.append("    Positions: \(candidate.keyPositions.joined(separator: "; "))")
+                if !candidate.endorsements.isEmpty {
+                    lines.append("    Endorsements: \(candidate.endorsements.joined(separator: "; "))")
+                }
+                if !candidate.pros.isEmpty {
+                    lines.append("    Pros: \(candidate.pros.joined(separator: "; "))")
+                }
+                if !candidate.cons.isEmpty {
+                    lines.append("    Cons: \(candidate.cons.joined(separator: "; "))")
+                }
+            }
+            lines.append("")
+        }
+
+        if !ballot.propositions.isEmpty {
+            for prop in ballot.propositions {
+                lines.append("PROPOSITION \(prop.number): \(prop.title)")
+                lines.append("  \(prop.description)")
+                lines.append("")
             }
         }
 
-        let response = try await callClaude(
-            system: votingGuideSystemPrompt,
-            userMessage: prompt
-        )
-
-        return try parseGuideResponse(response, profile: profile)
+        return lines.joined(separator: "\n")
     }
 
-    // MARK: - Generate Profile Summary
+    // MARK: - Prompts
 
-    func generateProfileSummary(profile: VoterProfile) async throws -> String {
-        guard !apiKey.isEmpty else {
-            return sampleSummary(profile: profile)
+    private var systemPrompt: String {
+        """
+        You are a non-partisan voting guide assistant for Austin, Texas elections. \
+        Your job is to make personalized recommendations based ONLY on the voter's stated values and the candidate data provided. \
+        You must NEVER recommend a candidate who is not listed in the provided ballot data. \
+        You must NEVER invent or hallucinate candidate information. \
+        Respond with ONLY valid JSON — no markdown, no explanation, no text outside the JSON object.
+        """
+    }
+
+    private func buildUserPrompt(profile: VoterProfile, ballotDescription: String, ballot: Ballot) -> String {
+        let raceLines = ballot.races.map { race in
+            let names = race.candidates.map(\.name).joined(separator: ", ")
+            return "\(race.office): \(names)"
         }
 
-        let prompt = """
-        Based on this voter profile, write a 2-sentence summary that captures their political identity in plain language. \
-        Be specific and accurate — don't use generic platitudes.
+        return """
+        Based on this voter's profile, recommend ONE candidate per race and a stance on each proposition.
 
-        Issues: \(profile.topIssues.map(\.rawValue).joined(separator: ", "))
-        Spectrum: \(profile.politicalSpectrum.rawValue)
-        Values in candidates: \(profile.candidateQualities.map(\.rawValue).joined(separator: ", "))
-        Policy views: \(profile.policyViews.map { "\($0.key): \($0.value)" }.joined(separator: "; "))
-        Admires: \(profile.admiredPoliticians.joined(separator: ", "))
-        Dislikes: \(profile.dislikedPoliticians.joined(separator: ", "))
+        VOTER PROFILE:
+        - Primary: \(profile.primaryBallot.rawValue)
+        - Top issues: \(profile.topIssues.map(\.rawValue).joined(separator: ", "))
+        - Political spectrum: \(profile.politicalSpectrum.rawValue)
+        - Values in candidates: \(profile.candidateQualities.map(\.rawValue).joined(separator: ", "))
+        - Policy stances: \(profile.policyViews.map { "\($0.key): \($0.value)" }.joined(separator: "; "))
+        - Politicians admired: \(profile.admiredPoliticians.joined(separator: ", "))
+        - Politicians disliked: \(profile.dislikedPoliticians.joined(separator: ", "))
+
+        BALLOT DATA:
+        \(ballotDescription)
+
+        VALID CANDIDATES (you MUST only recommend names from this list):
+        \(raceLines.joined(separator: "\n"))
+
+        Return this exact JSON structure:
+        {
+          "profileSummary": "2-sentence summary of this voter's political identity",
+          "races": [
+            {
+              "office": "exact office name from ballot",
+              "district": "district string or null",
+              "recommendedCandidate": "exact candidate name from ballot",
+              "reasoning": "2-3 sentences connecting to voter profile",
+              "strategicNotes": "optional runoff/tactical note or null",
+              "caveats": "optional concern or null",
+              "confidence": "Strong Match|Good Match|Best Available|Symbolic Race"
+            }
+          ],
+          "propositions": [
+            {
+              "number": 1,
+              "recommendation": "Lean Yes|Lean No|Your Call",
+              "reasoning": "1-2 sentences connecting to voter profile"
+            }
+          ]
+        }
         """
-
-        return try await callClaude(
-            system: "You are writing a concise voter profile summary. Be direct and specific.",
-            userMessage: prompt
-        )
     }
 
     // MARK: - API Call
 
-    private func callClaude(system: String, userMessage: String) async throws -> String {
-        var request = URLRequest(url: URL(string: baseURL)!)
+    private func callClaude(apiKey: String, system: String, userMessage: String) async throws -> String {
+        guard let url = URL(string: baseURL) else {
+            throw ClaudeError.apiError("Invalid API URL")
+        }
+
+        var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.addValue(apiKey, forHTTPHeaderField: "x-api-key")
         request.addValue("2023-06-01", forHTTPHeaderField: "anthropic-version")
@@ -69,7 +190,7 @@ actor ClaudeService {
 
         let body: [String: Any] = [
             "model": model,
-            "max_tokens": 4096,
+            "max_tokens": 8192,
             "system": system,
             "messages": [
                 ["role": "user", "content": userMessage]
@@ -80,63 +201,104 @@ actor ClaudeService {
 
         let (data, response) = try await URLSession.shared.data(for: request)
 
-        guard let httpResponse = response as? HTTPURLResponse,
-              httpResponse.statusCode == 200 else {
-            throw ClaudeError.apiError("API returned non-200 status")
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw ClaudeError.apiError("Invalid response")
+        }
+
+        switch httpResponse.statusCode {
+        case 200:
+            break
+        case 401:
+            throw ClaudeError.invalidAPIKey
+        case 429:
+            throw ClaudeError.rateLimited
+        case 500...599:
+            throw ClaudeError.serverError(httpResponse.statusCode)
+        default:
+            let body = String(data: data, encoding: .utf8) ?? "Unknown error"
+            throw ClaudeError.apiError("HTTP \(httpResponse.statusCode): \(body)")
         }
 
         let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
         guard let content = json?["content"] as? [[String: Any]],
               let text = content.first?["text"] as? String else {
-            throw ClaudeError.parseError("Could not parse response")
+            throw ClaudeError.parseError("Could not extract text from API response")
         }
 
         return text
     }
 
-    // MARK: - Prompt Building
+    // MARK: - Parse Response
 
-    private var votingGuideSystemPrompt: String {
-        """
-        You are a non-partisan voting guide assistant for Austin, Texas. \
-        You research candidates thoroughly, present facts fairly, and make personalized \
-        recommendations based on the voter's stated values — not your own opinions. \
-        Always note where candidates don't perfectly match the voter's profile. \
-        Return structured JSON matching the Ballot schema.
-        """
+    private func parseClaudeResponse(_ text: String) throws -> ClaudeGuideResponse {
+        // Strip markdown code fences if present
+        var cleaned = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        if cleaned.hasPrefix("```json") {
+            cleaned = String(cleaned.dropFirst(7))
+        } else if cleaned.hasPrefix("```") {
+            cleaned = String(cleaned.dropFirst(3))
+        }
+        if cleaned.hasSuffix("```") {
+            cleaned = String(cleaned.dropLast(3))
+        }
+        cleaned = cleaned.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard let data = cleaned.data(using: .utf8) else {
+            throw ClaudeError.parseError("Response is not valid UTF-8")
+        }
+
+        do {
+            return try JSONDecoder().decode(ClaudeGuideResponse.self, from: data)
+        } catch {
+            throw ClaudeError.parseError("Failed to decode Claude response: \(error.localizedDescription)")
+        }
     }
 
-    private func buildGuidePrompt(profile: VoterProfile) -> String {
-        """
-        Build a personalized voting guide for the March 2026 Texas primary election.
+    // MARK: - Merge Recommendations
 
-        VOTER PROFILE:
-        - Address: \(profile.address?.formatted ?? "Austin, TX")
-        - Primary: \(profile.primaryBallot.rawValue)
-        - Top issues: \(profile.topIssues.map(\.rawValue).joined(separator: ", "))
-        - Spectrum: \(profile.politicalSpectrum.rawValue)
-        - Values in candidates: \(profile.candidateQualities.map(\.rawValue).joined(separator: ", "))
-        - Policy stances: \(profile.policyViews.map { "\($0.key): \($0.value)" }.joined(separator: "; "))
-        - Politicians admired: \(profile.admiredPoliticians.joined(separator: ", "))
-        - Politicians disliked: \(profile.dislikedPoliticians.joined(separator: ", "))
+    private func merge(recommendations: ClaudeGuideResponse, into ballot: Ballot) -> Ballot {
+        var merged = ballot
 
-        For each contested race, research candidates and recommend one based on this voter's \
-        specific values. Explain WHY in 2-3 sentences connecting to their profile. \
-        Note strategic considerations like runoffs.
+        for (index, race) in merged.races.enumerated() {
+            guard let rec = recommendations.races.first(where: {
+                $0.office == race.office && $0.district == race.district
+            }) else { continue }
 
-        Return valid JSON matching this structure: { races: [...], propositions: [...] }
-        """
+            // Clear existing recommendations
+            for candIndex in merged.races[index].candidates.indices {
+                merged.races[index].candidates[candIndex].isRecommended = false
+            }
+            merged.races[index].recommendation = nil
+
+            // Find the recommended candidate by name
+            if let candIndex = merged.races[index].candidates.firstIndex(where: {
+                $0.name == rec.recommendedCandidate
+            }) {
+                merged.races[index].candidates[candIndex].isRecommended = true
+                merged.races[index].recommendation = RaceRecommendation(
+                    candidateId: merged.races[index].candidates[candIndex].id,
+                    candidateName: rec.recommendedCandidate,
+                    reasoning: rec.reasoning,
+                    strategicNotes: rec.strategicNotes,
+                    caveats: rec.caveats,
+                    confidence: RaceRecommendation.Confidence(rawValue: rec.confidence) ?? .moderate
+                )
+            }
+        }
+
+        // Merge proposition recommendations
+        for (index, prop) in merged.propositions.enumerated() {
+            if let rec = recommendations.propositions.first(where: { $0.number == prop.number }) {
+                merged.propositions[index].recommendation =
+                    Proposition.PropRecommendation(rawValue: rec.recommendation) ?? .yourCall
+                merged.propositions[index].reasoning = rec.reasoning
+            }
+        }
+
+        return merged
     }
 
-    // MARK: - Response Parsing
-
-    private func parseGuideResponse(_ response: String, profile: VoterProfile) throws -> Ballot {
-        // In production, parse the JSON response from Claude
-        // For now, return sample data
-        return Ballot.sampleRepublican
-    }
-
-    // MARK: - Sample Data (development fallback)
+    // MARK: - Sample Fallback
 
     private func sampleSummary(profile: VoterProfile) -> String {
         let spectrum = profile.politicalSpectrum.rawValue.lowercased()
@@ -145,14 +307,22 @@ actor ClaudeService {
     }
 }
 
+// MARK: - Errors
+
 enum ClaudeError: Error, LocalizedError {
     case apiError(String)
     case parseError(String)
+    case invalidAPIKey
+    case rateLimited
+    case serverError(Int)
 
     var errorDescription: String? {
         switch self {
         case .apiError(let msg): msg
         case .parseError(let msg): msg
+        case .invalidAPIKey: "Invalid API key. Please check your key in the Profile tab."
+        case .rateLimited: "Too many requests. Please wait a moment and try again."
+        case .serverError(let code): "Server error (\(code)). Please try again later."
         }
     }
 }

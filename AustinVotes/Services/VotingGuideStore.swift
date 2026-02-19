@@ -92,19 +92,15 @@ class VotingGuideStore: ObservableObject {
             loadingMessage = "Looking up your districts..."
             try await Task.sleep(for: .seconds(1))
 
-            // Step 2: Fetch candidate information
-            loadingMessage = "Researching candidates..."
-            try await Task.sleep(for: .seconds(1))
+            // Step 2: Generate personalized recommendations (single API call)
+            if ClaudeService.hasAPIKey {
+                loadingMessage = "Personalizing your recommendations..."
+            } else {
+                loadingMessage = "Building your guide..."
+            }
 
-            // Step 3: Generate personalized recommendations
-            loadingMessage = "Building your personalized guide..."
-
-            let generatedBallot = try await claudeService.generateVotingGuide(profile: voterProfile)
+            let (generatedBallot, summary) = try await claudeService.generateVotingGuide(profile: voterProfile)
             self.ballot = generatedBallot
-
-            // Step 4: Generate profile summary
-            loadingMessage = "Finishing up..."
-            let summary = try await claudeService.generateProfileSummary(profile: voterProfile)
             voterProfile.summaryText = summary
 
             // Save
@@ -116,6 +112,9 @@ class VotingGuideStore: ObservableObject {
             }
 
             requestAppReviewIfNeeded()
+        } catch let error as ClaudeError {
+            errorMessage = error.localizedDescription
+            isLoading = false
         } catch {
             errorMessage = "Something went wrong building your guide. Please try again."
             isLoading = false

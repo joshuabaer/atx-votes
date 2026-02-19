@@ -23,6 +23,11 @@ struct BallotOverviewView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
+                    // Sample data warning
+                    if !ClaudeService.hasAPIKey {
+                        SampleDataBanner()
+                    }
+
                     // Disclaimer banner
                     if showDisclaimer {
                         DisclaimerBanner { showDisclaimer = false }
