@@ -23,7 +23,8 @@ Items recently fixed but not yet tested. **Test these before attempting again or
 ### Improvements
 
 - [ ] Complete policy deep-dive questions — added InterviewQuestions entries for all 12 issues: education, healthcare, environment, infrastructure, transportation, immigration, civil rights (IDs 104-110). Updated PolicyDeepDiveView switch to handle all cases (no more `default: break`). Also added dedup guard for economy/taxes sharing a question.
-- [ ] Fictional candidate names in sample data — replaced all real politician names in SampleData.swift (Cornyn→Langford, Paxton→Mercer, Abbott→Brackett, etc.) and VotingGuideStore preview data. Propositions also neutralized (Sharia→foreign law, Dem chairs→opposing-party chairs).
+- [ ] Real candidate data for March 2026 primary — replaced all fictional candidates with real March 2026 Texas primary data from Travis County Clerk, Ballotpedia, Texas Tribune, and KUT. Republican ballot: 9 races (Senate, AG, Comptroller, Ag Commissioner, Governor, Lt. Gov, Railroad Commissioner, CD-10, CD-37, State Rep 48). Democratic ballot: 10 races (Senate, Governor, Lt. Gov, AG, Comptroller, CD-37, Commissioner Pct 2 & 4, State Rep 49 & 48, SBOE 5). All 10 Republican and 13 Democratic propositions are real. Sources cited in file header.
+- [ ] Real proposition data — all 10 Republican and 13 Democratic primary propositions now match the actual March 2026 ballot.
 - [ ] Accuracy disclaimer — added `DisclaimerBanner` component (Theme.swift). Dismissible banner at top of BallotOverviewView, persistent warning footer on CheatSheetView and RaceDetailView, and disclaimer line in cheat sheet share text.
 
 ### Features
@@ -41,8 +42,6 @@ Items not yet attempted or needing a fresh approach after failed verification.
 (none)
 
 ### Improvements
-- [ ] Real candidate data for March 2026 primary — all candidate info in SampleData.swift is placeholder. Research actual candidates, positions, endorsements, and fundraising for Travis County races
-- [ ] Real proposition data — verify the 10 sample propositions match actual March 2026 ballot propositions for Travis County
 
 ### Features
 
