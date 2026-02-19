@@ -32,6 +32,7 @@ struct PoliticianPickerView: View {
                         HStack {
                             TextField("e.g. Kirk Watson, Obama...", text: $admireText)
                                 .textFieldStyle(.plain)
+                                .foregroundColor(Theme.textPrimary)
                                 .focused($focusedField, equals: .admire)
                                 .submitLabel(.done)
                                 .onSubmit { addAdmired() }
@@ -70,6 +71,7 @@ struct PoliticianPickerView: View {
                         HStack {
                             TextField("e.g. Greg Casar, Ken Paxton...", text: $dislikeText)
                                 .textFieldStyle(.plain)
+                                .foregroundColor(Theme.textPrimary)
                                 .focused($focusedField, equals: .dislike)
                                 .submitLabel(.done)
                                 .onSubmit { addDisliked() }
@@ -164,6 +166,7 @@ struct ChipView: View {
                     .font(.system(size: 14))
                     .foregroundColor(color.opacity(0.6))
             }
+            .accessibilityLabel("Remove \(label)")
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 6)

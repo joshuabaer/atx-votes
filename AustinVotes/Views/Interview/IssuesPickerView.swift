@@ -99,6 +99,8 @@ struct IssueCard: View {
             .shadow(color: isSelected ? Theme.primaryBlue.opacity(0.3) : .clear, radius: 6, y: 2)
         }
         .buttonStyle(.plain)
+        .accessibilityLabel(issue.rawValue)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
 

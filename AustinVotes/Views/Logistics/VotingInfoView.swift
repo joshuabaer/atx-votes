@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct VotingInfoView: View {
+    @EnvironmentObject var store: VotingGuideStore
     @State private var expandedSection: InfoSection?
 
     enum InfoSection: String, CaseIterable, Identifiable {
@@ -31,6 +32,9 @@ struct VotingInfoView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     // Countdown card
                     countdownCard
+
+                    // Polling location finder
+                    pollingLocationCard
 
                     // Info sections
                     ForEach(InfoSection.allCases) { section in
@@ -96,6 +100,60 @@ struct VotingInfoView: View {
         .shadow(color: .black.opacity(0.06), radius: 8, y: 2)
     }
 
+    // MARK: - Polling Location
+
+    private var pollingLocationCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 10) {
+                Image(systemName: "mappin.and.ellipse")
+                    .font(.system(size: 20))
+                    .foregroundColor(Theme.primaryBlue)
+                Text("Find Your Polling Location")
+                    .font(Theme.headline)
+                    .foregroundColor(Theme.textPrimary)
+            }
+
+            Text("Travis County uses Vote Centers — you can vote at any location.")
+                .font(Theme.caption)
+                .foregroundColor(Theme.textSecondary)
+
+            HStack(spacing: 12) {
+                if let address = store.voterProfile.address {
+                    Button {
+                        openMapsSearch(near: address)
+                    } label: {
+                        Label("Open in Maps", systemImage: "map.fill")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
+                            .background(Theme.primaryBlue)
+                            .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadiusSmall))
+                    }
+                }
+
+                Link(destination: URL(string: "https://countyclerk.traviscountytx.gov/departments/elections/current-election/")!) {
+                    Label("VoteTravis.gov", systemImage: "globe")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(Theme.primaryBlue)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(Theme.primaryBlue.opacity(0.1))
+                        .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadiusSmall))
+                }
+            }
+        }
+        .card()
+    }
+
+    private func openMapsSearch(near address: Address) {
+        let query = "Vote Center near \(address.formatted)"
+            .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        if let url = URL(string: "maps://?q=\(query)") {
+            UIApplication.shared.open(url)
+        }
+    }
+
     // MARK: - Contact
 
     private var contactCard: some View {
@@ -133,6 +191,7 @@ struct InfoAccordion: View {
                         .font(.system(size: 18))
                         .foregroundColor(Theme.primaryBlue)
                         .frame(width: 28)
+                        .accessibilityHidden(true)
 
                     Text(section.rawValue)
                         .font(Theme.headline)
@@ -144,9 +203,13 @@ struct InfoAccordion: View {
                         .rotationEffect(.degrees(isExpanded ? 180 : 0))
                         .foregroundColor(Theme.textSecondary)
                         .font(.caption)
+                        .accessibilityHidden(true)
                 }
             }
             .buttonStyle(.plain)
+            .accessibilityLabel(section.rawValue)
+            .accessibilityHint(isExpanded ? "Double tap to collapse" : "Double tap to expand")
+            .accessibilityAddTraits(isExpanded ? .isSelected : [])
 
             if isExpanded {
                 VStack(alignment: .leading, spacing: 10) {
@@ -314,4 +377,5 @@ struct InfoRow: View {
 
 #Preview {
     VotingInfoView()
+        .environmentObject(VotingGuideStore.preview)
 }

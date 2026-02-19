@@ -2,6 +2,7 @@ import SwiftUI
 
 struct BuildingGuideView: View {
     @EnvironmentObject var store: VotingGuideStore
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var animateStep = 0
 
     private let steps = [
@@ -25,14 +26,14 @@ struct BuildingGuideView: View {
                 Circle()
                     .fill(Theme.primaryBlue.opacity(0.05))
                     .frame(width: 180, height: 180)
-                    .scaleEffect(store.isLoading ? 1.1 : 1.0)
-                    .animation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true), value: store.isLoading)
+                    .scaleEffect(store.isLoading && !reduceMotion ? 1.1 : 1.0)
+                    .animation(reduceMotion ? nil : .easeInOut(duration: 1.5).repeatForever(autoreverses: true), value: store.isLoading)
 
                 if store.guideComplete {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.system(size: 64))
                         .foregroundColor(Theme.success)
-                        .transition(.scale.combined(with: .opacity))
+                        .transition(reduceMotion ? .opacity : .scale.combined(with: .opacity))
                 } else {
                     ProgressView()
                         .scaleEffect(1.5)

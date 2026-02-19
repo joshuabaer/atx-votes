@@ -49,6 +49,7 @@ struct OnboardingFlowView: View {
 struct ProgressBarView: View {
     let progress: Double
     let phase: InterviewPhase
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         VStack(spacing: 6) {
@@ -61,7 +62,7 @@ struct ProgressBarView: View {
                     RoundedRectangle(cornerRadius: 3)
                         .fill(Theme.primaryBlue)
                         .frame(width: geo.size.width * progress, height: 6)
-                        .animation(.spring(response: 0.4), value: progress)
+                        .animation(reduceMotion ? nil : .spring(response: 0.4), value: progress)
                 }
             }
             .frame(height: 6)
@@ -76,6 +77,8 @@ struct ProgressBarView: View {
                     .foregroundColor(Theme.textSecondary)
             }
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(phase.title), step \(phase.stepNumber) of \(phase.totalSteps)")
     }
 }
 
@@ -98,6 +101,7 @@ struct WelcomeView: View {
                         .font(.system(size: 56))
                         .foregroundColor(Theme.primaryBlue)
                 }
+                .accessibilityHidden(true)
 
                 VStack(spacing: 12) {
                     Text("ATX Votes")
@@ -148,10 +152,12 @@ struct WelcomeFeatureRow: View {
                 .font(.system(size: 20))
                 .foregroundColor(Theme.primaryBlue)
                 .frame(width: 28)
+                .accessibilityHidden(true)
             Text(text)
                 .font(Theme.body)
                 .foregroundColor(Theme.textPrimary)
         }
+        .accessibilityElement(children: .combine)
     }
 }
 

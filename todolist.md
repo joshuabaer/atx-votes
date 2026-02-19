@@ -33,6 +33,10 @@ Items recently fixed but not yet tested. **Test these before attempting again or
 - [ ] Feedback by email — added `FeedbackHelper` (Theme.swift) with mailto URL and "Send Feedback" button on ProfileView using `Link(destination:)`. Pre-fills subject line.
 - [ ] Share the app with others — added ShareLink on BuildingGuideView (prominent button after guide completes with "Help your friends vote informed!") and CheatSheetView toolbar (person.2.fill icon alongside existing share). Message: "I just built my personalized voting guide..."
 - [ ] App Store review prompt — triggers `SKStoreReviewController.requestReview()` 2 seconds after guide first completes. Guarded by UserDefaults flag (`austin_votes_review_prompted`) so it only fires once per install.
+- [ ] Cloudflare Worker backend proxy — replaced client-side API key with Cloudflare Worker at `atxvotes-api.joshuabaer.workers.dev`. `/api/guide` proxies to Anthropic with server-side key. Removed KeychainHelper, API key UI from ProfileView, SampleDataBanner. Users get personalized recommendations without setup.
+- [ ] Address-to-district lookup — added `/api/districts` endpoint to Worker using Census Geocoder API. New `DistrictLookupService.swift` calls it during guide build. `Ballot.filtered(to:)` filters races to user's actual districts. Districts cached in VoterProfile. Falls back to all races if lookup fails.
+- [ ] Polling location finder — added "Find My Polling Location" card to VotingInfoView with "Open in Maps" button (searches "Vote Center" near user's address) and VoteTravis.gov link. Requires EnvironmentObject for address access.
+- [ ] Accessibility audit — added Reduce Motion support (ProgressBarView, BuildingGuideView pulsing animation, transitions), VoiceOver labels (IssueCard selected state, accordion expand/collapse hints, PropositionCard labels, StarBadge, ChipView remove buttons), decorative image hiding (.accessibilityHidden), element grouping (.accessibilityElement(children: .combine) on WelcomeFeatureRow, DisclaimerBanner, ProgressBarView). Fixed white-on-white text in AddressEntryView and PoliticianPickerView TextFields by adding .foregroundColor(Theme.textPrimary).
 
 ---
 
@@ -42,7 +46,7 @@ Items not yet attempted or needing a fresh approach after failed verification.
 
 ### Bugs
 
-- [ ] White-on-white text in input boxes — text input fields for address entry and politician names show white text on a white background, making typed text invisible
+(none)
 
 ### Improvements
 
@@ -50,15 +54,13 @@ Items not yet attempted or needing a fresh approach after failed verification.
 
 ### Features
 
-- [ ] Claude API integration — ClaudeService has full HTTP infrastructure and well-written system prompts but `generateVotingGuide()` returns `Ballot.sampleRepublican` when apiKey is empty. Implement `parseGuideResponse()` JSON parsing. Add secure API key storage (Keychain or environment variable)
-- [ ] Address-to-district lookup — address is collected in AddressEntryView but never used to determine real districts. Integrate with Google Civic Information API, Census Geocoder, or similar to map street address → congressional district, state house, state senate, county commissioner precinct, school board district
+- [ ] Share voter profile — allow users to share their voter profile (issues, spectrum, qualities, policy stances, admired/disliked politicians) with friends, excluding private data like address. Could use ShareLink with a formatted text summary or a shareable link
+- [ ] Election Day voting locations link — add a direct link to Election Day voting location information (e.g. VoteTravis.gov or county clerk site) so users can find where to vote on Election Day specifically
 - [ ] Profile summary generation — `ClaudeService.generateProfileSummary()` returns hardcoded placeholder text. Wire up to Claude API to generate a natural-language summary of the voter's values and preferences
 - [ ] Personalized ballot generation — connect voter profile (issues, spectrum, qualities, policy stances, admired/disliked politicians) to Claude API to generate tailored race recommendations and proposition analysis
 - [ ] Cloud persistence / backup — currently UserDefaults only. Consider CloudKit or similar for syncing voter profile and guide across devices
-- [ ] Polling location finder — add a map view or link to find the user's nearest early voting / Election Day polling location based on their address
 - [ ] Push notification reminders — remind users about early voting dates, Election Day, and registration deadlines
 - [ ] iPad / larger screen layout — current views are iPhone-optimized. Consider NavigationSplitView or multi-column layout for iPad
-- [ ] Accessibility audit — verify VoiceOver labels, Dynamic Type support, and Reduce Motion throughout all views
 - [ ] Offline mode — cache the generated ballot so the app works without network after initial guide generation
 
 ### Testing

@@ -124,6 +124,7 @@ struct DisclaimerBanner: View {
             Image(systemName: "exclamationmark.triangle.fill")
                 .foregroundColor(Theme.warning)
                 .font(.title3)
+                .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text("AI-Generated Recommendations")
@@ -141,8 +142,10 @@ struct DisclaimerBanner: View {
                         .foregroundColor(Theme.textSecondary)
                         .padding(4)
                 }
+                .accessibilityLabel("Dismiss disclaimer")
             }
         }
+        .accessibilityElement(children: .combine)
         .padding(12)
         .background(Theme.warning.opacity(0.08))
         .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadiusSmall))

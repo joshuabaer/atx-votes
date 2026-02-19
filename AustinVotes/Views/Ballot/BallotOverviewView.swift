@@ -208,6 +208,7 @@ struct RaceCard: View {
                             .foregroundColor(Theme.textPrimary)
                         if race.isKeyRace {
                             StarBadge()
+                                .accessibilityLabel("Key race")
                         }
                     }
                     if let district = race.district {
@@ -301,9 +302,12 @@ struct PropositionCard: View {
                         .rotationEffect(.degrees(isExpanded ? 180 : 0))
                         .foregroundColor(Theme.textSecondary)
                         .font(.caption)
+                        .accessibilityHidden(true)
                 }
             }
             .buttonStyle(.plain)
+            .accessibilityLabel("Proposition \(proposition.number): \(proposition.title), \(proposition.recommendation.rawValue)")
+            .accessibilityHint(isExpanded ? "Double tap to collapse" : "Double tap to expand")
 
             if isExpanded {
                 VStack(alignment: .leading, spacing: 8) {

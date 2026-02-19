@@ -40,6 +40,7 @@ struct AddressEntryView: View {
                                 .textContentType(.streetAddressLine1)
                                 .submitLabel(.next)
                                 .onSubmit { focusedField = .city }
+                                .foregroundColor(Theme.textPrimary)
                                 .padding(14)
                                 .background(Theme.cardBackground)
                                 .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadiusSmall))
@@ -60,6 +61,7 @@ struct AddressEntryView: View {
                                     .textContentType(.addressCity)
                                     .submitLabel(.next)
                                     .onSubmit { focusedField = .zip }
+                                    .foregroundColor(Theme.textPrimary)
                                     .padding(14)
                                     .background(Theme.cardBackground)
                                     .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadiusSmall))
@@ -97,6 +99,7 @@ struct AddressEntryView: View {
                                     .textContentType(.postalCode)
                                     .keyboardType(.numberPad)
                                     .submitLabel(.done)
+                                    .foregroundColor(Theme.textPrimary)
                                     .padding(14)
                                     .background(Theme.cardBackground)
                                     .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadiusSmall))
