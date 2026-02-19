@@ -30,6 +30,8 @@ Items recently fixed but not yet tested. **Test these before attempting again or
 ### Features
 
 - [ ] Feedback by email — added `FeedbackHelper` (Theme.swift) with mailto URL and "Send Feedback" button on ProfileView using `Link(destination:)`. Pre-fills subject line.
+- [ ] Share the app with others — added ShareLink on BuildingGuideView (prominent button after guide completes with "Help your friends vote informed!") and CheatSheetView toolbar (person.2.fill icon alongside existing share). Message: "I just built my personalized voting guide..."
+- [ ] App Store review prompt — triggers `SKStoreReviewController.requestReview()` 2 seconds after guide first completes. Guarded by UserDefaults flag (`austin_votes_review_prompted`) so it only fires once per install.
 
 ---
 
@@ -43,6 +45,8 @@ Items not yet attempted or needing a fresh approach after failed verification.
 
 ### Improvements
 
+- [ ] Extract election data into separate data file — pull candidate and proposition info out of SampleData.swift into a standalone JSON or plist file (e.g. `ElectionData/march2026.json`). Makes it easier to update for different elections without modifying Swift code. SampleData.swift would load from the data file instead of hardcoding everything.
+
 ### Features
 
 - [ ] Claude API integration — ClaudeService has full HTTP infrastructure and well-written system prompts but `generateVotingGuide()` returns `Ballot.sampleRepublican` when apiKey is empty. Implement `parseGuideResponse()` JSON parsing. Add secure API key storage (Keychain or environment variable)
@@ -54,8 +58,6 @@ Items not yet attempted or needing a fresh approach after failed verification.
 - [ ] Push notification reminders — remind users about early voting dates, Election Day, and registration deadlines
 - [ ] iPad / larger screen layout — current views are iPhone-optimized. Consider NavigationSplitView or multi-column layout for iPad
 - [ ] Accessibility audit — verify VoiceOver labels, Dynamic Type support, and Reduce Motion throughout all views
-- [ ] Share the app with others — add a share sheet button that lets users share a link/message about ATX Votes. Show it prominently after the cheat sheet is first generated (BuildingGuideView → completion) and on CheatSheetView alongside the existing ShareLink. Use a friendly message like "I just built my personalized voting guide for the March 2026 primary with ATX Votes!"
-- [ ] Prompt to leave App Store review — trigger `SKStoreReviewController.requestReview()` right after the cheat sheet is first generated (when `guideComplete` flips to true). Only prompt once per install. Guard with a UserDefaults flag so it doesn't re-trigger on subsequent launches
 - [ ] Offline mode — cache the generated ballot so the app works without network after initial guide generation
 
 ### Testing

@@ -87,6 +87,26 @@ struct BuildingGuideView: View {
 
             Spacer()
 
+            if store.guideComplete {
+                VStack(spacing: 12) {
+                    ShareLink(item: shareAppMessage) {
+                        Label("Share ATX Votes", systemImage: "square.and.arrow.up")
+                            .font(Theme.headline)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 14)
+                            .background(Theme.primaryBlue.opacity(0.1))
+                            .foregroundColor(Theme.primaryBlue)
+                            .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadiusSmall))
+                    }
+
+                    Text("Help your friends vote informed!")
+                        .font(Theme.caption)
+                        .foregroundColor(Theme.textSecondary)
+                }
+                .padding(.horizontal, Theme.paddingLarge)
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
+
             if let error = store.errorMessage {
                 VStack(spacing: 12) {
                     Text(error)
@@ -105,6 +125,10 @@ struct BuildingGuideView: View {
             }
         }
         .onAppear { startStepAnimation() }
+    }
+
+    private var shareAppMessage: String {
+        "I just built my personalized voting guide for the March 2026 Texas primary with ATX Votes! Build yours in 5 minutes and know exactly who to vote for."
     }
 
     private func startStepAnimation() {

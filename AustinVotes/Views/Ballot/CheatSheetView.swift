@@ -140,8 +140,14 @@ struct CheatSheetView: View {
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    ShareLink(item: cheatSheetText) {
-                        Image(systemName: "square.and.arrow.up")
+                    HStack(spacing: 16) {
+                        ShareLink(item: shareAppMessage) {
+                            Image(systemName: "person.2.fill")
+                                .font(.system(size: 14))
+                        }
+                        ShareLink(item: cheatSheetText) {
+                            Image(systemName: "square.and.arrow.up")
+                        }
                     }
                 }
             }
@@ -200,6 +206,12 @@ struct CheatSheetView: View {
         case .leanNo: Theme.danger
         case .yourCall: Theme.warning
         }
+    }
+
+    // MARK: - Share App
+
+    private var shareAppMessage: String {
+        "I just built my personalized voting guide for the March 2026 Texas primary with ATX Votes! Build yours in 5 minutes and know exactly who to vote for."
     }
 
     // MARK: - Share Text

@@ -1,4 +1,5 @@
 import Foundation
+import StoreKit
 import SwiftUI
 
 @MainActor
@@ -18,6 +19,7 @@ class VotingGuideStore: ObservableObject {
     // MARK: - Services
     private let claudeService = ClaudeService()
     private let persistenceKey = "austin_votes_profile"
+    private let reviewPromptedKey = "austin_votes_review_prompted"
 
     // MARK: - Interview Flow
 
@@ -112,9 +114,26 @@ class VotingGuideStore: ObservableObject {
                 guideComplete = true
                 isLoading = false
             }
+
+            requestAppReviewIfNeeded()
         } catch {
             errorMessage = "Something went wrong building your guide. Please try again."
             isLoading = false
+        }
+    }
+
+    // MARK: - App Store Review
+
+    private func requestAppReviewIfNeeded() {
+        guard !UserDefaults.standard.bool(forKey: reviewPromptedKey) else { return }
+        UserDefaults.standard.set(true, forKey: reviewPromptedKey)
+
+        // Delay slightly so the user sees the "guide is ready" state first
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            if let scene = UIApplication.shared.connectedScenes
+                .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
+                SKStoreReviewController.requestReview(in: scene)
+            }
         }
     }
 
