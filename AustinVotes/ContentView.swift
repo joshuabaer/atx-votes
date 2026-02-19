@@ -11,6 +11,7 @@ struct ContentView: View {
                 OnboardingFlowView()
             }
         }
+        .preferredColorScheme(.light)
     }
 }
 

@@ -62,6 +62,7 @@ Items not yet attempted or needing a fresh approach after failed verification.
 - [ ] Push notification reminders — remind users about early voting dates, Election Day, and registration deadlines
 - [ ] iPad / larger screen layout — current views are iPhone-optimized. Consider NavigationSplitView or multi-column layout for iPad
 - [ ] Offline mode — cache the generated ballot so the app works without network after initial guide generation
+- [ ] Light/dark mode support — currently forced to light mode via `.preferredColorScheme(.light)` on ContentView. Define dark-mode variants for all Theme colors (backgroundCream, cardBackground, textPrimary, textSecondary, etc.) and remove the forced light mode so the app respects the system setting
 
 ### Testing
 
