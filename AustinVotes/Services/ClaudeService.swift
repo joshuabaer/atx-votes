@@ -53,6 +53,30 @@ actor ClaudeService {
         return (mergedBallot, guideResponse.profileSummary)
     }
 
+    // MARK: - Generate Profile Summary
+
+    func generateProfileSummary(profile: VoterProfile) async throws -> String {
+        let userMessage = """
+        Summarize this voter's political identity in 2-3 sentences. Be specific and insightful — \
+        don't just list their positions, synthesize what kind of voter they are.
+
+        - Political spectrum: \(profile.politicalSpectrum.rawValue)
+        - Top issues: \(profile.topIssues.map(\.rawValue).joined(separator: ", "))
+        - Values in candidates: \(profile.candidateQualities.map(\.rawValue).joined(separator: ", "))
+        - Policy stances: \(profile.policyViews.map { "\($0.key): \($0.value)" }.joined(separator: "; "))
+        - Politicians admired: \(profile.admiredPoliticians.joined(separator: ", "))
+        - Politicians disliked: \(profile.dislikedPoliticians.joined(separator: ", "))
+
+        Return ONLY the summary text — no JSON, no quotes, no labels.
+        """
+
+        let response = try await callClaude(
+            system: "You are a concise political analyst. Return only plain text, no formatting.",
+            userMessage: userMessage
+        )
+        return response.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
     // MARK: - Load Base Ballot
 
     private func loadBaseBallot(for primary: PrimaryBallot) -> Ballot {

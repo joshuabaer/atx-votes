@@ -3,6 +3,7 @@ import SwiftUI
 struct VotingInfoView: View {
     @EnvironmentObject var store: VotingGuideStore
     @State private var expandedSection: InfoSection?
+    @State private var remindersEnabled = NotificationService.shared.remindersEnabled
 
     enum InfoSection: String, CaseIterable, Identifiable {
         case dates = "Key Dates"
@@ -32,6 +33,9 @@ struct VotingInfoView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     // Countdown card
                     countdownCard
+
+                    // Reminders toggle
+                    remindersCard
 
                     // Polling location finder
                     pollingLocationCard
@@ -98,6 +102,43 @@ struct VotingInfoView: View {
         .background(Theme.cardBackground)
         .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadius))
         .shadow(color: .black.opacity(0.06), radius: 8, y: 2)
+    }
+
+    // MARK: - Reminders
+
+    private var remindersCard: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "bell.badge.fill")
+                .font(.system(size: 20))
+                .foregroundColor(Theme.accentGold)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Election Reminders")
+                    .font(Theme.headline)
+                    .foregroundColor(Theme.textPrimary)
+                Text("Get notified for early voting and Election Day")
+                    .font(Theme.caption)
+                    .foregroundColor(Theme.textSecondary)
+            }
+
+            Spacer()
+
+            Toggle("", isOn: $remindersEnabled)
+                .labelsHidden()
+                .onChange(of: remindersEnabled) { _, newValue in
+                    if newValue {
+                        Task {
+                            let granted = await NotificationService.shared.requestPermissionAndEnable()
+                            if !granted {
+                                remindersEnabled = false
+                            }
+                        }
+                    } else {
+                        NotificationService.shared.remindersEnabled = false
+                    }
+                }
+        }
+        .card()
     }
 
     // MARK: - Polling Location
@@ -256,6 +297,16 @@ struct InfoAccordion: View {
             Text("Texas has open primaries — tell the poll worker which party's primary you want. You can only vote in one.")
                 .font(Theme.caption)
                 .foregroundColor(Theme.textSecondary)
+
+            Link(destination: URL(string: "https://countyclerk.traviscountytx.gov/departments/elections/current-election/")!) {
+                Label("Find Election Day locations", systemImage: "mappin.and.ellipse")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(Theme.primaryBlue)
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadiusSmall))
+            }
 
         case .voterID:
             Text("Texas requires photo ID to vote in person:")

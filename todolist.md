@@ -37,6 +37,10 @@ Items recently fixed but not yet tested. **Test these before attempting again or
 - [ ] Address-to-district lookup — added `/api/districts` endpoint to Worker using Census Geocoder API. New `DistrictLookupService.swift` calls it during guide build. `Ballot.filtered(to:)` filters races to user's actual districts. Districts cached in VoterProfile. Falls back to all races if lookup fails.
 - [ ] Polling location finder — added "Find My Polling Location" card to VotingInfoView with "Open in Maps" button (searches "Vote Center" near user's address) and VoteTravis.gov link. Requires EnvironmentObject for address access.
 - [ ] Accessibility audit — added Reduce Motion support (ProgressBarView, BuildingGuideView pulsing animation, transitions), VoiceOver labels (IssueCard selected state, accordion expand/collapse hints, PropositionCard labels, StarBadge, ChipView remove buttons), decorative image hiding (.accessibilityHidden), element grouping (.accessibilityElement(children: .combine) on WelcomeFeatureRow, DisclaimerBanner, ProgressBarView). Fixed white-on-white text in AddressEntryView and PoliticianPickerView TextFields by adding .foregroundColor(Theme.textPrimary).
+- [ ] Share voter profile — added ShareLink to ProfileView toolbar (square.and.arrow.up icon). Formats profile as shareable text: political outlook, AI summary, top issues, candidate qualities, policy stances, admired/disliked politicians. Excludes address for privacy.
+- [ ] Election Day voting locations link — added "Find Election Day locations" button in the Election Day accordion section of VotingInfoView. Links to Travis County Clerk elections page.
+- [ ] Profile summary generation — added standalone `ClaudeService.generateProfileSummary()` that calls Claude API with voter profile data and returns a 2-3 sentence synthesis. Added refresh button (arrow.trianglehead.2.clockwise) on ProfileView summary card to regenerate. Summary was already generated during guide build; this adds standalone regeneration.
+- [ ] Push notification reminders — added `NotificationService` with 5 scheduled local notifications: early voting start (Feb 17), mid-week reminder (Feb 24), last day of early voting (Feb 27), election eve (Mar 2), Election Day (Mar 3). Toggle card on VotingInfoView requests permission and schedules/cancels all reminders. State persisted in UserDefaults.
 
 ---
 
@@ -54,12 +58,7 @@ Items not yet attempted or needing a fresh approach after failed verification.
 
 ### Features
 
-- [ ] Share voter profile — allow users to share their voter profile (issues, spectrum, qualities, policy stances, admired/disliked politicians) with friends, excluding private data like address. Could use ShareLink with a formatted text summary or a shareable link
-- [ ] Election Day voting locations link — add a direct link to Election Day voting location information (e.g. VoteTravis.gov or county clerk site) so users can find where to vote on Election Day specifically
-- [ ] Profile summary generation — `ClaudeService.generateProfileSummary()` returns hardcoded placeholder text. Wire up to Claude API to generate a natural-language summary of the voter's values and preferences
-- [ ] Personalized ballot generation — connect voter profile (issues, spectrum, qualities, policy stances, admired/disliked politicians) to Claude API to generate tailored race recommendations and proposition analysis
 - [ ] Cloud persistence / backup — currently UserDefaults only. Consider CloudKit or similar for syncing voter profile and guide across devices
-- [ ] Push notification reminders — remind users about early voting dates, Election Day, and registration deadlines
 - [ ] iPad / larger screen layout — current views are iPhone-optimized. Consider NavigationSplitView or multi-column layout for iPad
 - [ ] Offline mode — cache the generated ballot so the app works without network after initial guide generation
 - [ ] Light/dark mode support — currently forced to light mode via `.preferredColorScheme(.light)` on ContentView. Define dark-mode variants for all Theme colors (backgroundCream, cardBackground, textPrimary, textSecondary, etc.) and remove the forced light mode so the app respects the system setting

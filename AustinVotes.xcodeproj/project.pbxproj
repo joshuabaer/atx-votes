@@ -31,6 +31,7 @@
 		A10016000000000000000016 /* VotingGuideStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20016000000000000000016 /* VotingGuideStore.swift */; };
 		A10017000000000000000017 /* ClaudeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20017000000000000000017 /* ClaudeService.swift */; };
 		A1001C00000000000000001C /* DistrictLookupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2001C00000000000000001C /* DistrictLookupService.swift */; };
+		A1001D00000000000000001D /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2001D00000000000000001D /* NotificationService.swift */; };
 		A10018000000000000000018 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A20018000000000000000018 /* Assets.xcassets */; };
 		A10019000000000000000019 /* republican_primary_2026.json in Resources */ = {isa = PBXBuildFile; fileRef = A20019000000000000000019 /* republican_primary_2026.json */; };
 		A1001A00000000000000001A /* democrat_primary_2026.json in Resources */ = {isa = PBXBuildFile; fileRef = A2001A00000000000000001A /* democrat_primary_2026.json */; };
@@ -61,6 +62,7 @@
 		A20016000000000000000016 /* VotingGuideStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VotingGuideStore.swift; sourceTree = "<group>"; };
 		A20017000000000000000017 /* ClaudeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeService.swift; sourceTree = "<group>"; };
 		A2001C00000000000000001C /* DistrictLookupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistrictLookupService.swift; sourceTree = "<group>"; };
+		A2001D00000000000000001D /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		A20018000000000000000018 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A20019000000000000000019 /* republican_primary_2026.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = republican_primary_2026.json; sourceTree = "<group>"; };
 		A2001A00000000000000001A /* democrat_primary_2026.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = democrat_primary_2026.json; sourceTree = "<group>"; };
@@ -172,6 +174,7 @@
 				A20016000000000000000016 /* VotingGuideStore.swift */,
 				A20017000000000000000017 /* ClaudeService.swift */,
 				A2001C00000000000000001C /* DistrictLookupService.swift */,
+				A2001D00000000000000001D /* NotificationService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -276,6 +279,7 @@
 				A10013000000000000000013 /* RaceDetailView.swift in Sources */,
 				A10014000000000000000014 /* CheatSheetView.swift in Sources */,
 				A10015000000000000000015 /* VotingInfoView.swift in Sources */,
+				A1001D00000000000000001D /* NotificationService.swift in Sources */,
 				A10016000000000000000016 /* VotingGuideStore.swift in Sources */,
 				A10017000000000000000017 /* ClaudeService.swift in Sources */,
 				A1001C00000000000000001C /* DistrictLookupService.swift in Sources */,
