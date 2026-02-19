@@ -3,9 +3,6 @@ import SwiftUI
 struct ProfileView: View {
     @EnvironmentObject var store: VotingGuideStore
     @State private var showResetConfirmation = false
-    @State private var apiKeyInput = ""
-    @State private var showAPIKey = false
-    @State private var apiKeySaved = KeychainHelper.load(key: "claude_api_key") != nil
 
     private var profile: VoterProfile { store.voterProfile }
 
@@ -158,64 +155,6 @@ struct ProfileView: View {
                         }
                         .padding(.top, 8)
                     }
-
-                    // API Key Settings
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("Claude API Key")
-                            .font(Theme.headline)
-                            .foregroundColor(Theme.textPrimary)
-
-                        Text(apiKeySaved
-                             ? "API key saved. Your guide will use personalized AI recommendations."
-                             : "Add an API key to get personalized recommendations powered by Claude.")
-                            .font(Theme.caption)
-                            .foregroundColor(Theme.textSecondary)
-
-                        HStack(spacing: 8) {
-                            Group {
-                                if showAPIKey {
-                                    TextField("sk-ant-...", text: $apiKeyInput)
-                                } else {
-                                    SecureField("sk-ant-...", text: $apiKeyInput)
-                                }
-                            }
-                            .textFieldStyle(.roundedBorder)
-                            .font(.system(size: 14, design: .monospaced))
-                            .autocorrectionDisabled()
-                            .textInputAutocapitalization(.never)
-
-                            Button {
-                                showAPIKey.toggle()
-                            } label: {
-                                Image(systemName: showAPIKey ? "eye.slash" : "eye")
-                                    .foregroundColor(Theme.textSecondary)
-                            }
-                        }
-
-                        HStack(spacing: 12) {
-                            Button("Save") {
-                                let trimmed = apiKeyInput.trimmingCharacters(in: .whitespacesAndNewlines)
-                                guard !trimmed.isEmpty else { return }
-                                KeychainHelper.save(key: "claude_api_key", value: trimmed)
-                                apiKeySaved = true
-                                apiKeyInput = ""
-                                showAPIKey = false
-                            }
-                            .buttonStyle(.borderedProminent)
-                            .tint(Theme.primaryBlue)
-                            .disabled(apiKeyInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-
-                            if apiKeySaved {
-                                Button("Remove", role: .destructive) {
-                                    KeychainHelper.delete(key: "claude_api_key")
-                                    apiKeySaved = false
-                                    apiKeyInput = ""
-                                }
-                                .buttonStyle(.bordered)
-                            }
-                        }
-                    }
-                    .card()
 
                     // Reset button
                     Button("Start Over") {

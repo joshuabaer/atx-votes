@@ -9,7 +9,7 @@ struct Ballot: Codable, Identifiable {
     var races: [Race]
     var propositions: [Proposition]
 
-    struct Districts: Codable {
+    struct Districts: Codable, Equatable {
         var congressional: String?      // e.g. "District 37"
         var stateSenate: String?        // e.g. "District 14"
         var stateHouse: String?         // e.g. "District 48"
@@ -91,5 +91,23 @@ struct Proposition: Codable, Identifiable {
         case leanYes = "Lean Yes"
         case leanNo = "Lean No"
         case yourCall = "Your Call"
+    }
+}
+
+// MARK: - District Filtering
+
+extension Ballot {
+    func filtered(to districts: Districts) -> Ballot {
+        var result = self
+        result.districts = districts
+        let districtValues: Set<String> = Set(
+            [districts.congressional, districts.stateSenate, districts.stateHouse,
+             districts.countyCommissioner, districts.schoolBoard].compactMap { $0 }
+        )
+        result.races = races.filter { race in
+            guard let raceDistrict = race.district else { return true }
+            return districtValues.contains(raceDistrict)
+        }
+        return result
     }
 }

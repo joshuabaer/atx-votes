@@ -10,6 +10,7 @@ struct VoterProfile: Codable, Equatable {
     var primaryBallot: PrimaryBallot
     var address: Address?
     var summaryText: String?
+    var districts: Ballot.Districts?
 
     static let empty = VoterProfile(
         topIssues: [],
@@ -20,7 +21,8 @@ struct VoterProfile: Codable, Equatable {
         candidateQualities: [],
         primaryBallot: .undecided,
         address: nil,
-        summaryText: nil
+        summaryText: nil,
+        districts: nil
     )
 }
 

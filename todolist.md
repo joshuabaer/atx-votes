@@ -42,7 +42,7 @@ Items not yet attempted or needing a fresh approach after failed verification.
 
 ### Bugs
 
-(none)
+- [ ] White-on-white text in input boxes — text input fields for address entry and politician names show white text on a white background, making typed text invisible
 
 ### Improvements
 

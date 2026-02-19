@@ -27,33 +27,23 @@ struct ClaudePropositionRecommendation: Decodable {
 // MARK: - Service
 
 actor ClaudeService {
-    private let baseURL = "https://api.anthropic.com/v1/messages"
+    private let baseURL = "https://atxvotes-api.joshuabaer.workers.dev/api/guide"
     private let model = "claude-sonnet-4-20250514"
-    private static let keychainKey = "claude_api_key"
-
-    private var apiKey: String? {
-        KeychainHelper.load(key: Self.keychainKey)
-    }
-
-    static var hasAPIKey: Bool {
-        KeychainHelper.load(key: keychainKey) != nil
-    }
+    private let appSecret = "atxvotes-2026-primary"
 
     // MARK: - Generate Personalized Voting Guide
 
-    func generateVotingGuide(profile: VoterProfile) async throws -> (Ballot, String) {
-        let baseBallot = loadBaseBallot(for: profile.primaryBallot)
+    func generateVotingGuide(profile: VoterProfile, districts: Ballot.Districts? = nil) async throws -> (Ballot, String) {
+        var baseBallot = loadBaseBallot(for: profile.primaryBallot)
 
-        guard let apiKey, !apiKey.isEmpty else {
-            let summary = sampleSummary(profile: profile)
-            return (baseBallot, summary)
+        if let districts {
+            baseBallot = baseBallot.filtered(to: districts)
         }
 
         let condensed = buildCondensedBallotDescription(baseBallot)
         let userPrompt = buildUserPrompt(profile: profile, ballotDescription: condensed, ballot: baseBallot)
 
         let responseText = try await callClaude(
-            apiKey: apiKey,
             system: systemPrompt,
             userMessage: userPrompt
         )
@@ -177,16 +167,15 @@ actor ClaudeService {
 
     // MARK: - API Call
 
-    private func callClaude(apiKey: String, system: String, userMessage: String) async throws -> String {
+    private func callClaude(system: String, userMessage: String) async throws -> String {
         guard let url = URL(string: baseURL) else {
             throw ClaudeError.apiError("Invalid API URL")
         }
 
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.addValue(apiKey, forHTTPHeaderField: "x-api-key")
-        request.addValue("2023-06-01", forHTTPHeaderField: "anthropic-version")
-        request.addValue("application/json", forHTTPHeaderField: "content-type")
+        request.addValue("Bearer \(appSecret)", forHTTPHeaderField: "Authorization")
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
 
         let body: [String: Any] = [
             "model": model,
@@ -298,13 +287,6 @@ actor ClaudeService {
         return merged
     }
 
-    // MARK: - Sample Fallback
-
-    private func sampleSummary(profile: VoterProfile) -> String {
-        let spectrum = profile.politicalSpectrum.rawValue.lowercased()
-        let issues = profile.topIssues.prefix(3).map(\.rawValue).joined(separator: ", ")
-        return "A \(spectrum) Austin voter who prioritizes \(issues). Values \(profile.candidateQualities.first?.rawValue.lowercased() ?? "competence") in candidates and takes a pragmatic, results-oriented approach to politics."
-    }
 }
 
 // MARK: - Errors
@@ -320,7 +302,7 @@ enum ClaudeError: Error, LocalizedError {
         switch self {
         case .apiError(let msg): msg
         case .parseError(let msg): msg
-        case .invalidAPIKey: "Invalid API key. Please check your key in the Profile tab."
+        case .invalidAPIKey: "Authentication error. Please update the app."
         case .rateLimited: "Too many requests. Please wait a moment and try again."
         case .serverError(let code): "Server error (\(code)). Please try again later."
         }

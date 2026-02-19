@@ -18,6 +18,7 @@ class VotingGuideStore: ObservableObject {
 
     // MARK: - Services
     private let claudeService = ClaudeService()
+    private let districtService = DistrictLookupService()
     private let persistenceKey = "austin_votes_profile"
     private let reviewPromptedKey = "austin_votes_review_prompted"
 
@@ -90,16 +91,22 @@ class VotingGuideStore: ObservableObject {
         do {
             // Step 1: Look up districts based on address
             loadingMessage = "Looking up your districts..."
-            try await Task.sleep(for: .seconds(1))
-
-            // Step 2: Generate personalized recommendations (single API call)
-            if ClaudeService.hasAPIKey {
-                loadingMessage = "Personalizing your recommendations..."
-            } else {
-                loadingMessage = "Building your guide..."
+            if let address = voterProfile.address, voterProfile.districts == nil {
+                do {
+                    voterProfile.districts = try await districtService.lookupDistricts(for: address)
+                } catch {
+                    // District lookup failed — fall through to show all races
+                    print("District lookup failed: \(error). Showing all races.")
+                }
             }
 
-            let (generatedBallot, summary) = try await claudeService.generateVotingGuide(profile: voterProfile)
+            // Step 2: Generate personalized recommendations via API proxy
+            loadingMessage = "Personalizing your recommendations..."
+
+            let (generatedBallot, summary) = try await claudeService.generateVotingGuide(
+                profile: voterProfile,
+                districts: voterProfile.districts
+            )
             self.ballot = generatedBallot
             voterProfile.summaryText = summary
 
@@ -176,7 +183,8 @@ class VotingGuideStore: ObservableObject {
             candidateQualities: [.competence, .integrity, .independence],
             primaryBallot: .republican,
             address: Address(street: "123 Congress Ave", city: "Austin", state: "TX", zip: "78701"),
-            summaryText: "A pragmatic, tech-forward Austin moderate who values competence, integrity, and results over ideology."
+            summaryText: "A pragmatic, tech-forward Austin moderate who values competence, integrity, and results over ideology.",
+            districts: nil
         )
         return store
     }
