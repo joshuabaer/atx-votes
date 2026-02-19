@@ -1,0 +1,554 @@
+{
+  "electionName": "March 2026 Republican Primary",
+  "electionDate": "2026-03-03",
+  "party": "republican",
+  "districts": {
+    "congressional": "District 37",
+    "stateSenate": "District 14",
+    "stateHouse": "District 48",
+    "countyCommissioner": "Precinct 2",
+    "schoolBoard": "District 5"
+  },
+  "races": [
+    {
+      "office": "U.S. Senator",
+      "district": null,
+      "isContested": true,
+      "isKeyRace": true,
+      "candidates": [
+        {
+          "name": "John Cornyn",
+          "party": "Republican",
+          "isIncumbent": true,
+          "isRecommended": true,
+          "summary": "Four-term incumbent, former TX Attorney General and TX Supreme Court Justice. Senate's second-ranking Republican. Legislative dealmaker who secured CHIPS Act manufacturing investments for Texas.",
+          "background": "Served as Texas Attorney General (1999–2002) and on the Texas Supreme Court. In the U.S. Senate since 2002. Former Majority Whip.",
+          "keyPositions": ["Border security", "Semiconductor manufacturing", "Tax reform", "Bipartisan dealmaking"],
+          "endorsements": ["National Border Patrol Council", "Texas Farm Bureau"],
+          "pros": ["Effective legislator with real deliverables", "Strongest general election candidate", "Massive spending advantage ($59M in allied spending)"],
+          "cons": ["Long-tenured career politician", "Supported some bipartisan bills that angered the base"],
+          "fundraising": "$59M in allied spending",
+          "polling": "31% — second place, runoff likely"
+        },
+        {
+          "name": "Ken Paxton",
+          "party": "Republican",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "Current Texas Attorney General. Impeached by the TX House in 2023, acquitted by Senate. Under federal indictment for securities fraud. Leads primary polling.",
+          "background": "Texas Attorney General since 2015. Impeached by the Texas House, acquitted by Senate. Under federal indictment for securities fraud since 2015.",
+          "keyPositions": ["Aggressive litigation against federal government", "Immigration enforcement", "Anti-ESG"],
+          "endorsements": ["Former President Trump"],
+          "pros": ["High name recognition", "Trump endorsement", "Aggressive on base issues"],
+          "cons": ["Impeached by his own party's House", "Under federal indictment", "Staff reported him to FBI for bribery"],
+          "fundraising": "$2.3M",
+          "polling": "38% — frontrunner"
+        },
+        {
+          "name": "Wesley Hunt",
+          "party": "Republican",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "U.S. Representative, West Point graduate, Apache helicopter combat pilot. Triple Ivy League degrees. Young, dynamic next-generation candidate.",
+          "background": "U.S. Army combat veteran (Apache helicopter pilot). West Point graduate. MBA and MPA from Ivy League schools. Elected to Congress in 2022.",
+          "keyPositions": ["Military/veterans", "Economic opportunity", "Next-generation leadership"],
+          "endorsements": [],
+          "pros": ["Exceptional resume", "Young and dynamic", "Military service and combat experience"],
+          "cons": ["Only 17% in polls — splits anti-Paxton vote", "Less legislative experience"],
+          "fundraising": null,
+          "polling": "17% — third place"
+        }
+      ],
+      "recommendation": {
+        "candidateName": "John Cornyn",
+        "reasoning": "Effective, experienced legislator with real deliverables for Texas. If stopping the indicted frontrunner matters to you, Cornyn is the only viable vehicle — Hunt splits the opposition vote at 17%.",
+        "strategicNotes": "A runoff between the top two is almost certain. Every opposition vote for Cornyn helps ensure he makes the runoff in the strongest position.",
+        "caveats": "Career politician, which frustrates some voters. But the alternative has serious legal and ethical issues.",
+        "confidence": "Strong Match"
+      }
+    },
+    {
+      "office": "Attorney General",
+      "district": null,
+      "isContested": true,
+      "isKeyRace": true,
+      "candidates": [
+        {
+          "name": "Chip Roy",
+          "party": "Republican",
+          "isIncumbent": false,
+          "isRecommended": true,
+          "summary": "U.S. Representative and former First Assistant AG under Paxton. Federal prosecutor background. Constitutional conservative who resigned from AG's office on principle. Frontrunner at 33-40%.",
+          "background": "Currently serving in Congress (TX-21). Served as First Assistant Attorney General. Former Assistant U.S. Attorney prosecuting violent criminals.",
+          "keyPositions": ["Constitutional principles", "Border security", "Government accountability"],
+          "endorsements": ["Sen. John Cornyn", "Sen. Ted Cruz"],
+          "pros": ["Actually served in the AG's office", "Resigned on principle from Paxton's AG office", "Federal prosecutor experience", "Frontrunner"],
+          "cons": ["Leaves an open congressional seat", "Some may see him as establishment"],
+          "fundraising": "Well-funded with major endorsements",
+          "polling": "33-40% — frontrunner"
+        },
+        {
+          "name": "Mayes Middleton",
+          "party": "Republican",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "State Senator and businessman. Chair of the Texas Freedom Caucus. Positioned as the most conservative option.",
+          "background": "Texas State Senator. Chairman of the Texas Freedom Caucus. Oil and gas businessman.",
+          "keyPositions": ["Hard-right conservatism", "Property tax elimination", "Border security"],
+          "endorsements": ["Texas Freedom Caucus allies"],
+          "pros": ["Strong conservative credentials", "Legislative experience", "Business background"],
+          "cons": ["Freedom Caucus approach can be combative", "Less legal experience than rivals"],
+          "fundraising": null,
+          "polling": null
+        },
+        {
+          "name": "Joan Huffman",
+          "party": "Republican",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "State Senator with prosecutorial background. Over 100 jury trials. Led the Paxton impeachment trial as presiding judge.",
+          "background": "Texas State Senator. Former prosecutor with over 100 jury trials. Presided over the Paxton impeachment trial in the Senate.",
+          "keyPositions": ["Law and order", "Prosecutorial experience", "Judicial reform"],
+          "endorsements": [],
+          "pros": ["Most actual courtroom experience", "Presided over impeachment — understands the office"],
+          "cons": ["Lower polling numbers", "May not be viable in a crowded field"],
+          "fundraising": null,
+          "polling": "~13%"
+        },
+        {
+          "name": "Aaron Reitz",
+          "party": "Republican",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "Deputy Secretary of State under Governor Abbott. Youngest candidate in the race. Self-funded with $12M.",
+          "background": "Former Deputy Secretary of State. Attorney.",
+          "keyPositions": ["MAGA alignment", "Election integrity", "Culture war issues"],
+          "endorsements": [],
+          "pros": ["Well-funded ($12M self-funded)", "Youth and energy"],
+          "cons": ["Limited legal practice experience", "Heavy self-funding raises questions"],
+          "fundraising": "$12M (self-funded)",
+          "polling": null
+        }
+      ],
+      "recommendation": {
+        "candidateName": "Chip Roy",
+        "reasoning": "Best combination of legal experience and principled conservatism. Actually served in the AG's office and resigned on principle. Federal prosecutor background gives him credibility for the role.",
+        "strategicNotes": "Roy needs 50% to avoid a runoff. Consolidating behind the frontrunner helps avoid a prolonged primary.",
+        "caveats": null,
+        "confidence": "Strong Match"
+      }
+    },
+    {
+      "office": "Comptroller of Public Accounts",
+      "district": null,
+      "isContested": true,
+      "isKeyRace": true,
+      "candidates": [
+        {
+          "name": "Kelly Hancock",
+          "party": "Republican",
+          "isIncumbent": true,
+          "isRecommended": true,
+          "summary": "Appointed Comptroller after Glenn Hegar resigned. Former state senator with 10 years on the Senate Finance Committee. Authored the state spending cap.",
+          "background": "Former state senator. Served on Legislative Budget Board. Appointed Acting Comptroller.",
+          "keyPositions": ["Fiscal discipline", "State spending cap", "School voucher implementation"],
+          "endorsements": ["Gov. Greg Abbott"],
+          "pros": ["Most relevant fiscal experience", "Actually doing the job now", "Governor endorsement", "Clean record"],
+          "cons": ["Insider appointment — didn't win the seat in an election", "Only polling at ~13%"],
+          "fundraising": "Moderate",
+          "polling": "~13%"
+        },
+        {
+          "name": "Don Huffines",
+          "party": "Republican",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "'DOGE Texas' platform — government efficiency. Former state senator and real estate developer. Best-funded candidate at $15.8M (mostly self-funded). Lost 2022 governor's race.",
+          "background": "Former state senator. Real estate developer. Lost the 2022 governor's primary to Abbott.",
+          "keyPositions": ["DOGE Texas — government efficiency", "Cut waste", "Property tax elimination"],
+          "endorsements": ["Elon Musk"],
+          "pros": ["Best funded ($15.8M)", "DOGE platform resonates with efficiency voters", "Strong endorsements"],
+          "cons": ["$10M is self-funded", "Lost two consecutive races", "Family real estate dealings raised questions"],
+          "fundraising": "$15.8M ($10M personal)",
+          "polling": "33% — frontrunner"
+        },
+        {
+          "name": "Christi Craddick",
+          "party": "Republican",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "12+ years as Railroad Commissioner (state energy regulator). Won statewide three times. Father is former TX House Speaker Tom Craddick.",
+          "background": "Current Railroad Commissioner since 2012. Attorney. Father is longest-serving Texas state legislator.",
+          "keyPositions": ["Energy regulation experience", "Business-friendly governance"],
+          "endorsements": ["Oil and gas industry supporters"],
+          "pros": ["12 years running a statewide agency", "Won statewide three times", "Strategic alternative at 21%"],
+          "cons": ["$20M+ in industry lease interests while regulating that industry", "Misled public during 2021 winter storm"],
+          "fundraising": "$2.9M (mostly industry donors)",
+          "polling": "21%"
+        },
+        {
+          "name": "Michael Berlanga",
+          "party": "Republican",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "Lesser-known candidate in the Comptroller race.",
+          "background": null,
+          "keyPositions": [],
+          "endorsements": [],
+          "pros": [],
+          "cons": ["Low name recognition", "Minimal campaign infrastructure"],
+          "fundraising": null,
+          "polling": null
+        }
+      ],
+      "recommendation": {
+        "candidateName": "Kelly Hancock",
+        "reasoning": "Most relevant fiscal experience — 10 years on Senate Finance, authored the spending cap, currently doing the job. Clean record with no conflicts of interest.",
+        "strategicNotes": "At only 13%, Hancock may not be viable. If stopping Huffines is the priority, Craddick at 21% is the strategic alternative.",
+        "caveats": "Insider appointment feels like backroom dealing. If strategic viability matters more, consider Craddick.",
+        "confidence": "Good Match"
+      }
+    },
+    {
+      "office": "Commissioner of Agriculture",
+      "district": null,
+      "isContested": true,
+      "isKeyRace": true,
+      "candidates": [
+        {
+          "name": "Nate Sheets",
+          "party": "Republican",
+          "isIncumbent": false,
+          "isRecommended": true,
+          "summary": "Entrepreneur who built a specialty food company from a backyard operation into a national brand. Navy veteran. Governor Abbott endorsed him over the incumbent — a rare rebuke.",
+          "background": "Founded a successful food company. U.S. Navy veteran. Entrepreneur.",
+          "keyPositions": ["Agricultural innovation", "Refocus office on actual farming mission", "Support Texas farmers and ranchers"],
+          "endorsements": ["Gov. Greg Abbott (endorsed over his own party's incumbent)"],
+          "pros": ["Built a real business in the food industry", "Navy veteran", "Governor endorsed over incumbent — significant", "Results-oriented"],
+          "cons": ["No government experience"],
+          "fundraising": "Well-funded with Governor backing",
+          "polling": "Competitive"
+        },
+        {
+          "name": "Sid Miller",
+          "party": "Republican",
+          "isIncumbent": true,
+          "isRecommended": false,
+          "summary": "Scandal-plagued incumbent. State investigators looking into his office. Aide indicted for bribery. Known more for culture war social media posts than agricultural policy.",
+          "background": "Commissioner of Agriculture since 2015. Former state representative. Rodeo competitor.",
+          "keyPositions": ["Culture war positioning", "Status quo"],
+          "endorsements": [],
+          "pros": ["Incumbent experience", "Name recognition"],
+          "cons": ["Under state investigation", "Aide indicted for bribery", "Lost thousands of farmers from state programs on his watch", "Office focused on culture war, not agriculture"],
+          "fundraising": null,
+          "polling": null
+        }
+      ],
+      "recommendation": {
+        "candidateName": "Nate Sheets",
+        "reasoning": "Entrepreneur vs. scandal-plagued incumbent. Governor Abbott himself broke ranks to endorse Sheets — that's how problematic Miller's tenure has been. Sheets would refocus the office on actual agriculture.",
+        "strategicNotes": null,
+        "caveats": null,
+        "confidence": "Strong Match"
+      }
+    },
+    {
+      "office": "Governor",
+      "district": null,
+      "isContested": false,
+      "isKeyRace": false,
+      "candidates": [
+        {
+          "name": "Greg Abbott",
+          "party": "Republican",
+          "isIncumbent": true,
+          "isRecommended": true,
+          "summary": "Three-term incumbent with $106M war chest. No credible primary challenger among 10 opponents.",
+          "background": "Governor since 2015. Former Attorney General (2002-2015). Former Texas Supreme Court Justice.",
+          "keyPositions": ["Border security (Operation Lone Star)", "Economic development", "School choice", "Grid improvements"],
+          "endorsements": [],
+          "pros": ["Massive funding advantage", "Incumbent with strong GOP base support"],
+          "cons": ["Grid failures under his watch (2021 winter storm)", "Some conservatives feel he's not aggressive enough"],
+          "fundraising": "$106M",
+          "polling": "No credible challenger"
+        }
+      ],
+      "recommendation": null
+    },
+    {
+      "office": "Lieutenant Governor",
+      "district": null,
+      "isContested": false,
+      "isKeyRace": false,
+      "candidates": [
+        {
+          "name": "Dan Patrick",
+          "party": "Republican",
+          "isIncumbent": true,
+          "isRecommended": true,
+          "summary": "Three-term incumbent with $33.5M. Presides over the Texas Senate. No credible challenger.",
+          "background": "Lt. Governor since 2015. Former state senator and conservative radio host. Presides over the Texas Senate.",
+          "keyPositions": ["School choice/vouchers", "Property tax reform", "Border security"],
+          "endorsements": [],
+          "pros": ["Effectively controls the Texas Senate agenda", "Well-funded"],
+          "cons": ["Polarizing figure", "More culture warrior than some prefer"],
+          "fundraising": "$33.5M",
+          "polling": "No credible challenger"
+        }
+      ],
+      "recommendation": null
+    },
+    {
+      "office": "Railroad Commissioner",
+      "district": null,
+      "isContested": true,
+      "isKeyRace": false,
+      "candidates": [
+        {
+          "name": "Jim Wright",
+          "party": "Republican",
+          "isIncumbent": true,
+          "isRecommended": true,
+          "summary": "Incumbent Railroad Commissioner. Oil field services business owner and fifth-generation Texas rancher. Emphasizes fair and consistent energy regulation.",
+          "background": "Oil field services business owner. Fifth-generation Texas rancher. Railroad Commissioner since 2020.",
+          "keyPositions": ["Fair regulation", "Energy development", "Industry stability"],
+          "endorsements": [],
+          "pros": ["Industry knowledge", "Incumbent experience", "Doing the job competently"],
+          "cons": ["Industry insider — potential conflicts of interest"],
+          "fundraising": null,
+          "polling": "Favored over challengers"
+        },
+        {
+          "name": "Katherine Culbert",
+          "party": "Republican",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "Challenger in the Railroad Commissioner race.",
+          "background": null,
+          "keyPositions": [],
+          "endorsements": [],
+          "pros": [],
+          "cons": ["Low name recognition"],
+          "fundraising": null,
+          "polling": null
+        }
+      ],
+      "recommendation": {
+        "candidateName": "Jim Wright",
+        "reasoning": "Competent incumbent with relevant industry experience. None of his challengers have made a compelling case for change.",
+        "strategicNotes": null,
+        "caveats": null,
+        "confidence": "Strong Match"
+      }
+    },
+    {
+      "office": "U.S. Representative",
+      "district": "District 37",
+      "isContested": true,
+      "isKeyRace": false,
+      "candidates": [
+        {
+          "name": "Ge'Nell Gary",
+          "party": "Republican",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "Republican candidate in the heavily Democratic Austin-centered CD-37.",
+          "background": null,
+          "keyPositions": [],
+          "endorsements": [],
+          "pros": [],
+          "cons": ["D+26 district — Republican nominee will lose in November"],
+          "fundraising": null,
+          "polling": null
+        },
+        {
+          "name": "Lauren B. Pena",
+          "party": "Republican",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "Republican candidate in CD-37.",
+          "background": null,
+          "keyPositions": [],
+          "endorsements": [],
+          "pros": [],
+          "cons": ["D+26 district — Republican nominee will lose in November"],
+          "fundraising": null,
+          "polling": null
+        },
+        {
+          "name": "Janet Malzahn",
+          "party": "Republican",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "Republican candidate in CD-37.",
+          "background": null,
+          "keyPositions": [],
+          "endorsements": [],
+          "pros": [],
+          "cons": ["D+26 district — Republican nominee will lose in November"],
+          "fundraising": null,
+          "polling": null
+        }
+      ],
+      "recommendation": {
+        "candidateName": "Ge'Nell Gary",
+        "reasoning": "In a symbolic race (D+26 district), this vote is about expression rather than outcome. The Republican nominee will not win in November.",
+        "strategicNotes": "The real action in CD-37 is in the Democratic primary.",
+        "caveats": "Limited information available about all three candidates.",
+        "confidence": "Symbolic Race"
+      }
+    },
+    {
+      "office": "U.S. Representative",
+      "district": "District 10",
+      "isContested": true,
+      "isKeyRace": true,
+      "candidates": [
+        {
+          "name": "Chris Gober",
+          "party": "Republican",
+          "isIncumbent": false,
+          "isRecommended": true,
+          "summary": "Election law attorney. Considered one of the top contenders in the crowded 9-candidate field for McCaul's open seat.",
+          "background": "Attorney specializing in election law. Well-connected in Republican politics.",
+          "keyPositions": ["Election integrity", "Conservative governance"],
+          "endorsements": [],
+          "pros": ["Legal expertise", "Well-positioned in the race"],
+          "cons": ["Crowded field makes outcomes unpredictable"],
+          "fundraising": null,
+          "polling": null
+        },
+        {
+          "name": "Jessica Karlsruher",
+          "party": "Republican",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "Candidate in the CD-10 open seat race.",
+          "background": null,
+          "keyPositions": [],
+          "endorsements": [],
+          "pros": [],
+          "cons": [],
+          "fundraising": null,
+          "polling": null
+        },
+        {
+          "name": "Rob Altman",
+          "party": "Republican",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "Candidate in the CD-10 open seat race.",
+          "background": null,
+          "keyPositions": [],
+          "endorsements": [],
+          "pros": [],
+          "cons": [],
+          "fundraising": null,
+          "polling": null
+        }
+      ],
+      "recommendation": {
+        "candidateName": "Chris Gober",
+        "reasoning": "Open seat with 9 candidates — one of the most competitive Republican primaries in the Austin area. A runoff is very likely given the crowded field.",
+        "strategicNotes": "With 9 candidates, no one is likely to hit 50%. Expect a runoff between the top two.",
+        "caveats": "Limited polling and public information available for many candidates in this race.",
+        "confidence": "Best Available"
+      }
+    },
+    {
+      "office": "State Representative",
+      "district": "District 48",
+      "isContested": false,
+      "isKeyRace": false,
+      "candidates": [
+        {
+          "name": "Gupta",
+          "party": "Republican",
+          "isIncumbent": false,
+          "isRecommended": true,
+          "summary": "Sole Republican candidate for House District 48.",
+          "background": null,
+          "keyPositions": [],
+          "endorsements": [],
+          "pros": ["Only option in Republican primary"],
+          "cons": [],
+          "fundraising": null,
+          "polling": null
+        }
+      ],
+      "recommendation": null
+    }
+  ],
+  "propositions": [
+    {
+      "number": 1,
+      "title": "Phase out property taxes",
+      "description": "Texas property taxes should be assessed at the purchase price and phased out entirely over the next six years through spending reductions.",
+      "recommendation": "Lean Yes",
+      "reasoning": "Aspirational but popular. Signals strong support for property tax relief."
+    },
+    {
+      "number": 2,
+      "title": "Voter approval for local tax hikes",
+      "description": "Texas should require any local government budget that raises property taxes to be approved by voters at a November general election.",
+      "recommendation": "Lean Yes",
+      "reasoning": "Direct accountability mechanism for local government spending."
+    },
+    {
+      "number": 3,
+      "title": "Healthcare & vaccination status",
+      "description": "Texas should prohibit denial of healthcare or any medical service based solely on the patient's vaccination status.",
+      "recommendation": "Your Call",
+      "reasoning": "Medical freedom issue. Not directly related to most voters' top priorities."
+    },
+    {
+      "number": 4,
+      "title": "Life at fertilization in schools",
+      "description": "Texas should require its public schools to teach that life begins at fertilization.",
+      "recommendation": "Your Call",
+      "reasoning": "Social conservative priority. Depends on your views on school curriculum."
+    },
+    {
+      "number": 5,
+      "title": "Ban school health clinics",
+      "description": "Texas should ban gender, sexuality, and reproductive clinics and services in K-12 schools.",
+      "recommendation": "Your Call",
+      "reasoning": "Social conservative priority. Depends on your views on school health services."
+    },
+    {
+      "number": 6,
+      "title": "Term limits",
+      "description": "Texas should enact term limits on all elected officials.",
+      "recommendation": "Lean Yes",
+      "reasoning": "Broadly popular across the political spectrum. Limits entrenchment of career politicians."
+    },
+    {
+      "number": 7,
+      "title": "Protect Texas water",
+      "description": "Texas should ban the large-scale export, or sale, of our groundwater and surface water to any single private or public entity.",
+      "recommendation": "Lean Yes",
+      "reasoning": "Water security is a growing Texas concern. Protects a critical resource."
+    },
+    {
+      "number": 8,
+      "title": "End services for undocumented immigrants",
+      "description": "The Texas Legislature should reduce the burden of illegal immigration on taxpayers by ending public services for illegal immigrants.",
+      "recommendation": "Your Call",
+      "reasoning": "Depends on how broadly you define 'public services' and your immigration views."
+    },
+    {
+      "number": 9,
+      "title": "No Democratic committee chairs",
+      "description": "The Republican-controlled Texas Legislature should stop awarding leadership positions, including committee chairmanships, to Democrats.",
+      "recommendation": "Lean No",
+      "reasoning": "Hyper-partisan. Cross-aisle governance and bipartisan committee work have long Texas traditions."
+    },
+    {
+      "number": 10,
+      "title": "Prohibit Sharia Law",
+      "description": "Texas should prohibit Sharia Law.",
+      "recommendation": "Lean No",
+      "reasoning": "Foreign religious law has no legal standing in Texas courts already. Purely symbolic."
+    }
+  ]
+}

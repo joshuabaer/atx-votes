@@ -26,6 +26,7 @@ Items recently fixed but not yet tested. **Test these before attempting again or
 - [ ] Real candidate data for March 2026 primary — replaced all fictional candidates with real March 2026 Texas primary data from Travis County Clerk, Ballotpedia, Texas Tribune, and KUT. Republican ballot: 9 races (Senate, AG, Comptroller, Ag Commissioner, Governor, Lt. Gov, Railroad Commissioner, CD-10, CD-37, State Rep 48). Democratic ballot: 10 races (Senate, Governor, Lt. Gov, AG, Comptroller, CD-37, Commissioner Pct 2 & 4, State Rep 49 & 48, SBOE 5). All 10 Republican and 13 Democratic propositions are real. Sources cited in file header.
 - [ ] Real proposition data — all 10 Republican and 13 Democratic primary propositions now match the actual March 2026 ballot.
 - [ ] Accuracy disclaimer — added `DisclaimerBanner` component (Theme.swift). Dismissible banner at top of BallotOverviewView, persistent warning footer on CheatSheetView and RaceDetailView, and disclaimer line in cheat sheet share text.
+- [ ] Extract election data into separate JSON files — created `ElectionData/republican_primary_2026.json` and `democrat_primary_2026.json` with full ballot data. Rewrote SampleData.swift with `ElectionDataLoader` and intermediate Raw* Decodable types (no UUIDs in JSON, string enums, simple date strings). To update for a new election: edit the JSON files — no Swift changes needed.
 
 ### Features
 
@@ -45,7 +46,7 @@ Items not yet attempted or needing a fresh approach after failed verification.
 
 ### Improvements
 
-- [ ] Extract election data into separate data file — pull candidate and proposition info out of SampleData.swift into a standalone JSON or plist file (e.g. `ElectionData/march2026.json`). Makes it easier to update for different elections without modifying Swift code. SampleData.swift would load from the data file instead of hardcoding everything.
+(none)
 
 ### Features
 

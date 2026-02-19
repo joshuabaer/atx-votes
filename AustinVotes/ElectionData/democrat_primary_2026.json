@@ -1,0 +1,677 @@
+{
+  "electionName": "March 2026 Democratic Primary",
+  "electionDate": "2026-03-03",
+  "party": "democrat",
+  "districts": {
+    "congressional": "District 37",
+    "stateSenate": "District 14",
+    "stateHouse": "District 48",
+    "countyCommissioner": "Precinct 2",
+    "schoolBoard": "District 5"
+  },
+  "races": [
+    {
+      "office": "U.S. Senator",
+      "district": null,
+      "isContested": true,
+      "isKeyRace": true,
+      "candidates": [
+        {
+          "name": "Jasmine Crockett",
+          "party": "Democrat",
+          "isIncumbent": false,
+          "isRecommended": true,
+          "summary": "U.S. Representative from Dallas. Rose to national prominence on the House Oversight Committee. Known for sharp, viral exchanges with Republican colleagues. Considered the frontrunner.",
+          "background": "U.S. Representative (TX-30) since 2023. Attorney and former state representative. Member of House Oversight Committee.",
+          "keyPositions": ["Voting rights", "Criminal justice reform", "Healthcare access", "Economic equity"],
+          "endorsements": [],
+          "pros": ["National profile and momentum", "Strong fundraising", "Proven communicator", "Federal legislative experience"],
+          "cons": ["Relatively new to Congress (one term)", "Dallas-based — less Austin connection"],
+          "fundraising": "Strong — leading Democratic fundraising",
+          "polling": "Frontrunner"
+        },
+        {
+          "name": "James Talarico",
+          "party": "Democrat",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "State Representative from Round Rock (HD-50). Former teacher. Known for bipartisan education legislation. Giving up his House seat to run.",
+          "background": "Texas State Representative since 2019. Former public school teacher and education nonprofit worker. Georgetown University graduate.",
+          "keyPositions": ["Public education funding", "Teacher pay", "Bipartisan governance", "Youth engagement"],
+          "endorsements": [],
+          "pros": ["Austin-area candidate — local connection", "Bipartisan track record in the Legislature", "Education expertise", "Younger generation voice"],
+          "cons": ["State-level experience only", "Giving up safe House seat", "Lower name recognition statewide than Crockett"],
+          "fundraising": null,
+          "polling": "Second place"
+        },
+        {
+          "name": "Ahmad R. Hassan",
+          "party": "Democrat",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "Third candidate in the Democratic Senate primary.",
+          "background": null,
+          "keyPositions": [],
+          "endorsements": [],
+          "pros": [],
+          "cons": ["Low name recognition", "Minimal campaign infrastructure"],
+          "fundraising": null,
+          "polling": null
+        }
+      ],
+      "recommendation": {
+        "candidateName": "Jasmine Crockett",
+        "reasoning": "National profile, strong fundraising, and federal experience give her the best shot in the November general election. Talarico is a strong Austin-area alternative with bipartisan credentials if local connection matters more.",
+        "strategicNotes": "Democrats need their strongest general election candidate to compete in November. Electability matters in a statewide Texas race.",
+        "caveats": "If bipartisan governance and education are your top priorities, Talarico may be the better fit despite lower polling.",
+        "confidence": "Good Match"
+      }
+    },
+    {
+      "office": "Governor",
+      "district": null,
+      "isContested": true,
+      "isKeyRace": true,
+      "candidates": [
+        {
+          "name": "Gina Hinojosa",
+          "party": "Democrat",
+          "isIncumbent": false,
+          "isRecommended": true,
+          "summary": "State Representative from Austin. Giving up her House seat to run for Governor. Known for education policy and progressive advocacy in the Legislature.",
+          "background": "Texas State Representative. Former Austin ISD school board trustee. Attorney. Austin-based.",
+          "keyPositions": ["Public education", "Reproductive rights", "Affordable housing", "Grid reliability"],
+          "endorsements": [],
+          "pros": ["Austin-area candidate", "Education policy expertise", "Legislative experience", "Progressive credentials"],
+          "cons": ["State-level experience only", "Statewide name recognition challenge", "Crowded 9-candidate field"],
+          "fundraising": null,
+          "polling": "Among top tier"
+        },
+        {
+          "name": "Chris Bell",
+          "party": "Democrat",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "Former U.S. Representative from Houston. Previously ran for Governor in 2006. Most experienced candidate in terms of federal office.",
+          "background": "Former U.S. Representative (2003-2005). Houston City Council member. Attorney. Ran for Governor in 2006 (lost to Rick Perry).",
+          "keyPositions": ["Moderate Democratic governance", "Infrastructure", "Ethics reform"],
+          "endorsements": [],
+          "pros": ["Federal experience", "Previous statewide campaign experience", "Moderate positioning"],
+          "cons": ["Lost 2006 Governor's race", "Out of office for two decades", "May lack fresh energy"],
+          "fundraising": null,
+          "polling": "Among top tier"
+        },
+        {
+          "name": "Andrew White",
+          "party": "Democrat",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "Businessman and son of former Governor Mark White. Ran for Governor in 2018, finished second in the Democratic primary.",
+          "background": "Businessman. Son of former Texas Governor Mark White. Ran in the 2018 Democratic gubernatorial primary.",
+          "keyPositions": ["Business-friendly Democratic governance", "Education (family legacy)", "Moderate approach"],
+          "endorsements": [],
+          "pros": ["Name recognition from father's legacy", "Business background", "Previous campaign experience"],
+          "cons": ["Lost 2018 primary to Lupe Valdez", "No elected office experience"],
+          "fundraising": null,
+          "polling": null
+        }
+      ],
+      "recommendation": {
+        "candidateName": "Gina Hinojosa",
+        "reasoning": "Austin-area state representative with legislative experience and education expertise. In a 9-candidate field, she has strong local support and progressive credentials.",
+        "strategicNotes": "9 candidates — a runoff is very likely. The top two finishers will face off in a May runoff.",
+        "caveats": "If you prefer a more moderate candidate or value federal experience, Chris Bell is an alternative.",
+        "confidence": "Good Match"
+      }
+    },
+    {
+      "office": "Lieutenant Governor",
+      "district": null,
+      "isContested": true,
+      "isKeyRace": false,
+      "candidates": [
+        {
+          "name": "Vikki Goodwin",
+          "party": "Democrat",
+          "isIncumbent": false,
+          "isRecommended": true,
+          "summary": "State Representative from Austin (HD-47). Giving up her House seat to run. Real estate background with focus on housing affordability.",
+          "background": "Texas State Representative. Former real estate agent. Austin-based.",
+          "keyPositions": ["Housing affordability", "Property tax reform", "Public education"],
+          "endorsements": [],
+          "pros": ["Austin-area candidate", "Real estate/housing expertise", "Legislative experience"],
+          "cons": ["Statewide name recognition challenge", "Giving up safe House seat"],
+          "fundraising": null,
+          "polling": null
+        },
+        {
+          "name": "Courtney Head",
+          "party": "Democrat",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "Candidate for Lieutenant Governor in the Democratic primary.",
+          "background": null,
+          "keyPositions": [],
+          "endorsements": [],
+          "pros": [],
+          "cons": [],
+          "fundraising": null,
+          "polling": null
+        },
+        {
+          "name": "Marcos Isaias Velez",
+          "party": "Democrat",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "Candidate for Lieutenant Governor in the Democratic primary.",
+          "background": null,
+          "keyPositions": [],
+          "endorsements": [],
+          "pros": [],
+          "cons": [],
+          "fundraising": null,
+          "polling": null
+        }
+      ],
+      "recommendation": {
+        "candidateName": "Vikki Goodwin",
+        "reasoning": "Austin-area state representative with housing and real estate expertise. Most recognizable name in the Democratic Lt. Governor field.",
+        "strategicNotes": null,
+        "caveats": null,
+        "confidence": "Good Match"
+      }
+    },
+    {
+      "office": "Attorney General",
+      "district": null,
+      "isContested": true,
+      "isKeyRace": false,
+      "candidates": [
+        {
+          "name": "Joe Jaworski",
+          "party": "Democrat",
+          "isIncumbent": false,
+          "isRecommended": true,
+          "summary": "Former Galveston mayor and attorney. Ran for AG in 2022. Grandson of Watergate special prosecutor Leon Jaworski.",
+          "background": "Former Mayor of Galveston. Attorney. Grandson of Watergate special prosecutor Leon Jaworski. Ran for AG in the 2022 Democratic primary.",
+          "keyPositions": ["Rule of law", "Consumer protection", "Environmental enforcement", "Government accountability"],
+          "endorsements": [],
+          "pros": ["Legal family pedigree (Watergate prosecutor's grandson)", "Executive experience as mayor", "Previous AG campaign — knows the race"],
+          "cons": ["Lost 2022 primary runoff to Rochelle Garza", "Galveston-based — less Austin connection"],
+          "fundraising": null,
+          "polling": null
+        },
+        {
+          "name": "Nathan Johnson",
+          "party": "Democrat",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "State Senator from Dallas. Experienced legislator with legal background.",
+          "background": "Texas State Senator. Attorney. Dallas-based.",
+          "keyPositions": ["Legislative reform", "Consumer protection", "Civil rights"],
+          "endorsements": [],
+          "pros": ["Legislative experience", "Legal background"],
+          "cons": [],
+          "fundraising": null,
+          "polling": null
+        },
+        {
+          "name": "Anthony \"Tony\" Box",
+          "party": "Democrat",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "Candidate in the Democratic AG primary.",
+          "background": null,
+          "keyPositions": [],
+          "endorsements": [],
+          "pros": [],
+          "cons": [],
+          "fundraising": null,
+          "polling": null
+        }
+      ],
+      "recommendation": {
+        "candidateName": "Joe Jaworski",
+        "reasoning": "Most experienced candidate with a legal family legacy (Watergate prosecutor's grandson), executive experience as Galveston mayor, and previous AG campaign knowledge.",
+        "strategicNotes": null,
+        "caveats": "Nathan Johnson brings legislative experience as a state senator if that matters more to you.",
+        "confidence": "Good Match"
+      }
+    },
+    {
+      "office": "Comptroller of Public Accounts",
+      "district": null,
+      "isContested": true,
+      "isKeyRace": false,
+      "candidates": [
+        {
+          "name": "Sarah Eckhardt",
+          "party": "Democrat",
+          "isIncumbent": false,
+          "isRecommended": true,
+          "summary": "State Senator from Austin. Former Travis County Judge (top county executive). Deep fiscal and government management experience.",
+          "background": "Texas State Senator. Former Travis County Judge (2015-2020). Former Travis County Commissioner. Attorney. Austin-based.",
+          "keyPositions": ["Fiscal transparency", "Government efficiency", "Environmental protection", "Local government support"],
+          "endorsements": [],
+          "pros": ["Austin-area candidate", "Executive experience as County Judge", "Deep fiscal knowledge", "Legislative experience"],
+          "cons": ["Giving up Senate seat"],
+          "fundraising": null,
+          "polling": null
+        },
+        {
+          "name": "Savant Moore",
+          "party": "Democrat",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "Candidate in the Democratic Comptroller primary.",
+          "background": null,
+          "keyPositions": [],
+          "endorsements": [],
+          "pros": [],
+          "cons": [],
+          "fundraising": null,
+          "polling": null
+        },
+        {
+          "name": "Michael Lange",
+          "party": "Democrat",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "Candidate in the Democratic Comptroller primary.",
+          "background": null,
+          "keyPositions": [],
+          "endorsements": [],
+          "pros": [],
+          "cons": [],
+          "fundraising": null,
+          "polling": null
+        }
+      ],
+      "recommendation": {
+        "candidateName": "Sarah Eckhardt",
+        "reasoning": "Austin-based state senator with executive experience as Travis County Judge. Deep fiscal and government management background makes her the strongest candidate for Comptroller.",
+        "strategicNotes": null,
+        "caveats": null,
+        "confidence": "Strong Match"
+      }
+    },
+    {
+      "office": "U.S. Representative",
+      "district": "District 37",
+      "isContested": true,
+      "isKeyRace": false,
+      "candidates": [
+        {
+          "name": "Greg Casar",
+          "party": "Democrat",
+          "isIncumbent": true,
+          "isRecommended": true,
+          "summary": "First-term incumbent, former Austin City Council member and labor organizer. Progressive champion in a safe D+26 seat. Member of the Congressional Progressive Caucus.",
+          "background": "U.S. Representative since 2023. Former Austin City Council member (District 4). Labor organizer. Member of the Congressional Progressive Caucus.",
+          "keyPositions": ["Workers' rights", "Medicare for All", "Housing affordability", "Immigration reform"],
+          "endorsements": ["Congressional Progressive Caucus", "AFL-CIO"],
+          "pros": ["Strong constituent services", "Visible and accessible in district", "Effective coalition-builder", "Safe seat — can focus on policy"],
+          "cons": ["Very progressive — some moderates feel unrepresented", "Only one term of experience"],
+          "fundraising": "Well-funded as incumbent",
+          "polling": "Heavy favorite"
+        },
+        {
+          "name": "Esther Amalia De Jesus Fleharty",
+          "party": "Democrat",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "Challenger to Casar in the CD-37 Democratic primary.",
+          "background": null,
+          "keyPositions": [],
+          "endorsements": [],
+          "pros": ["Offers an alternative to the incumbent"],
+          "cons": ["Very low name recognition", "No significant campaign infrastructure against a popular incumbent"],
+          "fundraising": null,
+          "polling": null
+        }
+      ],
+      "recommendation": {
+        "candidateName": "Greg Casar",
+        "reasoning": "Popular first-term incumbent with strong constituent services in a safe Democratic seat. No compelling reason to unseat him.",
+        "strategicNotes": null,
+        "caveats": null,
+        "confidence": "Strong Match"
+      }
+    },
+    {
+      "office": "County Commissioner",
+      "district": "Precinct 2",
+      "isContested": true,
+      "isKeyRace": true,
+      "candidates": [
+        {
+          "name": "Brigid Shea",
+          "party": "Democrat",
+          "isIncumbent": true,
+          "isRecommended": true,
+          "summary": "Incumbent Commissioner. Environmental advocate with focus on water quality, flooding, and transportation. Seeking re-election.",
+          "background": "Travis County Commissioner since 2015. Environmental advocate. Former journalist.",
+          "keyPositions": ["Environmental protection", "Flood mitigation", "Transportation", "Responsible growth"],
+          "endorsements": [],
+          "pros": ["Incumbent experience", "Deep knowledge of county operations", "Environmental leadership"],
+          "cons": ["Some feel county needs fresh energy", "Long tenure"],
+          "fundraising": null,
+          "polling": "Favored as incumbent"
+        },
+        {
+          "name": "Rick Astray-Caneda III",
+          "party": "Democrat",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "Challenger for the Precinct 2 Commissioner seat.",
+          "background": null, "keyPositions": [], "endorsements": [], "pros": [], "cons": [],
+          "fundraising": null, "polling": null
+        },
+        {
+          "name": "Amanda Marzullo",
+          "party": "Democrat",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "Challenger for the Precinct 2 Commissioner seat.",
+          "background": null, "keyPositions": [], "endorsements": [], "pros": [], "cons": [],
+          "fundraising": null, "polling": null
+        },
+        {
+          "name": "Reese Ricci Armstrong",
+          "party": "Democrat",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "Challenger for the Precinct 2 Commissioner seat.",
+          "background": null, "keyPositions": [], "endorsements": [], "pros": [], "cons": [],
+          "fundraising": null, "polling": null
+        }
+      ],
+      "recommendation": {
+        "candidateName": "Brigid Shea",
+        "reasoning": "Experienced incumbent with deep knowledge of county operations. Environmental and infrastructure focus addresses key Austin-area concerns.",
+        "strategicNotes": "Four-way race — if no one gets 50%, expect a runoff.",
+        "caveats": null,
+        "confidence": "Good Match"
+      }
+    },
+    {
+      "office": "County Commissioner",
+      "district": "Precinct 4",
+      "isContested": true,
+      "isKeyRace": true,
+      "candidates": [
+        {
+          "name": "Susanna Ledesma-Woody",
+          "party": "Democrat",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "Candidate for the open Precinct 4 seat after Margaret Gomez's retirement.",
+          "background": null, "keyPositions": [], "endorsements": [], "pros": [], "cons": [],
+          "fundraising": null, "polling": null
+        },
+        {
+          "name": "Ofelia Maldonado Zapata",
+          "party": "Democrat",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "Candidate for the open Precinct 4 seat.",
+          "background": null, "keyPositions": [], "endorsements": [], "pros": [], "cons": [],
+          "fundraising": null, "polling": null
+        },
+        {
+          "name": "George Morales III",
+          "party": "Democrat",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "Candidate for the open Precinct 4 seat.",
+          "background": null, "keyPositions": [], "endorsements": [], "pros": [], "cons": [],
+          "fundraising": null, "polling": null
+        },
+        {
+          "name": "Gavino Fernandez, Jr.",
+          "party": "Democrat",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "Candidate for the open Precinct 4 seat.",
+          "background": null, "keyPositions": [], "endorsements": [], "pros": [], "cons": [],
+          "fundraising": null, "polling": null
+        }
+      ],
+      "recommendation": {
+        "candidateName": "Susanna Ledesma-Woody",
+        "reasoning": "Open seat with four candidates — all relatively unknown. Research each candidate's background and community involvement before deciding.",
+        "strategicNotes": "Open seat after long-serving Commissioner Gomez's retirement. Four-way race makes a runoff likely.",
+        "caveats": "Limited public information available. Do your own research on these candidates.",
+        "confidence": "Best Available"
+      }
+    },
+    {
+      "office": "State Representative",
+      "district": "District 49",
+      "isContested": true,
+      "isKeyRace": true,
+      "candidates": [
+        {
+          "name": "Kathie Tovo",
+          "party": "Democrat",
+          "isIncumbent": false,
+          "isRecommended": true,
+          "summary": "Former Austin City Council member (District 9) and former Mayor Pro Tem. Extensive local government experience. Well-known in Austin politics.",
+          "background": "Former Austin City Council member. Former Mayor Pro Tem. Adjunct professor. Deep roots in Austin civic life.",
+          "keyPositions": ["Housing affordability", "Homelessness policy", "Transportation", "Local governance"],
+          "endorsements": [],
+          "pros": ["Most government experience in the field", "Well-known in Austin politics", "Deep policy knowledge"],
+          "cons": ["City council tenure was sometimes polarizing", "Some see her as an insider"],
+          "fundraising": null,
+          "polling": null
+        },
+        {
+          "name": "Sam Slade",
+          "party": "Democrat",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "Candidate in the HD-49 open seat race.",
+          "background": null, "keyPositions": [], "endorsements": [], "pros": [], "cons": [],
+          "fundraising": null, "polling": null
+        },
+        {
+          "name": "Montserrat Garibay",
+          "party": "Democrat",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "Former Austin ISD board trustee and education advocate.",
+          "background": "Former Austin ISD board trustee. Education and labor advocate.",
+          "keyPositions": ["Public education", "Workers' rights", "Immigration"],
+          "endorsements": [],
+          "pros": ["Education policy experience", "Labor and community organizing background"],
+          "cons": [],
+          "fundraising": null,
+          "polling": null
+        },
+        {
+          "name": "Kimmie Ellison",
+          "party": "Democrat",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "Candidate in the HD-49 open seat race.",
+          "background": null, "keyPositions": [], "endorsements": [], "pros": [], "cons": [],
+          "fundraising": null, "polling": null
+        }
+      ],
+      "recommendation": {
+        "candidateName": "Kathie Tovo",
+        "reasoning": "Most experienced candidate with deep Austin government experience as a former City Council member and Mayor Pro Tem. In an 8-candidate field, her name recognition and policy depth stand out.",
+        "strategicNotes": "8 candidates — a runoff is almost certain. This open seat is one of the most competitive local Democratic primaries.",
+        "caveats": "If education is your top priority, Montserrat Garibay's AISD board experience may be more relevant.",
+        "confidence": "Good Match"
+      }
+    },
+    {
+      "office": "State Representative",
+      "district": "District 48",
+      "isContested": false,
+      "isKeyRace": false,
+      "candidates": [
+        {
+          "name": "Donna Howard",
+          "party": "Democrat",
+          "isIncumbent": true,
+          "isRecommended": true,
+          "summary": "Long-serving incumbent. Registered nurse turned legislator. Known for healthcare and education advocacy in the Texas House.",
+          "background": "Texas State Representative since 2006. Registered nurse. Serves on Appropriations and Public Education committees.",
+          "keyPositions": ["Healthcare access", "Public education funding", "Women's health", "Budget oversight"],
+          "endorsements": ["Texas State Teachers Association"],
+          "pros": ["Deep legislative experience", "Healthcare expertise as an RN", "Strong committee positions"],
+          "cons": [],
+          "fundraising": null,
+          "polling": "Unopposed in primary"
+        }
+      ],
+      "recommendation": null
+    },
+    {
+      "office": "State Board of Education",
+      "district": "District 5",
+      "isContested": true,
+      "isKeyRace": false,
+      "candidates": [
+        {
+          "name": "Allison Bush",
+          "party": "Democrat",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "Candidate for SBOE District 5.",
+          "background": null, "keyPositions": [], "endorsements": [], "pros": [], "cons": [],
+          "fundraising": null, "polling": null
+        },
+        {
+          "name": "Victor Sampson",
+          "party": "Democrat",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "Candidate for SBOE District 5.",
+          "background": null, "keyPositions": [], "endorsements": [], "pros": [], "cons": [],
+          "fundraising": null, "polling": null
+        },
+        {
+          "name": "Neto Longoria",
+          "party": "Democrat",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "Candidate for SBOE District 5.",
+          "background": null, "keyPositions": [], "endorsements": [], "pros": [], "cons": [],
+          "fundraising": null, "polling": null
+        },
+        {
+          "name": "Stephanie Limon Bazan",
+          "party": "Democrat",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "Candidate for SBOE District 5.",
+          "background": null, "keyPositions": [], "endorsements": [], "pros": [], "cons": [],
+          "fundraising": null, "polling": null
+        }
+      ],
+      "recommendation": {
+        "candidateName": "Allison Bush",
+        "reasoning": "6-candidate field for SBOE District 5. Research each candidate's education background and priorities. The State Board of Education sets curriculum standards and textbook adoption for all Texas public schools.",
+        "strategicNotes": "This down-ballot race has outsized impact — SBOE decisions affect millions of Texas students.",
+        "caveats": "Limited public information available. Do your own research.",
+        "confidence": "Best Available"
+      }
+    }
+  ],
+  "propositions": [
+    {
+      "number": 1,
+      "title": "Expand Medicaid",
+      "description": "Texas should expand Medicaid to ensure access to affordable healthcare for all residents.",
+      "recommendation": "Lean Yes",
+      "reasoning": "Texas has the highest uninsured rate in the nation. Medicaid expansion would cover over a million Texans using available federal funding."
+    },
+    {
+      "number": 2,
+      "title": "Humane immigration reform",
+      "description": "Texas should adopt humane and dignified immigration policies and clear pathways to citizenship.",
+      "recommendation": "Your Call",
+      "reasoning": "Depends on your immigration priorities. Both humanitarian and practical arguments exist."
+    },
+    {
+      "number": 3,
+      "title": "Reproductive rights",
+      "description": "Texans should have the right to make their own healthcare decisions, including reproductive rights, with removal of insurance barriers to treatment.",
+      "recommendation": "Lean Yes",
+      "reasoning": "Core Democratic platform issue. Aligns with bodily autonomy and personal healthcare decision-making."
+    },
+    {
+      "number": 4,
+      "title": "Housing affordability",
+      "description": "The state should use funding and regulation to address the housing crisis in urban and rural communities.",
+      "recommendation": "Lean Yes",
+      "reasoning": "Housing costs are a top concern across Texas, especially in Austin."
+    },
+    {
+      "number": 5,
+      "title": "Public school funding",
+      "description": "Texas should equalize per-pupil spending to the national average. Texas currently ranks 42nd.",
+      "recommendation": "Lean Yes",
+      "reasoning": "Texas ranks near the bottom in per-pupil education spending despite a growing economy."
+    },
+    {
+      "number": 6,
+      "title": "Online voter registration",
+      "description": "Texas should implement secure online voter registration, already used by 42 other states.",
+      "recommendation": "Lean Yes",
+      "reasoning": "42 other states already do this. Modernizes voter access without compromising security."
+    },
+    {
+      "number": 7,
+      "title": "Environmental standards",
+      "description": "Texas should enforce stricter environmental standards for air, water, and biodiversity.",
+      "recommendation": "Lean Yes",
+      "reasoning": "Austin and Texas face growing environmental challenges including air quality, water scarcity, and urban heat."
+    },
+    {
+      "number": 8,
+      "title": "Cannabis legalization",
+      "description": "Texas should legalize adult cannabis use and automatically expunge past cannabis-related convictions.",
+      "recommendation": "Your Call",
+      "reasoning": "Combines drug policy reform with criminal justice reform. Depends on your personal stance."
+    },
+    {
+      "number": 9,
+      "title": "Raise state employee wages",
+      "description": "State and school employee salaries should be raised to national averages with biennial cost-of-living adjustments.",
+      "recommendation": "Lean Yes",
+      "reasoning": "Texas state employees and teachers are paid below national averages, contributing to recruitment and retention challenges."
+    },
+    {
+      "number": 10,
+      "title": "Redistricting reform",
+      "description": "Texas should ban racially motivated and mid-decade redistricting.",
+      "recommendation": "Lean Yes",
+      "reasoning": "Fair maps are foundational to representative democracy. Texas has a long history of redistricting controversies."
+    },
+    {
+      "number": 11,
+      "title": "Fair taxation",
+      "description": "The federal tax burden should shift to the wealthiest individuals with working-class income tax relief.",
+      "recommendation": "Your Call",
+      "reasoning": "Depends on your views on federal tax policy and progressivity."
+    },
+    {
+      "number": 12,
+      "title": "Expand public transit",
+      "description": "Texas should expand accessible transit in rural and urban areas.",
+      "recommendation": "Lean Yes",
+      "reasoning": "Transportation is a top Austin concern. Expanded transit reduces congestion and improves access."
+    },
+    {
+      "number": 13,
+      "title": "Red flag gun safety laws",
+      "description": "Texas should enact Extreme Risk Protection Orders to prevent individuals with a history of domestic abuse from purchasing firearms.",
+      "recommendation": "Your Call",
+      "reasoning": "Gun policy is deeply personal. Balances public safety with Second Amendment concerns."
+    }
+  ]
+}

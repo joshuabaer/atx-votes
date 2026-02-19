@@ -31,6 +31,8 @@
 		A10016000000000000000016 /* VotingGuideStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20016000000000000000016 /* VotingGuideStore.swift */; };
 		A10017000000000000000017 /* ClaudeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20017000000000000000017 /* ClaudeService.swift */; };
 		A10018000000000000000018 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A20018000000000000000018 /* Assets.xcassets */; };
+		A10019000000000000000019 /* republican_primary_2026.json in Resources */ = {isa = PBXBuildFile; fileRef = A20019000000000000000019 /* republican_primary_2026.json */; };
+		A1001A00000000000000001A /* democrat_primary_2026.json in Resources */ = {isa = PBXBuildFile; fileRef = A2001A00000000000000001A /* democrat_primary_2026.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -58,6 +60,8 @@
 		A20016000000000000000016 /* VotingGuideStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VotingGuideStore.swift; sourceTree = "<group>"; };
 		A20017000000000000000017 /* ClaudeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeService.swift; sourceTree = "<group>"; };
 		A20018000000000000000018 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A20019000000000000000019 /* republican_primary_2026.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = republican_primary_2026.json; sourceTree = "<group>"; };
+		A2001A00000000000000001A /* democrat_primary_2026.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = democrat_primary_2026.json; sourceTree = "<group>"; };
 		A30000000000000000000001 /* AustinVotes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AustinVotes.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -89,9 +93,19 @@
 				A50000000000000000000003 /* Models */,
 				A50000000000000000000004 /* Views */,
 				A50000000000000000000008 /* Services */,
+				A50000000000000000000009 /* ElectionData */,
 				A20018000000000000000018 /* Assets.xcassets */,
 			);
 			path = AustinVotes;
+			sourceTree = "<group>";
+		};
+		A50000000000000000000009 /* ElectionData */ = {
+			isa = PBXGroup;
+			children = (
+				A20019000000000000000019 /* republican_primary_2026.json */,
+				A2001A00000000000000001A /* democrat_primary_2026.json */,
+			);
+			path = ElectionData;
 			sourceTree = "<group>";
 		};
 		A50000000000000000000003 /* Models */ = {
@@ -226,6 +240,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				A10018000000000000000018 /* Assets.xcassets in Resources */,
+				A10019000000000000000019 /* republican_primary_2026.json in Resources */,
+				A1001A00000000000000001A /* democrat_primary_2026.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
