@@ -7,13 +7,24 @@ struct PolicyDeepDiveView: View {
 
     private var deepDiveQuestions: [InterviewQuestion] {
         var questions: [InterviewQuestion] = []
+        var hasEconomy = false
         for issue in store.voterProfile.topIssues.prefix(4) {
             switch issue {
             case .housing: questions.append(InterviewQuestions.housingDeepDive())
             case .safety: questions.append(InterviewQuestions.safetyDeepDive())
-            case .economy, .taxes: questions.append(InterviewQuestions.economyDeepDive())
+            case .economy, .taxes:
+                if !hasEconomy {
+                    questions.append(InterviewQuestions.economyDeepDive())
+                    hasEconomy = true
+                }
             case .tech: questions.append(InterviewQuestions.techDeepDive())
-            default: break
+            case .education: questions.append(InterviewQuestions.educationDeepDive())
+            case .healthcare: questions.append(InterviewQuestions.healthcareDeepDive())
+            case .environment: questions.append(InterviewQuestions.environmentDeepDive())
+            case .infrastructure: questions.append(InterviewQuestions.infrastructureDeepDive())
+            case .transportation: questions.append(InterviewQuestions.transportationDeepDive())
+            case .immigration: questions.append(InterviewQuestions.immigrationDeepDive())
+            case .civilRights: questions.append(InterviewQuestions.civilRightsDeepDive())
             }
         }
         return questions

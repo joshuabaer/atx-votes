@@ -19,7 +19,10 @@ actor ClaudeService {
 
         // If API key is empty, return sample data for development
         guard !apiKey.isEmpty else {
-            return Ballot.sampleRepublican
+            switch profile.primaryBallot {
+            case .democrat: return Ballot.sampleDemocrat
+            case .republican, .undecided: return Ballot.sampleRepublican
+            }
         }
 
         let response = try await callClaude(

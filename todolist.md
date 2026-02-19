@@ -16,10 +16,13 @@ Items recently fixed but not yet tested. **Test these before attempting again or
 
 ### Bugs
 
-- [ ] Onboarding scroll fix — replaced paged TabView with Group+switch in OnboardingFlowView to fix vertical ScrollView gesture conflict. Transition animation preserved with `.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading))`.
+- [ ] Onboarding scroll fix — replaced paged TabView with Group+switch in OnboardingFlowView to fix vertical ScrollView gesture conflict. Also removed broad `.animation()` modifiers from ContentView and OnboardingFlowView that were redundant (withAnimation in store already handles transitions). Note: scrolling was actually working — the simulator requires click-and-drag, not trackpad scroll.
+- [ ] Always shows Republican primary results regardless of party choice — added `Ballot.sampleDemocrat` with 5 Democratic races (CD-37, County Commissioner Pct 2, District Attorney, State Rep Dist 48, Justice of Peace) and 8 propositions. Updated `ClaudeService.generateVotingGuide()` to switch on `profile.primaryBallot` and return the correct sample ballot.
+- [ ] PolicyDeepDiveView skips silently for unmapped issues — added deep-dive questions for all 7 missing issues (education, healthcare, environment, infrastructure, transportation, immigration, civil rights). Removed `default: break` from switch. Each question has 4 options covering the political spectrum from conservative to progressive.
 
 ### Improvements
 
+- [ ] Complete policy deep-dive questions — added InterviewQuestions entries for all 12 issues: education, healthcare, environment, infrastructure, transportation, immigration, civil rights (IDs 104-110). Updated PolicyDeepDiveView switch to handle all cases (no more `default: break`). Also added dedup guard for economy/taxes sharing a question.
 - [ ] Fictional candidate names in sample data — replaced all real politician names in SampleData.swift (Cornyn→Langford, Paxton→Mercer, Abbott→Brackett, etc.) and VotingGuideStore preview data. Propositions also neutralized (Sharia→foreign law, Dem chairs→opposing-party chairs).
 - [ ] Accuracy disclaimer — added `DisclaimerBanner` component (Theme.swift). Dismissible banner at top of BallotOverviewView, persistent warning footer on CheatSheetView and RaceDetailView, and disclaimer line in cheat sheet share text.
 
@@ -35,13 +38,9 @@ Items not yet attempted or needing a fresh approach after failed verification.
 
 ### Bugs
 
-- [ ] Always shows Republican primary results regardless of party choice — selecting Democrat in PrimaryPickerView still generates `Ballot.sampleRepublican` because `ClaudeService.generateVotingGuide()` is stubbed and always returns the Republican sample ballot. Need `Ballot.sampleDemocrat` in SampleData.swift and logic in the stub to return the correct one based on `voterProfile.primaryBallot`
-- [ ] PolicyDeepDiveView skips silently for unmapped issues — only housing, safety, economy/taxes, and tech have deep-dive questions. Other issues (healthcare, education, environment, infrastructure, transportation, immigration, civil rights) hit a `default: break` and show "Got it! Moving on..." with no meaningful interaction.
+(none)
 
 ### Improvements
-
-- [ ] Complete policy deep-dive questions — add InterviewQuestions entries for all 12 issues (healthcare, education, environment, infrastructure, transportation, immigration, civil rights are missing)
-- [ ] Democratic primary sample ballot — only `Ballot.sampleRepublican` exists in SampleData.swift. Need `Ballot.sampleDemocrat` with Austin-area Democratic primary races (U.S. Rep CD-37, County Commissioner, etc.)
 - [ ] Real candidate data for March 2026 primary — all candidate info in SampleData.swift is placeholder. Research actual candidates, positions, endorsements, and fundraising for Travis County races
 - [ ] Real proposition data — verify the 10 sample propositions match actual March 2026 ballot propositions for Travis County
 

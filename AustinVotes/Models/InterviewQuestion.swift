@@ -209,6 +209,132 @@ enum InterviewQuestions {
         )
     }
 
+    static func educationDeepDive() -> InterviewQuestion {
+        InterviewQuestion(
+            id: 104,
+            phase: .policyDeepDive,
+            text: "On public education, what's your priority?",
+            subtitle: nil,
+            type: .singleChoice,
+            options: [
+                .init(label: "School choice first", icon: nil, description: "Vouchers, charters, let parents decide"),
+                .init(label: "Fix public schools", icon: nil, description: "More funding and support for neighborhood schools"),
+                .init(label: "Teacher-focused", icon: nil, description: "Raise pay, reduce class sizes, trust educators"),
+                .init(label: "Back to basics", icon: nil, description: "Focus on core academics, less politics in schools"),
+            ],
+            allowsMultiple: false,
+            allowsCustom: true
+        )
+    }
+
+    static func healthcareDeepDive() -> InterviewQuestion {
+        InterviewQuestion(
+            id: 105,
+            phase: .policyDeepDive,
+            text: "On healthcare, where do you stand?",
+            subtitle: nil,
+            type: .singleChoice,
+            options: [
+                .init(label: "Free market", icon: nil, description: "Less regulation, more competition to lower costs"),
+                .init(label: "Expand Medicaid", icon: nil, description: "Texas should accept federal Medicaid expansion"),
+                .init(label: "Universal coverage", icon: nil, description: "Everyone deserves healthcare regardless of income"),
+                .init(label: "Local solutions", icon: nil, description: "Community health centers and county programs"),
+            ],
+            allowsMultiple: false,
+            allowsCustom: true
+        )
+    }
+
+    static func environmentDeepDive() -> InterviewQuestion {
+        InterviewQuestion(
+            id: 106,
+            phase: .policyDeepDive,
+            text: "On environment and climate?",
+            subtitle: nil,
+            type: .singleChoice,
+            options: [
+                .init(label: "Don't overreact", icon: nil, description: "Protect energy jobs, market-driven solutions"),
+                .init(label: "All of the above", icon: nil, description: "Renewables and fossil fuels, pragmatic transition"),
+                .init(label: "Go green fast", icon: nil, description: "Aggressive renewable targets and climate action"),
+                .init(label: "Local focus", icon: nil, description: "Clean air and water in Austin, green spaces, urban heat"),
+            ],
+            allowsMultiple: false,
+            allowsCustom: true
+        )
+    }
+
+    static func infrastructureDeepDive() -> InterviewQuestion {
+        InterviewQuestion(
+            id: 107,
+            phase: .policyDeepDive,
+            text: "On the power grid and infrastructure?",
+            subtitle: nil,
+            type: .singleChoice,
+            options: [
+                .init(label: "Deregulate more", icon: nil, description: "Competition drives reliability, less ERCOT control"),
+                .init(label: "Weatherize & invest", icon: nil, description: "Mandate upgrades, spend what it takes to prevent outages"),
+                .init(label: "Connect the grid", icon: nil, description: "Link Texas to national grid for backup"),
+                .init(label: "Local resilience", icon: nil, description: "Microgrids, batteries, community-level solutions"),
+            ],
+            allowsMultiple: false,
+            allowsCustom: true
+        )
+    }
+
+    static func transportationDeepDive() -> InterviewQuestion {
+        InterviewQuestion(
+            id: 108,
+            phase: .policyDeepDive,
+            text: "On Austin transportation, what's the priority?",
+            subtitle: nil,
+            type: .singleChoice,
+            options: [
+                .init(label: "Build more roads", icon: nil, description: "Expand highways and reduce congestion for drivers"),
+                .init(label: "Public transit", icon: nil, description: "Light rail, better buses, less car dependence"),
+                .init(label: "Balanced approach", icon: nil, description: "Roads, transit, bikes, and walkability together"),
+                .init(label: "Remote work first", icon: nil, description: "Reduce the need to commute in the first place"),
+            ],
+            allowsMultiple: false,
+            allowsCustom: true
+        )
+    }
+
+    static func immigrationDeepDive() -> InterviewQuestion {
+        InterviewQuestion(
+            id: 109,
+            phase: .policyDeepDive,
+            text: "On immigration, what's your view?",
+            subtitle: nil,
+            type: .singleChoice,
+            options: [
+                .init(label: "Secure the border", icon: nil, description: "Enforcement first, then talk about reform"),
+                .init(label: "Enforce but reform", icon: nil, description: "Secure borders AND create legal pathways"),
+                .init(label: "Welcoming approach", icon: nil, description: "Immigrants strengthen Austin, expand protections"),
+                .init(label: "Local isn't federal", icon: nil, description: "City shouldn't spend resources on federal immigration enforcement"),
+            ],
+            allowsMultiple: false,
+            allowsCustom: true
+        )
+    }
+
+    static func civilRightsDeepDive() -> InterviewQuestion {
+        InterviewQuestion(
+            id: 110,
+            phase: .policyDeepDive,
+            text: "On civil rights and equality?",
+            subtitle: nil,
+            type: .singleChoice,
+            options: [
+                .init(label: "Equal treatment", icon: nil, description: "Same rules for everyone, no special categories"),
+                .init(label: "Protect what we have", icon: nil, description: "Maintain current protections, don't roll them back"),
+                .init(label: "Expand protections", icon: nil, description: "Stronger anti-discrimination laws and enforcement"),
+                .init(label: "Systemic change", icon: nil, description: "Address root causes of inequality, not just symptoms"),
+            ],
+            allowsMultiple: false,
+            allowsCustom: true
+        )
+    }
+
     private static func spectrumDescription(_ s: PoliticalSpectrum) -> String {
         switch s {
         case .progressive: "Bold systemic change, social justice focused"

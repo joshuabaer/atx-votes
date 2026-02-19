@@ -415,6 +415,278 @@ extension Ballot {
         ]
     }
 
+    // MARK: - Democratic Sample Ballot
+
+    static var sampleDemocrat: Ballot {
+        Ballot(
+            id: UUID(),
+            party: .democrat,
+            electionDate: DateComponents(calendar: .current, year: 2026, month: 3, day: 3).date!,
+            electionName: "March 2026 Democratic Primary",
+            districts: Districts(
+                congressional: "District 37",
+                stateSenate: "District 14",
+                stateHouse: "District 48",
+                countyCommissioner: "Precinct 2",
+                schoolBoard: "District 5"
+            ),
+            races: sampleDemRaces,
+            propositions: sampleDemPropositions
+        )
+    }
+
+    private static var sampleDemRaces: [Race] {
+        [
+            // US Representative CD-37 (key race — this is where the real action is on the Dem side)
+            Race(
+                id: UUID(),
+                office: "U.S. Representative",
+                district: "District 37",
+                candidates: [
+                    Candidate(
+                        id: UUID(),
+                        name: "Elena Vásquez",
+                        party: "Democrat",
+                        isIncumbent: true,
+                        isRecommended: true,
+                        summary: "First-term incumbent, former labor organizer and city council member. Progressive champion in a safe D+26 seat. Strong grassroots support.",
+                        background: "Former labor organizer and Austin City Council member. Elected to Congress in 2024. Member of the Congressional Progressive Caucus.",
+                        keyPositions: ["Medicare for All", "Green New Deal", "Workers' rights", "Housing affordability"],
+                        endorsements: ["Congressional Progressive Caucus", "AFL-CIO", "Sunrise Movement"],
+                        pros: ["Strong constituent services", "Accessible and visible in district", "Effective at coalition-building", "Authentic grassroots organizer"],
+                        cons: ["Very progressive — some moderates feel unrepresented", "Only one term of experience", "Sometimes prioritizes national profile over local issues"],
+                        fundraising: "$2.1M",
+                        polling: "72% — heavy favorite"
+                    ),
+                    Candidate(
+                        id: UUID(),
+                        name: "Michael Torres",
+                        party: "Democrat",
+                        isIncumbent: false,
+                        isRecommended: false,
+                        summary: "Small business owner and moderate Democrat. Running on pragmatism and bipartisan deal-making. Struggling to gain traction against the incumbent.",
+                        background: "Owner of a successful Austin tech consulting firm. Former school board member. MBA from UT Austin.",
+                        keyPositions: ["Infrastructure investment", "Small business support", "Bipartisan governance", "Education funding"],
+                        endorsements: ["Local business association"],
+                        pros: ["Business experience", "Moderate voice in a progressive district", "Focus on local economic issues"],
+                        cons: ["Only 15% in polls — not viable", "Lacks grassroots infrastructure", "Unclear why he's running against a popular incumbent"],
+                        fundraising: "$180K",
+                        polling: "15%"
+                    ),
+                ],
+                isContested: true,
+                isKeyRace: true,
+                recommendation: RaceRecommendation(
+                    candidateId: UUID(),
+                    candidateName: "Elena Vásquez",
+                    reasoning: "Popular first-term incumbent with strong constituent services and progressive credentials. Torres offers a moderate alternative but has no viable path to victory.",
+                    strategicNotes: "This is a safe Democratic seat. The real question is whether you want a more progressive or moderate representative.",
+                    caveats: nil,
+                    confidence: .strong
+                )
+            ),
+
+            // County Commissioner Precinct 2
+            Race(
+                id: UUID(),
+                office: "County Commissioner",
+                district: "Precinct 2",
+                candidates: [
+                    Candidate(
+                        id: UUID(),
+                        name: "Denise Okafor",
+                        party: "Democrat",
+                        isIncumbent: false,
+                        isRecommended: true,
+                        summary: "Environmental engineer and neighborhood association president. Focused on flooding infrastructure, transit, and responsible growth.",
+                        background: "Environmental engineer at a consulting firm. Led neighborhood flood mitigation efforts. Active in community planning.",
+                        keyPositions: ["Flood infrastructure", "Project Connect transit", "Affordable housing", "Climate resilience"],
+                        endorsements: ["Sierra Club", "Austin Environmental Democrats", "Outgoing Commissioner"],
+                        pros: ["Technical expertise on infrastructure", "Deep community roots", "Endorsed by outgoing commissioner", "Pragmatic problem-solver"],
+                        cons: ["No elected office experience", "May struggle with political dynamics of Commissioners Court"],
+                        fundraising: "$340K",
+                        polling: "38% — frontrunner"
+                    ),
+                    Candidate(
+                        id: UUID(),
+                        name: "Ray Hutchinson",
+                        party: "Democrat",
+                        isIncumbent: false,
+                        isRecommended: false,
+                        summary: "Former city planning commissioner and real estate attorney. Pro-development stance with focus on housing supply.",
+                        background: "Real estate attorney for 15 years. Served on Austin Planning Commission. Active in housing policy advocacy.",
+                        keyPositions: ["Housing supply", "Zoning reform", "Economic development", "Transportation"],
+                        endorsements: ["Real estate industry groups", "Housing advocacy organizations"],
+                        pros: ["Deep understanding of land use and housing policy", "Pro-housing supply", "Legal expertise"],
+                        cons: ["Real estate industry ties raise conflict-of-interest concerns", "Less community organizing experience"],
+                        fundraising: "$290K",
+                        polling: "28%"
+                    ),
+                    Candidate(
+                        id: UUID(),
+                        name: "Alma Reyes",
+                        party: "Democrat",
+                        isIncumbent: false,
+                        isRecommended: false,
+                        summary: "Community organizer and social worker. Running on equity and tenant protections. Strong grassroots energy but underfunded.",
+                        background: "Social worker specializing in housing stability. Founded a tenant rights organization.",
+                        keyPositions: ["Tenant protections", "Racial equity", "Community land trusts", "Defund-to-reinvest"],
+                        endorsements: ["DSA Austin", "Tenant advocacy groups"],
+                        pros: ["Authentic community voice", "Strong on equity issues", "Energetic grassroots campaign"],
+                        cons: ["Underfunded at $85K", "Very progressive positions may not play well county-wide", "No government experience"],
+                        fundraising: "$85K",
+                        polling: "18%"
+                    ),
+                ],
+                isContested: true,
+                isKeyRace: true,
+                recommendation: RaceRecommendation(
+                    candidateId: UUID(),
+                    candidateName: "Denise Okafor",
+                    reasoning: "Best combination of technical expertise and community roots. Her infrastructure focus addresses real Austin problems (flooding, transit). Endorsed by the outgoing commissioner who knows what the job requires.",
+                    strategicNotes: "Three-way race — if no one gets 50%, there will be a runoff between the top two.",
+                    caveats: "If housing supply is your top priority, Hutchinson has deeper expertise there.",
+                    confidence: .strong
+                )
+            ),
+
+            // Travis County District Attorney
+            Race(
+                id: UUID(),
+                office: "District Attorney",
+                district: "Travis County",
+                candidates: [
+                    Candidate(
+                        id: UUID(),
+                        name: "Natasha Freeman",
+                        party: "Democrat",
+                        isIncumbent: true,
+                        isRecommended: true,
+                        summary: "Incumbent DA focused on criminal justice reform. Diverted thousands of low-level cases, invested in mental health courts. Controversial with law enforcement.",
+                        background: "Career prosecutor who rose through the DA's office. Appointed DA, now running for first full term.",
+                        keyPositions: ["Diversion programs", "Mental health courts", "Prosecuting wage theft", "Reducing mass incarceration"],
+                        endorsements: ["Criminal justice reform organizations", "Mental health advocacy groups"],
+                        pros: ["Reduced low-level prosecutions without crime spike", "Mental health court expansion", "Data-driven approach"],
+                        cons: ["Law enforcement groups oppose her", "Some feel she's too lenient on property crime", "Perception of being soft on crime"],
+                        fundraising: "$520K",
+                        polling: "55%"
+                    ),
+                    Candidate(
+                        id: UUID(),
+                        name: "James Whitmore",
+                        party: "Democrat",
+                        isIncumbent: false,
+                        isRecommended: false,
+                        summary: "Former prosecutor running on a 'tough but fair' platform. Endorsed by police association. Says current DA has gone too far on reform.",
+                        background: "15 years as a prosecutor in Travis County. Left the DA's office citing policy disagreements with current leadership.",
+                        keyPositions: ["Prosecute all crimes", "Support law enforcement", "Victim advocacy", "Drug court expansion"],
+                        endorsements: ["Police officers association", "Victim advocacy groups"],
+                        pros: ["Extensive courtroom experience", "Law enforcement support", "Strong on victim advocacy"],
+                        cons: ["Represents a return to pre-reform prosecution", "Police association endorsement may signal over-incarceration approach"],
+                        fundraising: "$380K",
+                        polling: "35%"
+                    ),
+                ],
+                isContested: true,
+                isKeyRace: true,
+                recommendation: RaceRecommendation(
+                    candidateId: UUID(),
+                    candidateName: "Natasha Freeman",
+                    reasoning: "Her data-driven reform approach has reduced low-level prosecutions without a corresponding crime increase. If you value evidence-based policy over tough-on-crime rhetoric, she's the clear choice.",
+                    strategicNotes: nil,
+                    caveats: "If public safety is your top concern and you feel reform has gone too far, Whitmore offers a course correction.",
+                    confidence: .moderate
+                )
+            ),
+
+            // State Representative District 48
+            Race(
+                id: UUID(),
+                office: "State Representative",
+                district: "District 48",
+                candidates: [
+                    Candidate(
+                        id: UUID(),
+                        name: "Caroline Huang",
+                        party: "Democrat",
+                        isIncumbent: true,
+                        isRecommended: true,
+                        summary: "Two-term incumbent, former UT professor. Known for bipartisan work on education funding and grid reliability legislation.",
+                        background: "Former UT Austin public policy professor. Elected in 2022. Serves on Energy Resources and Public Education committees.",
+                        keyPositions: ["Education funding", "Grid reliability", "Affordable housing", "Water conservation"],
+                        endorsements: ["Texas State Teachers Association", "League of Conservation Voters"],
+                        pros: ["Effective bipartisan legislator", "Deep policy expertise", "Key role in grid reform", "Education champion"],
+                        cons: ["Some progressives feel she compromises too much"],
+                        fundraising: "$410K",
+                        polling: "Unopposed in primary"
+                    ),
+                ],
+                isContested: false,
+                isKeyRace: false,
+                recommendation: nil
+            ),
+
+            // Justice of the Peace
+            Race(
+                id: UUID(),
+                office: "Justice of the Peace",
+                district: "Precinct 2",
+                candidates: [
+                    Candidate(
+                        id: UUID(),
+                        name: "Bernard Mixon",
+                        party: "Democrat",
+                        isIncumbent: true,
+                        isRecommended: true,
+                        summary: "Long-serving JP known for efficient court management and tenant mediation programs.",
+                        background: "Justice of the Peace for 8 years. Former mediator and small claims attorney.",
+                        keyPositions: ["Court efficiency", "Tenant mediation", "Access to justice"],
+                        endorsements: [],
+                        pros: ["Experienced and efficient", "Innovative mediation programs"],
+                        cons: ["Long tenure — some want fresh perspective"],
+                        fundraising: nil,
+                        polling: nil
+                    ),
+                ],
+                isContested: false,
+                isKeyRace: false,
+                recommendation: nil
+            ),
+        ]
+    }
+
+    private static var sampleDemPropositions: [Proposition] {
+        // Democrats vote on the same propositions but with different party-specific ones
+        [
+            Proposition(id: UUID(), number: 1, title: "Universal healthcare access",
+                        description: "Texas should expand Medicaid and pursue universal healthcare coverage.",
+                        recommendation: .leanYes, reasoning: "Aligns with healthcare access priorities. Texas has the highest uninsured rate in the nation."),
+            Proposition(id: UUID(), number: 2, title: "Marijuana legalization",
+                        description: "Texas should legalize and regulate marijuana for adult use.",
+                        recommendation: .yourCall, reasoning: "Criminal justice reform angle supports this. Depends on your personal stance on drug policy."),
+            Proposition(id: UUID(), number: 3, title: "Reproductive rights",
+                        description: "Texas should restore the right to abortion access as it existed before 2022.",
+                        recommendation: .leanYes, reasoning: "Core Democratic platform issue. Aligns with bodily autonomy values."),
+            Proposition(id: UUID(), number: 4, title: "Gun safety measures",
+                        description: "Texas should require universal background checks and red flag laws.",
+                        recommendation: .leanYes, reasoning: "Aligns with public safety priorities and evidence-based policy."),
+            Proposition(id: UUID(), number: 5, title: "Renewable energy investment",
+                        description: "Texas should invest $10B in renewable energy infrastructure and grid reliability.",
+                        recommendation: .leanYes, reasoning: "Infrastructure and environment are in your top issues. Grid reliability is an urgent Texas need."),
+            Proposition(id: UUID(), number: 6, title: "Immigration reform",
+                        description: "Texas should support a path to citizenship for long-term undocumented residents.",
+                        recommendation: .yourCall, reasoning: "Depends on where you land on immigration. Both humanitarian and practical arguments exist."),
+            Proposition(id: UUID(), number: 7, title: "Public education funding",
+                        description: "Oppose school vouchers and increase per-pupil public school funding by 20%.",
+                        recommendation: .leanYes, reasoning: "Education is a priority. Public school funding has not kept pace with enrollment growth."),
+            Proposition(id: UUID(), number: 8, title: "Voting rights expansion",
+                        description: "Restore same-day voter registration and expand early voting to three weeks.",
+                        recommendation: .leanYes, reasoning: "Supports democratic participation. More access to voting aligns with civic engagement values."),
+        ]
+    }
+
+    // MARK: - Republican Propositions
+
     private static var samplePropositions: [Proposition] {
         [
             Proposition(id: UUID(), number: 1, title: "Phase out property taxes",
