@@ -113,10 +113,15 @@ struct CheatSheetView: View {
                                 .foregroundColor(Theme.textSecondary)
                         }
 
-                        Text("Remember: These are recommendations based on your stated values. You make the final call.")
-                            .font(Theme.caption)
-                            .foregroundColor(Theme.textSecondary)
-                            .multilineTextAlignment(.center)
+                        HStack(alignment: .top, spacing: 6) {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .font(.system(size: 10))
+                                .foregroundColor(Theme.warning)
+                            Text("AI-generated recommendations may contain errors. Do your own research before voting.")
+                                .font(.system(size: 11))
+                                .foregroundColor(Theme.textSecondary)
+                                .multilineTextAlignment(.center)
+                        }
 
                         Text("Built with ATX Votes")
                             .font(.system(size: 11, weight: .medium))
@@ -217,6 +222,7 @@ struct CheatSheetView: View {
         }
 
         lines.append("")
+        lines.append("⚠️ AI-generated recommendations — do your own research.")
         lines.append("Built with ATX Votes")
         return lines.joined(separator: "\n")
     }

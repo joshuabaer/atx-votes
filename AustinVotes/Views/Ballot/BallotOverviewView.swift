@@ -3,6 +3,7 @@ import SwiftUI
 struct BallotOverviewView: View {
     @EnvironmentObject var store: VotingGuideStore
     @State private var expandedRaceId: UUID?
+    @State private var showDisclaimer = true
 
     private var ballot: Ballot? { store.ballot }
 
@@ -22,6 +23,11 @@ struct BallotOverviewView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
+                    // Disclaimer banner
+                    if showDisclaimer {
+                        DisclaimerBanner { showDisclaimer = false }
+                    }
+
                     // Header card
                     headerCard
 

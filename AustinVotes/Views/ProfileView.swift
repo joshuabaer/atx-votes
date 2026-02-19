@@ -138,12 +138,29 @@ struct ProfileView: View {
                         .card()
                     }
 
+                    // Send Feedback
+                    if let url = FeedbackHelper.mailtoURL {
+                        Link(destination: url) {
+                            HStack(spacing: 10) {
+                                Image(systemName: "envelope.fill")
+                                    .font(.system(size: 16))
+                                Text("Send Feedback")
+                                    .font(Theme.headline)
+                            }
+                            .foregroundColor(Theme.primaryBlue)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 16)
+                            .background(Theme.primaryBlue.opacity(0.1))
+                            .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadiusSmall))
+                        }
+                        .padding(.top, 8)
+                    }
+
                     // Reset button
                     Button("Start Over") {
                         showResetConfirmation = true
                     }
                     .buttonStyle(SecondaryButtonStyle())
-                    .padding(.top, 8)
 
                     // Credits
                     VStack(spacing: 4) {

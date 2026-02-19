@@ -67,6 +67,17 @@ struct RaceDetailView: View {
                     .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadiusSmall))
                 }
 
+                // Disclaimer
+                HStack(alignment: .top, spacing: 6) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.system(size: 10))
+                        .foregroundColor(Theme.warning)
+                    Text("AI-generated recommendations may contain errors. Do your own research before voting.")
+                        .font(.system(size: 11))
+                        .foregroundColor(Theme.textSecondary)
+                }
+                .padding(.top, 4)
+
                 Spacer(minLength: 40)
             }
             .padding(.horizontal, Theme.paddingMedium)
