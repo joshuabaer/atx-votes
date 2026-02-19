@@ -1,0 +1,183 @@
+import SwiftUI
+
+struct ProfileView: View {
+    @EnvironmentObject var store: VotingGuideStore
+    @State private var showResetConfirmation = false
+
+    private var profile: VoterProfile { store.voterProfile }
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    // Profile summary card
+                    if let summary = profile.summaryText {
+                        VStack(alignment: .leading, spacing: 10) {
+                            HStack(spacing: 10) {
+                                Image(systemName: "person.circle.fill")
+                                    .font(.system(size: 32))
+                                    .foregroundColor(Theme.primaryBlue)
+                                VStack(alignment: .leading) {
+                                    Text("Your Voter Profile")
+                                        .font(Theme.headline)
+                                        .foregroundColor(Theme.textPrimary)
+                                    Text(profile.politicalSpectrum.rawValue)
+                                        .font(Theme.caption)
+                                        .foregroundColor(Theme.textSecondary)
+                                }
+                            }
+                            Text(summary)
+                                .font(Theme.callout)
+                                .foregroundColor(Theme.textSecondary)
+                        }
+                        .card()
+                    }
+
+                    // Top Issues
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Your Top Issues")
+                            .font(Theme.headline)
+                            .foregroundColor(Theme.textPrimary)
+
+                        FlowLayout(spacing: 8) {
+                            ForEach(profile.topIssues) { issue in
+                                HStack(spacing: 6) {
+                                    Image(systemName: issue.icon)
+                                        .font(.system(size: 12))
+                                    Text(issue.rawValue)
+                                        .font(.system(size: 13, weight: .medium))
+                                }
+                                .foregroundColor(Theme.primaryBlue)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .background(Theme.primaryBlue.opacity(0.08))
+                                .clipShape(Capsule())
+                            }
+                        }
+                    }
+                    .card()
+
+                    // Candidate Qualities
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("What You Value in Candidates")
+                            .font(Theme.headline)
+                            .foregroundColor(Theme.textPrimary)
+
+                        ForEach(profile.candidateQualities) { quality in
+                            HStack(spacing: 8) {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .foregroundColor(Theme.success)
+                                    .font(.caption)
+                                Text(quality.rawValue)
+                                    .font(Theme.callout)
+                                    .foregroundColor(Theme.textPrimary)
+                            }
+                        }
+                    }
+                    .card()
+
+                    // Policy Views
+                    if !profile.policyViews.isEmpty {
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("Your Policy Stances")
+                                .font(Theme.headline)
+                                .foregroundColor(Theme.textPrimary)
+
+                            ForEach(Array(profile.policyViews.keys.sorted()), id: \.self) { key in
+                                HStack(alignment: .top) {
+                                    Text(key)
+                                        .font(Theme.caption)
+                                        .foregroundColor(Theme.textSecondary)
+                                        .frame(width: 100, alignment: .leading)
+                                    Text(profile.policyViews[key] ?? "")
+                                        .font(.system(size: 14, weight: .medium))
+                                        .foregroundColor(Theme.textPrimary)
+                                }
+                            }
+                        }
+                        .card()
+                    }
+
+                    // Politicians
+                    if !profile.admiredPoliticians.isEmpty || !profile.dislikedPoliticians.isEmpty {
+                        VStack(alignment: .leading, spacing: 12) {
+                            if !profile.admiredPoliticians.isEmpty {
+                                VStack(alignment: .leading, spacing: 6) {
+                                    Label("Admire", systemImage: "hand.thumbsup.fill")
+                                        .font(Theme.caption)
+                                        .foregroundColor(Theme.success)
+                                    Text(profile.admiredPoliticians.joined(separator: ", "))
+                                        .font(Theme.callout)
+                                        .foregroundColor(Theme.textPrimary)
+                                }
+                            }
+                            if !profile.dislikedPoliticians.isEmpty {
+                                VStack(alignment: .leading, spacing: 6) {
+                                    Label("Dislike", systemImage: "hand.thumbsdown.fill")
+                                        .font(Theme.caption)
+                                        .foregroundColor(Theme.danger)
+                                    Text(profile.dislikedPoliticians.joined(separator: ", "))
+                                        .font(Theme.callout)
+                                        .foregroundColor(Theme.textPrimary)
+                                }
+                            }
+                        }
+                        .card()
+                    }
+
+                    // Address
+                    if let address = profile.address {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("Your Address")
+                                .font(Theme.headline)
+                                .foregroundColor(Theme.textPrimary)
+                            Text(address.formatted)
+                                .font(Theme.callout)
+                                .foregroundColor(Theme.textSecondary)
+                        }
+                        .card()
+                    }
+
+                    // Reset button
+                    Button("Start Over") {
+                        showResetConfirmation = true
+                    }
+                    .buttonStyle(SecondaryButtonStyle())
+                    .padding(.top, 8)
+
+                    // Credits
+                    VStack(spacing: 4) {
+                        Text("Built with ATX Votes")
+                            .font(Theme.caption)
+                            .foregroundColor(Theme.textSecondary)
+                        Text("Powered by Claude (Anthropic)")
+                            .font(.system(size: 11))
+                            .foregroundColor(Theme.textSecondary.opacity(0.6))
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, 8)
+
+                    Spacer(minLength: 40)
+                }
+                .padding(.horizontal, Theme.paddingMedium)
+                .padding(.top, Theme.paddingSmall)
+            }
+            .background(Theme.backgroundCream)
+            .navigationTitle("Profile")
+            .navigationBarTitleDisplayMode(.large)
+            .alert("Start Over?", isPresented: $showResetConfirmation) {
+                Button("Cancel", role: .cancel) { }
+                Button("Reset", role: .destructive) {
+                    store.resetGuide()
+                }
+            } message: {
+                Text("This will erase your voter profile and recommendations. You'll need to go through the interview again.")
+            }
+        }
+    }
+}
+
+#Preview {
+    ProfileView()
+        .environmentObject(VotingGuideStore.preview)
+}

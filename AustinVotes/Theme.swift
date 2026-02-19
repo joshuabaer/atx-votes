@@ -1,0 +1,149 @@
+import SwiftUI
+
+enum Theme {
+    // Austin-inspired palette
+    static let primary = Color("AccentColor", bundle: nil)
+    static let primaryBlue = Color(red: 0.13, green: 0.35, blue: 0.56)    // Deep Texas blue
+    static let accentGold = Color(red: 0.85, green: 0.65, blue: 0.13)     // Capitol gold
+    static let backgroundCream = Color(red: 0.98, green: 0.97, blue: 0.94)
+    static let cardBackground = Color.white
+    static let textPrimary = Color(red: 0.12, green: 0.12, blue: 0.14)
+    static let textSecondary = Color(red: 0.45, green: 0.45, blue: 0.50)
+    static let success = Color(red: 0.20, green: 0.65, blue: 0.32)
+    static let warning = Color(red: 0.90, green: 0.55, blue: 0.10)
+    static let danger = Color(red: 0.82, green: 0.20, blue: 0.20)
+
+    // Party colors
+    static let republican = Color(red: 0.85, green: 0.15, blue: 0.15)
+    static let democrat = Color(red: 0.15, green: 0.30, blue: 0.75)
+
+    // Typography
+    static let largeTitle = Font.system(size: 34, weight: .bold, design: .rounded)
+    static let title = Font.system(size: 28, weight: .bold, design: .rounded)
+    static let title2 = Font.system(size: 22, weight: .semibold, design: .rounded)
+    static let headline = Font.system(size: 17, weight: .semibold)
+    static let body = Font.system(size: 17, weight: .regular)
+    static let callout = Font.system(size: 16, weight: .regular)
+    static let caption = Font.system(size: 13, weight: .regular)
+
+    // Spacing
+    static let paddingSmall: CGFloat = 8
+    static let paddingMedium: CGFloat = 16
+    static let paddingLarge: CGFloat = 24
+    static let cornerRadius: CGFloat = 16
+    static let cornerRadiusSmall: CGFloat = 10
+}
+
+// MARK: - Reusable Components
+
+struct CardModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .padding(Theme.paddingMedium)
+            .background(Theme.cardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadius))
+            .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 2)
+    }
+}
+
+extension View {
+    func card() -> some View {
+        modifier(CardModifier())
+    }
+}
+
+struct PrimaryButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(Theme.headline)
+            .foregroundColor(.white)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 16)
+            .background(Theme.primaryBlue)
+            .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadiusSmall))
+            .opacity(configuration.isPressed ? 0.85 : 1.0)
+            .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
+            .animation(.easeOut(duration: 0.15), value: configuration.isPressed)
+    }
+}
+
+struct SecondaryButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(Theme.headline)
+            .foregroundColor(Theme.primaryBlue)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 16)
+            .background(Theme.primaryBlue.opacity(0.1))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadiusSmall))
+            .opacity(configuration.isPressed ? 0.7 : 1.0)
+    }
+}
+
+struct ChoiceChip: View {
+    let label: String
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(label)
+                .font(Theme.callout)
+                .foregroundColor(isSelected ? .white : Theme.textPrimary)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+                .background(isSelected ? Theme.primaryBlue : Color.gray.opacity(0.1))
+                .clipShape(Capsule())
+                .overlay(
+                    Capsule()
+                        .strokeBorder(isSelected ? Theme.primaryBlue : Color.gray.opacity(0.25), lineWidth: 1)
+                )
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+struct StarBadge: View {
+    var body: some View {
+        Image(systemName: "star.fill")
+            .font(.caption2)
+            .foregroundColor(Theme.accentGold)
+            .padding(4)
+            .background(Theme.accentGold.opacity(0.15))
+            .clipShape(Circle())
+    }
+}
+
+struct RecommendationBadge: View {
+    enum Style { case recommended, leanYes, leanNo, yourCall }
+
+    let style: Style
+
+    var label: String {
+        switch style {
+        case .recommended: "Recommended"
+        case .leanYes: "Lean Yes"
+        case .leanNo: "Lean No"
+        case .yourCall: "Your Call"
+        }
+    }
+
+    var color: Color {
+        switch style {
+        case .recommended: Theme.success
+        case .leanYes: Theme.success.opacity(0.8)
+        case .leanNo: Theme.danger.opacity(0.8)
+        case .yourCall: Theme.warning
+        }
+    }
+
+    var body: some View {
+        Text(label)
+            .font(.system(size: 12, weight: .semibold))
+            .foregroundColor(color)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(color.opacity(0.12))
+            .clipShape(Capsule())
+    }
+}
