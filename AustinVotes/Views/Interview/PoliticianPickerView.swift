@@ -30,7 +30,7 @@ struct PoliticianPickerView: View {
                             .foregroundColor(Theme.success)
 
                         HStack {
-                            TextField("e.g. Kirk Watson, Obama...", text: $admireText)
+                            TextField("e.g. George Washington, Abraham Lincoln...", text: $admireText)
                                 .textFieldStyle(.plain)
                                 .foregroundColor(Theme.textPrimary)
                                 .focused($focusedField, equals: .admire)
@@ -69,7 +69,7 @@ struct PoliticianPickerView: View {
                             .foregroundColor(Theme.danger)
 
                         HStack {
-                            TextField("e.g. Greg Casar, Ken Paxton...", text: $dislikeText)
+                            TextField("e.g. Darth Vader, President Snow...", text: $dislikeText)
                                 .textFieldStyle(.plain)
                                 .foregroundColor(Theme.textPrimary)
                                 .focused($focusedField, equals: .dislike)
