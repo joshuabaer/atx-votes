@@ -30,6 +30,7 @@ Items recently fixed but not yet tested. **Test these before attempting again or
 - [ ] Election Day voting locations link — added "Find Election Day locations" button in the Election Day accordion section of VotingInfoView. Links to Travis County Clerk elections page.
 - [ ] Profile summary generation — added standalone `ClaudeService.generateProfileSummary()` that calls Claude API with voter profile data and returns a 2-3 sentence synthesis. Added refresh button (arrow.trianglehead.2.clockwise) on ProfileView summary card to regenerate. Summary was already generated during guide build; this adds standalone regeneration.
 - [ ] Push notification reminders — added `NotificationService` with 5 scheduled local notifications: early voting start (Feb 17), mid-week reminder (Feb 24), last day of early voting (Feb 27), election eve (Mar 2), Election Day (Mar 3). Toggle card on VotingInfoView requests permission and schedules/cancels all reminders. State persisted in UserDefaults.
+- [ ] Offline mode — ballot is now cached to UserDefaults alongside voter profile. On app launch, `VotingGuideStore.init()` calls `loadSavedState()` which restores both profile and ballot, setting `guideComplete = true` if a cached ballot exists. `resetGuide()` clears the cached ballot. App works without network after initial guide generation.
 
 ---
 
@@ -49,7 +50,6 @@ Items not yet attempted or needing a fresh approach after failed verification.
 
 - [ ] Cloud persistence / backup — currently UserDefaults only. Consider CloudKit or similar for syncing voter profile and guide across devices
 - [ ] iPad / larger screen layout — current views are iPhone-optimized. Consider NavigationSplitView or multi-column layout for iPad
-- [ ] Offline mode — cache the generated ballot so the app works without network after initial guide generation
 - [ ] More entertaining loading animation — BuildingGuideView currently shows a simple pulsing icon and rotating status messages while the guide builds. Replace with something more engaging (e.g. animated ballot being filled in, fun voting facts, progress stages with illustrations)
 - [ ] Light/dark mode support — currently forced to light mode via `.preferredColorScheme(.light)` on ContentView. Define dark-mode variants for all Theme colors (backgroundCream, cardBackground, textPrimary, textSecondary, etc.) and remove the forced light mode so the app respects the system setting
 

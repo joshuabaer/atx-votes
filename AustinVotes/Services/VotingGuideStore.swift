@@ -20,7 +20,14 @@ class VotingGuideStore: ObservableObject {
     private let claudeService = ClaudeService()
     private let districtService = DistrictLookupService()
     private let persistenceKey = "austin_votes_profile"
+    private let ballotKey = "austin_votes_ballot"
     private let reviewPromptedKey = "austin_votes_review_prompted"
+
+    // MARK: - Init
+
+    init() {
+        loadSavedState()
+    }
 
     // MARK: - Interview Flow
 
@@ -149,12 +156,24 @@ class VotingGuideStore: ObservableObject {
         if let data = try? JSONEncoder().encode(voterProfile) {
             UserDefaults.standard.set(data, forKey: persistenceKey)
         }
+        if let ballot, let data = try? JSONEncoder().encode(ballot) {
+            UserDefaults.standard.set(data, forKey: ballotKey)
+        }
     }
 
     func loadProfile() {
         if let data = UserDefaults.standard.data(forKey: persistenceKey),
            let profile = try? JSONDecoder().decode(VoterProfile.self, from: data) {
             voterProfile = profile
+        }
+    }
+
+    private func loadSavedState() {
+        loadProfile()
+        if let data = UserDefaults.standard.data(forKey: ballotKey),
+           let savedBallot = try? JSONDecoder().decode(Ballot.self, from: data) {
+            ballot = savedBallot
+            guideComplete = true
         }
     }
 
@@ -166,6 +185,7 @@ class VotingGuideStore: ObservableObject {
             currentPhase = .welcome
         }
         UserDefaults.standard.removeObject(forKey: persistenceKey)
+        UserDefaults.standard.removeObject(forKey: ballotKey)
     }
 
     // MARK: - Preview
