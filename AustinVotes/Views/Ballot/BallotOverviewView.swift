@@ -78,6 +78,11 @@ struct BallotOverviewView: View {
             .background(Theme.backgroundCream)
             .navigationTitle("My Ballot")
             .navigationBarTitleDisplayMode(.large)
+            .task {
+                guard !NotificationService.shared.hasBeenPrompted else { return }
+                try? await Task.sleep(nanoseconds: 5_000_000_000)
+                _ = await NotificationService.shared.requestPermissionAndEnable()
+            }
         }
     }
 

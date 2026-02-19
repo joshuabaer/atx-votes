@@ -5,6 +5,11 @@ class NotificationService {
     static let shared = NotificationService()
 
     private let remindersEnabledKey = "austin_votes_reminders_enabled"
+    private let remindersPromptedKey = "austin_votes_reminders_prompted"
+
+    var hasBeenPrompted: Bool {
+        UserDefaults.standard.bool(forKey: remindersPromptedKey)
+    }
 
     var remindersEnabled: Bool {
         get { UserDefaults.standard.bool(forKey: remindersEnabledKey) }
@@ -65,6 +70,7 @@ class NotificationService {
     // MARK: - Permission & Scheduling
 
     func requestPermissionAndEnable() async -> Bool {
+        UserDefaults.standard.set(true, forKey: remindersPromptedKey)
         let center = UNUserNotificationCenter.current()
         do {
             let granted = try await center.requestAuthorization(options: [.alert, .sound, .badge])

@@ -5,6 +5,28 @@ struct VotingInfoView: View {
     @State private var expandedSection: InfoSection?
     @State private var remindersEnabled = NotificationService.shared.remindersEnabled
 
+    private var shareText: String {
+        let electionDay = DateComponents(calendar: .current, year: 2026, month: 3, day: 3).date!
+        let daysUntil = Calendar.current.dateComponents([.day], from: Date(), to: electionDay).day ?? 0
+
+        var lines: [String] = []
+        lines.append("Texas Primary Election — March 3, 2026")
+        if daysUntil > 0 {
+            lines.append("\(daysUntil) days away!")
+        }
+        lines.append("")
+        lines.append("Early Voting: Feb 17–27")
+        lines.append("Election Day: March 3, 7 AM – 7 PM")
+        lines.append("")
+        lines.append("Travis County uses Vote Centers — vote at any location.")
+        lines.append("Bring photo ID (TX driver's license, passport, etc.)")
+        lines.append("No phones allowed in the voting booth — print your cheat sheet!")
+        lines.append("")
+        lines.append("Build your personalized voting guide with ATX Votes:")
+        lines.append("https://atxvotes.app")
+        return lines.joined(separator: "\n")
+    }
+
     enum InfoSection: String, CaseIterable, Identifiable {
         case dates = "Key Dates"
         case earlyVoting = "Early Voting"
@@ -63,6 +85,13 @@ struct VotingInfoView: View {
             .background(Theme.backgroundCream)
             .navigationTitle("Vote Info")
             .navigationBarTitleDisplayMode(.large)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    ShareLink(item: shareText) {
+                        Image(systemName: "square.and.arrow.up")
+                    }
+                }
+            }
         }
     }
 
@@ -188,9 +217,11 @@ struct VotingInfoView: View {
     }
 
     private func openMapsSearch(near address: Address) {
-        let query = "Vote Center near \(address.formatted)"
+        let query = "Travis County Vote Center"
             .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-        if let url = URL(string: "maps://?q=\(query)") {
+        let near = address.formatted
+            .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        if let url = URL(string: "maps://?q=\(query)&near=\(near)") {
             UIApplication.shared.open(url)
         }
     }
