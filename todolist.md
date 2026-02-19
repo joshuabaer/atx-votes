@@ -35,6 +35,7 @@ Items not yet attempted or needing a fresh approach after failed verification.
 
 ### Bugs
 
+- [ ] Always shows Republican primary results regardless of party choice — selecting Democrat in PrimaryPickerView still generates `Ballot.sampleRepublican` because `ClaudeService.generateVotingGuide()` is stubbed and always returns the Republican sample ballot. Need `Ballot.sampleDemocrat` in SampleData.swift and logic in the stub to return the correct one based on `voterProfile.primaryBallot`
 - [ ] PolicyDeepDiveView skips silently for unmapped issues — only housing, safety, economy/taxes, and tech have deep-dive questions. Other issues (healthcare, education, environment, infrastructure, transportation, immigration, civil rights) hit a `default: break` and show "Got it! Moving on..." with no meaningful interaction.
 
 ### Improvements

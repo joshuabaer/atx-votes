@@ -11,7 +11,6 @@ struct ContentView: View {
                 OnboardingFlowView()
             }
         }
-        .animation(.easeInOut, value: store.guideComplete)
     }
 }
 

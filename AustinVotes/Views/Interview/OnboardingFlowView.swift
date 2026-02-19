@@ -38,11 +38,7 @@ struct OnboardingFlowView: View {
                         BuildingGuideView()
                     }
                 }
-                .transition(.asymmetric(
-                    insertion: .move(edge: .trailing).combined(with: .opacity),
-                    removal: .move(edge: .leading).combined(with: .opacity)
-                ))
-                .animation(.easeInOut(duration: 0.35), value: store.currentPhase)
+                .id(store.currentPhase)
             }
         }
     }
