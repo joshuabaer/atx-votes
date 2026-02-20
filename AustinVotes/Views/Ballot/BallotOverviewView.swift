@@ -101,7 +101,7 @@ struct BallotOverviewView: View {
                 }
                 Spacer()
                 Image(systemName: "checkmark.seal.fill")
-                    .font(.system(size: 32))
+                    .font(.system(size: 36))
                     .foregroundColor(.white.opacity(0.3))
             }
 
@@ -119,6 +119,13 @@ struct BallotOverviewView: View {
                     }
                 }
             }
+
+            if store.districtLookupFailed {
+                Text("Showing all races — district lookup unavailable")
+                    .font(Theme.caption)
+                    .foregroundColor(.white.opacity(0.7))
+                    .italic()
+            }
         }
         .padding(Theme.paddingMedium)
         .background(
@@ -134,11 +141,11 @@ struct BallotOverviewView: View {
     private func districtRow(_ label: String, _ value: String) -> some View {
         HStack(spacing: 8) {
             Text(label)
-                .font(.system(size: 12, weight: .semibold))
+                .font(.system(size: 14, weight: .semibold))
                 .foregroundColor(.white.opacity(0.6))
                 .frame(width: 80, alignment: .leading)
             Text(value)
-                .font(.system(size: 13, weight: .medium))
+                .font(.system(size: 15, weight: .medium))
                 .foregroundColor(.white.opacity(0.9))
         }
     }
@@ -149,11 +156,13 @@ struct BallotOverviewView: View {
         HStack(spacing: 8) {
             Image(systemName: icon)
                 .foregroundColor(color)
+                .accessibilityHidden(true)
             Text(title)
                 .font(Theme.title2)
                 .foregroundColor(Theme.textPrimary)
         }
         .padding(.top, 8)
+        .accessibilityAddTraits(.isHeader)
     }
 
     // MARK: - Uncontested Section
@@ -235,7 +244,7 @@ struct RaceCard: View {
                         HStack(spacing: 6) {
                             RecommendationBadge(style: .recommended)
                             Text(candidate.name)
-                                .font(.system(size: 16, weight: .bold))
+                                .font(.system(size: 18, weight: .bold))
                                 .foregroundColor(Theme.primaryBlue)
                         }
                         Text(rec.reasoning)
@@ -255,12 +264,14 @@ struct RaceCard: View {
                     Text("·")
                         .foregroundColor(Theme.textSecondary)
                     Text(rec.confidence.rawValue)
-                        .font(.system(size: 12, weight: .medium))
+                        .font(.system(size: 14, weight: .medium))
                         .foregroundColor(Theme.primaryBlue)
                 }
             }
         }
         .card()
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(race.office)\(race.district.map { ", \($0)" } ?? "")\(race.isKeyRace ? ", Key race" : ""). \(recommendedCandidate.map { "Recommended: \($0.name)" } ?? "\(race.candidates.count) candidates")")
     }
 }
 
@@ -287,7 +298,7 @@ struct PropositionCard: View {
                     VStack(alignment: .leading, spacing: 4) {
                         HStack(spacing: 8) {
                             Text("Prop \(proposition.number)")
-                                .font(.system(size: 13, weight: .bold, design: .rounded))
+                                .font(.system(size: 15, weight: .bold, design: .rounded))
                                 .foregroundColor(Theme.primaryBlue)
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 3)

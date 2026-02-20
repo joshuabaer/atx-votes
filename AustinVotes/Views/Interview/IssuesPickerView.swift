@@ -78,11 +78,11 @@ struct IssueCard: View {
         Button(action: action) {
             VStack(spacing: 8) {
                 Image(systemName: issue.icon)
-                    .font(.system(size: 24))
+                    .font(.system(size: 28))
                     .foregroundColor(isSelected ? .white : Theme.primaryBlue)
 
                 Text(issue.rawValue)
-                    .font(.system(size: 14, weight: .medium))
+                    .font(.system(size: 16, weight: .medium))
                     .foregroundColor(isSelected ? .white : Theme.textPrimary)
                     .multilineTextAlignment(.center)
                     .lineLimit(2)

@@ -70,10 +70,10 @@ struct RaceDetailView: View {
                 // Disclaimer
                 HStack(alignment: .top, spacing: 6) {
                     Image(systemName: "exclamationmark.triangle.fill")
-                        .font(.system(size: 10))
+                        .font(.system(size: 13))
                         .foregroundColor(Theme.warning)
                     Text("AI-generated recommendations may contain errors. Do your own research before voting.")
-                        .font(.system(size: 11))
+                        .font(.system(size: 14))
                         .foregroundColor(Theme.textSecondary)
                 }
                 .padding(.top, 4)
@@ -96,7 +96,7 @@ struct RaceDetailView: View {
                     .foregroundColor(Theme.success)
                     .font(.title3)
                 Text("Our Pick: \(rec.candidateName)")
-                    .font(.system(size: 17, weight: .bold))
+                    .font(.system(size: 19, weight: .bold))
                     .foregroundColor(Theme.textPrimary)
             }
 
@@ -118,7 +118,7 @@ struct RaceDetailView: View {
 
             HStack {
                 Text(rec.confidence.rawValue)
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(.system(size: 14, weight: .semibold))
                     .foregroundColor(Theme.primaryBlue)
                     .padding(.horizontal, 10)
                     .padding(.vertical, 4)
@@ -154,7 +154,7 @@ struct CandidateCard: View {
                             .fill(candidate.isRecommended ? Theme.primaryBlue : Color.gray.opacity(0.12))
                             .frame(width: 44, height: 44)
                         Text(candidate.name.prefix(1))
-                            .font(.system(size: 18, weight: .bold))
+                            .font(.system(size: 20, weight: .bold))
                             .foregroundColor(candidate.isRecommended ? .white : Theme.textSecondary)
                     }
 
@@ -168,7 +168,7 @@ struct CandidateCard: View {
                             }
                             if candidate.isIncumbent {
                                 Text("Incumbent")
-                                    .font(.system(size: 11, weight: .medium))
+                                    .font(.system(size: 13, weight: .medium))
                                     .foregroundColor(Theme.textSecondary)
                                     .padding(.horizontal, 6)
                                     .padding(.vertical, 2)
@@ -202,13 +202,13 @@ struct CandidateCard: View {
                     if !candidate.pros.isEmpty {
                         VStack(alignment: .leading, spacing: 6) {
                             Label("Strengths", systemImage: "plus.circle.fill")
-                                .font(.system(size: 13, weight: .semibold))
+                                .font(.system(size: 15, weight: .semibold))
                                 .foregroundColor(Theme.success)
 
                             ForEach(candidate.pros, id: \.self) { pro in
                                 HStack(alignment: .top, spacing: 8) {
                                     Text("+")
-                                        .font(.system(size: 13, weight: .bold, design: .monospaced))
+                                        .font(.system(size: 15, weight: .bold, design: .monospaced))
                                         .foregroundColor(Theme.success)
                                     Text(pro)
                                         .font(Theme.caption)
@@ -222,13 +222,13 @@ struct CandidateCard: View {
                     if !candidate.cons.isEmpty {
                         VStack(alignment: .leading, spacing: 6) {
                             Label("Concerns", systemImage: "minus.circle.fill")
-                                .font(.system(size: 13, weight: .semibold))
+                                .font(.system(size: 15, weight: .semibold))
                                 .foregroundColor(Theme.danger)
 
                             ForEach(candidate.cons, id: \.self) { con in
                                 HStack(alignment: .top, spacing: 8) {
                                     Text("-")
-                                        .font(.system(size: 13, weight: .bold, design: .monospaced))
+                                        .font(.system(size: 15, weight: .bold, design: .monospaced))
                                         .foregroundColor(Theme.danger)
                                     Text(con)
                                         .font(Theme.caption)
@@ -242,12 +242,12 @@ struct CandidateCard: View {
                     if !candidate.keyPositions.isEmpty {
                         VStack(alignment: .leading, spacing: 6) {
                             Text("Key Positions")
-                                .font(.system(size: 13, weight: .semibold))
+                                .font(.system(size: 15, weight: .semibold))
                                 .foregroundColor(Theme.textSecondary)
                             FlowLayout(spacing: 6) {
                                 ForEach(candidate.keyPositions, id: \.self) { position in
                                     Text(position)
-                                        .font(.system(size: 12))
+                                        .font(.system(size: 14))
                                         .foregroundColor(Theme.textPrimary)
                                         .padding(.horizontal, 10)
                                         .padding(.vertical, 5)
@@ -263,20 +263,20 @@ struct CandidateCard: View {
                         if let funds = candidate.fundraising {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text("Fundraising")
-                                    .font(.system(size: 11, weight: .medium))
+                                    .font(.system(size: 13, weight: .medium))
                                     .foregroundColor(Theme.textSecondary)
                                 Text(funds)
-                                    .font(.system(size: 13, weight: .semibold))
+                                    .font(.system(size: 15, weight: .semibold))
                                     .foregroundColor(Theme.textPrimary)
                             }
                         }
                         if let polling = candidate.polling {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text("Polling")
-                                    .font(.system(size: 11, weight: .medium))
+                                    .font(.system(size: 13, weight: .medium))
                                     .foregroundColor(Theme.textSecondary)
                                 Text(polling)
-                                    .font(.system(size: 13, weight: .semibold))
+                                    .font(.system(size: 15, weight: .semibold))
                                     .foregroundColor(Theme.textPrimary)
                             }
                         }
@@ -286,7 +286,7 @@ struct CandidateCard: View {
                     if !candidate.endorsements.isEmpty {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Endorsements")
-                                .font(.system(size: 11, weight: .medium))
+                                .font(.system(size: 13, weight: .medium))
                                 .foregroundColor(Theme.textSecondary)
                             Text(candidate.endorsements.joined(separator: ", "))
                                 .font(Theme.caption)
@@ -298,6 +298,9 @@ struct CandidateCard: View {
             }
         }
         .card()
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(candidate.name)\(candidate.isRecommended ? ", Recommended" : "")\(candidate.isIncumbent ? ", Incumbent" : ""). \(candidate.summary)")
+        .accessibilityHint(isExpanded ? "Double tap to collapse" : "Double tap to expand details")
     }
 }
 

@@ -89,7 +89,7 @@ struct QualityOption: View {
                         .fill(isSelected ? Theme.primaryBlue : Color.gray.opacity(0.08))
                         .frame(width: 40, height: 40)
                     Image(systemName: icon)
-                        .font(.system(size: 18))
+                        .font(.system(size: 20))
                         .foregroundColor(isSelected ? .white : Theme.primaryBlue)
                 }
 

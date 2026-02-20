@@ -4,6 +4,7 @@ struct ProfileView: View {
     @EnvironmentObject var store: VotingGuideStore
     @State private var showResetConfirmation = false
     @State private var isRegeneratingSummary = false
+    @State private var summaryError: String?
 
     private var profile: VoterProfile { store.voterProfile }
 
@@ -57,7 +58,7 @@ struct ProfileView: View {
                     VStack(alignment: .leading, spacing: 10) {
                         HStack(spacing: 10) {
                             Image(systemName: "person.circle.fill")
-                                .font(.system(size: 32))
+                                .font(.system(size: 36))
                                 .foregroundColor(Theme.primaryBlue)
                             VStack(alignment: .leading) {
                                 Text("Your Voter Profile")
@@ -75,7 +76,7 @@ struct ProfileView: View {
                                     Task { await regenerateSummary() }
                                 } label: {
                                     Image(systemName: "arrow.trianglehead.2.clockwise")
-                                        .font(.system(size: 14))
+                                        .font(.system(size: 18))
                                         .foregroundColor(Theme.textSecondary)
                                 }
                             }
@@ -88,6 +89,13 @@ struct ProfileView: View {
                     }
                     .card()
 
+                    if let summaryError {
+                        Text(summaryError)
+                            .font(Theme.caption)
+                            .foregroundColor(Theme.danger)
+                            .padding(.horizontal, 4)
+                    }
+
                     // Top Issues
                     VStack(alignment: .leading, spacing: 10) {
                         Text("Your Top Issues")
@@ -98,9 +106,9 @@ struct ProfileView: View {
                             ForEach(profile.topIssues) { issue in
                                 HStack(spacing: 6) {
                                     Image(systemName: issue.icon)
-                                        .font(.system(size: 12))
+                                        .font(.system(size: 14))
                                     Text(issue.rawValue)
-                                        .font(.system(size: 13, weight: .medium))
+                                        .font(.system(size: 15, weight: .medium))
                                 }
                                 .foregroundColor(Theme.primaryBlue)
                                 .padding(.horizontal, 12)
@@ -145,7 +153,7 @@ struct ProfileView: View {
                                         .foregroundColor(Theme.textSecondary)
                                         .frame(width: 100, alignment: .leading)
                                     Text(profile.policyViews[key] ?? "")
-                                        .font(.system(size: 14, weight: .medium))
+                                        .font(.system(size: 16, weight: .medium))
                                         .foregroundColor(Theme.textPrimary)
                                 }
                             }
@@ -198,7 +206,7 @@ struct ProfileView: View {
                         Link(destination: url) {
                             HStack(spacing: 10) {
                                 Image(systemName: "envelope.fill")
-                                    .font(.system(size: 16))
+                                    .font(.system(size: 18))
                                 Text("Send Feedback")
                                     .font(Theme.headline)
                             }
@@ -223,7 +231,7 @@ struct ProfileView: View {
                             .font(Theme.caption)
                             .foregroundColor(Theme.textSecondary)
                         Text("Powered by Claude (Anthropic)")
-                            .font(.system(size: 11))
+                            .font(.system(size: 13))
                             .foregroundColor(Theme.textSecondary.opacity(0.6))
                     }
                     .frame(maxWidth: .infinity)
@@ -242,6 +250,7 @@ struct ProfileView: View {
                     ShareLink(item: shareableProfileText) {
                         Image(systemName: "square.and.arrow.up")
                     }
+                    .accessibilityLabel("Share voter profile")
                 }
             }
             .alert("Start Over?", isPresented: $showResetConfirmation) {
@@ -257,12 +266,13 @@ struct ProfileView: View {
 
     private func regenerateSummary() async {
         isRegeneratingSummary = true
+        summaryError = nil
         do {
-            let summary = try await ClaudeService().generateProfileSummary(profile: store.voterProfile)
+            let summary = try await store.claudeService.generateProfileSummary(profile: store.voterProfile)
             store.voterProfile.summaryText = summary
             store.saveProfile()
         } catch {
-            // Silently fail — keep existing summary
+            summaryError = "Could not refresh summary. Check your connection and try again."
         }
         isRegeneratingSummary = false
     }

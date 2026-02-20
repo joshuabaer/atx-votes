@@ -44,7 +44,13 @@ Items not yet attempted or needing a fresh approach after failed verification.
 
 ### Improvements
 
-(none)
+- [ ] Structured logging — replace `print()` with `os.Logger` using subsystem/category prefixes (e.g. `[PROBE]`, `[STATE]`, `[STORAGE]`). Currently 2 bare `print()` calls in production code
+- [ ] Accessibility gaps — add `accessibilityLabel` to CandidateCard, RaceCard, and toolbar share buttons. Add `.accessibilityAddTraits(.isHeader)` to section headings. Add `accessibilityValue` to reminders Toggle
+- [ ] Dynamic Type support — current `Font.system(size:)` uses fixed point sizes that don't scale with user accessibility settings. Switch to `.body`, `.headline` etc. with `relativeTo:` for proper Dynamic Type scaling
+- [ ] Service dependency injection — `ClaudeService` is instantiated ad-hoc in `ProfileView.regenerateSummary()` instead of reusing the store's instance. Extract protocol abstractions for services to enable unit testing
+- [ ] Error feedback — `VotingGuideStore.errorMessage` may not be surfaced in UI. `ProfileView.regenerateSummary()` silently swallows all errors. District lookup failure gives no user indication
+- [ ] Safe URL/Date construction — replace force-unwrapped `URL(string:)!` and `DateComponents.date!` in VotingInfoView with safe alternatives
+- [ ] Design review document — create a design review checklist (accessibility, force unwraps, logging hygiene, memory/retain cycles) with automated verification scripts, per Canary pattern
 
 ### Features
 
@@ -53,6 +59,7 @@ Items not yet attempted or needing a fresh approach after failed verification.
 - [ ] More entertaining loading animation — BuildingGuideView currently shows a simple pulsing icon and rotating status messages while the guide builds. Replace with something more engaging (e.g. animated ballot being filled in, fun voting facts, progress stages with illustrations)
 - [ ] Light/dark mode support — currently forced to light mode via `.preferredColorScheme(.light)` on ContentView. Define dark-mode variants for all Theme colors (backgroundCream, cardBackground, textPrimary, textSecondary, etc.) and remove the forced light mode so the app respects the system setting
 - [ ] Find a good domain name — research and register a memorable domain for the app (e.g. atxvotes.com, austinvotes.app, etc.)
+- [ ] Election countdown widget — WidgetKit extension with systemSmall/systemMedium/lock screen families showing days until Election Day and next key date. Use App Group shared UserDefaults for data bridge
 
 ### Testing
 

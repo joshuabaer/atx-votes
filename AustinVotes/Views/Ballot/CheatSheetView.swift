@@ -24,7 +24,7 @@ struct CheatSheetView: View {
                     // Title card
                     VStack(spacing: 8) {
                         Image(systemName: "list.clipboard.fill")
-                            .font(.system(size: 28))
+                            .font(.system(size: 32))
                             .foregroundColor(Theme.primaryBlue)
 
                         Text("Your Ballot Cheat Sheet")
@@ -38,7 +38,7 @@ struct CheatSheetView: View {
                         }
 
                         Text(ballot?.party.rawValue ?? "Republican")
-                            .font(.system(size: 13, weight: .semibold))
+                            .font(.system(size: 15, weight: .semibold))
                             .foregroundColor(.white)
                             .padding(.horizontal, 12)
                             .padding(.vertical, 4)
@@ -106,7 +106,7 @@ struct CheatSheetView: View {
                         Divider()
                         HStack(spacing: 4) {
                             Image(systemName: "star.fill")
-                                .font(.system(size: 10))
+                                .font(.system(size: 15))
                                 .foregroundColor(Theme.accentGold)
                             Text("= Key race where your vote matters most")
                                 .font(Theme.caption)
@@ -115,16 +115,16 @@ struct CheatSheetView: View {
 
                         HStack(alignment: .top, spacing: 6) {
                             Image(systemName: "exclamationmark.triangle.fill")
-                                .font(.system(size: 10))
+                                .font(.system(size: 15))
                                 .foregroundColor(Theme.warning)
                             Text("AI-generated recommendations may contain errors. Do your own research before voting.")
-                                .font(.system(size: 11))
+                                .font(.system(size: 16))
                                 .foregroundColor(Theme.textSecondary)
                                 .multilineTextAlignment(.center)
                         }
 
                         Text("Built with ATX Votes")
-                            .font(.system(size: 11, weight: .medium))
+                            .font(.system(size: 13, weight: .medium))
                             .foregroundColor(Theme.textSecondary.opacity(0.5))
                     }
                     .padding(Theme.paddingMedium)
@@ -143,11 +143,13 @@ struct CheatSheetView: View {
                     HStack(spacing: 16) {
                         ShareLink(item: shareAppMessage) {
                             Image(systemName: "person.2.fill")
-                                .font(.system(size: 14))
+                                .font(.system(size: 16))
                         }
+                        .accessibilityLabel("Share app with friends")
                         ShareLink(item: cheatSheetText) {
                             Image(systemName: "square.and.arrow.up")
                         }
+                        .accessibilityLabel("Share cheat sheet")
                     }
                 }
             }
@@ -159,7 +161,7 @@ struct CheatSheetView: View {
     private func cheatSheetHeader(_ title: String) -> some View {
         HStack {
             Text(title)
-                .font(.system(size: 11, weight: .bold, design: .monospaced))
+                .font(.system(size: 13, weight: .bold, design: .monospaced))
                 .foregroundColor(.white)
             Spacer()
         }
@@ -173,17 +175,17 @@ struct CheatSheetView: View {
             HStack(spacing: 4) {
                 if isKeyRace {
                     Image(systemName: "star.fill")
-                        .font(.system(size: 10))
+                        .font(.system(size: 15))
                         .foregroundColor(Theme.accentGold)
                 }
                 Text(office)
-                    .font(.system(size: 13))
+                    .font(.system(size: 15))
                     .foregroundColor(Theme.textPrimary)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
             Text(vote)
-                .font(.system(size: 13, weight: .bold))
+                .font(.system(size: 15, weight: .bold))
                 .foregroundColor(voteColor)
                 .multilineTextAlignment(.trailing)
                 .frame(maxWidth: .infinity, alignment: .trailing)

@@ -1,4 +1,7 @@
 import Foundation
+import os
+
+private let logger = Logger(subsystem: "app.atxvotes", category: "ElectionData")
 
 // MARK: - Election Data Loader
 // Loads ballot data from bundled JSON files in ElectionData/.
@@ -15,7 +18,7 @@ enum ElectionDataLoader {
             let raw = try JSONDecoder().decode(RawBallot.self, from: data)
             return raw.toBallot()
         } catch {
-            print("ElectionDataLoader: Failed to decode \(filename).json — \(error)")
+            logger.error("Failed to decode \(filename).json — \(error.localizedDescription)")
             return nil
         }
     }
@@ -176,7 +179,7 @@ extension Ballot {
         Ballot(
             id: UUID(),
             party: .republican,
-            electionDate: DateComponents(calendar: .current, year: 2026, month: 3, day: 3).date!,
+            electionDate: DateComponents(calendar: .current, year: 2026, month: 3, day: 3).date ?? Date(),
             electionName: "March 2026 Republican Primary",
             districts: Districts(),
             races: [],
@@ -188,7 +191,7 @@ extension Ballot {
         Ballot(
             id: UUID(),
             party: .democrat,
-            electionDate: DateComponents(calendar: .current, year: 2026, month: 3, day: 3).date!,
+            electionDate: DateComponents(calendar: .current, year: 2026, month: 3, day: 3).date ?? Date(),
             electionName: "March 2026 Democratic Primary",
             districts: Districts(),
             races: [],

@@ -150,7 +150,7 @@ struct PolicyOptionButton: View {
                     )
                     .overlay(
                         isSelected ? Image(systemName: "checkmark")
-                            .font(.system(size: 11, weight: .bold))
+                            .font(.system(size: 13, weight: .bold))
                             .foregroundColor(.white)
                         : nil
                     )

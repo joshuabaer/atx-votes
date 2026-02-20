@@ -31,7 +31,7 @@ struct BuildingGuideView: View {
 
                 if store.guideComplete {
                     Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 64))
+                        .font(.system(size: 68))
                         .foregroundColor(Theme.success)
                         .transition(reduceMotion ? .opacity : .scale.combined(with: .opacity))
                 } else {
@@ -74,7 +74,7 @@ struct BuildingGuideView: View {
 
                         HStack(spacing: 8) {
                             Image(systemName: step.0)
-                                .font(.system(size: 14))
+                                .font(.system(size: 16))
                                 .foregroundColor(index <= animateStep ? Theme.primaryBlue : Theme.textSecondary)
                                 .frame(width: 20)
                             Text(step.1)

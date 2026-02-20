@@ -1,6 +1,9 @@
 import Foundation
+import os
 import StoreKit
 import SwiftUI
+
+private let logger = Logger(subsystem: "app.atxvotes", category: "GuideStore")
 
 @MainActor
 class VotingGuideStore: ObservableObject {
@@ -15,9 +18,10 @@ class VotingGuideStore: ObservableObject {
     @Published var isLoading = false
     @Published var loadingMessage = "Researching your ballot..."
     @Published var errorMessage: String?
+    @Published var districtLookupFailed = false
 
     // MARK: - Services
-    private let claudeService = ClaudeService()
+    let claudeService = ClaudeService()
     private let districtService = DistrictLookupService()
     private let persistenceKey = "austin_votes_profile"
     private let ballotKey = "austin_votes_ballot"
@@ -103,7 +107,8 @@ class VotingGuideStore: ObservableObject {
                     voterProfile.districts = try await districtService.lookupDistricts(for: address)
                 } catch {
                     // District lookup failed — fall through to show all races
-                    print("District lookup failed: \(error). Showing all races.")
+                    logger.warning("District lookup failed: \(error.localizedDescription). Showing all races.")
+                    districtLookupFailed = true
                 }
             }
 

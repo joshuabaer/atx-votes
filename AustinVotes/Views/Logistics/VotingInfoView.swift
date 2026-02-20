@@ -5,8 +5,13 @@ struct VotingInfoView: View {
     @State private var expandedSection: InfoSection?
     @State private var remindersEnabled = NotificationService.shared.remindersEnabled
 
+    private static let electionDay = DateComponents(calendar: .current, year: 2026, month: 3, day: 3).date ?? Date()
+    static let travisClerkURL = URL(string: "https://countyclerk.traviscountytx.gov/departments/elections/current-election/")!
+    static let voteTravisURL = URL(string: "https://votetravis.gov")!
+    static let phoneURL = URL(string: "tel:5122388683")!
+
     private var shareText: String {
-        let electionDay = DateComponents(calendar: .current, year: 2026, month: 3, day: 3).date!
+        let electionDay = Self.electionDay
         let daysUntil = Calendar.current.dateComponents([.day], from: Date(), to: electionDay).day ?? 0
 
         var lines: [String] = []
@@ -90,6 +95,7 @@ struct VotingInfoView: View {
                     ShareLink(item: shareText) {
                         Image(systemName: "square.and.arrow.up")
                     }
+                    .accessibilityLabel("Share voting info")
                 }
             }
         }
@@ -98,21 +104,21 @@ struct VotingInfoView: View {
     // MARK: - Countdown
 
     private var countdownCard: some View {
-        let electionDay = DateComponents(calendar: .current, year: 2026, month: 3, day: 3).date!
+        let electionDay = Self.electionDay
         let today = Date()
         let daysUntil = Calendar.current.dateComponents([.day], from: today, to: electionDay).day ?? 0
 
         return VStack(spacing: 8) {
             if daysUntil > 0 {
                 Text("\(daysUntil)")
-                    .font(.system(size: 48, weight: .bold, design: .rounded))
+                    .font(.system(size: 52, weight: .bold, design: .rounded))
                     .foregroundColor(Theme.primaryBlue)
                 Text("days until Election Day")
                     .font(Theme.headline)
                     .foregroundColor(Theme.textSecondary)
             } else if daysUntil == 0 {
                 Text("TODAY")
-                    .font(.system(size: 48, weight: .bold, design: .rounded))
+                    .font(.system(size: 52, weight: .bold, design: .rounded))
                     .foregroundColor(Theme.success)
                 Text("is Election Day!")
                     .font(Theme.headline)
@@ -138,7 +144,7 @@ struct VotingInfoView: View {
     private var remindersCard: some View {
         HStack(spacing: 12) {
             Image(systemName: "bell.badge.fill")
-                .font(.system(size: 20))
+                .font(.system(size: 22))
                 .foregroundColor(Theme.accentGold)
 
             VStack(alignment: .leading, spacing: 2) {
@@ -154,6 +160,8 @@ struct VotingInfoView: View {
 
             Toggle("", isOn: $remindersEnabled)
                 .labelsHidden()
+                .accessibilityLabel("Election reminders")
+                .accessibilityValue(remindersEnabled ? "On" : "Off")
                 .onChange(of: remindersEnabled) { _, newValue in
                     if newValue {
                         Task {
@@ -176,7 +184,7 @@ struct VotingInfoView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 10) {
                 Image(systemName: "mappin.and.ellipse")
-                    .font(.system(size: 20))
+                    .font(.system(size: 22))
                     .foregroundColor(Theme.primaryBlue)
                 Text("Find Your Polling Location")
                     .font(Theme.headline)
@@ -193,7 +201,7 @@ struct VotingInfoView: View {
                         openMapsSearch(near: address)
                     } label: {
                         Label("Open in Maps", systemImage: "map.fill")
-                            .font(.system(size: 14, weight: .semibold))
+                            .font(.system(size: 16, weight: .semibold))
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 12)
@@ -202,9 +210,9 @@ struct VotingInfoView: View {
                     }
                 }
 
-                Link(destination: URL(string: "https://countyclerk.traviscountytx.gov/departments/elections/current-election/")!) {
+                Link(destination: Self.travisClerkURL) {
                     Label("VoteTravis.gov", systemImage: "globe")
-                        .font(.system(size: 14, weight: .semibold))
+                        .font(.system(size: 16, weight: .semibold))
                         .foregroundColor(Theme.primaryBlue)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
@@ -234,11 +242,11 @@ struct VotingInfoView: View {
                 .font(Theme.headline)
                 .foregroundColor(Theme.textPrimary)
             HStack(spacing: 12) {
-                Link(destination: URL(string: "tel:5122388683")!) {
+                Link(destination: Self.phoneURL) {
                     Label("(512) 238-8683", systemImage: "phone.fill")
                         .font(Theme.caption)
                 }
-                Link(destination: URL(string: "https://votetravis.gov")!) {
+                Link(destination: Self.voteTravisURL) {
                     Label("votetravis.gov", systemImage: "globe")
                         .font(Theme.caption)
                 }
@@ -260,7 +268,7 @@ struct InfoAccordion: View {
             Button(action: onTap) {
                 HStack(spacing: 12) {
                     Image(systemName: section.icon)
-                        .font(.system(size: 18))
+                        .font(.system(size: 20))
                         .foregroundColor(Theme.primaryBlue)
                         .frame(width: 28)
                         .accessibilityHidden(true)
@@ -314,7 +322,7 @@ struct InfoAccordion: View {
             InfoRow(label: "Feb 23 - 25", value: "7:00 AM - 7:00 PM")
             InfoRow(label: "Feb 26 - 27", value: "7:00 AM - 10:00 PM")
 
-            Link(destination: URL(string: "https://votetravis.gov")!) {
+            Link(destination: VotingInfoView.voteTravisURL) {
                 Label("Find early voting locations", systemImage: "map.fill")
                     .font(Theme.callout)
                     .foregroundColor(Theme.primaryBlue)
@@ -329,9 +337,9 @@ struct InfoAccordion: View {
                 .font(Theme.caption)
                 .foregroundColor(Theme.textSecondary)
 
-            Link(destination: URL(string: "https://countyclerk.traviscountytx.gov/departments/elections/current-election/")!) {
+            Link(destination: VotingInfoView.travisClerkURL) {
                 Label("Find Election Day locations", systemImage: "mappin.and.ellipse")
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.system(size: 16, weight: .semibold))
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 12)
@@ -391,7 +399,7 @@ struct InfoAccordion: View {
     private func idItem(_ text: String) -> some View {
         HStack(spacing: 8) {
             Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 12))
+                .font(.system(size: 14))
                 .foregroundColor(Theme.success)
             Text(text)
                 .font(Theme.caption)
@@ -402,7 +410,7 @@ struct InfoAccordion: View {
     private func bringItem(_ text: String, icon: String, required: Bool) -> some View {
         HStack(spacing: 10) {
             Image(systemName: icon)
-                .font(.system(size: 16))
+                .font(.system(size: 18))
                 .foregroundColor(Theme.primaryBlue)
                 .frame(width: 24)
             Text(text)
@@ -410,7 +418,7 @@ struct InfoAccordion: View {
                 .foregroundColor(Theme.textPrimary)
             if required {
                 Text("Required")
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(.system(size: 13, weight: .semibold))
                     .foregroundColor(Theme.danger)
                     .padding(.horizontal, 6)
                     .padding(.vertical, 2)
@@ -421,7 +429,7 @@ struct InfoAccordion: View {
     }
 
     private func resourceLink(_ title: String, url: String) -> some View {
-        Link(destination: URL(string: url)!) {
+        Link(destination: URL(string: url) ?? VotingInfoView.voteTravisURL) {
             HStack {
                 Text(title)
                     .font(Theme.callout)
@@ -451,7 +459,7 @@ struct InfoRow: View {
                 .strikethrough(isPast)
             Spacer()
             Text(value)
-                .font(.system(size: 13, weight: highlight ? .bold : .medium))
+                .font(.system(size: 15, weight: highlight ? .bold : .medium))
                 .foregroundColor(isPast ? Theme.textSecondary.opacity(0.5) : (highlight ? Theme.primaryBlue : Theme.textPrimary))
         }
     }

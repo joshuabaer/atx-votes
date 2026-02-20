@@ -12,6 +12,7 @@ struct ContentView: View {
             }
         }
         .preferredColorScheme(.light)
+        .dynamicTypeSize(.large...)
     }
 }
 
