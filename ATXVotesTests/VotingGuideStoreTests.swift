@@ -1,5 +1,5 @@
 import XCTest
-@testable import AustinVotes
+@testable import ATXVotes
 
 @MainActor
 final class VotingGuideStoreTests: XCTestCase {
@@ -9,14 +9,14 @@ final class VotingGuideStoreTests: XCTestCase {
     override func setUp() {
         super.setUp()
         // Clear persisted state before each test
-        UserDefaults.standard.removeObject(forKey: "austin_votes_profile")
-        UserDefaults.standard.removeObject(forKey: "austin_votes_ballot")
+        UserDefaults.standard.removeObject(forKey: "atx_votes_profile")
+        UserDefaults.standard.removeObject(forKey: "atx_votes_ballot")
         store = VotingGuideStore()
     }
 
     override func tearDown() {
-        UserDefaults.standard.removeObject(forKey: "austin_votes_profile")
-        UserDefaults.standard.removeObject(forKey: "austin_votes_ballot")
+        UserDefaults.standard.removeObject(forKey: "atx_votes_profile")
+        UserDefaults.standard.removeObject(forKey: "atx_votes_ballot")
         store = nil
         super.tearDown()
     }
@@ -157,7 +157,7 @@ final class VotingGuideStoreTests: XCTestCase {
         // Don't save a ballot
 
         // Clear ballot key to ensure it's not there
-        UserDefaults.standard.removeObject(forKey: "austin_votes_ballot")
+        UserDefaults.standard.removeObject(forKey: "atx_votes_ballot")
 
         let store2 = VotingGuideStore()
         XCTAssertNil(store2.ballot)
@@ -181,8 +181,8 @@ final class VotingGuideStoreTests: XCTestCase {
         XCTAssertEqual(store.currentPhase, .welcome)
 
         // Verify persistence is cleared
-        XCTAssertNil(UserDefaults.standard.data(forKey: "austin_votes_profile"))
-        XCTAssertNil(UserDefaults.standard.data(forKey: "austin_votes_ballot"))
+        XCTAssertNil(UserDefaults.standard.data(forKey: "atx_votes_profile"))
+        XCTAssertNil(UserDefaults.standard.data(forKey: "atx_votes_ballot"))
     }
 
     // MARK: - Guide State

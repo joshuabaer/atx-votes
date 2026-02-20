@@ -1,5 +1,65 @@
 import SwiftUI
 
+// MARK: - I Voted Sticker
+
+struct IVotedStickerView: View {
+    var size: CGFloat = 200
+
+    private var scale: CGFloat { size / 200 }
+
+    var body: some View {
+        ZStack {
+            // Oval background
+            Ellipse()
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Color(red: 0.10, green: 0.25, blue: 0.55),
+                            Color(red: 0.15, green: 0.35, blue: 0.65)
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+
+            // Red border
+            Ellipse()
+                .strokeBorder(Color(red: 0.80, green: 0.15, blue: 0.15), lineWidth: 6 * scale)
+
+            VStack(spacing: 4 * scale) {
+                // Stars row
+                HStack(spacing: 6 * scale) {
+                    ForEach(0..<5) { _ in
+                        Image(systemName: "star.fill")
+                            .font(.system(size: 14 * scale))
+                            .foregroundColor(.white)
+                    }
+                }
+                .padding(.top, 20 * scale)
+
+                Spacer(minLength: 0)
+
+                // Main text
+                Text("I VOTED")
+                    .font(.system(size: 44 * scale, weight: .black, design: .rounded))
+                    .foregroundColor(.white)
+                    .tracking(2 * scale)
+
+                Spacer(minLength: 0)
+
+                // Subtitle
+                Text("TX PRIMARY 2026")
+                    .font(.system(size: 12 * scale, weight: .bold, design: .rounded))
+                    .foregroundColor(.white.opacity(0.8))
+                    .tracking(1.5 * scale)
+                    .padding(.bottom, 20 * scale)
+            }
+            .padding(.horizontal, 16 * scale)
+        }
+        .frame(width: size, height: size * 0.75)
+    }
+}
+
 struct BallotOverviewView: View {
     @EnvironmentObject var store: VotingGuideStore
     @State private var expandedRaceId: UUID?
@@ -27,6 +87,9 @@ struct BallotOverviewView: View {
                     if showDisclaimer {
                         DisclaimerBanner { showDisclaimer = false }
                     }
+
+                    // I Voted card
+                    iVotedCard
 
                     // Header card
                     headerCard
@@ -78,11 +141,6 @@ struct BallotOverviewView: View {
             .background(Theme.backgroundCream)
             .navigationTitle("My Ballot")
             .navigationBarTitleDisplayMode(.large)
-            .task {
-                guard !NotificationService.shared.hasBeenPrompted else { return }
-                try? await Task.sleep(nanoseconds: 5_000_000_000)
-                _ = await NotificationService.shared.requestPermissionAndEnable()
-            }
         }
     }
 
@@ -147,6 +205,68 @@ struct BallotOverviewView: View {
             Text(value)
                 .font(.system(size: 17, weight: .medium))
                 .foregroundColor(.white.opacity(0.9))
+        }
+    }
+
+    // MARK: - I Voted Card
+
+    @ViewBuilder
+    private var iVotedCard: some View {
+        if store.hasVoted {
+            VStack(spacing: 16) {
+                IVotedStickerView()
+                    .accessibilityLabel("I Voted sticker")
+
+                Button {
+                    shareIVotedSticker()
+                } label: {
+                    Label("Share", systemImage: "square.and.arrow.up")
+                        .font(Theme.headline)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(Theme.primaryBlue)
+                        .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadiusSmall))
+                }
+
+                Button("Undo") {
+                    store.unmarkVoted()
+                }
+                .font(Theme.caption)
+                .foregroundColor(Theme.textSecondary)
+            }
+            .card()
+        } else {
+            Button {
+                store.markAsVoted()
+            } label: {
+                HStack(spacing: 10) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 24))
+                        .foregroundColor(Theme.success)
+                    Text("Mark as Voted")
+                        .font(Theme.headline)
+                        .foregroundColor(Theme.success)
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundColor(Theme.textSecondary)
+                }
+            }
+            .buttonStyle(.plain)
+            .card()
+        }
+    }
+
+    private func shareIVotedSticker() {
+        let renderer = ImageRenderer(content: IVotedStickerView(size: 600))
+        renderer.scale = 3
+        guard let image = renderer.uiImage else { return }
+        let text = "I voted in the Texas Primary! Have you? Build your free voting guide at https://atxvotes.app"
+        let activityVC = UIActivityViewController(activityItems: [image, text], applicationActivities: nil)
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let rootVC = windowScene.keyWindow?.rootViewController {
+            rootVC.present(activityVC, animated: true)
         }
     }
 

@@ -109,7 +109,14 @@ struct VotingInfoView: View {
         let daysUntil = Calendar.current.dateComponents([.day], from: today, to: electionDay).day ?? 0
 
         return VStack(spacing: 8) {
-            if daysUntil > 0 {
+            if store.hasVoted {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 58))
+                    .foregroundColor(Theme.success)
+                Text("You voted!")
+                    .font(Theme.headline)
+                    .foregroundColor(Theme.success)
+            } else if daysUntil > 0 {
                 Text("\(daysUntil)")
                     .font(.system(size: 58, weight: .bold, design: .rounded))
                     .foregroundColor(Theme.primaryBlue)
@@ -143,25 +150,32 @@ struct VotingInfoView: View {
 
     private var remindersCard: some View {
         HStack(spacing: 12) {
-            Image(systemName: "bell.badge.fill")
+            Image(systemName: store.hasVoted ? "bell.slash.fill" : "bell.badge.fill")
                 .font(.system(size: 24))
-                .foregroundColor(Theme.accentGold)
+                .foregroundColor(store.hasVoted ? Theme.textSecondary : Theme.accentGold)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text("Election Reminders")
                     .font(Theme.headline)
                     .foregroundColor(Theme.textPrimary)
-                Text("Get notified for early voting and Election Day")
-                    .font(Theme.caption)
-                    .foregroundColor(Theme.textSecondary)
+                if store.hasVoted {
+                    Text("Reminders paused — you voted!")
+                        .font(Theme.caption)
+                        .foregroundColor(Theme.success)
+                } else {
+                    Text("Get notified for early voting and Election Day")
+                        .font(Theme.caption)
+                        .foregroundColor(Theme.textSecondary)
+                }
             }
 
             Spacer()
 
             Toggle("", isOn: $remindersEnabled)
                 .labelsHidden()
+                .disabled(store.hasVoted)
                 .accessibilityLabel("Election reminders")
-                .accessibilityValue(remindersEnabled ? "On" : "Off")
+                .accessibilityValue(store.hasVoted ? "Paused" : (remindersEnabled ? "On" : "Off"))
                 .onChange(of: remindersEnabled) { _, newValue in
                     if newValue {
                         Task {

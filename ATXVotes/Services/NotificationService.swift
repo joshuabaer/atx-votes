@@ -4,8 +4,8 @@ import UserNotifications
 class NotificationService {
     static let shared = NotificationService()
 
-    private let remindersEnabledKey = "austin_votes_reminders_enabled"
-    private let remindersPromptedKey = "austin_votes_reminders_prompted"
+    private let remindersEnabledKey = "atx_votes_reminders_enabled"
+    private let remindersPromptedKey = "atx_votes_reminders_prompted"
 
     var hasBeenPrompted: Bool {
         UserDefaults.standard.bool(forKey: remindersPromptedKey)
@@ -84,6 +84,8 @@ class NotificationService {
     }
 
     func scheduleAllReminders() {
+        if UserDefaults.standard.bool(forKey: "atx_votes_has_voted") { return }
+
         let center = UNUserNotificationCenter.current()
         let now = Date()
 

@@ -196,7 +196,7 @@ actor ClaudeService {
             throw ClaudeError.apiError("Invalid API URL")
         }
 
-        var request = URLRequest(url: url)
+        var request = URLRequest(url: url, timeoutInterval: 30)
         request.httpMethod = "POST"
         request.addValue("Bearer \(appSecret)", forHTTPHeaderField: "Authorization")
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")

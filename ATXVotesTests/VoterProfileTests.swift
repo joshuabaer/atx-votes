@@ -1,5 +1,5 @@
 import XCTest
-@testable import AustinVotes
+@testable import ATXVotes
 
 final class VoterProfileTests: XCTestCase {
 

@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct AustinVotesApp: App {
+struct ATXVotesApp: App {
     @StateObject private var store = VotingGuideStore()
 
     var body: some Scene {

@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A10001000000000000000001 /* AustinVotesApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20001000000000000000001 /* AustinVotesApp.swift */; };
+		A10001000000000000000001 /* ATXVotesApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20001000000000000000001 /* ATXVotesApp.swift */; };
 		A10002000000000000000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20002000000000000000002 /* ContentView.swift */; };
 		A10003000000000000000003 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20003000000000000000003 /* Theme.swift */; };
 		A10004000000000000000004 /* VoterProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20004000000000000000004 /* VoterProfile.swift */; };
@@ -30,19 +30,29 @@
 		A10015000000000000000015 /* VotingInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20015000000000000000015 /* VotingInfoView.swift */; };
 		A10016000000000000000016 /* VotingGuideStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20016000000000000000016 /* VotingGuideStore.swift */; };
 		A10017000000000000000017 /* ClaudeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20017000000000000000017 /* ClaudeService.swift */; };
-		A1001C00000000000000001C /* DistrictLookupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2001C00000000000000001C /* DistrictLookupService.swift */; };
-		A1001D00000000000000001D /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2001D00000000000000001D /* NotificationService.swift */; };
 		A10018000000000000000018 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A20018000000000000000018 /* Assets.xcassets */; };
 		A10019000000000000000019 /* republican_primary_2026.json in Resources */ = {isa = PBXBuildFile; fileRef = A20019000000000000000019 /* republican_primary_2026.json */; };
 		A1001A00000000000000001A /* democrat_primary_2026.json in Resources */ = {isa = PBXBuildFile; fileRef = A2001A00000000000000001A /* democrat_primary_2026.json */; };
+		A1001C00000000000000001C /* DistrictLookupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2001C00000000000000001C /* DistrictLookupService.swift */; };
+		A1001D00000000000000001D /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2001D00000000000000001D /* NotificationService.swift */; };
 		B10001000000000000000001 /* VotingGuideStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20001000000000000000001 /* VotingGuideStoreTests.swift */; };
 		B10002000000000000000002 /* BallotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20002000000000000000002 /* BallotTests.swift */; };
 		B10003000000000000000003 /* VoterProfileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20003000000000000000003 /* VoterProfileTests.swift */; };
 		B10004000000000000000004 /* ClaudeServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20004000000000000000004 /* ClaudeServiceTests.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		B50000000000000000000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AA0000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A60000000000000000000001;
+			remoteInfo = ATXVotes;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
-		A20001000000000000000001 /* AustinVotesApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AustinVotesApp.swift; sourceTree = "<group>"; };
+		A20001000000000000000001 /* ATXVotesApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ATXVotesApp.swift; sourceTree = "<group>"; };
 		A20002000000000000000002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A20003000000000000000003 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		A20004000000000000000004 /* VoterProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoterProfile.swift; sourceTree = "<group>"; };
@@ -65,17 +75,18 @@
 		A20015000000000000000015 /* VotingInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VotingInfoView.swift; sourceTree = "<group>"; };
 		A20016000000000000000016 /* VotingGuideStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VotingGuideStore.swift; sourceTree = "<group>"; };
 		A20017000000000000000017 /* ClaudeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeService.swift; sourceTree = "<group>"; };
-		A2001C00000000000000001C /* DistrictLookupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistrictLookupService.swift; sourceTree = "<group>"; };
-		A2001D00000000000000001D /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		A20018000000000000000018 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A20019000000000000000019 /* republican_primary_2026.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = republican_primary_2026.json; sourceTree = "<group>"; };
 		A2001A00000000000000001A /* democrat_primary_2026.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = democrat_primary_2026.json; sourceTree = "<group>"; };
-		A30000000000000000000001 /* AustinVotes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AustinVotes.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A2001C00000000000000001C /* DistrictLookupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistrictLookupService.swift; sourceTree = "<group>"; };
+		A2001D00000000000000001D /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		A2001E00000000000000001E /* ATXVotes.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ATXVotes.entitlements; sourceTree = "<group>"; };
+		A30000000000000000000001 /* ATXVotes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ATXVotes.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B20001000000000000000001 /* VotingGuideStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VotingGuideStoreTests.swift; sourceTree = "<group>"; };
 		B20002000000000000000002 /* BallotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BallotTests.swift; sourceTree = "<group>"; };
 		B20003000000000000000003 /* VoterProfileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoterProfileTests.swift; sourceTree = "<group>"; };
 		B20004000000000000000004 /* ClaudeServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeServiceTests.swift; sourceTree = "<group>"; };
-		B30000000000000000000001 /* AustinVotesTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AustinVotesTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B30000000000000000000001 /* ATXVotesTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ATXVotesTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -95,38 +106,21 @@
 		};
 /* End PBXFrameworksBuildPhase section */
 
-/* Begin PBXContainerItemProxy section */
-		B50000000000000000000001 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = AA0000000000000000000001 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = A60000000000000000000001;
-			remoteInfo = AustinVotes;
-		};
-/* End PBXContainerItemProxy section */
-
-/* Begin PBXTargetDependency section */
-		B60000000000000000000001 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = A60000000000000000000001 /* AustinVotes */;
-			targetProxy = B50000000000000000000001 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
-
 /* Begin PBXGroup section */
 		A50000000000000000000001 = {
 			isa = PBXGroup;
 			children = (
-				A50000000000000000000002 /* AustinVotes */,
-				B50000000000000000000002 /* AustinVotesTests */,
+				A50000000000000000000002 /* ATXVotes */,
+				B50000000000000000000002 /* ATXVotesTests */,
 				A50000000000000000000010 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		A50000000000000000000002 /* AustinVotes */ = {
+		A50000000000000000000002 /* ATXVotes */ = {
 			isa = PBXGroup;
 			children = (
-				A20001000000000000000001 /* AustinVotesApp.swift */,
+				A2001E00000000000000001E /* ATXVotes.entitlements */,
+				A20001000000000000000001 /* ATXVotesApp.swift */,
 				A20002000000000000000002 /* ContentView.swift */,
 				A20003000000000000000003 /* Theme.swift */,
 				A50000000000000000000003 /* Models */,
@@ -135,16 +129,7 @@
 				A50000000000000000000009 /* ElectionData */,
 				A20018000000000000000018 /* Assets.xcassets */,
 			);
-			path = AustinVotes;
-			sourceTree = "<group>";
-		};
-		A50000000000000000000009 /* ElectionData */ = {
-			isa = PBXGroup;
-			children = (
-				A20019000000000000000019 /* republican_primary_2026.json */,
-				A2001A00000000000000001A /* democrat_primary_2026.json */,
-			);
-			path = ElectionData;
+			path = ATXVotes;
 			sourceTree = "<group>";
 		};
 		A50000000000000000000003 /* Models */ = {
@@ -214,16 +199,25 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
+		A50000000000000000000009 /* ElectionData */ = {
+			isa = PBXGroup;
+			children = (
+				A20019000000000000000019 /* republican_primary_2026.json */,
+				A2001A00000000000000001A /* democrat_primary_2026.json */,
+			);
+			path = ElectionData;
+			sourceTree = "<group>";
+		};
 		A50000000000000000000010 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A30000000000000000000001 /* AustinVotes.app */,
-				B30000000000000000000001 /* AustinVotesTests.xctest */,
+				A30000000000000000000001 /* ATXVotes.app */,
+				B30000000000000000000001 /* ATXVotesTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		B50000000000000000000002 /* AustinVotesTests */ = {
+		B50000000000000000000002 /* ATXVotesTests */ = {
 			isa = PBXGroup;
 			children = (
 				B20001000000000000000001 /* VotingGuideStoreTests.swift */,
@@ -231,15 +225,15 @@
 				B20003000000000000000003 /* VoterProfileTests.swift */,
 				B20004000000000000000004 /* ClaudeServiceTests.swift */,
 			);
-			path = AustinVotesTests;
+			path = ATXVotesTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		A60000000000000000000001 /* AustinVotes */ = {
+		A60000000000000000000001 /* ATXVotes */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A80000000000000000000003 /* Build configuration list for PBXNativeTarget "AustinVotes" */;
+			buildConfigurationList = A80000000000000000000003 /* Build configuration list for PBXNativeTarget "ATXVotes" */;
 			buildPhases = (
 				A70000000000000000000001 /* Sources */,
 				A40000000000000000000001 /* Frameworks */,
@@ -249,14 +243,14 @@
 			);
 			dependencies = (
 			);
-			name = AustinVotes;
-			productName = AustinVotes;
-			productReference = A30000000000000000000001 /* AustinVotes.app */;
+			name = ATXVotes;
+			productName = ATXVotes;
+			productReference = A30000000000000000000001 /* ATXVotes.app */;
 			productType = "com.apple.product-type.application";
 		};
-		B60000000000000000000002 /* AustinVotesTests */ = {
+		B60000000000000000000002 /* ATXVotesTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B80000000000000000000001 /* Build configuration list for PBXNativeTarget "AustinVotesTests" */;
+			buildConfigurationList = B80000000000000000000001 /* Build configuration list for PBXNativeTarget "ATXVotesTests" */;
 			buildPhases = (
 				B70000000000000000000001 /* Sources */,
 				B40000000000000000000001 /* Frameworks */,
@@ -267,9 +261,9 @@
 			dependencies = (
 				B60000000000000000000001 /* PBXTargetDependency */,
 			);
-			name = AustinVotesTests;
-			productName = AustinVotesTests;
-			productReference = B30000000000000000000001 /* AustinVotesTests.xctest */;
+			name = ATXVotesTests;
+			productName = ATXVotesTests;
+			productReference = B30000000000000000000001 /* ATXVotesTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -291,7 +285,7 @@
 					};
 				};
 			};
-			buildConfigurationList = A80000000000000000000001 /* Build configuration list for PBXProject "AustinVotes" */;
+			buildConfigurationList = A80000000000000000000001 /* Build configuration list for PBXProject "ATXVotes" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -304,8 +298,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				A60000000000000000000001 /* AustinVotes */,
-				B60000000000000000000002 /* AustinVotesTests */,
+				A60000000000000000000001 /* ATXVotes */,
+				B60000000000000000000002 /* ATXVotesTests */,
 			);
 		};
 /* End PBXProject section */
@@ -335,7 +329,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A10001000000000000000001 /* AustinVotesApp.swift in Sources */,
+				A10001000000000000000001 /* ATXVotesApp.swift in Sources */,
 				A10002000000000000000002 /* ContentView.swift in Sources */,
 				A10003000000000000000003 /* Theme.swift in Sources */,
 				A10004000000000000000004 /* VoterProfile.swift in Sources */,
@@ -375,6 +369,14 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		B60000000000000000000001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A60000000000000000000001 /* ATXVotes */;
+			targetProxy = B50000000000000000000001 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		AB0000000000000000000001 /* Debug */ = {
@@ -501,12 +503,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = ATXVotes/ATXVotes.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = S7A2CEEUDS;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = AustinVotes;
+				INFOPLIST_KEY_CFBundleDisplayName = "ATX Votes";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -534,12 +537,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = ATXVotes/ATXVotes.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = S7A2CEEUDS;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = AustinVotes;
+				INFOPLIST_KEY_CFBundleDisplayName = "ATX Votes";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -578,7 +582,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AustinVotes.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/AustinVotes";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ATXVotes.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ATXVotes";
 			};
 			name = Debug;
 		};
@@ -598,14 +602,14 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AustinVotes.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/AustinVotes";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ATXVotes.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ATXVotes";
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		A80000000000000000000001 /* Build configuration list for PBXProject "AustinVotes" */ = {
+		A80000000000000000000001 /* Build configuration list for PBXProject "ATXVotes" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AB0000000000000000000001 /* Debug */,
@@ -614,7 +618,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A80000000000000000000003 /* Build configuration list for PBXNativeTarget "AustinVotes" */ = {
+		A80000000000000000000003 /* Build configuration list for PBXNativeTarget "ATXVotes" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AB0000000000000000000003 /* Debug */,
@@ -623,7 +627,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B80000000000000000000001 /* Build configuration list for PBXNativeTarget "AustinVotesTests" */ = {
+		B80000000000000000000001 /* Build configuration list for PBXNativeTarget "ATXVotesTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				BB0000000000000000000001 /* Debug */,

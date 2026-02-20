@@ -15,6 +15,7 @@ class VotingGuideStore: ObservableObject {
     // MARK: - Ballot State
     @Published var ballot: Ballot?
     @Published var guideComplete = false
+    @Published var hasVoted = false
     @Published var isLoading = false
     @Published var loadingMessage = "Researching your ballot..."
     @Published var errorMessage: String?
@@ -23,14 +24,23 @@ class VotingGuideStore: ObservableObject {
     // MARK: - Services
     let claudeService = ClaudeService()
     private let districtService = DistrictLookupService()
-    private let persistenceKey = "austin_votes_profile"
-    private let ballotKey = "austin_votes_ballot"
-    private let reviewPromptedKey = "austin_votes_review_prompted"
+    private let persistenceKey = "atx_votes_profile"
+    private let ballotKey = "atx_votes_ballot"
+    private let reviewPromptedKey = "atx_votes_review_prompted"
+    private let hasVotedKey = "atx_votes_has_voted"
+    private let cloudStore = NSUbiquitousKeyValueStore.default
 
     // MARK: - Init
 
     init() {
         loadSavedState()
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(iCloudDidChange(_:)),
+            name: NSUbiquitousKeyValueStore.didChangeExternallyNotification,
+            object: cloudStore
+        )
+        cloudStore.synchronize()
     }
 
     // MARK: - Interview Flow
@@ -91,6 +101,27 @@ class VotingGuideStore: ObservableObject {
 
     func setPolicyView(issue: String, stance: String) {
         voterProfile.policyViews[issue] = stance
+    }
+
+    // MARK: - Voted Status
+
+    func markAsVoted() {
+        withAnimation {
+            hasVoted = true
+        }
+        UserDefaults.standard.set(true, forKey: hasVotedKey)
+        cloudStore.set(true, forKey: hasVotedKey)
+        cloudStore.synchronize()
+        NotificationService.shared.cancelAllReminders()
+    }
+
+    func unmarkVoted() {
+        withAnimation {
+            hasVoted = false
+        }
+        UserDefaults.standard.removeObject(forKey: hasVotedKey)
+        cloudStore.removeObject(forKey: hasVotedKey)
+        cloudStore.synchronize()
     }
 
     // MARK: - Build Guide
@@ -160,25 +191,58 @@ class VotingGuideStore: ObservableObject {
     func saveProfile() {
         if let data = try? JSONEncoder().encode(voterProfile) {
             UserDefaults.standard.set(data, forKey: persistenceKey)
+            cloudStore.set(data, forKey: persistenceKey)
         }
         if let ballot, let data = try? JSONEncoder().encode(ballot) {
             UserDefaults.standard.set(data, forKey: ballotKey)
+            cloudStore.set(data, forKey: ballotKey)
         }
+        cloudStore.synchronize()
     }
 
     func loadProfile() {
-        if let data = UserDefaults.standard.data(forKey: persistenceKey),
-           let profile = try? JSONDecoder().decode(VoterProfile.self, from: data) {
+        // Prefer iCloud data, fall back to UserDefaults
+        let profileData = cloudStore.data(forKey: persistenceKey)
+            ?? UserDefaults.standard.data(forKey: persistenceKey)
+        if let profileData, let profile = try? JSONDecoder().decode(VoterProfile.self, from: profileData) {
             voterProfile = profile
         }
     }
 
     private func loadSavedState() {
+        migrateOldKeys()
         loadProfile()
-        if let data = UserDefaults.standard.data(forKey: ballotKey),
-           let savedBallot = try? JSONDecoder().decode(Ballot.self, from: data) {
+        let ballotData = cloudStore.data(forKey: ballotKey)
+            ?? UserDefaults.standard.data(forKey: ballotKey)
+        if let ballotData, let savedBallot = try? JSONDecoder().decode(Ballot.self, from: ballotData) {
             ballot = savedBallot
             guideComplete = true
+        }
+        if cloudStore.object(forKey: hasVotedKey) != nil {
+            hasVoted = cloudStore.bool(forKey: hasVotedKey)
+        } else {
+            hasVoted = UserDefaults.standard.bool(forKey: hasVotedKey)
+        }
+    }
+
+    /// Migrate data from old "austin_votes_" keys to new "atx_votes_" keys
+    private func migrateOldKeys() {
+        let migrations = [
+            ("austin_votes_profile", persistenceKey),
+            ("austin_votes_ballot", ballotKey),
+            ("austin_votes_review_prompted", reviewPromptedKey),
+            ("austin_votes_has_voted", hasVotedKey),
+        ]
+        let defaults = UserDefaults.standard
+        for (oldKey, newKey) in migrations {
+            if defaults.object(forKey: newKey) == nil, let old = defaults.object(forKey: oldKey) {
+                defaults.set(old, forKey: newKey)
+                defaults.removeObject(forKey: oldKey)
+            }
+            if cloudStore.object(forKey: newKey) == nil, let old = cloudStore.object(forKey: oldKey) {
+                cloudStore.set(old, forKey: newKey)
+                cloudStore.removeObject(forKey: oldKey)
+            }
         }
     }
 
@@ -187,10 +251,31 @@ class VotingGuideStore: ObservableObject {
             voterProfile = .empty
             ballot = nil
             guideComplete = false
+            hasVoted = false
             currentPhase = .welcome
         }
         UserDefaults.standard.removeObject(forKey: persistenceKey)
         UserDefaults.standard.removeObject(forKey: ballotKey)
+        UserDefaults.standard.removeObject(forKey: hasVotedKey)
+        cloudStore.removeObject(forKey: persistenceKey)
+        cloudStore.removeObject(forKey: ballotKey)
+        cloudStore.removeObject(forKey: hasVotedKey)
+        cloudStore.synchronize()
+    }
+
+    // MARK: - iCloud Sync
+
+    @objc private func iCloudDidChange(_ notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let changeReason = userInfo[NSUbiquitousKeyValueStoreChangeReasonKey] as? Int else { return }
+
+        if changeReason == NSUbiquitousKeyValueStoreServerChange
+            || changeReason == NSUbiquitousKeyValueStoreInitialSyncChange {
+            logger.info("iCloud sync: received external changes (reason: \(changeReason))")
+            Task { @MainActor in
+                self.loadSavedState()
+            }
+        }
     }
 
     // MARK: - Preview
