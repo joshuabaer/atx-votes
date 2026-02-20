@@ -544,3 +544,258 @@ extension MockDistrictService {
         shouldFail = fail
     }
 }
+
+// MARK: - Interview Flow Tests
+
+@MainActor
+final class InterviewFlowTests: XCTestCase {
+
+    private var store: VotingGuideStore!
+
+    override func setUp() {
+        super.setUp()
+        clearAllPersistedState()
+        store = VotingGuideStore()
+    }
+
+    override func tearDown() {
+        clearAllPersistedState()
+        store = nil
+        super.tearDown()
+    }
+
+    // MARK: - 1. Full Happy Path
+
+    func testFullInterviewFlowHappyPath() {
+        // welcome -> issues
+        store.advancePhase()
+        XCTAssertEqual(store.currentPhase, .issues)
+
+        store.selectIssues([.economy, .housing, .safety])
+
+        // issues -> spectrum
+        store.advancePhase()
+        XCTAssertEqual(store.currentPhase, .spectrum)
+
+        store.selectSpectrum(.progressive)
+
+        // spectrum -> policyDeepDive
+        store.advancePhase()
+        XCTAssertEqual(store.currentPhase, .policyDeepDive)
+
+        store.setPolicyView(issue: "economy", stance: "Redirect spending")
+        store.setPolicyView(issue: "housing", stance: "Smart growth")
+        store.setPolicyView(issue: "safety", stance: "Reform + fund")
+
+        // policyDeepDive -> qualities
+        store.advancePhase()
+        XCTAssertEqual(store.currentPhase, .qualities)
+
+        store.selectQualities([.competence, .integrity])
+
+        // qualities -> address
+        store.advancePhase()
+        XCTAssertEqual(store.currentPhase, .address)
+
+        store.setAddress(Address(street: "100 Congress Ave", city: "Austin", state: "TX", zip: "78701"))
+
+        // address -> building
+        store.advancePhase()
+        XCTAssertEqual(store.currentPhase, .building)
+
+        // Verify all profile data populated
+        XCTAssertEqual(store.voterProfile.topIssues, [.economy, .housing, .safety])
+        XCTAssertEqual(store.voterProfile.politicalSpectrum, .progressive)
+        XCTAssertEqual(store.voterProfile.policyViews.count, 3)
+        XCTAssertEqual(store.voterProfile.candidateQualities, [.competence, .integrity])
+        XCTAssertNotNil(store.voterProfile.address)
+    }
+
+    // MARK: - 2. Back Navigation Preserves Selections
+
+    func testBackNavigationPreservesSelections() {
+        store.advancePhase() // -> issues
+        store.selectIssues([.economy, .housing, .safety])
+
+        store.advancePhase() // -> spectrum
+        store.selectSpectrum(.liberal)
+
+        // Go back to issues
+        store.goBackPhase()
+        XCTAssertEqual(store.currentPhase, .issues)
+        XCTAssertEqual(store.voterProfile.topIssues, [.economy, .housing, .safety])
+
+        // Go forward again
+        store.advancePhase()
+        XCTAssertEqual(store.currentPhase, .spectrum)
+        XCTAssertEqual(store.voterProfile.politicalSpectrum, .liberal)
+    }
+
+    // MARK: - 3. Policy Deep Dive Stores Views Per Issue
+
+    func testPolicyDeepDiveStoresViewsPerIssue() {
+        store.selectIssues([.economy, .housing, .safety])
+
+        store.setPolicyView(issue: "economy", stance: "Cut taxes & spending")
+        store.setPolicyView(issue: "housing", stance: "Build, build, build")
+        store.setPolicyView(issue: "safety", stance: "Fully fund police")
+
+        XCTAssertEqual(store.voterProfile.policyViews.count, 3)
+        XCTAssertEqual(store.voterProfile.policyViews["economy"], "Cut taxes & spending")
+        XCTAssertEqual(store.voterProfile.policyViews["housing"], "Build, build, build")
+        XCTAssertEqual(store.voterProfile.policyViews["safety"], "Fully fund police")
+    }
+
+    // MARK: - 4. Phase Progress Fraction Values
+
+    func testPhaseProgressFractionValues() {
+        // welcome: stepNumber=0, totalSteps=5 -> 0/5 = 0
+        XCTAssertEqual(store.progressFraction, 0, accuracy: 0.001)
+
+        store.advancePhase() // issues: stepNumber=1, totalSteps=5 -> 1/5 = 0.2
+        XCTAssertEqual(store.progressFraction, 1.0/5.0, accuracy: 0.001)
+
+        store.advancePhase() // spectrum: stepNumber=2, totalSteps=5 -> 2/5 = 0.4
+        XCTAssertEqual(store.progressFraction, 2.0/5.0, accuracy: 0.001)
+
+        store.advancePhase() // policyDeepDive: stepNumber=3, totalSteps=5 -> 3/5 = 0.6
+        XCTAssertEqual(store.progressFraction, 3.0/5.0, accuracy: 0.001)
+
+        store.advancePhase() // qualities: stepNumber=4, totalSteps=5 -> 4/5 = 0.8
+        XCTAssertEqual(store.progressFraction, 4.0/5.0, accuracy: 0.001)
+
+        store.advancePhase() // address: stepNumber=5, totalSteps=5 -> 5/5 = 1.0
+        XCTAssertEqual(store.progressFraction, 1.0, accuracy: 0.001)
+    }
+
+    // MARK: - 5. Profile Accumulation Across Phases
+
+    func testProfileAccumulationAcrossPhases() {
+        store.selectIssues([.tech, .environment])
+        store.selectSpectrum(.libertarian)
+        store.setPolicyView(issue: "tech", stance: "Hands off")
+        store.setPolicyView(issue: "environment", stance: "All of the above")
+        store.selectQualities([.independence, .freshPerspective])
+        let address = Address(street: "500 E 7th St", city: "Austin", state: "TX", zip: "78702")
+        store.setAddress(address)
+
+        let profile = store.voterProfile
+        XCTAssertEqual(profile.topIssues, [.tech, .environment])
+        XCTAssertEqual(profile.politicalSpectrum, .libertarian)
+        XCTAssertEqual(profile.policyViews["tech"], "Hands off")
+        XCTAssertEqual(profile.policyViews["environment"], "All of the above")
+        XCTAssertEqual(profile.candidateQualities, [.independence, .freshPerspective])
+        XCTAssertEqual(profile.address, address)
+    }
+
+    // MARK: - 6. Go Back From Each Phase
+
+    func testGoBackFromEachPhase() {
+        // issues -> welcome
+        store.advancePhase() // -> issues
+        store.goBackPhase()
+        XCTAssertEqual(store.currentPhase, .welcome)
+
+        // spectrum -> issues
+        store.advancePhase() // -> issues
+        store.advancePhase() // -> spectrum
+        store.goBackPhase()
+        XCTAssertEqual(store.currentPhase, .issues)
+
+        // policyDeepDive -> spectrum
+        store.advancePhase() // -> spectrum
+        store.advancePhase() // -> policyDeepDive
+        store.goBackPhase()
+        XCTAssertEqual(store.currentPhase, .spectrum)
+
+        // qualities -> policyDeepDive
+        store.advancePhase() // -> policyDeepDive
+        store.advancePhase() // -> qualities
+        store.goBackPhase()
+        XCTAssertEqual(store.currentPhase, .policyDeepDive)
+
+        // address -> qualities
+        store.advancePhase() // -> qualities
+        store.advancePhase() // -> address
+        store.goBackPhase()
+        XCTAssertEqual(store.currentPhase, .qualities)
+    }
+
+    // MARK: - 7. Reset Clears All Interview State
+
+    func testResetClearsAllInterviewState() {
+        // Populate full profile
+        store.selectIssues([.economy, .housing, .safety])
+        store.selectSpectrum(.progressive)
+        store.setPolicyView(issue: "economy", stance: "Tax the wealthy more")
+        store.selectQualities([.competence, .integrity])
+        store.setAddress(Address(street: "100 Congress Ave", city: "Austin", state: "TX", zip: "78701"))
+
+        // Advance phases
+        for _ in 0..<6 {
+            store.advancePhase()
+        }
+        XCTAssertEqual(store.currentPhase, .building)
+
+        // Reset
+        store.resetGuide()
+
+        XCTAssertEqual(store.voterProfile, VoterProfile.empty)
+        XCTAssertEqual(store.currentPhase, .welcome)
+    }
+
+    // MARK: - 8. Phase Titles and Step Counts
+
+    func testPhaseTitlesAndStepCounts() {
+        let expected: [(InterviewPhase, String, Int)] = [
+            (.welcome,       "Welcome",        0),
+            (.issues,        "Your Issues",     1),
+            (.spectrum,      "Your Approach",   2),
+            (.policyDeepDive,"Your Views",      3),
+            (.qualities,     "What Matters",    4),
+            (.address,       "Your Address",    5),
+            (.building,      "Building Guide",  6),
+        ]
+
+        for (phase, title, stepNumber) in expected {
+            XCTAssertEqual(phase.title, title, "Title mismatch for \(phase)")
+            XCTAssertEqual(phase.stepNumber, stepNumber, "Step number mismatch for \(phase)")
+        }
+
+        XCTAssertEqual(InterviewPhase.issues.totalSteps, 5)
+    }
+
+    // MARK: - 9. Inferred Party From Spectrum
+
+    func testInferredPartyFromSpectrum() {
+        let expectations: [(PoliticalSpectrum, PrimaryBallot)] = [
+            (.progressive, .democrat),
+            (.liberal,     .democrat),
+            (.moderate,    .undecided),
+            (.conservative,.republican),
+            (.libertarian, .republican),
+            (.independent, .undecided),
+        ]
+
+        for (spectrum, expectedParty) in expectations {
+            store.selectSpectrum(spectrum)
+            XCTAssertEqual(store.inferredParty, expectedParty,
+                           "\(spectrum) should infer \(expectedParty)")
+        }
+    }
+
+    // MARK: - 10. Address Set and Retrieve
+
+    func testAddressSetAndRetrieve() {
+        let address = Address(street: "1100 Congress Ave", city: "Austin", state: "TX", zip: "78701")
+        store.setAddress(address)
+
+        let stored = store.voterProfile.address
+        XCTAssertNotNil(stored)
+        XCTAssertEqual(stored?.street, "1100 Congress Ave")
+        XCTAssertEqual(stored?.city, "Austin")
+        XCTAssertEqual(stored?.state, "TX")
+        XCTAssertEqual(stored?.zip, "78701")
+        XCTAssertEqual(stored?.formatted, "1100 Congress Ave, Austin, TX 78701")
+    }
+}

@@ -5,7 +5,7 @@ struct VotingInfoView: View {
     @State private var expandedSection: InfoSection?
     @State private var remindersEnabled = NotificationService.shared.remindersEnabled
 
-    private static let electionDay = DateComponents(calendar: .current, year: 2026, month: 3, day: 3).date ?? Date()
+    private static let electionDay = Election.date
     static let travisClerkURL = URL(string: "https://countyclerk.traviscountytx.gov/departments/elections/current-election/")!
     static let voteTravisURL = URL(string: "https://votetravis.gov")!
     static let phoneURL = URL(string: "tel:5122388683")!
@@ -15,13 +15,13 @@ struct VotingInfoView: View {
         let daysUntil = Calendar.current.dateComponents([.day], from: Date(), to: electionDay).day ?? 0
 
         var lines: [String] = []
-        lines.append("Texas Primary Election — March 3, 2026")
+        lines.append("Texas Primary Election — \(Election.dateFormatted)")
         if daysUntil > 0 {
             lines.append("\(daysUntil) days away!")
         }
         lines.append("")
         lines.append("Early Voting: Feb 17–27")
-        lines.append("Election Day: March 3, 7 AM – 7 PM")
+        lines.append("Election Day: \(Election.dateFormatted), 7 AM – 7 PM")
         lines.append("")
         lines.append("Travis County uses Vote Centers — vote at any location.")
         lines.append("Bring photo ID (TX driver's license, passport, etc.)")
@@ -138,7 +138,7 @@ struct VotingInfoView: View {
                     .font(Theme.title2)
                     .foregroundColor(Theme.textSecondary)
             }
-            Text("Tuesday, March 3, 2026")
+            Text("Tuesday, \(Election.dateFormatted)")
                 .font(Theme.caption)
                 .foregroundColor(Theme.textSecondary)
         }
@@ -390,7 +390,7 @@ struct InfoAccordion: View {
             InfoRow(label: "Registration deadline", value: "Feb 2, 2026", isPast: true)
             InfoRow(label: "Mail ballot application", value: "Feb 20, 2026")
             InfoRow(label: "Early voting", value: "Feb 17 - 27, 2026", highlight: true)
-            InfoRow(label: "Election Day", value: "March 3, 2026", highlight: true)
+            InfoRow(label: "Election Day", value: Election.dateFormatted, highlight: true)
 
         case .earlyVoting:
             Text("Vote at any early voting location in Travis County")

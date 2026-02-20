@@ -49,14 +49,14 @@
           "party": "Democrat",
           "isIncumbent": false,
           "isRecommended": false,
-          "summary": "Third candidate in the Democratic Senate primary.",
-          "background": null,
-          "keyPositions": [],
+          "summary": "Perennial candidate and businessman who emigrated from Egypt. Has run for office multiple times across Texas and Minnesota with minimal electoral support.",
+          "background": "Emigrated from Egypt in 1984. B.A. from Friends University (1989). Law degree from Presidents College School of Law (2001). Businessman, real estate and mortgage broker, owner of Alexandria Realty and Mortgage. Former professional soccer player, coach, referee, and team owner.",
+          "keyPositions": ["Making Texas affordable and safe", "No deportation without due process"],
           "endorsements": [],
-          "pros": [],
-          "cons": ["Low name recognition", "Minimal campaign infrastructure"],
-          "fundraising": null,
-          "polling": null
+          "pros": ["Immigrant success story", "Diverse professional background"],
+          "cons": ["Polling at 2%", "Perennial candidate — ran for U.S. Senate in both Texas and Minnesota, Harris County Judge, and TX State Senate across multiple cycles", "Minimal campaign infrastructure and fundraising"],
+          "fundraising": "Minimal",
+          "polling": "2%"
         }
       ],
       "recommendation": {
@@ -141,7 +141,7 @@
           "endorsements": [],
           "pros": ["Austin-area candidate", "Real estate/housing expertise", "Legislative experience"],
           "cons": ["Statewide name recognition challenge", "Giving up safe House seat"],
-          "fundraising": null,
+          "fundraising": "$159,000 cash on hand",
           "polling": null
         },
         {
@@ -149,13 +149,13 @@
           "party": "Democrat",
           "isIncumbent": false,
           "isRecommended": false,
-          "summary": "Candidate for Lieutenant Governor in the Democratic primary.",
-          "background": null,
-          "keyPositions": [],
+          "summary": "Legal and compliance professional running her first campaign. Contracts & Privacy Manager for a software company. Mother of two.",
+          "background": "B.A. in Philosophy with Political Science minor from University of Houston (2017). Associate degree in Paralegal Studies from San Antonio College (2014). Contracts & Privacy Manager for a Columbus, OH-based software company. Negotiates multi-million dollar agreements with government agencies and Fortune 500 firms. Born in Honolulu, Hawaii. First-time candidate.",
+          "keyPositions": ["Cannabis legalization", "Medicaid expansion", "High-speed rail funding", "Environmental protections", "Repeal school voucher program"],
           "endorsements": [],
-          "pros": [],
-          "cons": [],
-          "fundraising": null,
+          "pros": ["Fresh outsider perspective", "Legal and compliance expertise", "Ambitious policy platform"],
+          "cons": ["First-time candidate", "Only $330 cash on hand — lowest funded in race", "No elected office or government experience", "Based out of state for work"],
+          "fundraising": "$330 cash on hand",
           "polling": null
         },
         {
@@ -163,21 +163,21 @@
           "party": "Democrat",
           "isIncumbent": false,
           "isRecommended": false,
-          "summary": "Candidate for Lieutenant Governor in the Democratic primary.",
-          "background": null,
-          "keyPositions": [],
-          "endorsements": [],
-          "pros": [],
-          "cons": [],
-          "fundraising": null,
+          "summary": "Steelworkers union leader emerging as a dark horse candidate. Assistant Director of United Steelworkers District 13. Houston-based labor organizer with a focus on wages and affordability.",
+          "background": "Assistant Director of United Steelworkers union District 13. Former oil and gas refinery area operator in Texas. Blue-collar worker turned labor leader who has fought for higher pay, better benefits, and safer conditions. Houston-based.",
+          "keyPositions": ["Lowering costs for families", "Raising wages and rebuilding the middle class", "Fully funding public schools and raising teacher pay", "Protecting rural Texas communities", "Government accountability to working families"],
+          "endorsements": ["Texas AFL-CIO", "Houston LGBTQ+ Political Caucus", "Houston Progressive Caucus", "Stonewall Democrats of Dallas", "Stonewall Democrats of San Antonio", "Bay Area Democratic Movement"],
+          "pros": ["Strong labor endorsements including Texas AFL-CIO", "Authentic blue-collar background", "Message focused on wages and affordability resonates", "Donor support from state Democratic Party network"],
+          "cons": ["No elected office experience", "Lower name recognition than Goodwin", "Houston-based — less Austin connection"],
+          "fundraising": "$46,000 cash on hand",
           "polling": null
         }
       ],
       "recommendation": {
         "candidateName": "Vikki Goodwin",
         "reasoning": "Austin-area state representative with housing and real estate expertise. Most recognizable name in the Democratic Lt. Governor field.",
-        "strategicNotes": null,
-        "caveats": null,
+        "strategicNotes": "Vélez has emerged as a serious contender with strong labor backing (Texas AFL-CIO). If labor issues are your priority, he's worth a look.",
+        "caveats": "Vélez's union endorsements and affordability focus make him a viable alternative, especially for working-class voters.",
         "confidence": "Good Match"
       }
     },
@@ -191,50 +191,50 @@
           "name": "Joe Jaworski",
           "party": "Democrat",
           "isIncumbent": false,
-          "isRecommended": true,
+          "isRecommended": false,
           "summary": "Former Galveston mayor and attorney. Ran for AG in 2022. Grandson of Watergate special prosecutor Leon Jaworski.",
-          "background": "Former Mayor of Galveston. Attorney. Grandson of Watergate special prosecutor Leon Jaworski. Ran for AG in the 2022 Democratic primary.",
+          "background": "Former Mayor of Galveston. Attorney. Grandson of Watergate special prosecutor Leon Jaworski. Ran for AG in the 2022 Democratic primary runoff (lost to Rochelle Garza).",
           "keyPositions": ["Rule of law", "Consumer protection", "Environmental enforcement", "Government accountability"],
           "endorsements": [],
           "pros": ["Legal family pedigree (Watergate prosecutor's grandson)", "Executive experience as mayor", "Previous AG campaign — knows the race"],
-          "cons": ["Lost 2022 primary runoff to Rochelle Garza", "Galveston-based — less Austin connection"],
+          "cons": ["Lost 2022 primary runoff to Rochelle Garza", "Galveston-based — less Austin connection", "Polling third at 22%"],
           "fundraising": null,
-          "polling": null
+          "polling": "22% (third place)"
         },
         {
           "name": "Nathan Johnson",
           "party": "Democrat",
           "isIncumbent": false,
-          "isRecommended": false,
-          "summary": "State Senator from Dallas. Experienced legislator with legal background.",
-          "background": "Texas State Senator. Attorney. Dallas-based.",
-          "keyPositions": ["Legislative reform", "Consumer protection", "Civil rights"],
-          "endorsements": [],
-          "pros": ["Legislative experience", "Legal background"],
-          "cons": [],
-          "fundraising": null,
-          "polling": null
+          "isRecommended": true,
+          "summary": "State Senator from Dallas (District 16). Flipped a red seat in 2018. Most endorsed and best-funded candidate. Business litigator who has passed 135 bills including Medicaid expansion legislation.",
+          "background": "Texas State Senator (District 16) since 2019 — first Democrat to win the North Dallas district in three decades. B.S. in Physics from University of Arizona. J.D. from University of Texas at Austin. Business litigator and mediator at Thompson Coburn LLP. Composed musical scores for Dragon Ball Z. Won reelection in 2022 (61.9%) and 2024 (unopposed). Passed 135 bills.",
+          "keyPositions": ["Stop MAGA federal overreach through AG litigation", "Consumer protection and antitrust", "Root out political corruption", "Reproductive rights", "Cooperative public safety approach", "Border security without unconstitutional tactics"],
+          "endorsements": ["Dallas Morning News", "Houston Chronicle", "Austin Chronicle", "Fort Worth Star-Telegram", "State Senators Royce West, Sarah Eckhardt, Boris Miles, Jose Menendez", "Dallas DA John Creuzot", "Houston LGBTQ+ Political Caucus", "Texas AFL-CIO", "Asian Texans for Justice", "Stonewall Democrats of Dallas"],
+          "pros": ["Leads in polling at 25%", "Strongest fundraising ($650K+ cash on hand)", "Most endorsements including 4 major newspapers", "Proven winner in swing district — flipped red seat", "Passed 135 bills including Medicaid expansion"],
+          "cons": ["Business litigator, not a prosecutor — no criminal law experience", "Will give up Senate seat, creating open race in District 16", "Some may prefer outsider over sitting politician"],
+          "fundraising": "$650,000+ cash on hand — leads all candidates",
+          "polling": "25% (leads, with 40% undecided)"
         },
         {
           "name": "Anthony \"Tony\" Box",
           "party": "Democrat",
           "isIncumbent": false,
           "isRecommended": false,
-          "summary": "Candidate in the Democratic AG primary.",
-          "background": null,
-          "keyPositions": [],
-          "endorsements": [],
-          "pros": [],
-          "cons": [],
-          "fundraising": null,
-          "polling": null
+          "summary": "Dallas attorney with an extraordinary service resume: Army officer, FBI Special Agent, and federal prosecutor. First-time candidate who wants to depoliticize the AG office.",
+          "background": "B.S. in Accounting from Morehouse College. M.P.A. from Harvard Kennedy School. J.D. from Washington University in St. Louis. LL.M. in Taxation from Washington University. CPA. U.S. Army officer — commanded tank platoons in 1st Infantry Division, earned Airborne designation, deployed to Iraq as JAG officer. FBI Special Agent for nearly a decade — SWAT team, drug trafficking, major fraud. Assistant U.S. Attorney handling tax evasion and violent crime. Investigator for Congressional Commission on Wartime Contracting (uncovered $30B in waste). Currently private practice litigator at Gray Reed in Dallas. Shot at age 16 while apprehending a purse thief.",
+          "keyPositions": ["Restore professionalism and accountability to AG office", "Consumer protection and antitrust against big tech", "Expand voting access", "Cooperative approach with local DAs", "Depoliticize the office"],
+          "endorsements": ["San Antonio Express-News", "Austin American-Statesman", "VoteVets", "State Reps Gene Wu (House Dem Caucus Chair), Ann Johnson, Ron Reynolds", "U.S. Reps Julie Johnson and Marc Veasey"],
+          "pros": ["Deepest law enforcement resume (Army, FBI, federal prosecutor)", "No political baggage — first-time candidate with service narrative", "CPA + multiple law degrees — uniquely qualified on financial crimes", "Compelling personal story", "Two major newspaper endorsements"],
+          "cons": ["Weakest fundraising at $137K (vs Johnson's $650K+)", "Lowest polling at 13%", "No elected office experience", "Lower name recognition than opponents"],
+          "fundraising": "$137,000 raised, ~$28,000 cash on hand",
+          "polling": "13%"
         }
       ],
       "recommendation": {
-        "candidateName": "Joe Jaworski",
-        "reasoning": "Most experienced candidate with a legal family legacy (Watergate prosecutor's grandson), executive experience as Galveston mayor, and previous AG campaign knowledge.",
-        "strategicNotes": null,
-        "caveats": "Nathan Johnson brings legislative experience as a state senator if that matters more to you.",
+        "candidateName": "Nathan Johnson",
+        "reasoning": "Leads in polling, fundraising, and endorsements. Has 4 major newspaper endorsements, $650K+ cash on hand, and a proven record of passing 135 bills. Flipped a red Senate district — demonstrating electability.",
+        "strategicNotes": "40% of voters still undecided. Tony Box has the strongest law enforcement credentials (FBI, Army, prosecutor) and newspaper endorsements if you want someone who will depoliticize the office.",
+        "caveats": "Box is the most qualified by pure legal resume, but Johnson has the strongest path to winning. Jaworski has the most AG-specific campaign experience.",
         "confidence": "Good Match"
       }
     },
@@ -255,21 +255,21 @@
           "endorsements": [],
           "pros": ["Austin-area candidate", "Executive experience as County Judge", "Deep fiscal knowledge", "Legislative experience"],
           "cons": ["Giving up Senate seat"],
-          "fundraising": null,
-          "polling": null
+          "fundraising": "Leading fundraiser in Democratic Comptroller primary",
+          "polling": "Frontrunner"
         },
         {
           "name": "Savant Moore",
           "party": "Democrat",
           "isIncumbent": false,
           "isRecommended": false,
-          "summary": "Candidate in the Democratic Comptroller primary.",
-          "background": null,
-          "keyPositions": [],
-          "endorsements": [],
-          "pros": [],
-          "cons": [],
-          "fundraising": null,
+          "summary": "U.S. Army veteran and Houston ISD trustee with a background in trucking, software engineering, and ministry. Published author on personal finance.",
+          "background": "Houston ISD Trustee (District II) since 2024. U.S. Army veteran (Airborne Ranger, ~7-10 years service). B.A. in History from Howard University (2016). Truck driver, software engineer, small business owner (trucking), nonprofit founder, and minister in Houston's Sunnyside neighborhood. Author of a personal finance book. Father of three. From northeast Houston.",
+          "keyPositions": ["Fiscal transparency with plain-language public dashboard", "School voucher oversight and auditing", "Restore HUB program for minority/women/veteran-owned businesses", "Taxpayer protection with grace periods before penalties", "Small business support", "Fossil fuel tax exemption accountability"],
+          "endorsements": ["Lone Star Left"],
+          "pros": ["Unique combination of military service, business, and elected office", "Published author on personal finance — demonstrates subject-matter knowledge", "Strong personal narrative — working-class Houston, Army Ranger, minister", "Passionate about education finance during voucher debates"],
+          "cons": ["Limited fundraising and name recognition vs. Eckhardt", "History degree — lacks formal finance/accounting credentials", "School board is low-profile for a statewide race", "No major newspaper endorsements"],
+          "fundraising": "Limited — significantly less than Eckhardt",
           "polling": null
         },
         {
@@ -277,20 +277,20 @@
           "party": "Democrat",
           "isIncumbent": false,
           "isRecommended": false,
-          "summary": "Candidate in the Democratic Comptroller primary.",
-          "background": null,
-          "keyPositions": [],
+          "summary": "Finance professional with 40 years of investment management experience. Son of immigrants. Previously ran for Texas Land Commissioner in 2022.",
+          "background": "B.S. in Finance from University of Texas at Austin (1985). Advanced Management Program at INSEAD (France, 1999). 40 years in finance and investment management across Texas, London, and New York. Chair of a Texas State Democratic Committee. Harris County Precinct Chair. Grew up in Houston, son of immigrants. Ran for Texas Land Commissioner in 2022 (received 20.2% — did not advance past primary).",
+          "keyPositions": ["Full transparency with plain-language financial reports", "Audit $1B in school voucher spending", "Audit $20B in water infrastructure spending", "Broadband expansion", "Grow small business employment share from 44% to 60%"],
           "endorsements": [],
-          "pros": [],
-          "cons": [],
-          "fundraising": null,
+          "pros": ["Strongest formal finance credentials — 40 years professional experience, UT finance degree, INSEAD training", "Deep Democratic Party infrastructure experience", "Previous statewide campaign — received nearly 200K votes in 2022", "Specific, numbers-driven policy proposals"],
+          "cons": ["Lost 2022 Land Commissioner primary", "Low fundraising relative to Eckhardt", "No endorsements from major organizations or newspapers", "No elected office experience"],
+          "fundraising": "Limited — raised $105K in 2022 campaign",
           "polling": null
         }
       ],
       "recommendation": {
         "candidateName": "Sarah Eckhardt",
         "reasoning": "Austin-based state senator with executive experience as Travis County Judge. Deep fiscal and government management background makes her the strongest candidate for Comptroller.",
-        "strategicNotes": null,
+        "strategicNotes": "Lange has the strongest formal finance credentials (40 years) if that matters most. Moore brings a grassroots/military perspective.",
         "caveats": null,
         "confidence": "Strong Match"
       }
@@ -309,7 +309,7 @@
           "summary": "First-term incumbent, former Austin City Council member and labor organizer. Progressive champion in a safe D+26 seat. Member of the Congressional Progressive Caucus.",
           "background": "U.S. Representative since 2023. Former Austin City Council member (District 4). Labor organizer. Member of the Congressional Progressive Caucus.",
           "keyPositions": ["Workers' rights", "Medicare for All", "Housing affordability", "Immigration reform"],
-          "endorsements": ["Congressional Progressive Caucus", "AFL-CIO"],
+          "endorsements": ["Congressional Progressive Caucus", "AFL-CIO", "Austin Chronicle"],
           "pros": ["Strong constituent services", "Visible and accessible in district", "Effective coalition-builder", "Safe seat — can focus on policy"],
           "cons": ["Very progressive — some moderates feel unrepresented", "Only one term of experience"],
           "fundraising": "Well-funded as incumbent",
@@ -320,13 +320,12 @@
           "party": "Democrat",
           "isIncumbent": false,
           "isRecommended": false,
-          "summary": "Challenger to Casar in the CD-37 Democratic primary.",
-          "background": null,
-          "keyPositions": [],
-          "endorsements": [],
-          "pros": ["Offers an alternative to the incumbent"],
-          "cons": ["Very low name recognition", "No significant campaign infrastructure against a popular incumbent"],
-          "fundraising": null,
+          "summary": "Epidemiologist turned tech worker. Ran HIV clinics, oversaw food pantries, and served on the Texas COVID-19 task force. Latina daughter of Mexican immigrants and mother of two.",
+          "background": "Epidemiologist who ran HIV clinics and oversaw community food pantries. Served on the Texas COVID-19 task force reporting to the Governor's office. Transitioned to the technology sector. Latina, daughter of Mexican immigrants. Mother of two. Campaign focuses on AI governance, healthcare, and working families.",
+          "keyPositions": ["AI governance for child safety and worker protections", "Reproductive rights and federal protections", "Expanding mental health access", "Universal background checks", "Border economy through fair commerce", "Environmental equity"],
+          "pros": ["Unique background bridging public health, epidemiology, and technology", "COVID task force experience demonstrates crisis management", "Authentic personal story as immigrant's daughter", "Forward-looking AI policy focus"],
+          "cons": ["Challenging a well-known popular incumbent", "No significant endorsements found", "No reported FEC contributions — extremely limited fundraising", "Very low media profile"],
+          "fundraising": "Minimal — no FEC-reported contributions",
           "polling": null
         }
       ],
@@ -352,9 +351,9 @@
           "summary": "Incumbent Commissioner. Environmental advocate with focus on water quality, flooding, and transportation. Seeking re-election.",
           "background": "Travis County Commissioner since 2015. Environmental advocate. Former journalist.",
           "keyPositions": ["Environmental protection", "Flood mitigation", "Transportation", "Responsible growth"],
-          "endorsements": [],
-          "pros": ["Incumbent experience", "Deep knowledge of county operations", "Environmental leadership"],
-          "cons": ["Some feel county needs fresh energy", "Long tenure"],
+          "endorsements": ["Stonewall Democrats", "Austin Chronicle", "20+ organizational endorsements"],
+          "pros": ["Incumbent experience", "Deep knowledge of county operations", "Environmental leadership", "Extensive endorsement list"],
+          "cons": ["Some feel county needs fresh energy", "Long tenure", "2020 Tesla tax deal vote is a point of contention"],
           "fundraising": null,
           "polling": "Favored as incumbent"
         },
@@ -363,34 +362,49 @@
           "party": "Democrat",
           "isIncumbent": false,
           "isRecommended": false,
-          "summary": "Challenger for the Precinct 2 Commissioner seat.",
-          "background": null, "keyPositions": [], "endorsements": [], "pros": [], "cons": [],
-          "fundraising": null, "polling": null
+          "summary": "Government consultant with a PhD in Public Affairs. 12+ years with firms like Deloitte and Accenture focused on government modernization. Active in HIV/AIDS advocacy.",
+          "background": "PhD in Public Affairs, MPA, and BA in Political Science — all from Florida International University. Originally from Miami. 12+ years as a consultant with Deloitte, Accenture, Public Consulting Group, and Weaver on government modernization. Built large-scale contact centers serving 1M+ people. Managed a $19M county COVID resilience grant for small businesses. PhD research on social vulnerability and disaster mitigation policy. President of Friends of the David Powell Clinic (HIV services). Led cycling team raising $300K+ for Hill Country Ride for AIDS.",
+          "keyPositions": ["Health & human services — prevention-focused health initiatives", "Affordable housing using new 2025 legislative tools", "Governance innovation — proposes Travis County Quality of Life and Human Rights Commissions", "Collaborative, design-thinking approach to county government"],
+          "endorsements": [],
+          "pros": ["Strongest academic credentials in the race (PhD, MPA)", "Extensive consulting experience managing government programs at scale", "Deep community involvement in public health advocacy", "Evidence-based, technocratic approach"],
+          "cons": ["Originally from Miami — may face outsider perception", "Campaign website light on specific policy proposals", "No major organizational endorsements", "Lower media profile than Marzullo"],
+          "fundraising": null,
+          "polling": null
         },
         {
           "name": "Amanda Marzullo",
           "party": "Democrat",
           "isIncumbent": false,
           "isRecommended": false,
-          "summary": "Challenger for the Precinct 2 Commissioner seat.",
-          "background": null, "keyPositions": [], "endorsements": [], "pros": [], "cons": [],
-          "fundraising": null, "polling": null
+          "summary": "Civil rights attorney with 16 years reforming Texas's legal system. Gates Cambridge Scholar. Policy Director at Austin Community Law Center. Serves on City of Austin water and sustainability commissions.",
+          "background": "Master's in Criminology and J.D. from University of Pennsylvania (full-tuition scholarship). Law degree from Cambridge University (Gates Cambridge Scholar). Policy Director and Senior Counsel at Austin Community Law Center. Former Executive Director of Texas Defender Service — built bipartisan coalitions to stop executions. Founded her own legal and policy consultancy advising the Innocence Project and Vera Institute. Serves on City of Austin Water and Wastewater Commission and Joint Committee on Sustainability.",
+          "keyPositions": ["Affordable housing and cost-of-living relief", "Corporate accountability — critical of Tesla tax deal, wants moratorium on corporate tax breaks", "Public transit — push to dismiss Paxton's lawsuit tying up Project Connect", "Criminal justice reform and restorative justice", "Workers' rights in county contracts", "Environmental justice with solar investment"],
+          "endorsements": ["Texas Progressive Caucus"],
+          "pros": ["Strongest legal and policy credentials among challengers", "Track record of legislative accomplishments (restored 700K+ driver's licenses, bail reform)", "Most media coverage of challengers", "Detailed, actionable policy platform", "Currently serving on city commissions"],
+          "cons": ["Facing incumbent with 20+ endorsements", "Legal/policy background may be perceived as advocacy-oriented vs. administrative", "Less institutional support than incumbent"],
+          "fundraising": null,
+          "polling": null
         },
         {
           "name": "Reese Ricci Armstrong",
           "party": "Democrat",
           "isIncumbent": false,
           "isRecommended": false,
-          "summary": "Challenger for the Precinct 2 Commissioner seat.",
-          "background": null, "keyPositions": [], "endorsements": [], "pros": [], "cons": [],
-          "fundraising": null, "polling": null
+          "summary": "High school student, democratic socialist, and community organizer. Founded Students United for fairer workdays and special education support. The youngest candidate in the race.",
+          "background": "Current McCallum High School student (previously attended LASA). Chair of LASA Young Democratic Socialists of America chapter. Founded Students United, organizing for fairer workdays, special education support, and mental health resources. Organized with Hack Club to improve nonprofit worker conditions — transitioned workers from contractor to full employment, secured wage increases.",
+          "keyPositions": ["Build thousands of permanently affordable social housing units", "Expand Central Health toward universal healthcare", "Eliminate ambulance transport fees", "Require labor peace agreements for all companies receiving county investment", "Indefinite moratorium on jail construction", "Invest in transit, bike lanes, and sidewalks"],
+          "endorsements": ["Student Victory Fund", "Green Party US", "Jewish Voice for Peace", "Austin Students for a Democratic Society"],
+          "pros": ["Genuinely grassroots, youth-driven campaign with no corporate PAC money", "Most uncompromising progressive platform", "Real organizing experience with concrete worker wins despite young age"],
+          "cons": ["Current high school student — youngest and least experienced by far", "No professional or government experience", "Ambitious platform may exceed county commissioner authority", "Green Party endorsement may raise questions about Democratic commitment"],
+          "fundraising": "Small-dollar only — no corporate PAC money",
+          "polling": null
         }
       ],
       "recommendation": {
         "candidateName": "Brigid Shea",
         "reasoning": "Experienced incumbent with deep knowledge of county operations. Environmental and infrastructure focus addresses key Austin-area concerns.",
-        "strategicNotes": "Four-way race — if no one gets 50%, expect a runoff.",
-        "caveats": null,
+        "strategicNotes": "Four-way race — if no one gets 50%, expect a runoff. No Republican primary, so the Democratic winner takes the seat. Marzullo is the strongest challenger with detailed policy proposals and legal expertise.",
+        "caveats": "If the Tesla tax deal and corporate accountability matter most, Marzullo is the strongest challenger voice on those issues.",
         "confidence": "Good Match"
       }
     },
@@ -405,44 +419,64 @@
           "party": "Democrat",
           "isIncumbent": false,
           "isRecommended": false,
-          "summary": "Candidate for the open Precinct 4 seat after Margaret Gomez's retirement.",
-          "background": null, "keyPositions": [], "endorsements": [], "pros": [], "cons": [],
-          "fundraising": null, "polling": null
+          "summary": "Austin native and Del Valle community organizer running for the third time. Nearly won in 2022, losing by only 248 votes. Founded the Del Valle Community Coalition. Current Del Valle ISD board trustee.",
+          "background": "Austin native from Del Valle. Wife and working mother of three. Career in project management. Founded the Del Valle Community Coalition in 2010 (nonprofit for food and healthcare access). Del Valle ISD Board of Trustees (District 7) since 2011, currently Vice President. Played critical role in advocating for Del Valle Health and Wellness Center. County partnered with her nonprofit on COVID relief and vaccine outreach. Ran for this seat in 2018 (lost badly) and 2022 (lost by only 248 votes).",
+          "keyPositions": ["Equitable infrastructure investment — roads, utilities, water access", "Affordable housing and supporting working families", "Expanding Central Health services in the precinct", "Addressing historic neglect of Precinct 4"],
+          "endorsements": ["Run for Something", "Ground Game Texas", "Austin City Council Members Natasha Harper-Madison and Vanessa Fuentes", "Pflugerville Mayor Victor Gonzales", "Education Austin", "Black Austin Democrats", "Austin Environmental Democrats", "University Democrats", "Texas Democrats with Disabilities"],
+          "pros": ["Deep community roots — 15 years organizing in the precinct", "Nearly won in 2022 (248 votes)", "Founded nonprofit that tangibly delivered services", "Strong grassroots progressive endorsements", "School board governance experience"],
+          "cons": ["Has run and lost twice", "No county government administrative experience", "Fewer labor/institutional endorsements than Morales"],
+          "fundraising": null,
+          "polling": null
         },
         {
           "name": "Ofelia Maldonado Zapata",
           "party": "Democrat",
           "isIncumbent": false,
           "isRecommended": false,
-          "summary": "Candidate for the open Precinct 4 seat.",
-          "background": null, "keyPositions": [], "endorsements": [], "pros": [], "cons": [],
-          "fundraising": null, "polling": null
+          "summary": "Longtime community organizer with 30+ years experience. Visually impaired, retired on disability. Former AISD board trustee. Led Austin Interfaith for decades. Former chief of staff for Precinct 4 Commissioner Marcos De Leon.",
+          "background": "Grew up in public housing in southeast Austin. Visually impaired, retired on disability in 1995. 30+ years of community organizing. Served on Austin Interfaith board 30+ years. LULAC District 12 director. Former chief of staff (1991-1994) for Travis County Commissioner Marcos De Leon. Elected to AISD Board of Trustees (District 2) in 2020 with 60.5%. Community representative in Travis County Public Defender's Office. Texas Anti-Poverty Project organizer.",
+          "keyPositions": ["Water quality improvement in Austin Colony", "No more tax increases", "No ICE cooperation", "Keeping Precinct 4 affordable", "Climate change policies", "Creating cabinet of diverse community advisors"],
+          "endorsements": [],
+          "pros": ["30+ years of community organizing through Austin Interfaith", "Prior experience working in Precinct 4 Commissioner's office", "Won AISD board race convincingly at 60.5%", "Anti-poverty and social justice focus matches precinct needs"],
+          "cons": ["Fewest visible endorsements for 2026", "\"No more tax increases\" could limit needed infrastructure investment", "Less name recognition in this race than Ledesma-Woody and Morales"],
+          "fundraising": null,
+          "polling": null
         },
         {
           "name": "George Morales III",
           "party": "Democrat",
           "isIncumbent": false,
-          "isRecommended": false,
-          "summary": "Candidate for the open Precinct 4 seat.",
-          "background": null, "keyPositions": [], "endorsements": [], "pros": [], "cons": [],
-          "fundraising": null, "polling": null
+          "isRecommended": true,
+          "summary": "Former Travis County Precinct 4 Constable with 27 years of public service. Led the county's Mobile Vaccine Collaborative (380K+ vaccines). Austin City Council renamed Dove Springs Recreation Center in his honor. By far the most endorsed candidate.",
+          "background": "Lifelong Austin resident from Dove Springs. Became a father at 16, worked as a garbage collector, then pursued law enforcement. Graduated Huston-Tillotson University summa cum laude. Certified Master Texas Peace Officer. Travis County Precinct 4 Constable (2016-2024). Led county Mobile Vaccine Collaborative — administered 380,000+ vaccines. Austin City Council renamed Dove Springs Recreation Center in his honor (2019). Distributes ~5,000 backpacks annually. Annual Thanksgiving meals for ~6,000 families. Three-time Presidential Community Service Award recipient.",
+          "keyPositions": ["Road repairs and transportation infrastructure", "Expanding healthcare and mental health access", "Fully funding a diversion center", "Preventing family displacement through affordable housing", "Legal aid to prevent displacement", "Budget transparency and community engagement"],
+          "endorsements": ["Austin Chronicle", "U.S. Reps Greg Casar and Lloyd Doggett", "State Reps Sheryl Cole and Vikki Goodwin", "AFL-CIO Central Labor Council", "AFSCME Local 1624", "CWA Local 6132", "IAFF (Firefighters)", "IBEW Local 520", "Austin EMS Association", "Austin Young Democrats", "Black Austin Democrats", "Stonewall Democrats", "Tejano Democrats", "Capitol Area Progressive Democrats", "Liberal Austin Democrats", "Austin Board of Realtors", "30+ total endorsements"],
+          "pros": ["By far the most endorsements — Congress members, labor unions, nearly every Democratic club", "Extraordinary community service record with multiple presidential awards", "Deep institutional knowledge from serving as constable", "Proven large-scale initiative management (380K+ vaccines)", "Compelling personal story (teen father to college graduate summa cum laude)"],
+          "cons": ["Law enforcement background may not appeal to all progressive voters", "Moving from constable to commissioner is a significant role shift", "Has not faced competitive elections recently"],
+          "fundraising": "Strong endorsement infrastructure suggests solid fundraising",
+          "polling": null
         },
         {
           "name": "Gavino Fernandez, Jr.",
           "party": "Democrat",
           "isIncumbent": false,
           "isRecommended": false,
-          "summary": "Candidate for the open Precinct 4 seat.",
-          "background": null, "keyPositions": [], "endorsements": [], "pros": [], "cons": [],
-          "fundraising": null, "polling": null
+          "summary": "Longtime East Austin community activist. Retired from City of Austin and Travis County. Former chief of staff for Precinct 4 Commissioner Marcos De Leon (1991-1994). Johnston High School graduate.",
+          "background": "Born and raised in Austin near Ortega Elementary and Zavala Elementary. AISD graduate of Johnston High School (1972). Attended Austin Community College. Retired from City of Austin and Travis County. Former chief of staff for Precinct 4 Commissioner Marcos De Leon (1991-1994). Involved with Austin Brown Berets and El Concilio. Active in LULAC Austin and East Austin Lions Club. Austin coordinator for National Voter Registration Day. Ran for Austin City Council District 3 in 2022 (received 5.1%).",
+          "keyPositions": ["Keeping Precinct 4 affordable", "No more tax increases", "No ICE cooperation", "Funding mental health and addiction services for uninsured and homeless", "Auditing county contracts for cost-effectiveness", "Equitable resource allocation"],
+          "endorsements": [],
+          "pros": ["Deep East Austin roots and longtime community activist", "Direct experience in Precinct 4 Commissioner's office (1991-1994)", "Genuine personal motivation for public service", "Historical knowledge of the precinct"],
+          "cons": ["5.1% in 2022 City Council race — weak electoral showing", "No visible endorsements", "\"No more tax increases\" could limit needed investment", "Precinct 4 staff experience is from 30+ years ago", "Least organized campaign of the four candidates"],
+          "fundraising": null,
+          "polling": null
         }
       ],
       "recommendation": {
-        "candidateName": "Susanna Ledesma-Woody",
-        "reasoning": "Open seat with four candidates — all relatively unknown. Research each candidate's background and community involvement before deciding.",
-        "strategicNotes": "Open seat after long-serving Commissioner Gomez's retirement. Four-way race makes a runoff likely.",
-        "caveats": "Limited public information available. Do your own research on these candidates.",
-        "confidence": "Best Available"
+        "candidateName": "George Morales III",
+        "reasoning": "Most endorsed candidate in the race with support from Congress members, labor unions, nearly every Democratic club, and the Austin Chronicle. Extraordinary community service record — led 380K+ vaccine distribution, recreation center named in his honor. Compelling personal story from Dove Springs.",
+        "strategicNotes": "Open seat after Commissioner Gomez's 30-year tenure. Four-way race makes a runoff likely. Ledesma-Woody nearly won in 2022 and has strong grassroots support — she's the strongest alternative.",
+        "caveats": "If grassroots community organizing matters most, Ledesma-Woody has 15 years of on-the-ground work in the precinct and nearly won last time.",
+        "confidence": "Good Match"
       }
     },
     {
@@ -459,10 +493,10 @@
           "summary": "Former Austin City Council member (District 9) and former Mayor Pro Tem. Extensive local government experience. Well-known in Austin politics.",
           "background": "Former Austin City Council member. Former Mayor Pro Tem. Adjunct professor. Deep roots in Austin civic life.",
           "keyPositions": ["Housing affordability", "Homelessness policy", "Transportation", "Local governance"],
-          "endorsements": [],
-          "pros": ["Most government experience in the field", "Well-known in Austin politics", "Deep policy knowledge"],
+          "endorsements": ["Austin Chronicle (co-endorsed with Garibay)"],
+          "pros": ["Most government experience in the field", "Well-known in Austin politics", "Deep policy knowledge", "Among top fundraisers"],
           "cons": ["City council tenure was sometimes polarizing", "Some see her as an insider"],
-          "fundraising": null,
+          "fundraising": "Among top fundraisers in 8-candidate field",
           "polling": null
         },
         {
@@ -470,22 +504,27 @@
           "party": "Democrat",
           "isIncumbent": false,
           "isRecommended": false,
-          "summary": "Candidate in the HD-49 open seat race.",
-          "background": null, "keyPositions": [], "endorsements": [], "pros": [], "cons": [],
-          "fundraising": null, "polling": null
+          "summary": "Native Austinite, actor/comedian, and 20-year Democratic grassroots organizer. Radio personality (KLBJ-FM, ESPN Austin). Received a Texas House resolution from Rep. Hinojosa honoring his precinct chair work.",
+          "background": "Born and raised in Austin. Actor and comedian with credits on Apple TV ('Brothers'), 'Iron Claw' film, HBO, and The CW's 'Walker.' Trained at The Second City (Chicago). Radio personality at KLBJ-FM (Dudley and Bob Show), ESPN Austin, KMAC. 20+ years of Democratic organizing: precinct chair in Travis County, worked on both Obama campaigns. Austin High School graduate. Received Texas House resolution from Rep. Hinojosa.",
+          "keyPositions": ["Public education funding — comes from family of teachers", "Restrict new data center development to conserve water and lower utility bills", "Lower costs for gas, groceries, healthcare, housing", "Pledges 10 constituent calls per week and monthly roundtable meetings"],
+          "endorsements": ["Travis County Democratic Party (#1 choice for HD-49)"],
+          "pros": ["Deep Austin roots and 20+ years grassroots Democratic experience", "Strong communicator with media skills", "Working-class perspective on affordability", "Specific policy proposals (data center water legislation)"],
+          "cons": ["No legislative or government experience", "Lower name recognition than Tovo", "Less fundraising than frontrunners", "Not endorsed by Austin Chronicle or Texas AFL-CIO"],
+          "fundraising": "Lower-tier in 8-candidate field",
+          "polling": null
         },
         {
           "name": "Montserrat Garibay",
           "party": "Democrat",
           "isIncumbent": false,
           "isRecommended": false,
-          "summary": "Former Austin ISD board trustee and education advocate.",
+          "summary": "Former Austin ISD board trustee and education advocate. Strong labor and education organizing background. Co-endorsed by Austin Chronicle alongside Tovo.",
           "background": "Former Austin ISD board trustee. Education and labor advocate.",
           "keyPositions": ["Public education", "Workers' rights", "Immigration"],
-          "endorsements": [],
-          "pros": ["Education policy experience", "Labor and community organizing background"],
+          "endorsements": ["Austin Chronicle (co-endorsed with Tovo)", "Texas AFL-CIO"],
+          "pros": ["Education policy experience", "Labor and community organizing background", "Co-endorsed by Austin Chronicle", "Texas AFL-CIO endorsement", "Among top fundraisers"],
           "cons": [],
-          "fundraising": null,
+          "fundraising": "Among top fundraisers in 8-candidate field",
           "polling": null
         },
         {
@@ -493,16 +532,21 @@
           "party": "Democrat",
           "isIncumbent": false,
           "isRecommended": false,
-          "summary": "Candidate in the HD-49 open seat race.",
-          "background": null, "keyPositions": [], "endorsements": [], "pros": [], "cons": [],
-          "fundraising": null, "polling": null
+          "summary": "20-year nurse practitioner with a doctorate. Peace Corps volunteer (Ghana). Breast cancer survivor. Directs a nonprofit helping uninsured women with breast cancer. Former HUD and White House staffer.",
+          "background": "5th generation Texan from North Dallas, moved to Austin for college in the 1990s. B.A. in Government from UT Austin (2000). Worked at HUD and in the White House. Became an RN in 2006, M.S. in Nursing from UT Austin (2008). Served in Peace Corps in Ghana (2 years). ICU nurse in Chicago. Doctorate of Nursing Practice from Rush University (2015). 20-year nurse practitioner. Directs nonprofit assisting uninsured women with breast cancer. Breast cancer survivor (diagnosed 2020). Serves on anti-eviction nonprofit board.",
+          "keyPositions": ["Healthcare expansion and Medicaid access", "Increased teacher pay and school funding", "Affordable living", "LGBTQ+ protections", "Workers' right to organize"],
+          "endorsements": [],
+          "pros": ["Deeply credentialed in healthcare — 20 years with doctorate", "Lived experience as breast cancer survivor", "Diverse life experience: White House, HUD, Peace Corps, ICU nursing", "Direct understanding of uninsured patients' needs"],
+          "cons": ["Described as 'energy agnostic' supporting oil/gas — may be too moderate for this progressive district", "No prior elected office or legislative experience", "Relatively newer to Austin (returned ~2015)", "No major endorsements"],
+          "fundraising": "$31,000 cash on hand (end of 2025)",
+          "polling": null
         }
       ],
       "recommendation": {
         "candidateName": "Kathie Tovo",
         "reasoning": "Most experienced candidate with deep Austin government experience as a former City Council member and Mayor Pro Tem. In an 8-candidate field, her name recognition and policy depth stand out.",
-        "strategicNotes": "8 candidates — a runoff is almost certain. This open seat is one of the most competitive local Democratic primaries.",
-        "caveats": "If education is your top priority, Montserrat Garibay's AISD board experience may be more relevant.",
+        "strategicNotes": "8 candidates — a runoff is almost certain. Austin Chronicle co-endorsed both Tovo and Garibay. Garibay has the Texas AFL-CIO endorsement and strong labor support.",
+        "caveats": "If education is your top priority, Montserrat Garibay's AISD board experience and AFL-CIO endorsement may be more relevant.",
         "confidence": "Good Match"
       }
     },
@@ -539,45 +583,65 @@
           "name": "Allison Bush",
           "party": "Democrat",
           "isIncumbent": false,
-          "isRecommended": false,
-          "summary": "Candidate for SBOE District 5.",
-          "background": null, "keyPositions": [], "endorsements": [], "pros": [], "cons": [],
-          "fundraising": null, "polling": null
+          "isRecommended": true,
+          "summary": "25-year Texas educator — teacher, school counselor, nonprofit executive, and community advocate across Central Texas school districts. Former union member with progressive advocacy experience in conservative communities.",
+          "background": "25+ years as teacher, school counselor, nonprofit executive director, and community advocate in Central Texas ISDs. Associate degree in Communication and Visual Arts from Kilgore College. B.A. in Communication and Special Education from Stephen F. Austin State University. Former union member. Progressive advocacy experience in conservative communities.",
+          "keyPositions": ["Curriculum standards based on educator expertise, not partisan politics", "Fight to reduce teacher paperwork and improve retention", "Oppose book bans and attacks on DEI", "Charter school oversight — equal academic standards and fiscal transparency", "Protect accurate history and age-appropriate health education", "Oppose vouchers and privatization"],
+          "endorsements": ["Austin Chronicle"],
+          "pros": ["Most direct K-12 classroom and administrative experience (25 years in Texas ISDs)", "Austin Chronicle endorsement", "Union background aligns with teacher advocacy", "Experience advocating for progressive education in conservative communities"],
+          "cons": ["Lower academic/research profile than Sampson", "Less prominent endorsement list than Bazan's elected official endorsements"],
+          "fundraising": null,
+          "polling": null
         },
         {
           "name": "Victor Sampson",
           "party": "Democrat",
           "isIncumbent": false,
           "isRecommended": false,
-          "summary": "Candidate for SBOE District 5.",
-          "background": null, "keyPositions": [], "endorsements": [], "pros": [], "cons": [],
-          "fundraising": null, "polling": null
+          "summary": "UT Austin associate professor of STEM Education with a PhD in Curriculum and Instruction. Former classroom science teacher. Deepest academic credentials of any candidate.",
+          "background": "Associate Professor of STEM Education at UT Austin. Chief Innovation Officer for Argument-Driven Inquiry. B.S. in Biology from University of Washington (1997). M.Ed. from Seattle University (1999). Ph.D. in Curriculum and Instruction from Arizona State University (2007). Former classroom science teacher.",
+          "keyPositions": ["Curriculum based on educational research, not politics", "Anti-virtual schooling — incompatible with child development", "Adequate public school funding", "Assessment reform — reduce high-stakes testing", "Teacher autonomy and empowerment"],
+          "endorsements": [],
+          "pros": ["Deepest academic and research credentials — PhD and UT Austin professor", "Direct expertise in curriculum design, which is SBOE's core function", "Strong on evidence-based education policy", "Former K-12 classroom teacher plus academic research"],
+          "cons": ["Academic background may seem theoretical vs. Bush's 25 years in Texas ISDs", "Not endorsed by Austin Chronicle", "Limited visible endorsements or organizational support"],
+          "fundraising": null,
+          "polling": null
         },
         {
           "name": "Neto Longoria",
           "party": "Democrat",
           "isIncumbent": false,
           "isRecommended": false,
-          "summary": "Candidate for SBOE District 5.",
-          "background": null, "keyPositions": [], "endorsements": [], "pros": [], "cons": [],
-          "fundraising": null, "polling": null
+          "summary": "Current Austin ISD bilingual special education teacher and parent support specialist. Master's in Public Affairs from UT Austin's LBJ School (2025).",
+          "background": "B.B.A. in Business Administration from UT Austin (2015). M.P.Aff. in Public Affairs from UT Austin LBJ School (2025). Current Austin ISD bilingual special education teacher and parent support specialist. Former political canvasser.",
+          "keyPositions": ["Multilingual and bilingual education programs", "Special education resources and accessibility", "Community input in policy decisions", "Assessment reform", "Funding equity for underserved communities"],
+          "endorsements": [],
+          "pros": ["Active classroom teacher — brings current, firsthand experience", "Strong focus on bilingual and special education — underrepresented perspectives on SBOE", "Public policy education (LBJ School) bridges classroom and policy", "Younger generation of educators"],
+          "cons": ["No traditional campaign website — relies on social media", "Narrower issue focus than other candidates", "Relatively newer career", "No major endorsements"],
+          "fundraising": null,
+          "polling": null
         },
         {
           "name": "Stephanie Limon Bazan",
           "party": "Democrat",
           "isIncumbent": false,
           "isRecommended": false,
-          "summary": "Candidate for SBOE District 5.",
-          "background": null, "keyPositions": [], "endorsements": [], "pros": [], "cons": [],
-          "fundraising": null, "polling": null
+          "summary": "Nonprofit leader, former educator, and 5th generation Texan. Most endorsed candidate in the SBOE race with support from multiple elected officials. Mom of two, first-generation college graduate, Austin ISD product.",
+          "background": "Mom of two (ages 7 and 10). 5th generation Texan. Austin ISD public school product. First-generation college graduate. B.A. in English from St. Edward's University (2002). M.A. in Creative Writing from University of Leeds, England (2005). Former teacher at St. Edward's. Career spanning education, healthcare, law, and nonprofit sectors. Worked with LifeWorks addressing youth homelessness and literacy.",
+          "keyPositions": ["Historically accurate curriculum — not revised for political or religious agendas", "Stop Christian nationalist influence in curriculum", "Oppose vouchers and charter expansion", "Educator-led standards focused on critical thinking", "Reduce unnecessary testing", "Address chronic underfunding"],
+          "endorsements": ["State Rep. Sheryl Cole (HD-46)", "Travis County Tax Assessor Celia Israel", "Travis County Sheriff Sally Hernandez", "Capital Area Progressive Democrats", "Austin Tejano Democrats", "Austin Environmental Democrats", "Former Austin City Council Member Ann Kitchen"],
+          "pros": ["By far the most endorsements including multiple elected officials", "Strong personal connection to public education (AISD product, parent of two)", "Broad professional background across education, nonprofit, healthcare", "Clear, forceful messaging against privatization and Christian nationalism"],
+          "cons": ["Less direct K-12 classroom experience than Bush (25 years) or Longoria", "Teaching was at university level, not K-12", "Not endorsed by Austin Chronicle", "Creative writing/nonprofit background less tied to SBOE's curriculum-setting function"],
+          "fundraising": null,
+          "polling": null
         }
       ],
       "recommendation": {
         "candidateName": "Allison Bush",
-        "reasoning": "6-candidate field for SBOE District 5. Research each candidate's education background and priorities. The State Board of Education sets curriculum standards and textbook adoption for all Texas public schools.",
-        "strategicNotes": "This down-ballot race has outsized impact — SBOE decisions affect millions of Texas students.",
-        "caveats": "Limited public information available. Do your own research.",
-        "confidence": "Best Available"
+        "reasoning": "25 years of direct K-12 experience in Texas ISDs and Austin Chronicle endorsement make her the strongest choice for a board that sets curriculum standards. Only 5 of 15 current SBOE members are career educators.",
+        "strategicNotes": "This down-ballot race has outsized impact — SBOE decisions affect millions of Texas students. Bazan has the most elected official endorsements; Sampson has the deepest academic credentials.",
+        "caveats": "If elected official endorsements matter most, Stephanie Bazan has the broadest political support. If academic rigor matters most, Victor Sampson brings a PhD in curriculum design.",
+        "confidence": "Good Match"
       }
     }
   ],

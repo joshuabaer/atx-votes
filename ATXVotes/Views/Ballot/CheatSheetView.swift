@@ -45,7 +45,7 @@ struct CheatSheetView: View {
                             .background(store.selectedParty == .democrat ? Theme.democrat : Theme.republican)
                             .clipShape(Capsule())
 
-                        Text("March 3, 2026")
+                        Text(Election.dateFormatted)
                             .font(Theme.caption)
                             .foregroundColor(Theme.textSecondary)
                     }
@@ -222,7 +222,7 @@ struct CheatSheetView: View {
         var lines: [String] = []
         lines.append("MY BALLOT CHEAT SHEET")
         lines.append(store.voterProfile.address?.formatted ?? "Austin, TX")
-        lines.append("\(ballot?.party.rawValue ?? store.selectedParty.rawValue) Primary — March 3, 2026")
+        lines.append("\(ballot?.party.rawValue ?? store.selectedParty.rawValue) Primary — \(Election.dateFormatted)")
         lines.append("")
 
         for race in contestedRaces {

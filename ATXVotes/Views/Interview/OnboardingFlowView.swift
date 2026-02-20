@@ -128,7 +128,7 @@ struct WelcomeView: View {
                 }
                 .buttonStyle(PrimaryButtonStyle())
 
-                Text("March 3, 2026 Primary Election")
+                Text("\(Election.dateFormatted) Primary Election")
                     .font(Theme.caption)
                     .foregroundColor(Theme.textSecondary)
             }

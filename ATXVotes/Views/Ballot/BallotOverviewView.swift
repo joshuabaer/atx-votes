@@ -170,7 +170,7 @@ struct BallotOverviewView: View {
                     Text(ballot?.electionName ?? "March 2026 Primary")
                         .font(Theme.headline)
                         .foregroundColor(.white)
-                    Text(ballot?.electionDate.formatted(date: .long, time: .omitted) ?? "March 3, 2026")
+                    Text(ballot?.electionDate.formatted(date: .long, time: .omitted) ?? Election.dateFormatted)
                         .font(Theme.callout)
                         .foregroundColor(.white.opacity(0.8))
                 }
@@ -389,7 +389,7 @@ struct BallotOverviewView: View {
         var lines: [String] = []
         lines.append("MY BALLOT CHEAT SHEET")
         lines.append(store.voterProfile.address?.formatted ?? "Austin, TX")
-        lines.append("\(ballot?.party.rawValue ?? store.selectedParty.rawValue) Primary — March 3, 2026")
+        lines.append("\(ballot?.party.rawValue ?? store.selectedParty.rawValue) Primary — \(Election.dateFormatted)")
         lines.append("")
 
         for race in recommendedRaces {

@@ -1,4 +1,7 @@
 import Foundation
+import os
+
+private let logger = Logger(subsystem: "app.atxvotes", category: "ClaudeService")
 
 // MARK: - GuideGenerating Protocol
 
@@ -255,7 +258,7 @@ actor ClaudeService: GuideGenerating {
                     }
                     // Second 529 — fall through to try next model
                     if index < modelsToTry.count - 1 {
-                        print("[ClaudeService] \(model) returned 529, falling back to \(modelsToTry[index + 1])")
+                        logger.warning("\(model) returned 529, falling back to \(modelsToTry[index + 1])")
                         break
                     }
                     throw ClaudeError.overloaded
