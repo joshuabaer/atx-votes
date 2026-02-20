@@ -203,12 +203,112 @@ function handleLandingPage() {
   });
 }
 
+function handlePrivacyPolicy() {
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy Policy — ATX Votes</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #faf8f0;
+      color: #1e1e24;
+      padding: 2rem;
+      line-height: 1.7;
+    }
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      padding: 3rem 2.5rem;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    }
+    h1 { font-size: 1.8rem; font-weight: 800; color: #21598e; margin-bottom: 0.3rem; }
+    .updated { font-size: 0.9rem; color: #73737f; margin-bottom: 2rem; }
+    h2 { font-size: 1.15rem; font-weight: 700; color: #1e1e24; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+    p, li { font-size: 1rem; color: #3a3a44; margin-bottom: 0.75rem; }
+    ul { padding-left: 1.5rem; margin-bottom: 0.75rem; }
+    a { color: #21598e; }
+    .back { display: inline-block; margin-top: 1.5rem; font-size: 0.95rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Privacy Policy</h1>
+    <p class="updated">Last updated: February 19, 2026</p>
+
+    <p>ATX Votes ("the app") is a free voting guide for Austin and Travis County elections. Your privacy matters — here's exactly what happens with your data.</p>
+
+    <h2>What we collect</h2>
+    <p>The app collects only what you provide during the interview:</p>
+    <ul>
+      <li><strong>Voter preferences</strong> — your top issues, political outlook, policy views, and candidate qualities</li>
+      <li><strong>Street address</strong> — used once to look up your voting districts</li>
+    </ul>
+
+    <h2>How we use it</h2>
+    <ul>
+      <li>Your preferences are sent to our server to generate personalized ballot recommendations using AI (Claude by Anthropic)</li>
+      <li>Your address is sent to the U.S. Census Bureau Geocoder API to determine your congressional, state house, and state senate districts</li>
+      <li>After generating your guide, your profile and ballot are stored locally on your device</li>
+    </ul>
+
+    <h2>What we don't do</h2>
+    <ul>
+      <li>We do <strong>not</strong> store your data on our servers — the API proxy processes requests and discards them</li>
+      <li>We do <strong>not</strong> sell, share, or rent your personal information to anyone</li>
+      <li>We do <strong>not</strong> use analytics, tracking pixels, or advertising SDKs</li>
+      <li>We do <strong>not</strong> collect device identifiers, IP addresses, or usage data</li>
+    </ul>
+
+    <h2>iCloud sync</h2>
+    <p>If you have iCloud enabled, the app uses Apple's iCloud Key-Value Store to sync your voter profile and ballot across your devices. This data is stored in your personal iCloud account and is not accessible to us.</p>
+
+    <h2>Notifications</h2>
+    <p>The app can send local election reminder notifications if you enable them. These are scheduled entirely on your device — no data is sent to any push notification service.</p>
+
+    <h2>Third-party services</h2>
+    <ul>
+      <li><strong>Anthropic (Claude API)</strong> — processes your voter profile to generate recommendations. Subject to <a href="https://www.anthropic.com/privacy">Anthropic's privacy policy</a>.</li>
+      <li><strong>U.S. Census Bureau Geocoder</strong> — receives your address to return district information. A public government API.</li>
+      <li><strong>Cloudflare Workers</strong> — our API proxy runs on Cloudflare. Requests are processed in memory and not logged or stored.</li>
+    </ul>
+
+    <h2>Data deletion</h2>
+    <p>Tap "Start Over" in the Profile tab to erase all local data at any time. Since we don't store anything on our servers, there's nothing else to delete.</p>
+
+    <h2>Children's privacy</h2>
+    <p>The app is not directed at children under 13 and does not knowingly collect information from children.</p>
+
+    <h2>Changes</h2>
+    <p>If this policy changes, we'll update the date above and publish the new version at this URL.</p>
+
+    <h2>Contact</h2>
+    <p>Questions? Email <a href="mailto:feedback@atxvotes.app">feedback@atxvotes.app</a></p>
+
+    <a class="back" href="/">&larr; Back to ATX Votes</a>
+  </div>
+</body>
+</html>`;
+
+  return new Response(html, {
+    headers: { "Content-Type": "text/html;charset=utf-8" },
+  });
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    // Landing page for GET requests
+    // GET routes
     if (request.method === "GET") {
+      if (url.pathname === "/privacy") {
+        return handlePrivacyPolicy();
+      }
       return handleLandingPage();
     }
 
