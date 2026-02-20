@@ -42,8 +42,6 @@ Items not yet attempted or needing a fresh approach after failed verification.
 
 ### Features
 
-- [ ] Cloud persistence / backup — currently UserDefaults only. Consider CloudKit or similar for syncing voter profile and guide across devices
-- [ ] iPad / larger screen layout — current views are iPhone-optimized. Consider NavigationSplitView or multi-column layout for iPad
 - [ ] More entertaining loading animation — BuildingGuideView currently shows a simple pulsing icon and rotating status messages while the guide builds. Replace with something more engaging (e.g. animated ballot being filled in, fun voting facts, progress stages with illustrations)
 - [ ] Light/dark mode support — currently forced to light mode via `.preferredColorScheme(.light)` on ContentView. Define dark-mode variants for all Theme colors (backgroundCream, cardBackground, textPrimary, textSecondary, etc.) and remove the forced light mode so the app respects the system setting
 - [ ] Election countdown widget — WidgetKit extension with systemSmall/systemMedium/lock screen families showing days until Election Day and next key date. Use App Group shared UserDefaults for data bridge

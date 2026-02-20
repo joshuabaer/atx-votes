@@ -143,19 +143,26 @@ struct BallotOverviewView: View {
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    HStack(spacing: 16) {
+                    Menu {
+                        Button {
+                            UIPasteboard.general.string = cheatSheetText
+                        } label: {
+                            Label("Copy Cheat Sheet", systemImage: "doc.on.doc")
+                        }
+
                         Button {
                             printCheatSheet()
                         } label: {
-                            Image(systemName: "printer")
+                            Label("Print Cheat Sheet", systemImage: "printer")
                         }
-                        .accessibilityLabel("Print cheat sheet")
 
                         ShareLink(item: cheatSheetText) {
-                            Image(systemName: "square.and.arrow.up")
+                            Label("Share Cheat Sheet", systemImage: "square.and.arrow.up")
                         }
-                        .accessibilityLabel("Share cheat sheet")
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
                     }
+                    .accessibilityLabel("Cheat sheet actions")
                 }
             }
         }
@@ -471,12 +478,12 @@ struct RaceCard: View {
             }
 
             // Recommendation
-            if let rec = race.recommendation, let candidate = recommendedCandidate {
+            if let rec = race.recommendation {
                 HStack(spacing: 10) {
                     VStack(alignment: .leading, spacing: 4) {
                         HStack(spacing: 6) {
                             RecommendationBadge(style: .recommended)
-                            Text(candidate.name)
+                            Text(recommendedCandidate?.name ?? rec.candidateName)
                                 .font(.system(size: 20, weight: .bold))
                                 .foregroundColor(Theme.primaryBlue)
                         }
@@ -504,7 +511,7 @@ struct RaceCard: View {
         }
         .card()
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(race.office)\(race.district.map { ", \($0)" } ?? "")\(race.isKeyRace ? ", Key race" : ""). \(recommendedCandidate.map { "Recommended: \($0.name)" } ?? "\(race.candidates.count) candidates")")
+        .accessibilityLabel("\(race.office)\(race.district.map { ", \($0)" } ?? "")\(race.isKeyRace ? ", Key race" : ""). \(race.recommendation.map { "Recommended: \(recommendedCandidate?.name ?? $0.candidateName)" } ?? "\(race.candidates.count) candidates")")
     }
 }
 
