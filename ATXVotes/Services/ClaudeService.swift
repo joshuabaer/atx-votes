@@ -35,7 +35,10 @@ struct ClaudePropositionRecommendation: Decodable {
 
 actor ClaudeService: GuideGenerating {
     private let baseURL = "https://api.atxvotes.app/api/guide"
-    private let model = "claude-sonnet-4-20250514"
+    private let models = [
+        "claude-sonnet-4-20250514",
+        "claude-sonnet-4-5-20241022",
+    ]
     private let appSecret = "atxvotes-2026-primary"
 
     // MARK: - Generate Personalized Voting Guide
@@ -203,60 +206,76 @@ actor ClaudeService: GuideGenerating {
 
     // MARK: - API Call
 
-    private func callClaude(system: String, userMessage: String, retryCount: Int = 0) async throws -> String {
+    private func callClaude(system: String, userMessage: String, models fallbackModels: [String]? = nil) async throws -> String {
         guard let url = URL(string: baseURL) else {
             throw ClaudeError.apiError("Invalid API URL")
         }
 
-        var request = URLRequest(url: url, timeoutInterval: 30)
-        request.httpMethod = "POST"
-        request.addValue("Bearer \(appSecret)", forHTTPHeaderField: "Authorization")
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        let modelsToTry = fallbackModels ?? self.models
 
-        let body: [String: Any] = [
-            "model": model,
-            "max_tokens": 8192,
-            "system": system,
-            "messages": [
-                ["role": "user", "content": userMessage]
-            ]
-        ]
+        for (index, model) in modelsToTry.enumerated() {
+            // Try up to 2 attempts per model (initial + 1 retry for 529)
+            for attempt in 0...1 {
+                var request = URLRequest(url: url, timeoutInterval: 30)
+                request.httpMethod = "POST"
+                request.addValue("Bearer \(appSecret)", forHTTPHeaderField: "Authorization")
+                request.addValue("application/json", forHTTPHeaderField: "Content-Type")
 
-        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+                let body: [String: Any] = [
+                    "model": model,
+                    "max_tokens": 8192,
+                    "system": system,
+                    "messages": [
+                        ["role": "user", "content": userMessage]
+                    ]
+                ]
 
-        let (data, response) = try await URLSession.shared.data(for: request)
+                request.httpBody = try JSONSerialization.data(withJSONObject: body)
 
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw ClaudeError.apiError("Invalid response")
-        }
+                let (data, response) = try await URLSession.shared.data(for: request)
 
-        switch httpResponse.statusCode {
-        case 200:
-            break
-        case 401:
-            throw ClaudeError.invalidAPIKey
-        case 429:
-            throw ClaudeError.rateLimited
-        case 529:
-            if retryCount < 2 {
-                try await Task.sleep(for: .seconds(Double(retryCount + 1) * 2))
-                return try await callClaude(system: system, userMessage: userMessage, retryCount: retryCount + 1)
+                guard let httpResponse = response as? HTTPURLResponse else {
+                    throw ClaudeError.apiError("Invalid response")
+                }
+
+                switch httpResponse.statusCode {
+                case 200:
+                    let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+                    guard let content = json?["content"] as? [[String: Any]],
+                          let text = content.first?["text"] as? String else {
+                        throw ClaudeError.parseError("Could not extract text from API response")
+                    }
+                    return text
+
+                case 529:
+                    if attempt == 0 {
+                        // First 529 on this model — wait and retry
+                        try await Task.sleep(for: .seconds(2))
+                        continue
+                    }
+                    // Second 529 — fall through to try next model
+                    if index < modelsToTry.count - 1 {
+                        print("[ClaudeService] \(model) returned 529, falling back to \(modelsToTry[index + 1])")
+                        break
+                    }
+                    throw ClaudeError.overloaded
+
+                case 401:
+                    throw ClaudeError.invalidAPIKey
+                case 429:
+                    throw ClaudeError.rateLimited
+                case 500...599:
+                    throw ClaudeError.serverError(httpResponse.statusCode)
+                default:
+                    let bodyStr = String(data: data, encoding: .utf8) ?? "Unknown error"
+                    throw ClaudeError.apiError("HTTP \(httpResponse.statusCode): \(bodyStr)")
+                }
+
+                break // Move to next model after a non-retryable 529
             }
-            throw ClaudeError.overloaded
-        case 500...599:
-            throw ClaudeError.serverError(httpResponse.statusCode)
-        default:
-            let body = String(data: data, encoding: .utf8) ?? "Unknown error"
-            throw ClaudeError.apiError("HTTP \(httpResponse.statusCode): \(body)")
         }
 
-        let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
-        guard let content = json?["content"] as? [[String: Any]],
-              let text = content.first?["text"] as? String else {
-            throw ClaudeError.parseError("Could not extract text from API response")
-        }
-
-        return text
+        throw ClaudeError.overloaded
     }
 
     // MARK: - Parse Response
