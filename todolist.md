@@ -52,11 +52,10 @@ Items not yet attempted or needing a fresh approach after failed verification.
 - [ ] iPad / larger screen layout — current views are iPhone-optimized. Consider NavigationSplitView or multi-column layout for iPad
 - [ ] More entertaining loading animation — BuildingGuideView currently shows a simple pulsing icon and rotating status messages while the guide builds. Replace with something more engaging (e.g. animated ballot being filled in, fun voting facts, progress stages with illustrations)
 - [ ] Light/dark mode support — currently forced to light mode via `.preferredColorScheme(.light)` on ContentView. Define dark-mode variants for all Theme colors (backgroundCream, cardBackground, textPrimary, textSecondary, etc.) and remove the forced light mode so the app respects the system setting
+- [ ] Find a good domain name — research and register a memorable domain for the app (e.g. atxvotes.com, austinvotes.app, etc.)
 
 ### Testing
 
-- [ ] VotingGuideStore tests — verify phase navigation (advance/goBack), profile data accumulation, progress fraction calculation, save/load from UserDefaults, reset behavior
-- [ ] ClaudeService tests — test API call construction, JSON parsing of ballot response, error handling for network failures and malformed responses
 - [ ] Interview flow UI tests — walk through all 8 interview phases, verify required field validation (3+ issues, 2+ qualities, address fields), verify back navigation preserves selections
 
 ---

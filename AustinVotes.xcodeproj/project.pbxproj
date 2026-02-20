@@ -35,6 +35,10 @@
 		A10018000000000000000018 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A20018000000000000000018 /* Assets.xcassets */; };
 		A10019000000000000000019 /* republican_primary_2026.json in Resources */ = {isa = PBXBuildFile; fileRef = A20019000000000000000019 /* republican_primary_2026.json */; };
 		A1001A00000000000000001A /* democrat_primary_2026.json in Resources */ = {isa = PBXBuildFile; fileRef = A2001A00000000000000001A /* democrat_primary_2026.json */; };
+		B10001000000000000000001 /* VotingGuideStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20001000000000000000001 /* VotingGuideStoreTests.swift */; };
+		B10002000000000000000002 /* BallotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20002000000000000000002 /* BallotTests.swift */; };
+		B10003000000000000000003 /* VoterProfileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20003000000000000000003 /* VoterProfileTests.swift */; };
+		B10004000000000000000004 /* ClaudeServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20004000000000000000004 /* ClaudeServiceTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -67,6 +71,11 @@
 		A20019000000000000000019 /* republican_primary_2026.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = republican_primary_2026.json; sourceTree = "<group>"; };
 		A2001A00000000000000001A /* democrat_primary_2026.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = democrat_primary_2026.json; sourceTree = "<group>"; };
 		A30000000000000000000001 /* AustinVotes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AustinVotes.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B20001000000000000000001 /* VotingGuideStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VotingGuideStoreTests.swift; sourceTree = "<group>"; };
+		B20002000000000000000002 /* BallotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BallotTests.swift; sourceTree = "<group>"; };
+		B20003000000000000000003 /* VoterProfileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoterProfileTests.swift; sourceTree = "<group>"; };
+		B20004000000000000000004 /* ClaudeServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeServiceTests.swift; sourceTree = "<group>"; };
+		B30000000000000000000001 /* AustinVotesTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AustinVotesTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,13 +86,39 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B40000000000000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXContainerItemProxy section */
+		B50000000000000000000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AA0000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A60000000000000000000001;
+			remoteInfo = AustinVotes;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXTargetDependency section */
+		B60000000000000000000001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A60000000000000000000001 /* AustinVotes */;
+			targetProxy = B50000000000000000000001 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXGroup section */
 		A50000000000000000000001 = {
 			isa = PBXGroup;
 			children = (
 				A50000000000000000000002 /* AustinVotes */,
+				B50000000000000000000002 /* AustinVotesTests */,
 				A50000000000000000000010 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -183,8 +218,20 @@
 			isa = PBXGroup;
 			children = (
 				A30000000000000000000001 /* AustinVotes.app */,
+				B30000000000000000000001 /* AustinVotesTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		B50000000000000000000002 /* AustinVotesTests */ = {
+			isa = PBXGroup;
+			children = (
+				B20001000000000000000001 /* VotingGuideStoreTests.swift */,
+				B20002000000000000000002 /* BallotTests.swift */,
+				B20003000000000000000003 /* VoterProfileTests.swift */,
+				B20004000000000000000004 /* ClaudeServiceTests.swift */,
+			);
+			path = AustinVotesTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -207,6 +254,24 @@
 			productReference = A30000000000000000000001 /* AustinVotes.app */;
 			productType = "com.apple.product-type.application";
 		};
+		B60000000000000000000002 /* AustinVotesTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B80000000000000000000001 /* Build configuration list for PBXNativeTarget "AustinVotesTests" */;
+			buildPhases = (
+				B70000000000000000000001 /* Sources */,
+				B40000000000000000000001 /* Frameworks */,
+				B90000000000000000000001 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B60000000000000000000001 /* PBXTargetDependency */,
+			);
+			name = AustinVotesTests;
+			productName = AustinVotesTests;
+			productReference = B30000000000000000000001 /* AustinVotesTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -219,6 +284,10 @@
 				TargetAttributes = {
 					A60000000000000000000001 = {
 						CreatedOnToolsVersion = 15.4;
+					};
+					B60000000000000000000002 = {
+						CreatedOnToolsVersion = 15.4;
+						TestTargetID = A60000000000000000000001;
 					};
 				};
 			};
@@ -236,6 +305,7 @@
 			projectRoot = "";
 			targets = (
 				A60000000000000000000001 /* AustinVotes */,
+				B60000000000000000000002 /* AustinVotesTests */,
 			);
 		};
 /* End PBXProject section */
@@ -248,6 +318,13 @@
 				A10018000000000000000018 /* Assets.xcassets in Resources */,
 				A10019000000000000000019 /* republican_primary_2026.json in Resources */,
 				A1001A00000000000000001A /* democrat_primary_2026.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B90000000000000000000001 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -283,6 +360,17 @@
 				A10016000000000000000016 /* VotingGuideStore.swift in Sources */,
 				A10017000000000000000017 /* ClaudeService.swift in Sources */,
 				A1001C00000000000000001C /* DistrictLookupService.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B70000000000000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B10001000000000000000001 /* VotingGuideStoreTests.swift in Sources */,
+				B10002000000000000000002 /* BallotTests.swift in Sources */,
+				B10003000000000000000003 /* VoterProfileTests.swift in Sources */,
+				B10004000000000000000004 /* ClaudeServiceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -474,6 +562,46 @@
 			};
 			name = Release;
 		};
+		BB0000000000000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = S7A2CEEUDS;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.atxvotes.app.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AustinVotes.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/AustinVotes";
+			};
+			name = Debug;
+		};
+		BB0000000000000000000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = S7A2CEEUDS;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.atxvotes.app.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AustinVotes.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/AustinVotes";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -491,6 +619,15 @@
 			buildConfigurations = (
 				AB0000000000000000000003 /* Debug */,
 				AB0000000000000000000004 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B80000000000000000000001 /* Build configuration list for PBXNativeTarget "AustinVotesTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BB0000000000000000000001 /* Debug */,
+				BB0000000000000000000002 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
