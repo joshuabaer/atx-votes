@@ -91,6 +91,20 @@ struct BallotOverviewView: View {
                     // Party switcher
                     PartySwitcher(selectedParty: $store.selectedParty)
 
+                    if ballot == nil {
+                        VStack(spacing: 12) {
+                            Image(systemName: "hand.tap.fill")
+                                .font(.system(size: 36))
+                                .foregroundColor(Theme.textSecondary)
+                            Text("Choose a primary above to see your picks")
+                                .font(Theme.callout)
+                                .foregroundColor(Theme.textSecondary)
+                                .multilineTextAlignment(.center)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 60)
+                    }
+
                     // Header card
                     headerCard
 

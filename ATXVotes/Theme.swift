@@ -181,7 +181,6 @@ struct PartySwitcher: View {
 
     private func partyButton(party: PrimaryBallot, label: String, emoji: String, color: Color) -> some View {
         let isSelected = selectedParty == party
-            || (party == .republican && selectedParty == .undecided)
 
         return Button {
             withAnimation(.spring(response: 0.3)) {

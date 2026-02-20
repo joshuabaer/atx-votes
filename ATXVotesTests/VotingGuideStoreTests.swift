@@ -364,6 +364,24 @@ final class VotingGuideStoreBuildTests: XCTestCase {
                        "Conservative spectrum should infer Republican")
     }
 
+    func testBuildGuideDefaultsToUndecidedForModerate() async {
+        setUpProfile(spectrum: .moderate)
+        await store.buildVotingGuide()
+
+        XCTAssertEqual(store.selectedParty, .undecided,
+                       "Moderate spectrum should infer undecided")
+        XCTAssertNil(store.ballot,
+                     "Undecided should return nil ballot")
+    }
+
+    func testBuildGuideDefaultsToUndecidedForIndependent() async {
+        setUpProfile(spectrum: .independent)
+        await store.buildVotingGuide()
+
+        XCTAssertEqual(store.selectedParty, .undecided,
+                       "Independent spectrum should infer undecided")
+    }
+
     // MARK: - 3. District lookup populates districts
 
     func testBuildGuideWithDistrictLookup() async {
@@ -423,10 +441,11 @@ final class VotingGuideStoreBuildTests: XCTestCase {
     // MARK: - 7. Party switching changes ballot
 
     func testPartySwitchingChangesBallot() async {
-        setUpProfile()
+        setUpProfile(spectrum: .conservative)
         await store.buildVotingGuide()
 
-        store.selectedParty = .republican
+        // After build, conservative infers .republican
+        XCTAssertEqual(store.selectedParty, .republican)
         let repBallot = store.ballot
         XCTAssertNotNil(repBallot)
 
@@ -485,6 +504,17 @@ final class VotingGuideStoreBuildTests: XCTestCase {
         XCTAssertEqual(store.selectedParty, .democrat)
         XCTAssertEqual(store.voterProfile.summaryText, "Democrat test summary",
                        "Progressive voter should get Democrat summary")
+    }
+
+    func testBuildGuideSummaryForModerateUsesFirstAvailable() async {
+        setUpProfile(spectrum: .moderate)
+
+        await store.buildVotingGuide()
+
+        XCTAssertEqual(store.selectedParty, .undecided)
+        // Undecided summary picks first available (demSummary ?? repSummary)
+        XCTAssertEqual(store.voterProfile.summaryText, "Democrat test summary",
+                       "Moderate/undecided voter should get first available summary (democrat)")
     }
 
     func testBuildGuideSummaryUsesRepublicanForConservative() async {

@@ -34,7 +34,7 @@ struct PrimaryPickerView: View {
                             title: "Democratic Primary",
                             color: Theme.democrat,
                             icon: "d.circle.fill",
-                            description: "U.S. Representative (CD-37), County Commissioner, and more",
+                            description: "U.S. Representative (CD-37), County Commissioner, School Board, and more",
                             isSelected: selected == .democrat
                         ) {
                             withAnimation(.spring(response: 0.25)) {

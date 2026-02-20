@@ -23,7 +23,7 @@ A personalized voting guide app for Austin, Texas. Walks any voter through a qui
 2. Add your Claude API key in `ClaudeService.swift` (or configure via environment/Keychain)
 3. Build and run on iPhone or Simulator
 
-Without an API key, the app uses sample data from the March 2026 Republican primary (based on real research) — perfect for development and demo.
+Without an API key, the app uses sample data from the March 2026 Republican and Democratic primaries (based on real research) — perfect for development and demo.
 
 ## App Structure
 

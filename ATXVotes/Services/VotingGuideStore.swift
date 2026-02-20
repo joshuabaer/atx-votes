@@ -15,7 +15,7 @@ class VotingGuideStore: ObservableObject {
     // MARK: - Ballot State
     @Published var republicanBallot: Ballot?
     @Published var democratBallot: Ballot?
-    @Published var selectedParty: PrimaryBallot = .republican
+    @Published var selectedParty: PrimaryBallot = .undecided
     @Published var guideComplete = false
     @Published var hasVoted = false
     @Published var isLoading = false
@@ -25,8 +25,9 @@ class VotingGuideStore: ObservableObject {
 
     var ballot: Ballot? {
         switch selectedParty {
-        case .republican, .undecided: republicanBallot
+        case .republican: republicanBallot
         case .democrat: democratBallot
+        case .undecided: nil
         }
     }
 
@@ -87,7 +88,7 @@ class VotingGuideStore: ObservableObject {
         switch voterProfile.politicalSpectrum {
         case .progressive, .liberal: .democrat
         case .conservative, .libertarian: .republican
-        case .moderate, .independent: .republican  // TX default
+        case .moderate, .independent: .undecided
         }
     }
 
@@ -171,16 +172,31 @@ class VotingGuideStore: ObservableObject {
             var repSummary: String?
             var demSummary: String?
 
-            loadingMessage = "Building Republican picks..."
-            if let (ballot, summary) = try? await repTask.value {
-                republicanBallot = ballot
-                repSummary = summary
-            }
+            // Await results in inferred-party order so the loading UI matches
+            if inferredParty == .democrat {
+                loadingMessage = "Building Democrat picks..."
+                if let (ballot, summary) = try? await demTask.value {
+                    democratBallot = ballot
+                    demSummary = summary
+                }
 
-            loadingMessage = "Building Democrat picks..."
-            if let (ballot, summary) = try? await demTask.value {
-                democratBallot = ballot
-                demSummary = summary
+                loadingMessage = "Building Republican picks..."
+                if let (ballot, summary) = try? await repTask.value {
+                    republicanBallot = ballot
+                    repSummary = summary
+                }
+            } else {
+                loadingMessage = "Building Republican picks..."
+                if let (ballot, summary) = try? await repTask.value {
+                    republicanBallot = ballot
+                    repSummary = summary
+                }
+
+                loadingMessage = "Building Democrat picks..."
+                if let (ballot, summary) = try? await demTask.value {
+                    democratBallot = ballot
+                    demSummary = summary
+                }
             }
 
             loadingMessage = "Finalizing recommendations..."
@@ -190,8 +206,10 @@ class VotingGuideStore: ObservableObject {
             switch inferredParty {
             case .democrat:
                 voterProfile.summaryText = demSummary ?? repSummary
-            case .republican, .undecided:
+            case .republican:
                 voterProfile.summaryText = repSummary ?? demSummary
+            case .undecided:
+                voterProfile.summaryText = demSummary ?? repSummary
             }
 
             // Require at least one ballot to succeed
@@ -340,7 +358,7 @@ class VotingGuideStore: ObservableObject {
             voterProfile = .empty
             republicanBallot = nil
             democratBallot = nil
-            selectedParty = .republican
+            selectedParty = .undecided
             guideComplete = false
             hasVoted = false
             currentPhase = .welcome
@@ -374,16 +392,16 @@ class VotingGuideStore: ObservableObject {
         let store = VotingGuideStore()
         store.republicanBallot = Ballot.sampleRepublican
         store.democratBallot = Ballot.sampleDemocrat
-        store.selectedParty = .republican
+        store.selectedParty = .undecided
         store.guideComplete = true
         store.voterProfile = VoterProfile(
             topIssues: [.economy, .safety, .tech, .infrastructure],
-            politicalSpectrum: .independent,
-            policyViews: ["housing": "Smart growth", "safety": "Fully fund police"],
-            admiredPoliticians: ["John Cornyn", "Chip Roy"],
-            dislikedPoliticians: ["Ken Paxton"],
+            politicalSpectrum: .moderate,
+            policyViews: ["housing": "Smart growth", "safety": "Community-oriented policing"],
+            admiredPoliticians: ["Ann Richards", "Kay Bailey Hutchison"],
+            dislikedPoliticians: [],
             candidateQualities: [.competence, .integrity, .independence],
-            primaryBallot: .republican,
+            primaryBallot: .undecided,
             address: Address(street: "123 Congress Ave", city: "Austin", state: "TX", zip: "78701"),
             summaryText: "A pragmatic, tech-forward Austin moderate who values competence, integrity, and results over ideology.",
             districts: nil

@@ -90,7 +90,10 @@ actor ClaudeService: GuideGenerating {
         switch primary {
         case .democrat:
             return Ballot.sampleDemocrat
-        case .republican, .undecided:
+        case .republican:
+            return Ballot.sampleRepublican
+        case .undecided:
+            // Should not be reached — buildVotingGuide always sets an explicit party
             return Ballot.sampleRepublican
         }
     }

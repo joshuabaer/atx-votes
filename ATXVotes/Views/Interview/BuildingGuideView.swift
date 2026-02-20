@@ -4,22 +4,36 @@ struct BuildingGuideView: View {
     @EnvironmentObject var store: VotingGuideStore
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    private let steps: [(icon: String, label: String, emoji: String)] = [
-        ("magnifyingglass", "Finding your ballot", "🔍"),
-        ("doc.text.magnifyingglass", "Looking up districts", "🗺️"),
-        ("person.2.fill", "Researching candidates", "👥"),
-        ("brain.head.profile", "Building Republican picks", "🐘"),
-        ("brain.head.profile", "Building Democrat picks", "🫏"),
-        ("checkmark.seal.fill", "Finalizing recommendations", "✨"),
-    ]
+    private var steps: [(icon: String, label: String, emoji: String)] {
+        let demFirst = store.inferredParty == .democrat
+        let firstParty = (icon: "brain.head.profile",
+                          label: demFirst ? "Building Democrat picks" : "Building Republican picks",
+                          emoji: demFirst ? "🫏" : "🐘")
+        let secondParty = (icon: "brain.head.profile",
+                           label: demFirst ? "Building Republican picks" : "Building Democrat picks",
+                           emoji: demFirst ? "🐘" : "🫏")
+        return [
+            ("magnifyingglass", "Finding your ballot", "🔍"),
+            ("doc.text.magnifyingglass", "Looking up districts", "🗺️"),
+            ("person.2.fill", "Researching candidates", "👥"),
+            firstParty,
+            secondParty,
+            ("checkmark.seal.fill", "Finalizing recommendations", "✨"),
+        ]
+    }
 
     /// Which step we're on, derived from the store's loading message.
     private var currentStep: Int {
-        // Map loading messages to step indices
         let message = store.loadingMessage
+        let demFirst = store.inferredParty == .democrat
         if message.contains("Finalizing") { return 5 }
-        if message.contains("Democrat") { return 4 }
-        if message.contains("Republican") { return 3 }
+        if demFirst {
+            if message.contains("Republican") { return 4 }
+            if message.contains("Democrat") { return 3 }
+        } else {
+            if message.contains("Democrat") { return 4 }
+            if message.contains("Republican") { return 3 }
+        }
         if message.contains("Researching") { return 2 }
         if message.contains("districts") { return 1 }
         return 0
