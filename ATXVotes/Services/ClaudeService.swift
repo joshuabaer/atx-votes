@@ -203,7 +203,7 @@ actor ClaudeService: GuideGenerating {
 
     // MARK: - API Call
 
-    private func callClaude(system: String, userMessage: String) async throws -> String {
+    private func callClaude(system: String, userMessage: String, retryCount: Int = 0) async throws -> String {
         guard let url = URL(string: baseURL) else {
             throw ClaudeError.apiError("Invalid API URL")
         }
@@ -237,6 +237,12 @@ actor ClaudeService: GuideGenerating {
             throw ClaudeError.invalidAPIKey
         case 429:
             throw ClaudeError.rateLimited
+        case 529:
+            if retryCount < 2 {
+                try await Task.sleep(for: .seconds(Double(retryCount + 1) * 2))
+                return try await callClaude(system: system, userMessage: userMessage, retryCount: retryCount + 1)
+            }
+            throw ClaudeError.overloaded
         case 500...599:
             throw ClaudeError.serverError(httpResponse.statusCode)
         default:
@@ -332,6 +338,7 @@ enum ClaudeError: Error, LocalizedError {
     case parseError(String)
     case invalidAPIKey
     case rateLimited
+    case overloaded
     case serverError(Int)
 
     var errorDescription: String? {
@@ -340,6 +347,7 @@ enum ClaudeError: Error, LocalizedError {
         case .parseError(let msg): msg
         case .invalidAPIKey: "Authentication error. Please update the app."
         case .rateLimited: "Too many requests. Please wait a moment and try again."
+        case .overloaded: "The AI service is temporarily overloaded. Please try again in a minute."
         case .serverError(let code): "Server error (\(code)). Please try again later."
         }
     }

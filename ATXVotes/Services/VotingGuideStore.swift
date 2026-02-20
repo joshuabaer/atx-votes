@@ -171,32 +171,37 @@ class VotingGuideStore: ObservableObject {
 
             var repSummary: String?
             var demSummary: String?
+            var lastError: Error?
 
             // Await results in inferred-party order so the loading UI matches
             if inferredParty == .democrat {
                 loadingMessage = "Building Democrat picks..."
-                if let (ballot, summary) = try? await demTask.value {
+                do {
+                    let (ballot, summary) = try await demTask.value
                     democratBallot = ballot
                     demSummary = summary
-                }
+                } catch { lastError = error }
 
                 loadingMessage = "Building Republican picks..."
-                if let (ballot, summary) = try? await repTask.value {
+                do {
+                    let (ballot, summary) = try await repTask.value
                     republicanBallot = ballot
                     repSummary = summary
-                }
+                } catch { lastError = error }
             } else {
                 loadingMessage = "Building Republican picks..."
-                if let (ballot, summary) = try? await repTask.value {
+                do {
+                    let (ballot, summary) = try await repTask.value
                     republicanBallot = ballot
                     repSummary = summary
-                }
+                } catch { lastError = error }
 
                 loadingMessage = "Building Democrat picks..."
-                if let (ballot, summary) = try? await demTask.value {
+                do {
+                    let (ballot, summary) = try await demTask.value
                     democratBallot = ballot
                     demSummary = summary
-                }
+                } catch { lastError = error }
             }
 
             loadingMessage = "Finalizing recommendations..."
@@ -214,7 +219,7 @@ class VotingGuideStore: ObservableObject {
 
             // Require at least one ballot to succeed
             guard republicanBallot != nil || democratBallot != nil else {
-                throw ClaudeError.apiError("Failed to generate any ballot recommendations. Please try again.")
+                throw lastError ?? ClaudeError.apiError("Failed to generate ballot recommendations. Please try again.")
             }
 
             // Save
