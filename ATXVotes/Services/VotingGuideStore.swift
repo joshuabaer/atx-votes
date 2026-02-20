@@ -87,18 +87,6 @@ class VotingGuideStore: ObservableObject {
         voterProfile.address = address
     }
 
-    func addAdmiredPolitician(_ name: String) {
-        if !voterProfile.admiredPoliticians.contains(name) {
-            voterProfile.admiredPoliticians.append(name)
-        }
-    }
-
-    func addDislikedPolitician(_ name: String) {
-        if !voterProfile.dislikedPoliticians.contains(name) {
-            voterProfile.dislikedPoliticians.append(name)
-        }
-    }
-
     func setPolicyView(issue: String, stance: String) {
         voterProfile.policyViews[issue] = stance
     }

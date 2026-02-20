@@ -88,9 +88,6 @@ struct BallotOverviewView: View {
                         DisclaimerBanner { showDisclaimer = false }
                     }
 
-                    // I Voted card
-                    iVotedCard
-
                     // Header card
                     headerCard
 
@@ -133,6 +130,9 @@ struct BallotOverviewView: View {
                         uncontestedSection
                     }
 
+                    // Cheat Sheet
+                    cheatSheetSection
+
                     Spacer(minLength: 40)
                 }
                 .padding(.horizontal, Theme.paddingMedium)
@@ -141,6 +141,14 @@ struct BallotOverviewView: View {
             .background(Theme.backgroundCream)
             .navigationTitle("My Ballot")
             .navigationBarTitleDisplayMode(.large)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    ShareLink(item: cheatSheetText) {
+                        Image(systemName: "square.and.arrow.up")
+                    }
+                    .accessibilityLabel("Share cheat sheet")
+                }
+            }
         }
     }
 
@@ -208,68 +216,6 @@ struct BallotOverviewView: View {
         }
     }
 
-    // MARK: - I Voted Card
-
-    @ViewBuilder
-    private var iVotedCard: some View {
-        if store.hasVoted {
-            VStack(spacing: 16) {
-                IVotedStickerView()
-                    .accessibilityLabel("I Voted sticker")
-
-                Button {
-                    shareIVotedSticker()
-                } label: {
-                    Label("Share", systemImage: "square.and.arrow.up")
-                        .font(Theme.headline)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
-                        .background(Theme.primaryBlue)
-                        .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadiusSmall))
-                }
-
-                Button("Undo") {
-                    store.unmarkVoted()
-                }
-                .font(Theme.caption)
-                .foregroundColor(Theme.textSecondary)
-            }
-            .card()
-        } else {
-            Button {
-                store.markAsVoted()
-            } label: {
-                HStack(spacing: 10) {
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 24))
-                        .foregroundColor(Theme.success)
-                    Text("Mark as Voted")
-                        .font(Theme.headline)
-                        .foregroundColor(Theme.success)
-                    Spacer()
-                    Image(systemName: "chevron.right")
-                        .font(.caption)
-                        .foregroundColor(Theme.textSecondary)
-                }
-            }
-            .buttonStyle(.plain)
-            .card()
-        }
-    }
-
-    private func shareIVotedSticker() {
-        let renderer = ImageRenderer(content: IVotedStickerView(size: 600))
-        renderer.scale = 3
-        guard let image = renderer.uiImage else { return }
-        let text = "I voted in the Texas Primary! Have you? Build your free voting guide at https://atxvotes.app"
-        let activityVC = UIActivityViewController(activityItems: [image, text], applicationActivities: nil)
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let rootVC = windowScene.keyWindow?.rootViewController {
-            rootVC.present(activityVC, animated: true)
-        }
-    }
-
     // MARK: - Section Header
 
     private func sectionHeader(_ title: String, icon: String, color: Color) -> some View {
@@ -283,6 +229,152 @@ struct BallotOverviewView: View {
         }
         .padding(.top, 8)
         .accessibilityAddTraits(.isHeader)
+    }
+
+    // MARK: - Cheat Sheet
+
+    private var recommendedRaces: [Race] {
+        contestedRaces.filter { $0.recommendation != nil }
+    }
+
+    private var cheatSheetSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            sectionHeader("Cheat Sheet", icon: "list.clipboard.fill", color: Theme.primaryBlue)
+
+            VStack(spacing: 0) {
+                // Header
+                HStack {
+                    Text(store.voterProfile.address?.formatted ?? "Austin, TX")
+                        .font(Theme.caption)
+                        .foregroundColor(.white.opacity(0.8))
+                    Spacer()
+                    Text(ballot?.party.rawValue ?? "Republican")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundColor(.white)
+                }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 8)
+                .background(Theme.primaryBlue)
+
+                // Contested races
+                ForEach(Array(recommendedRaces.enumerated()), id: \.element.id) { index, race in
+                    cheatSheetRow(
+                        office: raceLabel(race),
+                        vote: race.recommendation?.candidateName ?? "—",
+                        isKeyRace: race.isKeyRace,
+                        isOdd: index % 2 == 1
+                    )
+                }
+
+                // Propositions
+                if let props = ballot?.propositions, !props.isEmpty {
+                    HStack {
+                        Text("PROPOSITIONS")
+                            .font(.system(size: 13, weight: .bold, design: .monospaced))
+                            .foregroundColor(.white)
+                        Spacer()
+                    }
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 6)
+                    .background(Theme.primaryBlue.opacity(0.8))
+
+                    ForEach(Array(props.enumerated()), id: \.element.id) { index, prop in
+                        cheatSheetRow(
+                            office: "Prop \(prop.number)",
+                            vote: prop.recommendation.rawValue,
+                            isKeyRace: false,
+                            isOdd: index % 2 == 1,
+                            voteColor: propColor(prop.recommendation)
+                        )
+                    }
+                }
+
+                // Footer
+                VStack(spacing: 6) {
+                    Divider()
+                    HStack(spacing: 4) {
+                        Image(systemName: "star.fill")
+                            .font(.system(size: 14))
+                            .foregroundColor(Theme.accentGold)
+                        Text("= Key race")
+                            .font(Theme.caption)
+                            .foregroundColor(Theme.textSecondary)
+                    }
+                    Text("AI-generated — do your own research.")
+                        .font(Theme.caption)
+                        .foregroundColor(Theme.textSecondary)
+                }
+                .padding(12)
+            }
+            .background(Theme.cardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadius))
+            .shadow(color: .black.opacity(0.06), radius: 8, y: 2)
+        }
+    }
+
+    private func cheatSheetRow(office: String, vote: String, isKeyRace: Bool, isOdd: Bool, voteColor: Color = Theme.primaryBlue) -> some View {
+        HStack(alignment: .top) {
+            HStack(spacing: 4) {
+                if isKeyRace {
+                    Image(systemName: "star.fill")
+                        .font(.system(size: 14))
+                        .foregroundColor(Theme.accentGold)
+                }
+                Text(office)
+                    .font(.system(size: 16))
+                    .foregroundColor(Theme.textPrimary)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            Text(vote)
+                .font(.system(size: 16, weight: .bold))
+                .foregroundColor(voteColor)
+                .multilineTextAlignment(.trailing)
+                .frame(maxWidth: .infinity, alignment: .trailing)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 8)
+        .background(isOdd ? Color.gray.opacity(0.04) : Color.clear)
+    }
+
+    private func raceLabel(_ race: Race) -> String {
+        if let district = race.district {
+            return "\(race.office) \(district)"
+        }
+        return race.office
+    }
+
+    private func propColor(_ rec: Proposition.PropRecommendation) -> Color {
+        switch rec {
+        case .leanYes: Theme.success
+        case .leanNo: Theme.danger
+        case .yourCall: Theme.warning
+        }
+    }
+
+    private var cheatSheetText: String {
+        var lines: [String] = []
+        lines.append("MY BALLOT CHEAT SHEET")
+        lines.append(store.voterProfile.address?.formatted ?? "Austin, TX")
+        lines.append("\(ballot?.party.rawValue ?? "Republican") Primary — March 3, 2026")
+        lines.append("")
+
+        for race in recommendedRaces {
+            let star = race.isKeyRace ? " *" : ""
+            lines.append("\(raceLabel(race))\(star): \(race.recommendation?.candidateName ?? "—")")
+        }
+
+        if let props = ballot?.propositions, !props.isEmpty {
+            lines.append("")
+            for prop in props {
+                lines.append("Prop \(prop.number) (\(prop.title)): \(prop.recommendation.rawValue)")
+            }
+        }
+
+        lines.append("")
+        lines.append("AI-generated recommendations — do your own research.")
+        lines.append("Built with ATX Votes — atxvotes.app")
+        return lines.joined(separator: "\n")
     }
 
     // MARK: - Uncontested Section

@@ -64,6 +64,9 @@ struct VotingInfoView: View {
                     // Reminders toggle
                     remindersCard
 
+                    // I Voted
+                    iVotedCard
+
                     // Polling location finder
                     pollingLocationCard
 
@@ -190,6 +193,68 @@ struct VotingInfoView: View {
                 }
         }
         .card()
+    }
+
+    // MARK: - I Voted
+
+    @ViewBuilder
+    private var iVotedCard: some View {
+        if store.hasVoted {
+            VStack(spacing: 16) {
+                IVotedStickerView()
+                    .accessibilityLabel("I Voted sticker")
+
+                Button {
+                    shareIVotedSticker()
+                } label: {
+                    Label("Share", systemImage: "square.and.arrow.up")
+                        .font(Theme.headline)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(Theme.primaryBlue)
+                        .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadiusSmall))
+                }
+
+                Button("Undo") {
+                    store.unmarkVoted()
+                }
+                .font(Theme.caption)
+                .foregroundColor(Theme.textSecondary)
+            }
+            .card()
+        } else {
+            Button {
+                store.markAsVoted()
+            } label: {
+                HStack(spacing: 10) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 24))
+                        .foregroundColor(Theme.success)
+                    Text("Mark as Voted")
+                        .font(Theme.headline)
+                        .foregroundColor(Theme.success)
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundColor(Theme.textSecondary)
+                }
+            }
+            .buttonStyle(.plain)
+            .card()
+        }
+    }
+
+    private func shareIVotedSticker() {
+        let renderer = ImageRenderer(content: IVotedStickerView(size: 600))
+        renderer.scale = 3
+        guard let image = renderer.uiImage else { return }
+        let text = "I voted in the Texas Primary! Have you? Build your free voting guide at https://atxvotes.app"
+        let activityVC = UIActivityViewController(activityItems: [image, text], applicationActivities: nil)
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let rootVC = windowScene.keyWindow?.rootViewController {
+            rootVC.present(activityVC, animated: true)
+        }
     }
 
     // MARK: - Polling Location

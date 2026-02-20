@@ -30,23 +30,17 @@ struct MainTabView: View {
                 }
                 .tag(0)
 
-            CheatSheetView()
-                .tabItem {
-                    Label("Cheat Sheet", systemImage: "list.clipboard.fill")
-                }
-                .tag(1)
-
             VotingInfoView()
                 .tabItem {
                     Label("Vote Info", systemImage: "info.circle.fill")
                 }
-                .tag(2)
+                .tag(1)
 
             ProfileView()
                 .tabItem {
                     Label("Profile", systemImage: "person.circle.fill")
                 }
-                .tag(3)
+                .tag(2)
         }
         .tint(Theme.primary)
     }

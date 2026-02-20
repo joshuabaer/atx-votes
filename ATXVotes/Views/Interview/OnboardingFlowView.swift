@@ -26,8 +26,6 @@ struct OnboardingFlowView: View {
                         SpectrumPickerView()
                     case .policyDeepDive:
                         PolicyDeepDiveView()
-                    case .politicians:
-                        PoliticianPickerView()
                     case .qualities:
                         QualitiesPickerView()
                     case .primaryChoice:

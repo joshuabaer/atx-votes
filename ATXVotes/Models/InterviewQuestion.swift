@@ -31,11 +31,10 @@ enum InterviewPhase: Int, CaseIterable {
     case issues = 1
     case spectrum = 2
     case policyDeepDive = 3
-    case politicians = 4
-    case qualities = 5
-    case primaryChoice = 6
-    case address = 7
-    case building = 8
+    case qualities = 4
+    case primaryChoice = 5
+    case address = 6
+    case building = 7
 
     var title: String {
         switch self {
@@ -43,7 +42,6 @@ enum InterviewPhase: Int, CaseIterable {
         case .issues: "Your Issues"
         case .spectrum: "Your Approach"
         case .policyDeepDive: "Your Views"
-        case .politicians: "Politicians"
         case .qualities: "What Matters"
         case .primaryChoice: "Your Primary"
         case .address: "Your Address"
