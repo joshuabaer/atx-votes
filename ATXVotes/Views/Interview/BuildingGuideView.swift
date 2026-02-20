@@ -3,7 +3,6 @@ import SwiftUI
 struct BuildingGuideView: View {
     @EnvironmentObject var store: VotingGuideStore
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var animateStep = 0
 
     private let steps = [
         ("magnifyingglass", "Finding your ballot"),
@@ -13,6 +12,18 @@ struct BuildingGuideView: View {
         ("brain.head.profile", "Building Democrat picks"),
         ("checkmark.seal.fill", "Finalizing recommendations"),
     ]
+
+    /// Which step we're on, derived from the store's loading message.
+    private var currentStep: Int {
+        // Map loading messages to step indices
+        let message = store.loadingMessage
+        if message.contains("Finalizing") { return 5 }
+        if message.contains("Democrat") { return 4 }
+        if message.contains("Republican") { return 3 }
+        if message.contains("Researching") { return 2 }
+        if message.contains("districts") { return 1 }
+        return 0
+    }
 
     var body: some View {
         VStack(spacing: 32) {
@@ -59,11 +70,11 @@ struct BuildingGuideView: View {
             VStack(alignment: .leading, spacing: 14) {
                 ForEach(Array(steps.enumerated()), id: \.offset) { index, step in
                     HStack(spacing: 12) {
-                        if index < animateStep {
+                        if store.guideComplete || index < currentStep {
                             Image(systemName: "checkmark.circle.fill")
                                 .foregroundColor(Theme.success)
                                 .transition(.scale)
-                        } else if index == animateStep && !store.guideComplete {
+                        } else if index == currentStep {
                             ProgressView()
                                 .scaleEffect(0.8)
                                 .frame(width: 20, height: 20)
@@ -76,13 +87,14 @@ struct BuildingGuideView: View {
                         HStack(spacing: 8) {
                             Image(systemName: step.0)
                                 .font(.system(size: 18))
-                                .foregroundColor(index <= animateStep ? Theme.primaryBlue : Theme.textSecondary)
+                                .foregroundColor(store.guideComplete || index <= currentStep ? Theme.primaryBlue : Theme.textSecondary)
                                 .frame(width: 20)
                             Text(step.1)
                                 .font(Theme.callout)
-                                .foregroundColor(index <= animateStep ? Theme.textPrimary : Theme.textSecondary)
+                                .foregroundColor(store.guideComplete || index <= currentStep ? Theme.textPrimary : Theme.textSecondary)
                         }
                     }
+                    .animation(.spring(response: 0.3), value: currentStep)
                 }
             }
             .padding(.horizontal, 40)
@@ -126,22 +138,10 @@ struct BuildingGuideView: View {
                 .padding(.bottom, 40)
             }
         }
-        .onAppear { startStepAnimation() }
     }
 
     private var shareAppMessage: String {
         "I just built my personalized voting guide for the March 2026 Texas primary with ATX Votes! Build yours in 5 minutes and know exactly who to vote for."
-    }
-
-    private func startStepAnimation() {
-        // Animate through steps
-        for i in 0..<steps.count {
-            DispatchQueue.main.asyncAfter(deadline: .now() + Double(i) * 1.5) {
-                withAnimation(.spring(response: 0.3)) {
-                    animateStep = i
-                }
-            }
-        }
     }
 }
 

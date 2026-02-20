@@ -31,8 +31,8 @@ class VotingGuideStore: ObservableObject {
     }
 
     // MARK: - Services
-    let claudeService = ClaudeService()
-    private let districtService = DistrictLookupService()
+    let claudeService: any GuideGenerating
+    private let districtService: any DistrictLooking
     private let persistenceKey = "atx_votes_profile"
     private let ballotKey = "atx_votes_ballot"  // legacy single-ballot key
     private let republicanBallotKey = "atx_votes_ballot_republican"
@@ -44,7 +44,10 @@ class VotingGuideStore: ObservableObject {
 
     // MARK: - Init
 
-    init() {
+    init(claudeService: any GuideGenerating = ClaudeService(),
+         districtService: any DistrictLooking = DistrictLookupService()) {
+        self.claudeService = claudeService
+        self.districtService = districtService
         loadSavedState()
         NotificationCenter.default.addObserver(
             self,
@@ -155,7 +158,7 @@ class VotingGuideStore: ObservableObject {
             }
 
             // Step 2: Generate personalized recommendations for both parties in parallel
-            loadingMessage = "Building Republican picks..."
+            loadingMessage = "Researching candidates..."
 
             var repProfile = voterProfile
             repProfile.primaryBallot = .republican
@@ -168,17 +171,19 @@ class VotingGuideStore: ObservableObject {
             var repSummary: String?
             var demSummary: String?
 
+            loadingMessage = "Building Republican picks..."
             if let (ballot, summary) = try? await repTask.value {
                 republicanBallot = ballot
                 repSummary = summary
             }
 
             loadingMessage = "Building Democrat picks..."
-
             if let (ballot, summary) = try? await demTask.value {
                 democratBallot = ballot
                 demSummary = summary
             }
+
+            loadingMessage = "Finalizing recommendations..."
 
             // Default to inferred party and use its summary
             selectedParty = inferredParty

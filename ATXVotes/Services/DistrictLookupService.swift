@@ -1,6 +1,14 @@
 import Foundation
 
-actor DistrictLookupService {
+// MARK: - DistrictLooking Protocol
+
+protocol DistrictLooking: Sendable {
+    func lookupDistricts(for address: Address) async throws -> Ballot.Districts
+}
+
+// MARK: - Service
+
+actor DistrictLookupService: DistrictLooking {
     private let baseURL = "https://api.atxvotes.app/api/districts"
     private let appSecret = "atxvotes-2026-primary"
 

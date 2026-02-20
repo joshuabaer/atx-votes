@@ -39,6 +39,7 @@ enum Theme {
 struct CardModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(Theme.paddingMedium)
             .background(Theme.cardBackground)
             .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadius))

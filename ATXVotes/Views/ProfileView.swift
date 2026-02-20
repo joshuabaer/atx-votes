@@ -216,7 +216,6 @@ struct ProfileView: View {
                             .background(Theme.primaryBlue.opacity(0.1))
                             .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadiusSmall))
                         }
-                        .padding(.horizontal, Theme.paddingMedium)
                         .padding(.top, 8)
                     }
 
@@ -225,7 +224,6 @@ struct ProfileView: View {
                         showResetConfirmation = true
                     }
                     .buttonStyle(SecondaryButtonStyle())
-                    .padding(.horizontal, Theme.paddingMedium)
 
                     // Credits
                     VStack(spacing: 4) {
@@ -241,6 +239,7 @@ struct ProfileView: View {
 
                     Spacer(minLength: 40)
                 }
+                .padding(.horizontal, Theme.paddingMedium)
                 .padding(.top, Theme.paddingSmall)
             }
             .background(Theme.backgroundCream)

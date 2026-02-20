@@ -186,7 +186,7 @@ function handleLandingPage() {
     <p class="subtitle">Your personalized voting guide for Austin &amp; Travis County elections.</p>
     <div class="badge">Texas Primary — March 3, 2026</div>
     <br>
-    <a class="cta" href="https://apps.apple.com/app/atx-votes/id0000000000">Download for iPhone</a>
+    <a class="cta" href="https://testflight.apple.com/join/19rYVCD6">Download for iPhone</a>
     <div class="features">
       <div><span>✅</span> 5-minute interview learns your values</div>
       <div><span>📋</span> Personalized ballot with recommendations</div>

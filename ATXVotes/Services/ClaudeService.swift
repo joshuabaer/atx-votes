@@ -1,5 +1,12 @@
 import Foundation
 
+// MARK: - GuideGenerating Protocol
+
+protocol GuideGenerating: Sendable {
+    func generateVotingGuide(profile: VoterProfile, districts: Ballot.Districts?) async throws -> (Ballot, String)
+    func generateProfileSummary(profile: VoterProfile) async throws -> String
+}
+
 // MARK: - Claude Response Types (personalization layer only)
 
 struct ClaudeGuideResponse: Decodable {
@@ -26,7 +33,7 @@ struct ClaudePropositionRecommendation: Decodable {
 
 // MARK: - Service
 
-actor ClaudeService {
+actor ClaudeService: GuideGenerating {
     private let baseURL = "https://api.atxvotes.app/api/guide"
     private let model = "claude-sonnet-4-20250514"
     private let appSecret = "atxvotes-2026-primary"
