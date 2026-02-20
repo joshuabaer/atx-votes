@@ -216,7 +216,7 @@ struct VotingInfoView: View {
                         .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadiusSmall))
                 }
 
-                Button("Undo") {
+                Button("Actually, I didn't vote yet") {
                     store.unmarkVoted()
                 }
                 .font(Theme.caption)
@@ -228,12 +228,12 @@ struct VotingInfoView: View {
                 store.markAsVoted()
             } label: {
                 HStack(spacing: 10) {
-                    Image(systemName: "checkmark.circle.fill")
+                    Image(systemName: "circle")
                         .font(.system(size: 24))
-                        .foregroundColor(Theme.success)
-                    Text("Mark as Voted")
+                        .foregroundColor(Theme.textSecondary)
+                    Text("Get your sticker")
                         .font(Theme.headline)
-                        .foregroundColor(Theme.success)
+                        .foregroundColor(Theme.textSecondary)
                     Spacer()
                     Image(systemName: "chevron.right")
                         .font(.caption)
