@@ -28,8 +28,6 @@ struct OnboardingFlowView: View {
                         PolicyDeepDiveView()
                     case .qualities:
                         QualitiesPickerView()
-                    case .primaryChoice:
-                        PrimaryPickerView()
                     case .address:
                         AddressEntryView()
                     case .building:

@@ -88,6 +88,9 @@ struct BallotOverviewView: View {
                         DisclaimerBanner { showDisclaimer = false }
                     }
 
+                    // Party switcher
+                    PartySwitcher(selectedParty: $store.selectedParty)
+
                     // Header card
                     headerCard
 
@@ -264,7 +267,7 @@ struct BallotOverviewView: View {
                         .font(Theme.caption)
                         .foregroundColor(.white.opacity(0.8))
                     Spacer()
-                    Text(ballot?.party.rawValue ?? "Republican")
+                    Text(ballot?.party.rawValue ?? store.selectedParty.rawValue)
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundColor(.white)
                 }
@@ -372,7 +375,7 @@ struct BallotOverviewView: View {
         var lines: [String] = []
         lines.append("MY BALLOT CHEAT SHEET")
         lines.append(store.voterProfile.address?.formatted ?? "Austin, TX")
-        lines.append("\(ballot?.party.rawValue ?? "Republican") Primary — March 3, 2026")
+        lines.append("\(ballot?.party.rawValue ?? store.selectedParty.rawValue) Primary — March 3, 2026")
         lines.append("")
 
         for race in recommendedRaces {

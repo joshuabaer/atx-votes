@@ -32,9 +32,8 @@ enum InterviewPhase: Int, CaseIterable {
     case spectrum = 2
     case policyDeepDive = 3
     case qualities = 4
-    case primaryChoice = 5
-    case address = 6
-    case building = 7
+    case address = 5
+    case building = 6
 
     var title: String {
         switch self {
@@ -43,7 +42,6 @@ enum InterviewPhase: Int, CaseIterable {
         case .spectrum: "Your Approach"
         case .policyDeepDive: "Your Views"
         case .qualities: "What Matters"
-        case .primaryChoice: "Your Primary"
         case .address: "Your Address"
         case .building: "Building Guide"
         }
@@ -104,33 +102,6 @@ enum InterviewQuestions {
             )
         },
         allowsMultiple: true,
-        allowsCustom: false
-    )
-
-    static let primaryChoice = InterviewQuestion(
-        id: 6,
-        phase: .primaryChoice,
-        text: "Which primary ballot will you take?",
-        subtitle: "Texas has open primaries — you choose at the polls. You can only vote in one.",
-        type: .singleChoice,
-        options: [
-            InterviewQuestion.QuestionOption(
-                label: "Republican",
-                icon: "r.circle.fill",
-                description: "Vote in Republican primary races"
-            ),
-            InterviewQuestion.QuestionOption(
-                label: "Democrat",
-                icon: "d.circle.fill",
-                description: "Vote in Democratic primary races"
-            ),
-            InterviewQuestion.QuestionOption(
-                label: "Not Sure Yet",
-                icon: "questionmark.circle",
-                description: "We'll help you think through the strategic considerations"
-            ),
-        ],
-        allowsMultiple: false,
         allowsCustom: false
     )
 

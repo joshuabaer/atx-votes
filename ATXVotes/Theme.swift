@@ -156,6 +156,60 @@ struct DisclaimerBanner: View {
     }
 }
 
+// MARK: - Party Switcher
+
+struct PartySwitcher: View {
+    @Binding var selectedParty: PrimaryBallot
+
+    var body: some View {
+        HStack(spacing: 12) {
+            partyButton(
+                party: .republican,
+                label: "Republican",
+                emoji: "\u{1F418}",
+                color: Theme.republican
+            )
+            partyButton(
+                party: .democrat,
+                label: "Democrat",
+                emoji: "\u{1FACF}",
+                color: Theme.democrat
+            )
+        }
+    }
+
+    private func partyButton(party: PrimaryBallot, label: String, emoji: String, color: Color) -> some View {
+        let isSelected = selectedParty == party
+            || (party == .republican && selectedParty == .undecided)
+
+        return Button {
+            withAnimation(.spring(response: 0.3)) {
+                selectedParty = party
+            }
+        } label: {
+            HStack(spacing: 8) {
+                Text(emoji)
+                    .font(.system(size: 28))
+                Text(label)
+                    .font(.system(size: 17, weight: .bold, design: .rounded))
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 14)
+            .foregroundColor(isSelected ? .white : color)
+            .background(isSelected ? color : color.opacity(0.08))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadiusSmall))
+            .overlay(
+                RoundedRectangle(cornerRadius: Theme.cornerRadiusSmall)
+                    .strokeBorder(color.opacity(isSelected ? 0 : 0.3), lineWidth: 1.5)
+            )
+            .shadow(color: isSelected ? color.opacity(0.3) : .clear, radius: 6, y: 2)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("\(label) primary")
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
+}
+
 // MARK: - Feedback
 
 enum FeedbackHelper {

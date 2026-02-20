@@ -13,7 +13,9 @@ class VotingGuideStore: ObservableObject {
     @Published var interviewAnswers: [Int: [String]] = [:]  // questionId -> selected options
 
     // MARK: - Ballot State
-    @Published var ballot: Ballot?
+    @Published var republicanBallot: Ballot?
+    @Published var democratBallot: Ballot?
+    @Published var selectedParty: PrimaryBallot = .republican
     @Published var guideComplete = false
     @Published var hasVoted = false
     @Published var isLoading = false
@@ -21,11 +23,21 @@ class VotingGuideStore: ObservableObject {
     @Published var errorMessage: String?
     @Published var districtLookupFailed = false
 
+    var ballot: Ballot? {
+        switch selectedParty {
+        case .republican, .undecided: republicanBallot
+        case .democrat: democratBallot
+        }
+    }
+
     // MARK: - Services
     let claudeService = ClaudeService()
     private let districtService = DistrictLookupService()
     private let persistenceKey = "atx_votes_profile"
-    private let ballotKey = "atx_votes_ballot"
+    private let ballotKey = "atx_votes_ballot"  // legacy single-ballot key
+    private let republicanBallotKey = "atx_votes_ballot_republican"
+    private let democratBallotKey = "atx_votes_ballot_democrat"
+    private let selectedPartyKey = "atx_votes_selected_party"
     private let reviewPromptedKey = "atx_votes_review_prompted"
     private let hasVotedKey = "atx_votes_has_voted"
     private let cloudStore = NSUbiquitousKeyValueStore.default
@@ -63,6 +75,17 @@ class VotingGuideStore: ObservableObject {
     var progressFraction: Double {
         guard currentPhase.totalSteps > 0 else { return 0 }
         return Double(currentPhase.stepNumber) / Double(currentPhase.totalSteps)
+    }
+
+    // MARK: - Party Inference
+
+    /// Infer the voter's likely primary party from their political spectrum.
+    var inferredParty: PrimaryBallot {
+        switch voterProfile.politicalSpectrum {
+        case .progressive, .liberal: .democrat
+        case .conservative, .libertarian: .republican
+        case .moderate, .independent: .republican  // TX default
+        }
     }
 
     // MARK: - Update Profile
@@ -131,15 +154,45 @@ class VotingGuideStore: ObservableObject {
                 }
             }
 
-            // Step 2: Generate personalized recommendations via API proxy
-            loadingMessage = "Personalizing your recommendations..."
+            // Step 2: Generate personalized recommendations for both parties in parallel
+            loadingMessage = "Building Republican picks..."
 
-            let (generatedBallot, summary) = try await claudeService.generateVotingGuide(
-                profile: voterProfile,
-                districts: voterProfile.districts
-            )
-            self.ballot = generatedBallot
-            voterProfile.summaryText = summary
+            var repProfile = voterProfile
+            repProfile.primaryBallot = .republican
+            var demProfile = voterProfile
+            demProfile.primaryBallot = .democrat
+
+            let repTask = Task { try await claudeService.generateVotingGuide(profile: repProfile, districts: voterProfile.districts) }
+            let demTask = Task { try await claudeService.generateVotingGuide(profile: demProfile, districts: voterProfile.districts) }
+
+            var repSummary: String?
+            var demSummary: String?
+
+            if let (ballot, summary) = try? await repTask.value {
+                republicanBallot = ballot
+                repSummary = summary
+            }
+
+            loadingMessage = "Building Democrat picks..."
+
+            if let (ballot, summary) = try? await demTask.value {
+                democratBallot = ballot
+                demSummary = summary
+            }
+
+            // Default to inferred party and use its summary
+            selectedParty = inferredParty
+            switch inferredParty {
+            case .democrat:
+                voterProfile.summaryText = demSummary ?? repSummary
+            case .republican, .undecided:
+                voterProfile.summaryText = repSummary ?? demSummary
+            }
+
+            // Require at least one ballot to succeed
+            guard republicanBallot != nil || democratBallot != nil else {
+                throw ClaudeError.apiError("Failed to generate any ballot recommendations. Please try again.")
+            }
 
             // Save
             saveProfile()
@@ -181,10 +234,16 @@ class VotingGuideStore: ObservableObject {
             UserDefaults.standard.set(data, forKey: persistenceKey)
             cloudStore.set(data, forKey: persistenceKey)
         }
-        if let ballot, let data = try? JSONEncoder().encode(ballot) {
-            UserDefaults.standard.set(data, forKey: ballotKey)
-            cloudStore.set(data, forKey: ballotKey)
+        if let republicanBallot, let data = try? JSONEncoder().encode(republicanBallot) {
+            UserDefaults.standard.set(data, forKey: republicanBallotKey)
+            cloudStore.set(data, forKey: republicanBallotKey)
         }
+        if let democratBallot, let data = try? JSONEncoder().encode(democratBallot) {
+            UserDefaults.standard.set(data, forKey: democratBallotKey)
+            cloudStore.set(data, forKey: democratBallotKey)
+        }
+        UserDefaults.standard.set(selectedParty.rawValue, forKey: selectedPartyKey)
+        cloudStore.set(selectedParty.rawValue, forKey: selectedPartyKey)
         cloudStore.synchronize()
     }
 
@@ -200,12 +259,49 @@ class VotingGuideStore: ObservableObject {
     private func loadSavedState() {
         migrateOldKeys()
         loadProfile()
-        let ballotData = cloudStore.data(forKey: ballotKey)
-            ?? UserDefaults.standard.data(forKey: ballotKey)
-        if let ballotData, let savedBallot = try? JSONDecoder().decode(Ballot.self, from: ballotData) {
-            ballot = savedBallot
+
+        // Load Republican ballot
+        let repData = cloudStore.data(forKey: republicanBallotKey)
+            ?? UserDefaults.standard.data(forKey: republicanBallotKey)
+        if let repData, let saved = try? JSONDecoder().decode(Ballot.self, from: repData) {
+            republicanBallot = saved
+        }
+
+        // Load Democrat ballot
+        let demData = cloudStore.data(forKey: democratBallotKey)
+            ?? UserDefaults.standard.data(forKey: democratBallotKey)
+        if let demData, let saved = try? JSONDecoder().decode(Ballot.self, from: demData) {
+            democratBallot = saved
+        }
+
+        // Migrate legacy single-ballot key
+        if republicanBallot == nil && democratBallot == nil {
+            let legacyData = cloudStore.data(forKey: ballotKey)
+                ?? UserDefaults.standard.data(forKey: ballotKey)
+            if let legacyData, let saved = try? JSONDecoder().decode(Ballot.self, from: legacyData) {
+                switch saved.party {
+                case .democrat: democratBallot = saved
+                case .republican, .undecided: republicanBallot = saved
+                }
+                // Clean up legacy key
+                UserDefaults.standard.removeObject(forKey: ballotKey)
+                cloudStore.removeObject(forKey: ballotKey)
+            }
+        }
+
+        if republicanBallot != nil || democratBallot != nil {
             guideComplete = true
         }
+
+        // Load selected party
+        if let partyString = cloudStore.string(forKey: selectedPartyKey)
+            ?? UserDefaults.standard.string(forKey: selectedPartyKey),
+           let party = PrimaryBallot(rawValue: partyString) {
+            selectedParty = party
+        } else {
+            selectedParty = inferredParty
+        }
+
         if cloudStore.object(forKey: hasVotedKey) != nil {
             hasVoted = cloudStore.bool(forKey: hasVotedKey)
         } else {
@@ -237,17 +333,18 @@ class VotingGuideStore: ObservableObject {
     func resetGuide() {
         withAnimation {
             voterProfile = .empty
-            ballot = nil
+            republicanBallot = nil
+            democratBallot = nil
+            selectedParty = .republican
             guideComplete = false
             hasVoted = false
             currentPhase = .welcome
         }
-        UserDefaults.standard.removeObject(forKey: persistenceKey)
-        UserDefaults.standard.removeObject(forKey: ballotKey)
-        UserDefaults.standard.removeObject(forKey: hasVotedKey)
-        cloudStore.removeObject(forKey: persistenceKey)
-        cloudStore.removeObject(forKey: ballotKey)
-        cloudStore.removeObject(forKey: hasVotedKey)
+        let keysToRemove = [persistenceKey, ballotKey, republicanBallotKey, democratBallotKey, selectedPartyKey, hasVotedKey]
+        for key in keysToRemove {
+            UserDefaults.standard.removeObject(forKey: key)
+            cloudStore.removeObject(forKey: key)
+        }
         cloudStore.synchronize()
     }
 
@@ -270,7 +367,9 @@ class VotingGuideStore: ObservableObject {
 
     static var preview: VotingGuideStore {
         let store = VotingGuideStore()
-        store.ballot = Ballot.sampleRepublican
+        store.republicanBallot = Ballot.sampleRepublican
+        store.democratBallot = Ballot.sampleDemocrat
+        store.selectedParty = .republican
         store.guideComplete = true
         store.voterProfile = VoterProfile(
             topIssues: [.economy, .safety, .tech, .infrastructure],

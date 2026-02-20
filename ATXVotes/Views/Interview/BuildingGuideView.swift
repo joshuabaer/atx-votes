@@ -9,8 +9,9 @@ struct BuildingGuideView: View {
         ("magnifyingglass", "Finding your ballot"),
         ("doc.text.magnifyingglass", "Looking up districts"),
         ("person.2.fill", "Researching candidates"),
-        ("brain.head.profile", "Matching to your values"),
-        ("checkmark.seal.fill", "Building recommendations"),
+        ("brain.head.profile", "Building Republican picks"),
+        ("brain.head.profile", "Building Democrat picks"),
+        ("checkmark.seal.fill", "Finalizing recommendations"),
     ]
 
     var body: some View {

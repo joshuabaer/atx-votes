@@ -6,17 +6,21 @@ final class VotingGuideStoreTests: XCTestCase {
 
     private var store: VotingGuideStore!
 
+    private let allKeys = [
+        "atx_votes_profile", "atx_votes_ballot",
+        "atx_votes_ballot_republican", "atx_votes_ballot_democrat",
+        "atx_votes_selected_party", "atx_votes_has_voted",
+    ]
+
     override func setUp() {
         super.setUp()
         // Clear persisted state before each test
-        UserDefaults.standard.removeObject(forKey: "atx_votes_profile")
-        UserDefaults.standard.removeObject(forKey: "atx_votes_ballot")
+        for key in allKeys { UserDefaults.standard.removeObject(forKey: key) }
         store = VotingGuideStore()
     }
 
     override func tearDown() {
-        UserDefaults.standard.removeObject(forKey: "atx_votes_profile")
-        UserDefaults.standard.removeObject(forKey: "atx_votes_ballot")
+        for key in allKeys { UserDefaults.standard.removeObject(forKey: key) }
         store = nil
         super.tearDown()
     }
@@ -48,7 +52,7 @@ final class VotingGuideStoreTests: XCTestCase {
     }
 
     func testAdvanceThroughAllPhases() {
-        for _ in 0..<8 {
+        for _ in 0..<7 {
             store.advancePhase()
         }
         XCTAssertEqual(store.currentPhase, .building)
@@ -92,32 +96,10 @@ final class VotingGuideStoreTests: XCTestCase {
         XCTAssertEqual(store.voterProfile.candidateQualities, [.competence, .integrity])
     }
 
-    func testSelectPrimary() {
-        store.selectPrimary(.democrat)
-        XCTAssertEqual(store.voterProfile.primaryBallot, .democrat)
-    }
-
     func testSetAddress() {
         let address = Address(street: "100 Congress Ave", city: "Austin", state: "TX", zip: "78701")
         store.setAddress(address)
         XCTAssertEqual(store.voterProfile.address, address)
-    }
-
-    func testAddAdmiredPolitician() {
-        store.addAdmiredPolitician("George Washington")
-        store.addAdmiredPolitician("Abraham Lincoln")
-        XCTAssertEqual(store.voterProfile.admiredPoliticians, ["George Washington", "Abraham Lincoln"])
-    }
-
-    func testAddDuplicateAdmiredPoliticianIgnored() {
-        store.addAdmiredPolitician("George Washington")
-        store.addAdmiredPolitician("George Washington")
-        XCTAssertEqual(store.voterProfile.admiredPoliticians.count, 1)
-    }
-
-    func testAddDislikedPolitician() {
-        store.addDislikedPolitician("Darth Vader")
-        XCTAssertEqual(store.voterProfile.dislikedPoliticians, ["Darth Vader"])
     }
 
     func testSetPolicyView() {
@@ -130,23 +112,22 @@ final class VotingGuideStoreTests: XCTestCase {
     func testSaveAndLoadProfile() {
         store.selectIssues([.economy, .tech])
         store.selectSpectrum(.libertarian)
-        store.selectPrimary(.republican)
-        store.addAdmiredPolitician("Test Person")
         store.saveProfile()
 
         let store2 = VotingGuideStore()
         XCTAssertEqual(store2.voterProfile.topIssues, [.economy, .tech])
         XCTAssertEqual(store2.voterProfile.politicalSpectrum, .libertarian)
-        XCTAssertEqual(store2.voterProfile.primaryBallot, .republican)
-        XCTAssertEqual(store2.voterProfile.admiredPoliticians, ["Test Person"])
     }
 
     func testSaveAndLoadBallot() {
-        store.ballot = Ballot.sampleRepublican
+        store.republicanBallot = Ballot.sampleRepublican
+        store.democratBallot = Ballot.sampleDemocrat
+        store.selectedParty = .republican
         store.saveProfile()
 
         let store2 = VotingGuideStore()
-        XCTAssertNotNil(store2.ballot)
+        XCTAssertNotNil(store2.republicanBallot)
+        XCTAssertNotNil(store2.democratBallot)
         XCTAssertTrue(store2.guideComplete)
         XCTAssertEqual(store2.ballot?.electionName, Ballot.sampleRepublican.electionName)
     }
@@ -156,8 +137,10 @@ final class VotingGuideStoreTests: XCTestCase {
         store.saveProfile()
         // Don't save a ballot
 
-        // Clear ballot key to ensure it's not there
-        UserDefaults.standard.removeObject(forKey: "atx_votes_ballot")
+        // Clear ballot keys to ensure they're not there
+        for key in allKeys where key.contains("ballot") {
+            UserDefaults.standard.removeObject(forKey: key)
+        }
 
         let store2 = VotingGuideStore()
         XCTAssertNil(store2.ballot)
@@ -169,20 +152,24 @@ final class VotingGuideStoreTests: XCTestCase {
     func testResetGuide() {
         store.selectIssues([.economy, .housing])
         store.selectSpectrum(.progressive)
-        store.ballot = Ballot.sampleRepublican
+        store.republicanBallot = Ballot.sampleRepublican
+        store.democratBallot = Ballot.sampleDemocrat
         store.guideComplete = true
         store.saveProfile()
 
         store.resetGuide()
 
         XCTAssertEqual(store.voterProfile, VoterProfile.empty)
+        XCTAssertNil(store.republicanBallot)
+        XCTAssertNil(store.democratBallot)
         XCTAssertNil(store.ballot)
         XCTAssertFalse(store.guideComplete)
         XCTAssertEqual(store.currentPhase, .welcome)
 
         // Verify persistence is cleared
         XCTAssertNil(UserDefaults.standard.data(forKey: "atx_votes_profile"))
-        XCTAssertNil(UserDefaults.standard.data(forKey: "atx_votes_ballot"))
+        XCTAssertNil(UserDefaults.standard.data(forKey: "atx_votes_ballot_republican"))
+        XCTAssertNil(UserDefaults.standard.data(forKey: "atx_votes_ballot_democrat"))
     }
 
     // MARK: - Guide State
