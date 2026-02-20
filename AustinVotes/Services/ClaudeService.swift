@@ -27,7 +27,7 @@ struct ClaudePropositionRecommendation: Decodable {
 // MARK: - Service
 
 actor ClaudeService {
-    private let baseURL = "https://atxvotes-api.joshuabaer.workers.dev/api/guide"
+    private let baseURL = "https://api.atxvotes.app/api/guide"
     private let model = "claude-sonnet-4-20250514"
     private let appSecret = "atxvotes-2026-primary"
 

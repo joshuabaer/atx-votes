@@ -1,7 +1,7 @@
 import Foundation
 
 actor DistrictLookupService {
-    private let baseURL = "https://atxvotes-api.joshuabaer.workers.dev/api/districts"
+    private let baseURL = "https://api.atxvotes.app/api/districts"
     private let appSecret = "atxvotes-2026-primary"
 
     func lookupDistricts(for address: Address) async throws -> Ballot.Districts {

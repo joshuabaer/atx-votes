@@ -2,6 +2,13 @@ name = "atxvotes-api"
 main = "src/index.js"
 compatibility_date = "2024-01-01"
 
+# Custom domain routes (requires DNS records pointing to Cloudflare)
+routes = [
+  { pattern = "atxvotes.app/*", zone_name = "atxvotes.app" },
+  { pattern = "api.atxvotes.app/*", zone_name = "atxvotes.app" },
+  { pattern = "www.atxvotes.app/*", zone_name = "atxvotes.app" },
+]
+
 # Secrets (set via `npx wrangler secret put`):
 #   ANTHROPIC_API_KEY - your Anthropic API key
 #   APP_SECRET - shared bearer token for the iOS app

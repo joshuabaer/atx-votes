@@ -95,9 +95,122 @@ async function handleGuide(request, env) {
   return jsonResponse(JSON.parse(responseBody), response.status);
 }
 
+function handleLandingPage() {
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ATX Votes — Your Personalized Austin Voting Guide</title>
+  <meta name="description" content="Build your personalized voting guide for Austin & Travis County elections in 5 minutes. Know exactly who to vote for based on your values.">
+  <meta property="og:title" content="ATX Votes — Your Personalized Austin Voting Guide">
+  <meta property="og:description" content="Build your personalized voting guide for Austin & Travis County elections in 5 minutes.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://atxvotes.app">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #faf8f0;
+      color: #1e1e24;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      text-align: center;
+    }
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 3rem 2.5rem;
+      max-width: 480px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    }
+    .icon { font-size: 4rem; margin-bottom: 1rem; }
+    h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #21598e;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.5px;
+    }
+    .subtitle {
+      font-size: 1.1rem;
+      color: #73737f;
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+    .badge {
+      display: inline-block;
+      background: #21598e15;
+      color: #21598e;
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 0.4rem 1rem;
+      border-radius: 99px;
+      margin-bottom: 2rem;
+    }
+    .cta {
+      display: inline-block;
+      background: #21598e;
+      color: white;
+      font-size: 1.1rem;
+      font-weight: 700;
+      padding: 1rem 2.5rem;
+      border-radius: 12px;
+      text-decoration: none;
+      transition: opacity 0.15s;
+    }
+    .cta:hover { opacity: 0.9; }
+    .features {
+      margin-top: 2rem;
+      text-align: left;
+      font-size: 0.95rem;
+      color: #73737f;
+      line-height: 2;
+    }
+    .features span { margin-right: 0.5rem; }
+    .footer {
+      margin-top: 2rem;
+      font-size: 0.85rem;
+      color: #73737f80;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">🗳️</div>
+    <h1>ATX Votes</h1>
+    <p class="subtitle">Your personalized voting guide for Austin &amp; Travis County elections.</p>
+    <div class="badge">Texas Primary — March 3, 2026</div>
+    <br>
+    <a class="cta" href="https://apps.apple.com/app/atx-votes/id0000000000">Download for iPhone</a>
+    <div class="features">
+      <div><span>✅</span> 5-minute interview learns your values</div>
+      <div><span>📋</span> Personalized ballot with recommendations</div>
+      <div><span>🖨️</span> Print your cheat sheet for the booth</div>
+      <div><span>📍</span> Find your polling location</div>
+    </div>
+  </div>
+  <p class="footer">Built in Austin, TX &middot; <a href="mailto:feedback@atxvotes.app" style="color:inherit">feedback@atxvotes.app</a></p>
+</body>
+</html>`;
+
+  return new Response(html, {
+    headers: { "Content-Type": "text/html;charset=utf-8" },
+  });
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+
+    // Landing page for GET requests
+    if (request.method === "GET") {
+      return handleLandingPage();
+    }
 
     if (request.method !== "POST") {
       return new Response("Not found", { status: 404 });

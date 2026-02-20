@@ -44,13 +44,7 @@ Items not yet attempted or needing a fresh approach after failed verification.
 
 ### Improvements
 
-- [ ] Structured logging — replace `print()` with `os.Logger` using subsystem/category prefixes (e.g. `[PROBE]`, `[STATE]`, `[STORAGE]`). Currently 2 bare `print()` calls in production code
-- [ ] Accessibility gaps — add `accessibilityLabel` to CandidateCard, RaceCard, and toolbar share buttons. Add `.accessibilityAddTraits(.isHeader)` to section headings. Add `accessibilityValue` to reminders Toggle
-- [ ] Dynamic Type support — current `Font.system(size:)` uses fixed point sizes that don't scale with user accessibility settings. Switch to `.body`, `.headline` etc. with `relativeTo:` for proper Dynamic Type scaling
-- [ ] Service dependency injection — `ClaudeService` is instantiated ad-hoc in `ProfileView.regenerateSummary()` instead of reusing the store's instance. Extract protocol abstractions for services to enable unit testing
-- [ ] Error feedback — `VotingGuideStore.errorMessage` may not be surfaced in UI. `ProfileView.regenerateSummary()` silently swallows all errors. District lookup failure gives no user indication
-- [ ] Safe URL/Date construction — replace force-unwrapped `URL(string:)!` and `DateComponents.date!` in VotingInfoView with safe alternatives
-- [ ] Design review document — create a design review checklist (accessibility, force unwraps, logging hygiene, memory/retain cycles) with automated verification scripts, per Canary pattern
+(none)
 
 ### Features
 
@@ -81,13 +75,20 @@ Verified working. Collapsed for reference.
 </details>
 
 <details>
-<summary>Improvements (5 resolved)</summary>
+<summary>Improvements (12 resolved)</summary>
 
 - [x] Complete policy deep-dive questions — all 12 issues covered
 - [x] Real candidate data for March 2026 primary — real data from Travis County Clerk, Ballotpedia, Texas Tribune, KUT
 - [x] Real proposition data — all 10 Republican and 13 Democratic propositions match actual ballot
 - [x] Accuracy disclaimer — DisclaimerBanner on BallotOverviewView, CheatSheetView, RaceDetailView
 - [x] Extract election data into separate JSON files — ElectionDataLoader with raw Decodable types
+- [x] Structured logging — replaced `print()` with `os.Logger` (subsystem `app.atxvotes`) in VotingGuideStore and SampleData
+- [x] Accessibility gaps — added VoiceOver labels/hints to RaceCard, CandidateCard, PropositionCard, share buttons, reminders toggle, section headers
+- [x] Dynamic Type support — switched Theme fonts to semantic text styles, set minimum Dynamic Type size to XXLarge, bumped all inline fixed sizes
+- [x] Service dependency injection — exposed ClaudeService through VotingGuideStore, removed ad-hoc instantiation in ProfileView
+- [x] Error feedback — surface summary regeneration errors in ProfileView, show district lookup failure note in ballot header
+- [x] Safe URL/Date construction — extracted static URL/Date constants in VotingInfoView with safe fallbacks
+- [x] Design review document — created DESIGN_REVIEW.md with 9-section checklist and automated verification commands
 
 </details>
 
