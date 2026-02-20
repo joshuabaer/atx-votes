@@ -3,6 +3,7 @@ import SwiftUI
 struct IssuesPickerView: View {
     @EnvironmentObject var store: VotingGuideStore
     @State private var selectedIssues: Set<Issue> = []
+    @State private var shuffledIssues = Issue.allCases.shuffled()
 
     private let columns = [
         GridItem(.flexible(), spacing: 12),
@@ -23,7 +24,7 @@ struct IssuesPickerView: View {
                     }
 
                     LazyVGrid(columns: columns, spacing: 12) {
-                        ForEach(Issue.allCases) { issue in
+                        ForEach(shuffledIssues) { issue in
                             IssueCard(
                                 issue: issue,
                                 isSelected: selectedIssues.contains(issue)

@@ -10,6 +10,7 @@ actor MockClaudeService: GuideGenerating {
     var demSummary: String = "Democrat test summary"
     var shouldFail = false
     var repShouldFail = false
+    var demShouldFail = false
     var callCount = 0
 
     func generateVotingGuide(profile: VoterProfile, districts: Ballot.Districts?) async throws -> (Ballot, String) {
@@ -17,6 +18,9 @@ actor MockClaudeService: GuideGenerating {
         if shouldFail { throw ClaudeError.apiError("Mock failure") }
         if profile.primaryBallot == .republican && repShouldFail {
             throw ClaudeError.apiError("Mock Republican failure")
+        }
+        if profile.primaryBallot == .democrat && demShouldFail {
+            throw ClaudeError.apiError("Mock Democrat failure")
         }
         let ballot = profile.primaryBallot == .democrat ? demBallot : repBallot
         let summary = profile.primaryBallot == .democrat ? demSummary : repSummary
@@ -82,8 +86,11 @@ enum TestFixtures {
                         Candidate(id: UUID(), name: "Bob Jones", party: "Democrat",
                                   isIncumbent: false, isRecommended: false, summary: "Challenger",
                                   keyPositions: ["Healthcare"], endorsements: [], pros: [], cons: []),
+                        Candidate(id: UUID(), name: "Carol Davis", party: "Democrat",
+                                  isIncumbent: false, isRecommended: false, summary: "Progressive activist",
+                                  keyPositions: ["Education"], endorsements: [], pros: [], cons: []),
                      ],
-                     isContested: false, isKeyRace: true)
+                     isContested: true, isKeyRace: true)
             ],
             propositions: [
                 Proposition(id: UUID(), number: 1, title: "Prop 1",
@@ -526,6 +533,99 @@ final class VotingGuideStoreBuildTests: XCTestCase {
         XCTAssertEqual(store.voterProfile.summaryText, "Republican test summary",
                        "Conservative voter should get Republican summary")
     }
+
+    // MARK: - 12. Democrat failure still generates Republican
+
+    func testBuildGuideDemocratFailureStillGeneratesRepublican() async {
+        setUpProfile()
+        await mockClaude.setDemShouldFail(true)
+
+        await store.buildVotingGuide()
+
+        XCTAssertNotNil(store.republicanBallot, "Republican ballot should still succeed")
+        XCTAssertNil(store.democratBallot, "Democrat ballot should be nil on failure")
+        XCTAssertTrue(store.guideComplete, "Guide should complete with partial success")
+    }
+
+    // MARK: - 13. Switching to Democrat after Dem failure shows nil ballot
+
+    func testSwitchingToDemocratAfterDemFailureShowsNilBallot() async {
+        setUpProfile(spectrum: .conservative)
+        await mockClaude.setDemShouldFail(true)
+
+        await store.buildVotingGuide()
+
+        // Republican should work
+        XCTAssertEqual(store.selectedParty, .republican)
+        XCTAssertNotNil(store.ballot)
+
+        // Switch to Democrat — should get nil since it failed
+        store.selectedParty = .democrat
+        XCTAssertNil(store.ballot,
+                     "Switching to Democrat when generation failed should return nil ballot")
+        XCTAssertNil(store.democratBallot,
+                     "democratBallot should be nil when Democrat generation failed")
+    }
+
+    // MARK: - 14. Both ballots accessible after successful build
+
+    func testBothBallotsAccessibleAfterBuild() async {
+        setUpProfile(spectrum: .progressive)
+        await store.buildVotingGuide()
+
+        // Democrat should be default for progressive
+        XCTAssertEqual(store.selectedParty, .democrat)
+        XCTAssertNotNil(store.ballot, "Democrat ballot should be accessible")
+        XCTAssertNotNil(store.democratBallot, "democratBallot property should be set")
+
+        // Switch to Republican
+        store.selectedParty = .republican
+        XCTAssertNotNil(store.ballot, "Republican ballot should be accessible after switching")
+        XCTAssertNotNil(store.republicanBallot, "republicanBallot property should be set")
+
+        // Switch back to Democrat
+        store.selectedParty = .democrat
+        XCTAssertNotNil(store.ballot, "Democrat ballot should still be accessible")
+    }
+
+    // MARK: - 15. Democrat ballot has contested races
+
+    func testDemocratBallotHasContestedRaces() async {
+        setUpProfile(spectrum: .progressive)
+        await store.buildVotingGuide()
+
+        store.selectedParty = .democrat
+        guard let ballot = store.ballot else {
+            XCTFail("Democrat ballot should not be nil")
+            return
+        }
+
+        let contested = ballot.races.filter { $0.isContested }
+        XCTAssertFalse(contested.isEmpty,
+                       "Democrat ballot should have at least one contested race")
+    }
+
+    // MARK: - 16. Undecided user can switch to either party
+
+    func testUndecidedUserCanSwitchToEitherParty() async {
+        setUpProfile(spectrum: .moderate)
+        await store.buildVotingGuide()
+
+        XCTAssertEqual(store.selectedParty, .undecided)
+        XCTAssertNil(store.ballot, "Undecided should show nil ballot initially")
+
+        // Both underlying ballots should exist
+        XCTAssertNotNil(store.republicanBallot, "Republican ballot should be generated even for undecided")
+        XCTAssertNotNil(store.democratBallot, "Democrat ballot should be generated even for undecided")
+
+        // Switch to Democrat
+        store.selectedParty = .democrat
+        XCTAssertNotNil(store.ballot, "Switching to Democrat should show ballot")
+
+        // Switch to Republican
+        store.selectedParty = .republican
+        XCTAssertNotNil(store.ballot, "Switching to Republican should show ballot")
+    }
 }
 
 // MARK: - Mock Helpers
@@ -536,6 +636,9 @@ extension MockClaudeService {
     }
     func setRepShouldFail(_ fail: Bool) {
         repShouldFail = fail
+    }
+    func setDemShouldFail(_ fail: Bool) {
+        demShouldFail = fail
     }
 }
 

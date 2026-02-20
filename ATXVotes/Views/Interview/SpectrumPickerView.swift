@@ -3,6 +3,7 @@ import SwiftUI
 struct SpectrumPickerView: View {
     @EnvironmentObject var store: VotingGuideStore
     @State private var selected: PoliticalSpectrum?
+    @State private var shuffledOptions = PoliticalSpectrum.allCases.shuffled()
 
     var body: some View {
         VStack(spacing: 0) {
@@ -18,7 +19,7 @@ struct SpectrumPickerView: View {
                     }
 
                     VStack(spacing: 12) {
-                        ForEach(PoliticalSpectrum.allCases) { spectrum in
+                        ForEach(shuffledOptions) { spectrum in
                             SpectrumOption(
                                 spectrum: spectrum,
                                 isSelected: selected == spectrum

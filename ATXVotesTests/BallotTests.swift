@@ -129,4 +129,71 @@ final class BallotTests: XCTestCase {
             XCTAssertLessThan(senatorIdx, stateRepIdx)
         }
     }
+
+    // MARK: - Contested Races Parity
+
+    func testRepublicanBallotHasContestedRaces() {
+        let ballot = Ballot.sampleRepublican
+        let contested = ballot.races.filter { $0.isContested }
+        XCTAssertFalse(contested.isEmpty, "Republican ballot should have contested races")
+
+        for race in contested {
+            XCTAssertGreaterThan(race.candidates.count, 1,
+                                 "Contested race '\(race.office)' should have multiple candidates")
+        }
+    }
+
+    func testDemocratBallotHasContestedRaces() {
+        let ballot = Ballot.sampleDemocrat
+        let contested = ballot.races.filter { $0.isContested }
+        XCTAssertFalse(contested.isEmpty, "Democrat ballot should have contested races")
+
+        for race in contested {
+            XCTAssertGreaterThan(race.candidates.count, 1,
+                                 "Contested race '\(race.office)' should have multiple candidates")
+        }
+    }
+
+    func testBothBallotsHaveComparableRaceCounts() {
+        let rep = Ballot.sampleRepublican
+        let dem = Ballot.sampleDemocrat
+
+        // Both ballots should have a reasonable number of races
+        XCTAssertGreaterThan(rep.races.count, 0, "Republican ballot should have races")
+        XCTAssertGreaterThan(dem.races.count, 0, "Democrat ballot should have races")
+
+        // Neither should be drastically smaller than the other
+        let ratio = Double(min(rep.races.count, dem.races.count)) / Double(max(rep.races.count, dem.races.count))
+        XCTAssertGreaterThan(ratio, 0.3,
+                             "Ballots should have roughly comparable race counts (rep: \(rep.races.count), dem: \(dem.races.count))")
+    }
+
+    // MARK: - Encode/Decode Parity
+
+    func testDemocratBallotEncodeDecode() throws {
+        let ballot = Ballot.sampleDemocrat
+        let data = try JSONEncoder().encode(ballot)
+        let decoded = try JSONDecoder().decode(Ballot.self, from: data)
+        XCTAssertEqual(decoded.electionName, ballot.electionName)
+        XCTAssertEqual(decoded.races.count, ballot.races.count)
+        XCTAssertEqual(decoded.propositions.count, ballot.propositions.count)
+        XCTAssertEqual(decoded.party, .democrat)
+    }
+
+    // MARK: - District Filtering Parity
+
+    func testDemocratFilteredKeepsStatewideRaces() {
+        let ballot = Ballot.sampleDemocrat
+        let districts = Ballot.Districts(
+            congressional: "District 99",
+            stateSenate: nil,
+            stateHouse: nil,
+            countyCommissioner: nil,
+            schoolBoard: nil
+        )
+        let filtered = ballot.filtered(to: districts)
+
+        let statewideRaces = filtered.races.filter { $0.district == nil }
+        XCTAssertFalse(statewideRaces.isEmpty, "Democrat statewide races should be kept after filtering")
+    }
 }

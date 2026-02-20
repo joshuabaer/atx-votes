@@ -3,6 +3,7 @@ import SwiftUI
 struct QualitiesPickerView: View {
     @EnvironmentObject var store: VotingGuideStore
     @State private var selected: Set<CandidateQuality> = []
+    @State private var shuffledQualities = CandidateQuality.allCases.shuffled()
 
     var body: some View {
         VStack(spacing: 0) {
@@ -18,7 +19,7 @@ struct QualitiesPickerView: View {
                     }
 
                     VStack(spacing: 12) {
-                        ForEach(CandidateQuality.allCases) { quality in
+                        ForEach(shuffledQualities) { quality in
                             QualityOption(
                                 quality: quality,
                                 isSelected: selected.contains(quality)

@@ -4,6 +4,7 @@ struct PolicyDeepDiveView: View {
     @EnvironmentObject var store: VotingGuideStore
     @State private var currentQuestionIndex = 0
     @State private var answers: [String: String] = [:]
+    @State private var shuffledOptions: [String: [InterviewQuestion.QuestionOption]] = [:]
 
     private var deepDiveQuestions: [InterviewQuestion] {
         var questions: [InterviewQuestion] = []
@@ -35,6 +36,17 @@ struct PolicyDeepDiveView: View {
         return deepDiveQuestions[currentQuestionIndex]
     }
 
+    private func optionsForQuestion(_ question: InterviewQuestion) -> [InterviewQuestion.QuestionOption] {
+        if let cached = shuffledOptions[question.text] {
+            return cached
+        }
+        let shuffled = question.options.shuffled()
+        DispatchQueue.main.async {
+            shuffledOptions[question.text] = shuffled
+        }
+        return shuffled
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             if let question = currentQuestion {
@@ -61,7 +73,7 @@ struct PolicyDeepDiveView: View {
                         }
 
                         VStack(spacing: 12) {
-                            ForEach(question.options) { option in
+                            ForEach(optionsForQuestion(question)) { option in
                                 PolicyOptionButton(
                                     label: option.label,
                                     description: option.description,

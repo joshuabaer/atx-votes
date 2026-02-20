@@ -3,6 +3,12 @@ import SwiftUI
 struct RaceDetailView: View {
     let race: Race
     @State private var selectedCandidate: Candidate?
+    @State private var shuffledCandidates: [Candidate]
+
+    init(race: Race) {
+        self.race = race
+        _shuffledCandidates = State(initialValue: race.candidates.shuffled())
+    }
 
     var body: some View {
         ScrollView {
@@ -33,7 +39,7 @@ struct RaceDetailView: View {
                 }
 
                 // Candidates
-                ForEach(race.candidates) { candidate in
+                ForEach(shuffledCandidates) { candidate in
                     CandidateCard(
                         candidate: candidate,
                         isExpanded: selectedCandidate?.id == candidate.id
