@@ -61,7 +61,7 @@ struct ProfileView: View {
                                 .font(.system(size: 40))
                                 .foregroundColor(Theme.primaryBlue)
                             VStack(alignment: .leading) {
-                                Text("Your Voter Profile")
+                                Text("How you might describe your politics to a friend")
                                     .font(Theme.headline)
                                     .foregroundColor(Theme.textPrimary)
                                 Text(profile.politicalSpectrum.rawValue)

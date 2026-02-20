@@ -57,8 +57,8 @@ actor ClaudeService {
 
     func generateProfileSummary(profile: VoterProfile) async throws -> String {
         let userMessage = """
-        Summarize this voter's political identity in 2-3 sentences. Be specific and insightful — \
-        don't just list their positions, synthesize what kind of voter they are.
+        Write 2-3 sentences describing this person's politics the way they might describe it to a friend. \
+        Be conversational, specific, and insightful — synthesize who they are as a voter, don't just list positions.
 
         - Political spectrum: \(profile.politicalSpectrum.rawValue)
         - Top issues: \(profile.topIssues.map(\.rawValue).joined(separator: ", "))

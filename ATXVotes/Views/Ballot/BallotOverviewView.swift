@@ -143,10 +143,19 @@ struct BallotOverviewView: View {
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    ShareLink(item: cheatSheetText) {
-                        Image(systemName: "square.and.arrow.up")
+                    HStack(spacing: 16) {
+                        Button {
+                            printCheatSheet()
+                        } label: {
+                            Image(systemName: "printer")
+                        }
+                        .accessibilityLabel("Print cheat sheet")
+
+                        ShareLink(item: cheatSheetText) {
+                            Image(systemName: "square.and.arrow.up")
+                        }
+                        .accessibilityLabel("Share cheat sheet")
                     }
-                    .accessibilityLabel("Share cheat sheet")
                 }
             }
         }
@@ -375,6 +384,18 @@ struct BallotOverviewView: View {
         lines.append("AI-generated recommendations — do your own research.")
         lines.append("Built with ATX Votes — atxvotes.app")
         return lines.joined(separator: "\n")
+    }
+
+    private func printCheatSheet() {
+        let printController = UIPrintInteractionController.shared
+        printController.printInfo = {
+            let info = UIPrintInfo(dictionary: nil)
+            info.jobName = "ATX Votes Cheat Sheet"
+            info.outputType = .general
+            return info
+        }()
+        printController.printFormatter = UISimpleTextPrintFormatter(text: cheatSheetText)
+        printController.present(animated: true)
     }
 
     // MARK: - Uncontested Section
