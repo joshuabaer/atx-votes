@@ -219,14 +219,14 @@ actor ClaudeService: GuideGenerating {
         for (index, model) in modelsToTry.enumerated() {
             // Try up to 2 attempts per model (initial + 1 retry for 529)
             for attempt in 0...1 {
-                var request = URLRequest(url: url, timeoutInterval: 30)
+                var request = URLRequest(url: url, timeoutInterval: 60)
                 request.httpMethod = "POST"
                 request.addValue("Bearer \(appSecret)", forHTTPHeaderField: "Authorization")
                 request.addValue("application/json", forHTTPHeaderField: "Content-Type")
 
                 let body: [String: Any] = [
                     "model": model,
-                    "max_tokens": 8192,
+                    "max_tokens": 12288,
                     "system": system,
                     "messages": [
                         ["role": "user", "content": userMessage]

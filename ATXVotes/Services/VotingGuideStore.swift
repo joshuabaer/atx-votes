@@ -194,28 +194,40 @@ class VotingGuideStore: ObservableObject {
                     let (ballot, summary) = try await demTask.value
                     democratBallot = ballot
                     demSummary = summary
-                } catch { lastError = error }
+                } catch {
+                    logger.error("Democrat ballot generation failed: \(error.localizedDescription)")
+                    lastError = error
+                }
 
                 await setLoadingPhase("Building Republican picks...")
                 do {
                     let (ballot, summary) = try await repTask.value
                     republicanBallot = ballot
                     repSummary = summary
-                } catch { lastError = error }
+                } catch {
+                    logger.error("Republican ballot generation failed: \(error.localizedDescription)")
+                    lastError = error
+                }
             } else {
                 await setLoadingPhase("Building Republican picks...")
                 do {
                     let (ballot, summary) = try await repTask.value
                     republicanBallot = ballot
                     repSummary = summary
-                } catch { lastError = error }
+                } catch {
+                    logger.error("Republican ballot generation failed: \(error.localizedDescription)")
+                    lastError = error
+                }
 
                 await setLoadingPhase("Building Democrat picks...")
                 do {
                     let (ballot, summary) = try await demTask.value
                     democratBallot = ballot
                     demSummary = summary
-                } catch { lastError = error }
+                } catch {
+                    logger.error("Democrat ballot generation failed: \(error.localizedDescription)")
+                    lastError = error
+                }
             }
 
             await setLoadingPhase("Finalizing recommendations...")

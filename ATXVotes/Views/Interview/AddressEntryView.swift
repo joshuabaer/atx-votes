@@ -118,7 +118,7 @@ struct AddressEntryView: View {
                                             .strokeBorder(focusedField == .zip ? Theme.primaryBlue : Color.gray.opacity(0.2), lineWidth: focusedField == .zip ? 2 : 1)
                                     )
                             }
-                            .frame(width: 90)
+                            .frame(width: 110)
                         }
                     }
 
