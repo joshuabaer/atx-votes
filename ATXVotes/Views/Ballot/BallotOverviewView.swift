@@ -108,6 +108,9 @@ struct BallotOverviewView: View {
                     // Header card
                     headerCard
 
+                    // Cheat Sheet
+                    cheatSheetSection
+
                     // Key Races
                     if !contestedRaces.filter(\.isKeyRace).isEmpty {
                         sectionHeader("Key Races", icon: "star.fill", color: Theme.accentGold)
@@ -146,9 +149,6 @@ struct BallotOverviewView: View {
                     if !uncontestedRaces.isEmpty {
                         uncontestedSection
                     }
-
-                    // Cheat Sheet
-                    cheatSheetSection
 
                     Spacer(minLength: 40)
                 }

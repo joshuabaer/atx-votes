@@ -22,6 +22,14 @@ struct BuildingGuideView: View {
         ]
     }
 
+    /// Tint color for the pulsing circle behind the current step's emoji.
+    private var circleTint: Color {
+        let emoji = steps[currentStep].emoji
+        if emoji == "🐘" { return Color.red }
+        if emoji == "🫏" { return Color.blue }
+        return Theme.primaryBlue
+    }
+
     /// Which step we're on, derived from the store's loading message.
     private var currentStep: Int {
         let message = store.loadingMessage
@@ -46,11 +54,11 @@ struct BuildingGuideView: View {
             // Animated icon
             ZStack {
                 Circle()
-                    .fill(Theme.primaryBlue.opacity(0.08))
+                    .fill(circleTint.opacity(0.08))
                     .frame(width: 140, height: 140)
 
                 Circle()
-                    .fill(Theme.primaryBlue.opacity(0.05))
+                    .fill(circleTint.opacity(0.05))
                     .frame(width: 180, height: 180)
                     .scaleEffect(store.isLoading && !reduceMotion ? 1.1 : 1.0)
                     .animation(reduceMotion ? nil : .easeInOut(duration: 1.5).repeatForever(autoreverses: true), value: store.isLoading)
