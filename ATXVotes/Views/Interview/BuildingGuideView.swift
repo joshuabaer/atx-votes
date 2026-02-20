@@ -5,7 +5,7 @@ struct BuildingGuideView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var steps: [(icon: String, label: String, emoji: String)] {
-        let demFirst = store.inferredParty == .democrat
+        let demFirst = store.demFirstOrder
         let firstParty = (icon: "brain.head.profile",
                           label: demFirst ? "Building Democrat picks" : "Building Republican picks",
                           emoji: demFirst ? "🫏" : "🐘")
@@ -33,7 +33,7 @@ struct BuildingGuideView: View {
     /// Which step we're on, derived from the store's loading message.
     private var currentStep: Int {
         let message = store.loadingMessage
-        let demFirst = store.inferredParty == .democrat
+        let demFirst = store.demFirstOrder
         if message.contains("Finalizing") { return 5 }
         if demFirst {
             if message.contains("Republican") { return 4 }

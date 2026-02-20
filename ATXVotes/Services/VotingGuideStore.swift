@@ -22,6 +22,7 @@ class VotingGuideStore: ObservableObject {
     @Published var loadingMessage = "Researching your ballot..."
     @Published var errorMessage: String?
     @Published var districtLookupFailed = false
+    @Published var demFirstOrder = false
 
     var ballot: Ballot? {
         switch selectedParty {
@@ -188,7 +189,9 @@ class VotingGuideStore: ObservableObject {
             var lastError: Error?
 
             // Await results in inferred-party order so the loading UI matches
-            if inferredParty == .democrat {
+            // For undecided voters, randomly pick which party to show first
+            demFirstOrder = inferredParty == .democrat || (inferredParty == .undecided && Bool.random())
+            if demFirstOrder {
                 await setLoadingPhase("Building Democrat picks...")
                 do {
                     let (ballot, summary) = try await demTask.value
