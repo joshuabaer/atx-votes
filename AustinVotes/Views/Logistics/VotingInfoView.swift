@@ -111,14 +111,14 @@ struct VotingInfoView: View {
         return VStack(spacing: 8) {
             if daysUntil > 0 {
                 Text("\(daysUntil)")
-                    .font(.system(size: 52, weight: .bold, design: .rounded))
+                    .font(.system(size: 58, weight: .bold, design: .rounded))
                     .foregroundColor(Theme.primaryBlue)
                 Text("days until Election Day")
                     .font(Theme.headline)
                     .foregroundColor(Theme.textSecondary)
             } else if daysUntil == 0 {
                 Text("TODAY")
-                    .font(.system(size: 52, weight: .bold, design: .rounded))
+                    .font(.system(size: 58, weight: .bold, design: .rounded))
                     .foregroundColor(Theme.success)
                 Text("is Election Day!")
                     .font(Theme.headline)
@@ -144,7 +144,7 @@ struct VotingInfoView: View {
     private var remindersCard: some View {
         HStack(spacing: 12) {
             Image(systemName: "bell.badge.fill")
-                .font(.system(size: 22))
+                .font(.system(size: 24))
                 .foregroundColor(Theme.accentGold)
 
             VStack(alignment: .leading, spacing: 2) {
@@ -184,7 +184,7 @@ struct VotingInfoView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 10) {
                 Image(systemName: "mappin.and.ellipse")
-                    .font(.system(size: 22))
+                    .font(.system(size: 24))
                     .foregroundColor(Theme.primaryBlue)
                 Text("Find Your Polling Location")
                     .font(Theme.headline)
@@ -201,7 +201,7 @@ struct VotingInfoView: View {
                         openMapsSearch(near: address)
                     } label: {
                         Label("Open in Maps", systemImage: "map.fill")
-                            .font(.system(size: 16, weight: .semibold))
+                            .font(.system(size: 18, weight: .semibold))
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 12)
@@ -212,7 +212,7 @@ struct VotingInfoView: View {
 
                 Link(destination: Self.travisClerkURL) {
                     Label("VoteTravis.gov", systemImage: "globe")
-                        .font(.system(size: 16, weight: .semibold))
+                        .font(.system(size: 18, weight: .semibold))
                         .foregroundColor(Theme.primaryBlue)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
@@ -268,7 +268,7 @@ struct InfoAccordion: View {
             Button(action: onTap) {
                 HStack(spacing: 12) {
                     Image(systemName: section.icon)
-                        .font(.system(size: 20))
+                        .font(.system(size: 22))
                         .foregroundColor(Theme.primaryBlue)
                         .frame(width: 28)
                         .accessibilityHidden(true)
@@ -339,7 +339,7 @@ struct InfoAccordion: View {
 
             Link(destination: VotingInfoView.travisClerkURL) {
                 Label("Find Election Day locations", systemImage: "mappin.and.ellipse")
-                    .font(.system(size: 16, weight: .semibold))
+                    .font(.system(size: 18, weight: .semibold))
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 12)
@@ -399,7 +399,7 @@ struct InfoAccordion: View {
     private func idItem(_ text: String) -> some View {
         HStack(spacing: 8) {
             Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 14))
+                .font(.system(size: 16))
                 .foregroundColor(Theme.success)
             Text(text)
                 .font(Theme.caption)
@@ -410,7 +410,7 @@ struct InfoAccordion: View {
     private func bringItem(_ text: String, icon: String, required: Bool) -> some View {
         HStack(spacing: 10) {
             Image(systemName: icon)
-                .font(.system(size: 18))
+                .font(.system(size: 20))
                 .foregroundColor(Theme.primaryBlue)
                 .frame(width: 24)
             Text(text)
@@ -418,7 +418,7 @@ struct InfoAccordion: View {
                 .foregroundColor(Theme.textPrimary)
             if required {
                 Text("Required")
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.system(size: 15, weight: .semibold))
                     .foregroundColor(Theme.danger)
                     .padding(.horizontal, 6)
                     .padding(.vertical, 2)
@@ -459,7 +459,7 @@ struct InfoRow: View {
                 .strikethrough(isPast)
             Spacer()
             Text(value)
-                .font(.system(size: 15, weight: highlight ? .bold : .medium))
+                .font(.system(size: 17, weight: highlight ? .bold : .medium))
                 .foregroundColor(isPast ? Theme.textSecondary.opacity(0.5) : (highlight ? Theme.primaryBlue : Theme.textPrimary))
         }
     }

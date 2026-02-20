@@ -159,11 +159,11 @@ struct ChipView: View {
     var body: some View {
         HStack(spacing: 6) {
             Text(label)
-                .font(.system(size: 16, weight: .medium))
+                .font(.system(size: 18, weight: .medium))
                 .foregroundColor(color)
             Button(action: onRemove) {
                 Image(systemName: "xmark.circle.fill")
-                    .font(.system(size: 16))
+                    .font(.system(size: 18))
                     .foregroundColor(color.opacity(0.6))
             }
             .accessibilityLabel("Remove \(label)")

@@ -101,7 +101,7 @@ struct BallotOverviewView: View {
                 }
                 Spacer()
                 Image(systemName: "checkmark.seal.fill")
-                    .font(.system(size: 36))
+                    .font(.system(size: 40))
                     .foregroundColor(.white.opacity(0.3))
             }
 
@@ -141,11 +141,11 @@ struct BallotOverviewView: View {
     private func districtRow(_ label: String, _ value: String) -> some View {
         HStack(spacing: 8) {
             Text(label)
-                .font(.system(size: 14, weight: .semibold))
+                .font(.system(size: 16, weight: .semibold))
                 .foregroundColor(.white.opacity(0.6))
                 .frame(width: 80, alignment: .leading)
             Text(value)
-                .font(.system(size: 15, weight: .medium))
+                .font(.system(size: 17, weight: .medium))
                 .foregroundColor(.white.opacity(0.9))
         }
     }
@@ -244,7 +244,7 @@ struct RaceCard: View {
                         HStack(spacing: 6) {
                             RecommendationBadge(style: .recommended)
                             Text(candidate.name)
-                                .font(.system(size: 18, weight: .bold))
+                                .font(.system(size: 20, weight: .bold))
                                 .foregroundColor(Theme.primaryBlue)
                         }
                         Text(rec.reasoning)
@@ -264,7 +264,7 @@ struct RaceCard: View {
                     Text("·")
                         .foregroundColor(Theme.textSecondary)
                     Text(rec.confidence.rawValue)
-                        .font(.system(size: 14, weight: .medium))
+                        .font(.system(size: 16, weight: .medium))
                         .foregroundColor(Theme.primaryBlue)
                 }
             }
@@ -298,7 +298,7 @@ struct PropositionCard: View {
                     VStack(alignment: .leading, spacing: 4) {
                         HStack(spacing: 8) {
                             Text("Prop \(proposition.number)")
-                                .font(.system(size: 15, weight: .bold, design: .rounded))
+                                .font(.system(size: 17, weight: .bold, design: .rounded))
                                 .foregroundColor(Theme.primaryBlue)
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 3)

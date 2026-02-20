@@ -58,7 +58,7 @@ struct ProfileView: View {
                     VStack(alignment: .leading, spacing: 10) {
                         HStack(spacing: 10) {
                             Image(systemName: "person.circle.fill")
-                                .font(.system(size: 36))
+                                .font(.system(size: 40))
                                 .foregroundColor(Theme.primaryBlue)
                             VStack(alignment: .leading) {
                                 Text("Your Voter Profile")
@@ -76,7 +76,7 @@ struct ProfileView: View {
                                     Task { await regenerateSummary() }
                                 } label: {
                                     Image(systemName: "arrow.trianglehead.2.clockwise")
-                                        .font(.system(size: 18))
+                                        .font(.system(size: 20))
                                         .foregroundColor(Theme.textSecondary)
                                 }
                             }
@@ -106,9 +106,9 @@ struct ProfileView: View {
                             ForEach(profile.topIssues) { issue in
                                 HStack(spacing: 6) {
                                     Image(systemName: issue.icon)
-                                        .font(.system(size: 14))
+                                        .font(.system(size: 16))
                                     Text(issue.rawValue)
-                                        .font(.system(size: 15, weight: .medium))
+                                        .font(.system(size: 17, weight: .medium))
                                 }
                                 .foregroundColor(Theme.primaryBlue)
                                 .padding(.horizontal, 12)
@@ -153,7 +153,7 @@ struct ProfileView: View {
                                         .foregroundColor(Theme.textSecondary)
                                         .frame(width: 100, alignment: .leading)
                                     Text(profile.policyViews[key] ?? "")
-                                        .font(.system(size: 16, weight: .medium))
+                                        .font(.system(size: 18, weight: .medium))
                                         .foregroundColor(Theme.textPrimary)
                                 }
                             }
@@ -206,7 +206,7 @@ struct ProfileView: View {
                         Link(destination: url) {
                             HStack(spacing: 10) {
                                 Image(systemName: "envelope.fill")
-                                    .font(.system(size: 18))
+                                    .font(.system(size: 20))
                                 Text("Send Feedback")
                                     .font(Theme.headline)
                             }
@@ -231,7 +231,7 @@ struct ProfileView: View {
                             .font(Theme.caption)
                             .foregroundColor(Theme.textSecondary)
                         Text("Powered by Claude (Anthropic)")
-                            .font(.system(size: 13))
+                            .font(.system(size: 15))
                             .foregroundColor(Theme.textSecondary.opacity(0.6))
                     }
                     .frame(maxWidth: .infinity)

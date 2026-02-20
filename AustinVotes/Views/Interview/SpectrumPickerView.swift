@@ -89,7 +89,7 @@ struct SpectrumOption: View {
                     )
                     .overlay(
                         isSelected ? Image(systemName: "checkmark")
-                            .font(.system(size: 14, weight: .bold))
+                            .font(.system(size: 16, weight: .bold))
                             .foregroundColor(.white)
                         : nil
                     )

@@ -116,7 +116,7 @@ struct PrimaryCard: View {
         Button(action: action) {
             HStack(spacing: 16) {
                 Image(systemName: icon)
-                    .font(.system(size: 40))
+                    .font(.system(size: 44))
                     .foregroundColor(color)
 
                 VStack(alignment: .leading, spacing: 4) {

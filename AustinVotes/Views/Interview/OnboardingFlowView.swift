@@ -98,7 +98,7 @@ struct WelcomeView: View {
                         .fill(Theme.primaryBlue.opacity(0.1))
                         .frame(width: 120, height: 120)
                     Image(systemName: "checkmark.seal.fill")
-                        .font(.system(size: 60))
+                        .font(.system(size: 66))
                         .foregroundColor(Theme.primaryBlue)
                 }
                 .accessibilityHidden(true)
@@ -149,7 +149,7 @@ struct WelcomeFeatureRow: View {
     var body: some View {
         HStack(spacing: 14) {
             Image(systemName: icon)
-                .font(.system(size: 22))
+                .font(.system(size: 24))
                 .foregroundColor(Theme.primaryBlue)
                 .frame(width: 28)
                 .accessibilityHidden(true)
