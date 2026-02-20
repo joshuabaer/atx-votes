@@ -231,7 +231,31 @@ struct BallotOverviewView: View {
 
     private var cheatSheetSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            sectionHeader("Cheat Sheet", icon: "list.clipboard.fill", color: Theme.primaryBlue)
+            HStack {
+                sectionHeader("Cheat Sheet", icon: "list.clipboard.fill", color: Theme.primaryBlue)
+                Spacer()
+                HStack(spacing: 16) {
+                    Button {
+                        UIPasteboard.general.string = cheatSheetText
+                    } label: {
+                        Image(systemName: "doc.on.doc")
+                    }
+                    .accessibilityLabel("Copy cheat sheet")
+
+                    Button {
+                        printCheatSheet()
+                    } label: {
+                        Image(systemName: "printer")
+                    }
+                    .accessibilityLabel("Print cheat sheet")
+
+                    ShareLink(item: cheatSheetText) {
+                        Image(systemName: "square.and.arrow.up")
+                    }
+                    .accessibilityLabel("Share cheat sheet")
+                }
+                .foregroundColor(Theme.primaryBlue)
+            }
 
             VStack(spacing: 0) {
                 // Header
@@ -301,32 +325,6 @@ struct BallotOverviewView: View {
             .background(Theme.cardBackground)
             .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadius))
             .shadow(color: .black.opacity(0.06), radius: 8, y: 2)
-
-            // Action buttons
-            HStack(spacing: 12) {
-                Button {
-                    UIPasteboard.general.string = cheatSheetText
-                } label: {
-                    Label("Copy", systemImage: "doc.on.doc")
-                        .font(Theme.caption)
-                }
-                .accessibilityLabel("Copy cheat sheet to clipboard")
-
-                Button {
-                    printCheatSheet()
-                } label: {
-                    Label("Print", systemImage: "printer")
-                        .font(Theme.caption)
-                }
-                .accessibilityLabel("Print cheat sheet")
-
-                ShareLink(item: cheatSheetText) {
-                    Label("Share", systemImage: "square.and.arrow.up")
-                        .font(Theme.caption)
-                }
-                .accessibilityLabel("Share cheat sheet")
-            }
-            .foregroundColor(Theme.primaryBlue)
         }
     }
 

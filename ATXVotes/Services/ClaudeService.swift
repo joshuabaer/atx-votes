@@ -166,7 +166,7 @@ actor ClaudeService {
 
         Return this exact JSON structure:
         {
-          "profileSummary": "2-sentence summary of this voter's political identity",
+          "profileSummary": "2-3 sentences describing this person's politics the way they'd describe it to a friend — conversational and specific",
           "races": [
             {
               "office": "exact office name from ballot",
