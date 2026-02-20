@@ -143,26 +143,26 @@ struct BallotOverviewView: View {
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Menu {
+                    VStack(spacing: 12) {
                         Button {
                             UIPasteboard.general.string = cheatSheetText
                         } label: {
-                            Label("Copy Cheat Sheet", systemImage: "doc.on.doc")
+                            Image(systemName: "doc.on.doc")
                         }
+                        .accessibilityLabel("Copy cheat sheet to clipboard")
 
                         Button {
                             printCheatSheet()
                         } label: {
-                            Label("Print Cheat Sheet", systemImage: "printer")
+                            Image(systemName: "printer")
                         }
+                        .accessibilityLabel("Print cheat sheet")
 
                         ShareLink(item: cheatSheetText) {
-                            Label("Share Cheat Sheet", systemImage: "square.and.arrow.up")
+                            Image(systemName: "square.and.arrow.up")
                         }
-                    } label: {
-                        Image(systemName: "ellipsis.circle")
+                        .accessibilityLabel("Share cheat sheet")
                     }
-                    .accessibilityLabel("Cheat sheet actions")
                 }
             }
         }
