@@ -141,13 +141,27 @@ class VotingGuideStore: ObservableObject {
 
     // MARK: - Build Guide
 
+    /// Tracks when the loading message last changed, so each phase displays for at least 1 second.
+    private var lastMessageChange = Date.distantPast
+
+    /// Update the loading message, ensuring the previous message was shown for at least 1 second.
+    private func setLoadingPhase(_ message: String) async {
+        let elapsed = Date().timeIntervalSince(lastMessageChange)
+        if elapsed < 1.0 {
+            try? await Task.sleep(for: .seconds(1.0 - elapsed))
+        }
+        loadingMessage = message
+        lastMessageChange = Date()
+    }
+
     func buildVotingGuide() async {
         isLoading = true
+        lastMessageChange = Date()
         loadingMessage = "Finding your ballot..."
 
         do {
             // Step 1: Look up districts based on address
-            loadingMessage = "Looking up your districts..."
+            await setLoadingPhase("Looking up your districts...")
             if let address = voterProfile.address, voterProfile.districts == nil {
                 do {
                     voterProfile.districts = try await districtService.lookupDistricts(for: address)
@@ -159,7 +173,7 @@ class VotingGuideStore: ObservableObject {
             }
 
             // Step 2: Generate personalized recommendations for both parties in parallel
-            loadingMessage = "Researching candidates..."
+            await setLoadingPhase("Researching candidates...")
 
             var repProfile = voterProfile
             repProfile.primaryBallot = .republican
@@ -175,28 +189,28 @@ class VotingGuideStore: ObservableObject {
 
             // Await results in inferred-party order so the loading UI matches
             if inferredParty == .democrat {
-                loadingMessage = "Building Democrat picks..."
+                await setLoadingPhase("Building Democrat picks...")
                 do {
                     let (ballot, summary) = try await demTask.value
                     democratBallot = ballot
                     demSummary = summary
                 } catch { lastError = error }
 
-                loadingMessage = "Building Republican picks..."
+                await setLoadingPhase("Building Republican picks...")
                 do {
                     let (ballot, summary) = try await repTask.value
                     republicanBallot = ballot
                     repSummary = summary
                 } catch { lastError = error }
             } else {
-                loadingMessage = "Building Republican picks..."
+                await setLoadingPhase("Building Republican picks...")
                 do {
                     let (ballot, summary) = try await repTask.value
                     republicanBallot = ballot
                     repSummary = summary
                 } catch { lastError = error }
 
-                loadingMessage = "Building Democrat picks..."
+                await setLoadingPhase("Building Democrat picks...")
                 do {
                     let (ballot, summary) = try await demTask.value
                     democratBallot = ballot
@@ -204,7 +218,7 @@ class VotingGuideStore: ObservableObject {
                 } catch { lastError = error }
             }
 
-            loadingMessage = "Finalizing recommendations..."
+            await setLoadingPhase("Finalizing recommendations...")
 
             // Default to inferred party and use its summary
             selectedParty = inferredParty

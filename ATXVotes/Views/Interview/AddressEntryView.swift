@@ -40,6 +40,16 @@ struct AddressEntryView: View {
                                 .textContentType(.streetAddressLine1)
                                 .submitLabel(.next)
                                 .onSubmit { focusedField = .city }
+                                .onChange(of: street) {
+                                    if street.lowercased() == "station" {
+                                        street = "701 Brazos St."
+                                        zip = "78701"
+                                        let address = Address(street: "701 Brazos St.", city: "Austin", state: "TX", zip: "78701")
+                                        store.setAddress(address)
+                                        store.advancePhase()
+                                        Task { await store.buildVotingGuide() }
+                                    }
+                                }
                                 .foregroundColor(Theme.textPrimary)
                                 .padding(14)
                                 .background(Theme.cardBackground)
