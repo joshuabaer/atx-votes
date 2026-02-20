@@ -4,13 +4,13 @@ struct BuildingGuideView: View {
     @EnvironmentObject var store: VotingGuideStore
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    private let steps = [
-        ("magnifyingglass", "Finding your ballot"),
-        ("doc.text.magnifyingglass", "Looking up districts"),
-        ("person.2.fill", "Researching candidates"),
-        ("brain.head.profile", "Building Republican picks"),
-        ("brain.head.profile", "Building Democrat picks"),
-        ("checkmark.seal.fill", "Finalizing recommendations"),
+    private let steps: [(icon: String, label: String, emoji: String)] = [
+        ("magnifyingglass", "Finding your ballot", "🔍"),
+        ("doc.text.magnifyingglass", "Looking up districts", "🗺️"),
+        ("person.2.fill", "Researching candidates", "👥"),
+        ("brain.head.profile", "Building Republican picks", "🐘"),
+        ("brain.head.profile", "Building Democrat picks", "🫏"),
+        ("checkmark.seal.fill", "Finalizing recommendations", "✨"),
     ]
 
     /// Which step we're on, derived from the store's loading message.
@@ -47,11 +47,14 @@ struct BuildingGuideView: View {
                         .foregroundColor(Theme.success)
                         .transition(reduceMotion ? .opacity : .scale.combined(with: .opacity))
                 } else {
-                    ProgressView()
-                        .scaleEffect(1.5)
-                        .tint(Theme.primaryBlue)
+                    Text(steps[currentStep].emoji)
+                        .font(.system(size: 64))
+                        .id(currentStep)
+                        .transition(reduceMotion ? .opacity : .scale.combined(with: .opacity))
                 }
             }
+            .animation(.spring(response: 0.4, dampingFraction: 0.7), value: currentStep)
+            .animation(.spring(response: 0.4, dampingFraction: 0.7), value: store.guideComplete)
 
             VStack(spacing: 8) {
                 Text(store.guideComplete ? "Your guide is ready!" : store.loadingMessage)
@@ -85,11 +88,11 @@ struct BuildingGuideView: View {
                         }
 
                         HStack(spacing: 8) {
-                            Image(systemName: step.0)
+                            Image(systemName: step.icon)
                                 .font(.system(size: 18))
                                 .foregroundColor(store.guideComplete || index <= currentStep ? Theme.primaryBlue : Theme.textSecondary)
                                 .frame(width: 20)
-                            Text(step.1)
+                            Text(step.label)
                                 .font(Theme.callout)
                                 .foregroundColor(store.guideComplete || index <= currentStep ? Theme.textPrimary : Theme.textSecondary)
                         }
