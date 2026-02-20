@@ -69,15 +69,7 @@ struct PolicyDeepDiveView: View {
                                 ) {
                                     withAnimation(.spring(response: 0.25)) {
                                         answers[question.text] = option.label
-                                    }
-                                    // Auto-advance after a short delay
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                                         store.setPolicyView(issue: question.text, stance: option.label)
-                                        if currentQuestionIndex < deepDiveQuestions.count - 1 {
-                                            withAnimation(.easeInOut(duration: 0.3)) {
-                                                currentQuestionIndex += 1
-                                            }
-                                        }
                                     }
                                 }
                             }

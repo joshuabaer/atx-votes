@@ -149,6 +149,8 @@ actor ClaudeService {
         return """
         Based on this voter's profile, recommend ONE candidate per race and a stance on each proposition.
 
+        IMPORTANT: For the profileSummary field, write 2-3 sentences in first person describing this person's politics the way they would explain it to a friend over coffee. Be conversational, specific, and avoid generic labels like "moderate Republican" — instead capture what actually drives their views.
+
         VOTER PROFILE:
         - Primary: \(profile.primaryBallot.rawValue)
         - Top issues: \(profile.topIssues.map(\.rawValue).joined(separator: ", "))
