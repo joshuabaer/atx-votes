@@ -1,4 +1,6 @@
 import { runDailyUpdate } from "./updater.js";
+import { handlePWA, handlePWA_SW, handlePWA_Manifest, handlePWA_Clear } from "./pwa.js";
+import { handlePWA_Guide } from "./pwa-guide.js";
 
 // Travis County commissioner precinct lookup by ZIP code
 // Source: Travis County Clerk precinct maps
@@ -166,6 +168,20 @@ function handleLandingPage() {
       transition: opacity 0.15s;
     }
     .cta:hover { opacity: 0.9; }
+    .cta-secondary {
+      display: inline-block;
+      background: transparent;
+      color: #21598e;
+      font-size: 1.1rem;
+      font-weight: 700;
+      padding: 0.9rem 2.5rem;
+      border-radius: 12px;
+      text-decoration: none;
+      border: 2px solid #21598e;
+      transition: opacity 0.15s;
+      margin-top: 0.75rem;
+    }
+    .cta-secondary:hover { opacity: 0.8; }
     .features {
       margin-top: 2rem;
       text-align: left;
@@ -189,6 +205,8 @@ function handleLandingPage() {
     <div class="badge">Texas Primary — March 3, 2026</div>
     <br>
     <a class="cta" href="https://testflight.apple.com/join/19rYVCD6">Download for iPhone</a>
+    <br>
+    <a class="cta-secondary" href="/app">Use in Browser</a>
     <div class="features">
       <div><span>✅</span> 5-minute interview learns your values</div>
       <div><span>📋</span> Personalized ballot with recommendations</div>
@@ -548,11 +566,51 @@ export default {
         }
         return handleBallotFetch(request, env);
       }
+      // PWA routes (no auth)
+      if (url.pathname === "/app/clear") {
+        return handlePWA_Clear();
+      }
+      if (url.pathname === "/app") {
+        return handlePWA();
+      }
+      if (url.pathname === "/app/sw.js") {
+        return handlePWA_SW();
+      }
+      if (url.pathname === "/app/manifest.json") {
+        return handlePWA_Manifest();
+      }
+      if (url.pathname === "/app/api/manifest") {
+        return handleManifest(env);
+      }
+      if (url.pathname === "/app/api/ballot") {
+        return handleBallotFetch(request, env);
+      }
       return handleLandingPage();
+    }
+
+    // CORS preflight for PWA API routes
+    if (request.method === "OPTIONS" && url.pathname.startsWith("/app/api/")) {
+      return new Response(null, {
+        status: 204,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type",
+          "Access-Control-Max-Age": "86400",
+        },
+      });
     }
 
     if (request.method !== "POST") {
       return new Response("Not found", { status: 404 });
+    }
+
+    // PWA POST routes (no auth — server-side guide gen protects secrets)
+    if (url.pathname === "/app/api/guide") {
+      return handlePWA_Guide(request, env);
+    }
+    if (url.pathname === "/app/api/districts") {
+      return handleDistricts(request, env);
     }
 
     // POST: /api/election/trigger uses ADMIN_SECRET
