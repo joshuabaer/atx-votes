@@ -2070,6 +2070,8 @@ var APP_JS = [
 
   // ============ INIT ============
   "load();",
+  "if(location.search.indexOf('start=1')!==-1&&!S.guideComplete&&S.phase===0)S.phase=1;",
+  "if(location.search)history.replaceState(null,'',location.pathname+location.hash);",
   "if(!S.guideComplete&&location.hash&&location.hash!=='#/')location.hash='#/';",
   "render();",
   "refreshBallots();",

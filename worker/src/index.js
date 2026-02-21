@@ -174,7 +174,7 @@ function handleLandingPage() {
     <p class="subtitle">Your personalized voting guide for Austin &amp; Travis County elections.</p>
     <div class="badge">Texas Primary — March 3, 2026</div>
     <br>
-    <a class="cta" href="/app">Build My Voting Guide</a>
+    <a class="cta" href="/app?start=1">Build My Voting Guide</a>
     <div class="features">
       <div><span>✅</span> 5-minute interview learns your values</div>
       <div><span>📋</span> Personalized ballot with recommendations</div>
@@ -265,7 +265,7 @@ function handleNonpartisan() {
     <p>Every screen says "Do your own research before voting." The app is a starting point, not the final word.</p>
 
     <h2>Privacy-First Design</h2>
-    <p>All data stays on your device. No analytics, no tracking, no ads. Your political views are never stored on our servers.</p>
+    <p>All data stays on your device. We collect only anonymous page-view counts (via Cloudflare Web Analytics — no cookies, no personal data). No tracking, no ads. Your political views are never stored on our servers.</p>
 
     <h2>Open Source Approach</h2>
     <p>The full prompt sent to the AI and every design decision is documented. Nothing is hidden.</p>
@@ -398,7 +398,7 @@ function handlePrivacyPolicy() {
 <body>
   <div class="container">
     <h1>Privacy Policy</h1>
-    <p class="updated">Last updated: February 19, 2026</p>
+    <p class="updated">Last updated: February 21, 2026</p>
 
     <p>ATX Votes ("the app") is a free voting guide for Austin and Travis County elections. Your privacy matters — here's exactly what happens with your data.</p>
 
@@ -420,7 +420,8 @@ function handlePrivacyPolicy() {
     <ul>
       <li>We do <strong>not</strong> store your data on our servers — the API proxy processes requests and discards them</li>
       <li>We do <strong>not</strong> sell, share, or rent your personal information to anyone</li>
-      <li>We do <strong>not</strong> use analytics, tracking pixels, or advertising SDKs</li>
+      <li>We use <strong>Cloudflare Web Analytics</strong> for anonymous page-view counts only — no cookies, no personal data, no tracking across sites</li>
+      <li>We do <strong>not</strong> use tracking pixels or advertising SDKs</li>
       <li>We do <strong>not</strong> collect device identifiers, IP addresses, or usage data</li>
     </ul>
 
@@ -435,6 +436,7 @@ function handlePrivacyPolicy() {
       <li><strong>Anthropic (Claude API)</strong> — processes your voter profile to generate recommendations. Subject to <a href="https://www.anthropic.com/privacy">Anthropic's privacy policy</a>.</li>
       <li><strong>U.S. Census Bureau Geocoder</strong> — receives your address to return district information. A public government API.</li>
       <li><strong>Cloudflare Workers</strong> — our API proxy runs on Cloudflare. Requests are processed in memory and not logged or stored.</li>
+      <li><strong>Cloudflare Web Analytics</strong> — collects anonymous page-view counts. No cookies, no personal data, no cross-site tracking. Subject to <a href="https://www.cloudflare.com/privacypolicy/">Cloudflare's privacy policy</a>.</li>
     </ul>
 
     <h2>Data deletion</h2>
@@ -515,10 +517,32 @@ async function hashString(str) {
   return [...new Uint8Array(hash)].map((b) => b.toString(16).padStart(2, "0")).join("").slice(0, 16);
 }
 
+// Inject Cloudflare Web Analytics beacon into HTML responses
+function injectBeacon(response, token) {
+  if (!token) return response;
+  const ct = response.headers.get("Content-Type") || "";
+  if (!ct.includes("text/html")) return response;
+
+  return new HTMLRewriter()
+    .on("body", {
+      element(el) {
+        el.append(
+          `<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"${token}"}'></script>`,
+          { html: true }
+        );
+      },
+    })
+    .transform(response);
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    const response = await this.handleRequest(request, env, url);
+    return injectBeacon(response, env.CF_BEACON_TOKEN);
+  },
 
+  async handleRequest(request, env, url) {
     // GET routes
     if (request.method === "GET") {
       if (url.pathname === "/privacy") {

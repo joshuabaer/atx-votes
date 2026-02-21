@@ -18,6 +18,7 @@ Items recently fixed but not yet tested. **Test these before attempting again or
 - [ ] PWA: Proposition explanations not translated — updated Claude prompt to generate all text fields (reasoning, caveats, strategicNotes) in Spanish when `lang=es`. Added 46 Spanish translations for static ifPasses/ifFails data to TR dictionary. Rendering now passes ifPasses/ifFails through `t()`.
 
 ### Improvements
+- [ ] PWA: Skip welcome screen from landing page — landing page CTA now links to `/app?start=1`. PWA init detects the param and jumps to Phase 1 (issues picker) if user hasn't completed a guide. URL cleaned via `history.replaceState`. Direct `/app` visits still show welcome.
 - [ ] PWA: Remove "Print" from cheat sheet button — renamed ballot page button from "Print Cheat Sheet" to "Cheat Sheet" with clipboard icon. Print button on the cheat sheet page itself still says "Print Cheat Sheet."
 - [ ] PWA: Free-form "Anything else?" field — added phase 5 textarea between Qualities and Address. Optional field stored in `S.freeform`, persisted in localStorage, shown on profile page. Text passed to Claude in both guide and summary prompts as "Additional context." Spanish translations included. Skip button available.
 - [ ] PWA: Bouncing mascot loading animation — replaced single-icon-per-phase with alternating elephant/donkey bounce. Elephant bounces 3 times, then donkey 3 times, repeating on a 600ms timer. Decoupled from progress status text. Timer stops on completion or error. `prefers-reduced-motion` disables animation.
@@ -44,13 +45,14 @@ Items not yet attempted or needing a fresh approach after failed verification.
 
 #### Pages
 
+- [ ] Ensure all public web pages link to Privacy Policy and Nonpartisan page
+
 #### Print
 
 #### Share
 
 ### Features
 
-- [ ] Add Google Analytics
 
 ### Testing
 
@@ -116,6 +118,13 @@ Verified working. Collapsed for reference.
 - [x] Spanish translation / i18n — English-as-key translation system with 200+ Spanish translations ported from iOS. Auto-detects browser language, language toggle on welcome page and profile. Translates all UI strings including interview questions, deep dives, ballot labels, vote info, and cheat sheet. Data values stay English for API compatibility.
 - [x] Regenerate profile summary — "Regenerate Summary" button on profile page calls new `POST /app/api/summary` endpoint. Server-side Claude call with dedicated summary prompt (matching iOS). Shows loading state, persists to localStorage, Spanish translations included.
 - [x] Accessibility — `prefers-reduced-motion` disables all animations, `focus-visible` outlines for keyboard nav, skip link, semantic HTML (`<main>`, `role="navigation"`), ARIA roles on tabs (`role="tablist"`/`role="tab"`/`aria-selected`), chips/radios (`role="option"`/`role="radio"`/`aria-checked`), accordions (`role="button"`/`aria-expanded`), race cards (`role="link"`/`aria-label`), keyboard Enter/Space handler for `div[data-action]`, `aria-live="polite"` on loading status.
+
+</details>
+
+<details>
+<summary>Infrastructure (1 resolved)</summary>
+
+- [x] Add analytics — used Cloudflare Web Analytics instead of Google Analytics (privacy-friendly, no cookies, no personal data, GDPR-compliant). Beacon script injected at response level via HTMLRewriter in fetch handler — covers all HTML pages automatically. Token `9c181c37d90740429efef870887a9774` configured via `CF_BEACON_TOKEN` env var in wrangler.toml. Deployed and verified live. Updated privacy policy and nonpartisan page disclosures.
 
 </details>
 
