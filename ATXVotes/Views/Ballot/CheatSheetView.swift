@@ -3,20 +3,6 @@ import SwiftUI
 struct CheatSheetView: View {
     @EnvironmentObject var store: VotingGuideStore
 
-    private var ballot: Ballot? { store.ballot }
-
-    private var contestedRaces: [Race] {
-        (ballot?.races ?? [])
-            .filter { $0.isContested && $0.recommendation != nil }
-            .sorted { $0.sortOrder < $1.sortOrder }
-    }
-
-    private var uncontestedRaces: [Race] {
-        (ballot?.races ?? [])
-            .filter { !$0.isContested }
-            .sorted { $0.sortOrder < $1.sortOrder }
-    }
-
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -26,6 +12,7 @@ struct CheatSheetView: View {
                         Image(systemName: "list.clipboard.fill")
                             .font(.system(size: 36))
                             .foregroundColor(Theme.primaryBlue)
+                            .accessibilityHidden(true)
 
                         Text(String(localized: "Your Ballot Cheat Sheet"))
                             .font(Theme.title2)
@@ -37,7 +24,7 @@ struct CheatSheetView: View {
                                 .foregroundColor(Theme.textSecondary)
                         }
 
-                        Text(ballot?.party.localizedName ?? store.selectedParty.localizedName)
+                        Text(store.ballot?.party.localizedName ?? store.selectedParty.localizedName)
                             .font(.system(size: 17, weight: .semibold))
                             .foregroundColor(.white)
                             .padding(.horizontal, 12)
@@ -57,7 +44,7 @@ struct CheatSheetView: View {
                     VStack(spacing: 0) {
                         cheatSheetHeader(String(localized: "CONTESTED RACES"))
 
-                        ForEach(Array(contestedRaces.enumerated()), id: \.element.id) { index, race in
+                        ForEach(Array(store.recommendedRaces.enumerated()), id: \.element.id) { index, race in
                             cheatSheetRow(
                                 office: raceLabel(race),
                                 vote: race.recommendation?.candidateName ?? "—",
@@ -68,7 +55,7 @@ struct CheatSheetView: View {
                     }
 
                     // Propositions table
-                    if let props = ballot?.propositions, !props.isEmpty {
+                    if let props = store.ballot?.propositions, !props.isEmpty {
                         VStack(spacing: 0) {
                             cheatSheetHeader(String(localized: "PROPOSITIONS"))
 
@@ -85,11 +72,11 @@ struct CheatSheetView: View {
                     }
 
                     // Uncontested
-                    if !uncontestedRaces.isEmpty {
+                    if !store.uncontestedRaces.isEmpty {
                         VStack(spacing: 0) {
                             cheatSheetHeader(String(localized: "UNCONTESTED"))
 
-                            ForEach(Array(uncontestedRaces.enumerated()), id: \.element.id) { index, race in
+                            ForEach(Array(store.uncontestedRaces.enumerated()), id: \.element.id) { index, race in
                                 cheatSheetRow(
                                     office: raceLabel(race),
                                     vote: race.candidates.first?.name ?? "—",
@@ -108,6 +95,7 @@ struct CheatSheetView: View {
                             Image(systemName: "star.fill")
                                 .font(.system(size: 17))
                                 .foregroundColor(Theme.accentGold)
+                                .accessibilityHidden(true)
                             Text(String(localized: "= Key race where your vote matters most"))
                                 .font(Theme.caption)
                                 .foregroundColor(Theme.textSecondary)
@@ -117,6 +105,7 @@ struct CheatSheetView: View {
                             Image(systemName: "exclamationmark.triangle.fill")
                                 .font(.system(size: 17))
                                 .foregroundColor(Theme.warning)
+                                .accessibilityHidden(true)
                             Text(String(localized: "AI-generated recommendations may contain errors. Do your own research before voting."))
                                 .font(.system(size: 18))
                                 .foregroundColor(Theme.textSecondary)
@@ -146,7 +135,7 @@ struct CheatSheetView: View {
                                 .font(.system(size: 18))
                         }
                         .accessibilityLabel("Share app with friends")
-                        ShareLink(item: cheatSheetText) {
+                        ShareLink(item: buildCheatSheetText()) {
                             Image(systemName: "square.and.arrow.up")
                         }
                         .accessibilityLabel("Share cheat sheet")
@@ -168,6 +157,7 @@ struct CheatSheetView: View {
         .padding(.horizontal, 14)
         .padding(.vertical, 8)
         .background(Theme.primaryBlue)
+        .accessibilityAddTraits(.isHeader)
     }
 
     private func cheatSheetRow(office: String, vote: String, isKeyRace: Bool, isOdd: Bool, voteColor: Color = Theme.primaryBlue) -> some View {
@@ -177,6 +167,7 @@ struct CheatSheetView: View {
                     Image(systemName: "star.fill")
                         .font(.system(size: 17))
                         .foregroundColor(Theme.accentGold)
+                        .accessibilityHidden(true)
                 }
                 Text(office)
                     .font(.system(size: 17))
@@ -193,6 +184,7 @@ struct CheatSheetView: View {
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
         .background(isOdd ? Color.gray.opacity(0.04) : Color.clear)
+        .accessibilityElement(children: .combine)
     }
 
     private func raceLabel(_ race: Race) -> String {
@@ -218,20 +210,20 @@ struct CheatSheetView: View {
 
     // MARK: - Share Text
 
-    private var cheatSheetText: String {
+    private func buildCheatSheetText() -> String {
         var lines: [String] = []
         lines.append(String(localized: "MY BALLOT CHEAT SHEET"))
         lines.append(store.voterProfile.address?.formatted ?? "Austin, TX")
-        lines.append("\(ballot?.party.localizedName ?? store.selectedParty.localizedName) \(String(localized: "Primary")) — \(Election.dateFormatted)")
+        lines.append("\(store.ballot?.party.localizedName ?? store.selectedParty.localizedName) \(String(localized: "Primary")) — \(Election.dateFormatted)")
         lines.append("")
 
-        for race in contestedRaces {
+        for race in store.recommendedRaces {
             let star = race.isKeyRace ? " ⭐" : ""
             lines.append("\(raceLabel(race))\(star): \(race.recommendation?.candidateName ?? "—")")
         }
 
         lines.append("")
-        for prop in ballot?.propositions ?? [] {
+        for prop in store.ballot?.propositions ?? [] {
             lines.append("Prop \(prop.number) (\(prop.title)): \(prop.recommendation.localizedName)")
         }
 

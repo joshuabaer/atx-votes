@@ -38,6 +38,30 @@ class VotingGuideStore: ObservableObject {
         }
     }
 
+    var contestedRaces: [Race] {
+        (ballot?.races ?? [])
+            .filter { $0.isContested }
+            .sorted { $0.sortOrder < $1.sortOrder }
+    }
+
+    var uncontestedRaces: [Race] {
+        (ballot?.races ?? [])
+            .filter { !$0.isContested }
+            .sorted { $0.sortOrder < $1.sortOrder }
+    }
+
+    var keyRaces: [Race] {
+        contestedRaces.filter(\.isKeyRace)
+    }
+
+    var otherContestedRaces: [Race] {
+        contestedRaces.filter { !$0.isKeyRace }
+    }
+
+    var recommendedRaces: [Race] {
+        contestedRaces.filter { $0.recommendation != nil }
+    }
+
     // MARK: - Services
     let claudeService: any GuideGenerating
     private let districtService: any DistrictLooking
@@ -334,42 +358,46 @@ class VotingGuideStore: ObservableObject {
         migrateOldKeys()
         loadProfile()
 
-        // Load Republican ballot
+        // Load lightweight state synchronously
+        loadSelectedParty()
+        loadHasVoted()
+
+        // Read raw ballot data synchronously (fast), but decode in a deferred Task
         let repData = cloudStore.data(forKey: republicanBallotKey)
             ?? UserDefaults.standard.data(forKey: republicanBallotKey)
-        if let repData, let saved = try? JSONDecoder().decode(Ballot.self, from: repData) {
-            republicanBallot = saved
-        }
-
-        // Load Democrat ballot
         let demData = cloudStore.data(forKey: democratBallotKey)
             ?? UserDefaults.standard.data(forKey: democratBallotKey)
-        if let demData, let saved = try? JSONDecoder().decode(Ballot.self, from: demData) {
-            democratBallot = saved
-        }
+        let legacyData = (repData == nil && demData == nil)
+            ? (cloudStore.data(forKey: ballotKey) ?? UserDefaults.standard.data(forKey: ballotKey))
+            : nil
 
-        // Migrate legacy single-ballot key
-        if republicanBallot == nil && democratBallot == nil {
-            let legacyData = cloudStore.data(forKey: ballotKey)
-                ?? UserDefaults.standard.data(forKey: ballotKey)
-            if let legacyData, let saved = try? JSONDecoder().decode(Ballot.self, from: legacyData) {
-                switch saved.party {
-                case .democrat: democratBallot = saved
-                case .republican, .undecided: republicanBallot = saved
+        if repData != nil || demData != nil || legacyData != nil {
+            Task {
+                if let repData, let saved = try? JSONDecoder().decode(Ballot.self, from: repData) {
+                    self.republicanBallot = saved
                 }
-                // Clean up legacy key
-                UserDefaults.standard.removeObject(forKey: ballotKey)
-                cloudStore.removeObject(forKey: ballotKey)
+                if let demData, let saved = try? JSONDecoder().decode(Ballot.self, from: demData) {
+                    self.democratBallot = saved
+                }
+                // Legacy migration
+                if self.republicanBallot == nil && self.democratBallot == nil,
+                   let legacyData, let saved = try? JSONDecoder().decode(Ballot.self, from: legacyData) {
+                    switch saved.party {
+                    case .democrat: self.democratBallot = saved
+                    case .republican, .undecided: self.republicanBallot = saved
+                    }
+                    UserDefaults.standard.removeObject(forKey: self.ballotKey)
+                    self.cloudStore.removeObject(forKey: self.ballotKey)
+                }
+                if self.republicanBallot != nil || self.democratBallot != nil {
+                    self.guideComplete = true
+                    await self.refreshElectionDataIfNeeded()
+                }
             }
         }
+    }
 
-        if republicanBallot != nil || democratBallot != nil {
-            guideComplete = true
-            // Check for remotely-updated election data in the background
-            Task { await self.refreshElectionDataIfNeeded() }
-        }
-
-        // Load selected party
+    private func loadSelectedParty() {
         if let partyString = cloudStore.string(forKey: selectedPartyKey)
             ?? UserDefaults.standard.string(forKey: selectedPartyKey),
            let party = PrimaryBallot(rawValue: partyString) {
@@ -377,7 +405,9 @@ class VotingGuideStore: ObservableObject {
         } else {
             selectedParty = inferredParty
         }
+    }
 
+    private func loadHasVoted() {
         if cloudStore.object(forKey: hasVotedKey) != nil {
             hasVoted = cloudStore.bool(forKey: hasVotedKey)
         } else {

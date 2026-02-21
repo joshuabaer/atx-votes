@@ -155,20 +155,6 @@ struct BallotOverviewView: View {
     @State private var expandedRaceId: UUID?
     @State private var showDisclaimer = true
 
-    private var ballot: Ballot? { store.ballot }
-
-    private var contestedRaces: [Race] {
-        (ballot?.races ?? [])
-            .filter { $0.isContested }
-            .sorted { $0.sortOrder < $1.sortOrder }
-    }
-
-    private var uncontestedRaces: [Race] {
-        (ballot?.races ?? [])
-            .filter { !$0.isContested }
-            .sorted { $0.sortOrder < $1.sortOrder }
-    }
-
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -181,7 +167,7 @@ struct BallotOverviewView: View {
                     // Party switcher
                     PartySwitcher(selectedParty: $store.selectedParty)
 
-                    if ballot == nil {
+                    if store.ballot == nil {
                         VStack(spacing: 12) {
                             Image(systemName: "hand.tap.fill")
                                 .font(.system(size: 36))
@@ -202,10 +188,10 @@ struct BallotOverviewView: View {
                     cheatSheetSection
 
                     // Key Races
-                    if !contestedRaces.filter(\.isKeyRace).isEmpty {
+                    if !store.keyRaces.isEmpty {
                         sectionHeader(String(localized: "Key Races"), icon: "star.fill", color: Theme.accentGold)
 
-                        ForEach(contestedRaces.filter(\.isKeyRace)) { race in
+                        ForEach(store.keyRaces) { race in
                             NavigationLink(destination: RaceDetailView(race: race)) {
                                 RaceCard(race: race)
                             }
@@ -214,11 +200,10 @@ struct BallotOverviewView: View {
                     }
 
                     // Other Contested Races
-                    let otherContested = contestedRaces.filter { !$0.isKeyRace }
-                    if !otherContested.isEmpty {
+                    if !store.otherContestedRaces.isEmpty {
                         sectionHeader(String(localized: "Other Contested Races"), icon: "person.2.fill", color: Theme.primaryBlue)
 
-                        ForEach(otherContested) { race in
+                        ForEach(store.otherContestedRaces) { race in
                             NavigationLink(destination: RaceDetailView(race: race)) {
                                 RaceCard(race: race)
                             }
@@ -227,7 +212,7 @@ struct BallotOverviewView: View {
                     }
 
                     // Propositions
-                    if let props = ballot?.propositions, !props.isEmpty {
+                    if let props = store.ballot?.propositions, !props.isEmpty {
                         sectionHeader(String(localized: "Propositions"), icon: "doc.text", color: Theme.primaryBlue)
 
                         ForEach(props) { prop in
@@ -236,7 +221,7 @@ struct BallotOverviewView: View {
                     }
 
                     // Uncontested
-                    if !uncontestedRaces.isEmpty {
+                    if !store.uncontestedRaces.isEmpty {
                         uncontestedSection
                     }
 
@@ -257,10 +242,10 @@ struct BallotOverviewView: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(ballot?.electionName ?? "March 2026 Primary")
+                    Text(store.ballot?.electionName ?? "March 2026 Primary")
                         .font(Theme.headline)
                         .foregroundColor(.white)
-                    Text(ballot?.electionDate.formatted(date: .long, time: .omitted) ?? Election.dateFormatted)
+                    Text(store.ballot?.electionDate.formatted(date: .long, time: .omitted) ?? Election.dateFormatted)
                         .font(Theme.callout)
                         .foregroundColor(.white.opacity(0.8))
                 }
@@ -270,7 +255,7 @@ struct BallotOverviewView: View {
                     .foregroundColor(.white.opacity(0.3))
             }
 
-            if let districts = ballot?.districts {
+            if let districts = store.ballot?.districts {
                 Divider().background(.white.opacity(0.2))
                 VStack(alignment: .leading, spacing: 4) {
                     if let cd = districts.congressional {
@@ -332,10 +317,6 @@ struct BallotOverviewView: View {
 
     // MARK: - Cheat Sheet
 
-    private var recommendedRaces: [Race] {
-        contestedRaces.filter { $0.recommendation != nil }
-    }
-
     private var cheatSheetSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
@@ -343,7 +324,7 @@ struct BallotOverviewView: View {
                 Spacer()
                 HStack(spacing: 16) {
                     Button {
-                        UIPasteboard.general.string = cheatSheetText
+                        UIPasteboard.general.string = buildCheatSheetText()
                     } label: {
                         Image(systemName: "doc.on.doc")
                     }
@@ -356,7 +337,7 @@ struct BallotOverviewView: View {
                     }
                     .accessibilityLabel("Print cheat sheet")
 
-                    ShareLink(item: cheatSheetText) {
+                    ShareLink(item: buildCheatSheetText()) {
                         Image(systemName: "square.and.arrow.up")
                     }
                     .accessibilityLabel("Share cheat sheet")
@@ -371,7 +352,7 @@ struct BallotOverviewView: View {
                         .font(Theme.caption)
                         .foregroundColor(.white.opacity(0.8))
                     Spacer()
-                    Text(ballot?.party.localizedName ?? store.selectedParty.localizedName)
+                    Text(store.ballot?.party.localizedName ?? store.selectedParty.localizedName)
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundColor(.white)
                 }
@@ -380,7 +361,7 @@ struct BallotOverviewView: View {
                 .background(Theme.primaryBlue)
 
                 // Contested races
-                ForEach(Array(recommendedRaces.enumerated()), id: \.element.id) { index, race in
+                ForEach(Array(store.recommendedRaces.enumerated()), id: \.element.id) { index, race in
                     cheatSheetRow(
                         office: raceLabel(race),
                         vote: race.recommendation?.candidateName ?? "—",
@@ -390,7 +371,7 @@ struct BallotOverviewView: View {
                 }
 
                 // Propositions
-                if let props = ballot?.propositions, !props.isEmpty {
+                if let props = store.ballot?.propositions, !props.isEmpty {
                     HStack {
                         Text(String(localized: "PROPOSITIONS"))
                             .font(.system(size: 13, weight: .bold, design: .monospaced))
@@ -419,6 +400,7 @@ struct BallotOverviewView: View {
                         Image(systemName: "star.fill")
                             .font(.system(size: 14))
                             .foregroundColor(Theme.accentGold)
+                            .accessibilityHidden(true)
                         Text(String(localized: "= Key race"))
                             .font(Theme.caption)
                             .foregroundColor(Theme.textSecondary)
@@ -442,6 +424,7 @@ struct BallotOverviewView: View {
                     Image(systemName: "star.fill")
                         .font(.system(size: 14))
                         .foregroundColor(Theme.accentGold)
+                        .accessibilityHidden(true)
                 }
                 Text(office)
                     .font(.system(size: 16))
@@ -475,19 +458,19 @@ struct BallotOverviewView: View {
         }
     }
 
-    private var cheatSheetText: String {
+    private func buildCheatSheetText() -> String {
         var lines: [String] = []
         lines.append(String(localized: "MY BALLOT CHEAT SHEET"))
         lines.append(store.voterProfile.address?.formatted ?? "Austin, TX")
-        lines.append("\(ballot?.party.localizedName ?? store.selectedParty.localizedName) \(String(localized: "Primary")) — \(Election.dateFormatted)")
+        lines.append("\(store.ballot?.party.localizedName ?? store.selectedParty.localizedName) \(String(localized: "Primary")) — \(Election.dateFormatted)")
         lines.append("")
 
-        for race in recommendedRaces {
+        for race in store.recommendedRaces {
             let star = race.isKeyRace ? " *" : ""
             lines.append("\(raceLabel(race))\(star): \(race.recommendation?.candidateName ?? "—")")
         }
 
-        if let props = ballot?.propositions, !props.isEmpty {
+        if let props = store.ballot?.propositions, !props.isEmpty {
             lines.append("")
             for prop in props {
                 lines.append("Prop \(prop.number) (\(prop.title)): \(prop.recommendation.localizedName)")
@@ -508,7 +491,7 @@ struct BallotOverviewView: View {
             info.outputType = .general
             return info
         }()
-        printController.printFormatter = UISimpleTextPrintFormatter(text: cheatSheetText)
+        printController.printFormatter = UISimpleTextPrintFormatter(text: buildCheatSheetText())
         printController.present(animated: true)
     }
 
@@ -519,7 +502,7 @@ struct BallotOverviewView: View {
             sectionHeader(String(localized: "Uncontested Races"), icon: "checkmark.circle", color: Theme.textSecondary)
 
             VStack(spacing: 0) {
-                ForEach(Array(uncontestedRaces.enumerated()), id: \.element.id) { index, race in
+                ForEach(Array(store.uncontestedRaces.enumerated()), id: \.element.id) { index, race in
                     HStack {
                         VStack(alignment: .leading, spacing: 2) {
                             Text(race.office)
@@ -533,11 +516,12 @@ struct BallotOverviewView: View {
                         Image(systemName: "checkmark")
                             .foregroundColor(Theme.textSecondary)
                             .font(.caption)
+                            .accessibilityHidden(true)
                     }
                     .padding(.vertical, 10)
                     .padding(.horizontal, Theme.paddingMedium)
 
-                    if index < uncontestedRaces.count - 1 {
+                    if index < store.uncontestedRaces.count - 1 {
                         Divider().padding(.horizontal, Theme.paddingMedium)
                     }
                 }

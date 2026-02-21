@@ -8,7 +8,7 @@ struct ProfileView: View {
 
     private var profile: VoterProfile { store.voterProfile }
 
-    private var shareableProfileText: String {
+    private func buildShareableProfileText() -> String {
         var lines: [String] = []
         lines.append(String(localized: "My Voter Profile — ATX Votes"))
         lines.append("")
@@ -60,6 +60,7 @@ struct ProfileView: View {
                             Image(systemName: "person.circle.fill")
                                 .font(.system(size: 40))
                                 .foregroundColor(Theme.primaryBlue)
+                                .accessibilityHidden(true)
                             VStack(alignment: .leading) {
                                 Text("How you might describe your politics to a friend")
                                     .font(Theme.headline)
@@ -79,6 +80,7 @@ struct ProfileView: View {
                                         .font(.system(size: 20))
                                         .foregroundColor(Theme.textSecondary)
                                 }
+                                .accessibilityLabel(String(localized: "Regenerate profile summary"))
                             }
                         }
                         if let summary = profile.summaryText {
@@ -107,6 +109,7 @@ struct ProfileView: View {
                                 HStack(spacing: 6) {
                                     Image(systemName: issue.icon)
                                         .font(.system(size: 16))
+                                        .accessibilityHidden(true)
                                     Text(issue.localizedName)
                                         .font(.system(size: 17, weight: .medium))
                                 }
@@ -131,6 +134,7 @@ struct ProfileView: View {
                                 Image(systemName: "checkmark.circle.fill")
                                     .foregroundColor(Theme.success)
                                     .font(.caption)
+                                    .accessibilityHidden(true)
                                 Text(quality.localizedName)
                                     .font(Theme.callout)
                                     .foregroundColor(Theme.textPrimary)
@@ -207,6 +211,7 @@ struct ProfileView: View {
                             HStack(spacing: 10) {
                                 Image(systemName: "envelope.fill")
                                     .font(.system(size: 20))
+                                    .accessibilityHidden(true)
                                 Text("Send Feedback")
                                     .font(Theme.headline)
                             }
@@ -247,7 +252,7 @@ struct ProfileView: View {
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    ShareLink(item: shareableProfileText) {
+                    ShareLink(item: buildShareableProfileText()) {
                         Image(systemName: "square.and.arrow.up")
                     }
                     .accessibilityLabel("Share voter profile")
