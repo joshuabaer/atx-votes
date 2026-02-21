@@ -225,7 +225,7 @@ var CSS = [
   ".star{color:var(--gold);font-size:12px;margin-left:6px}",
 
   // Disclaimer
-  ".disclaimer{display:flex;gap:10px;padding:12px;background:rgba(230,140,26,.08);border:1px solid rgba(230,140,26,.3);border-radius:var(--rs);margin-bottom:16px;font-size:13px;line-height:1.5;color:var(--text2)}",
+  ".disclaimer{display:flex;gap:10px;align-items:flex-start;padding:12px;background:rgba(230,140,26,.08);border:1px solid rgba(230,140,26,.3);border-radius:var(--rs);margin-bottom:16px;font-size:13px;line-height:1.5;color:var(--text2)}",
   ".disclaimer b{color:var(--text);font-size:15px;display:block;margin-bottom:2px}",
 
   // Recommendation box
@@ -292,6 +292,28 @@ var CSS = [
   ".info-item:last-child{border-bottom:none}",
   ".info-label{font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px}",
   ".info-value{font-size:16px;font-weight:600;margin-top:2px}",
+  // Accordion sections
+  ".acc{border-radius:var(--rs);overflow:hidden;margin-bottom:10px;border:1px solid var(--border);background:var(--card)}",
+  ".acc-head{display:flex;align-items:center;gap:10px;padding:14px 16px;cursor:pointer;font-size:16px;font-weight:700;color:var(--text);user-select:none}",
+  ".acc-head:hover{background:rgba(0,0,0,.03)}",
+  "@media(prefers-color-scheme:dark){.acc-head:hover{background:rgba(255,255,255,.05)}}",
+  ".acc-icon{font-size:20px;flex-shrink:0}",
+  ".acc-chev{margin-left:auto;color:var(--text2);font-size:14px;transition:transform .2s}",
+  ".acc-chev.open{transform:rotate(180deg)}",
+  ".acc-body{padding:0 16px 14px;font-size:14px;line-height:1.6;color:var(--text)}",
+  ".vi-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)}",
+  ".vi-row:last-child{border-bottom:none}",
+  ".vi-strike{text-decoration:line-through;color:var(--text2)}",
+  ".vi-highlight{color:var(--blue);font-weight:600}",
+  ".vi-warn{display:flex;gap:10px;align-items:flex-start;padding:12px;background:rgba(230,140,26,.08);border:1px solid rgba(230,140,26,.3);border-radius:var(--rs);margin-top:10px;font-size:13px;line-height:1.5}",
+  ".vi-check{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:15px}",
+  ".vi-check-icon{color:var(--ok);font-size:16px;flex-shrink:0}",
+  ".vi-link{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--border);font-size:15px;font-weight:600}",
+  ".vi-link:last-child{border-bottom:none}",
+  ".vi-link a{color:var(--blue);text-decoration:none}",
+  ".vi-badge{font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px}",
+  ".vi-badge-req{color:#d13333;background:rgba(209,51,51,.1)}",
+  ".vi-badge-opt{color:var(--text2);background:rgba(128,128,128,.1)}",
 
   // Welcome
   ".hero{text-align:center;padding:40px 0 20px}",
@@ -311,8 +333,39 @@ var CSS = [
   ".actions{display:flex;gap:10px;margin:16px 0}",
   ".actions .btn{flex:1;padding:10px;font-size:14px}",
 
+  // Cheat sheet
+  ".cs-header{text-align:center;padding:12px 0 8px}",
+  ".cs-header h2{font-size:20px;font-weight:800;color:var(--blue)}",
+  ".cs-meta{font-size:12px;color:var(--text2);margin-top:2px}",
+  ".cs-party{display:inline-block;color:#fff;font-size:13px;font-weight:700;padding:2px 10px;border-radius:99px;margin:4px 0}",
+  ".cs-party-rep{background:var(--rep)}",
+  ".cs-party-dem{background:var(--dem)}",
+  ".cs-table{width:100%;border-collapse:collapse;font-size:14px}",
+  ".cs-table th{background:var(--blue);color:#fff;text-align:left;padding:5px 10px;font-size:12px;font-weight:700;letter-spacing:.5px;font-family:monospace}",
+  ".cs-table td{padding:5px 10px;border-bottom:1px solid var(--border);vertical-align:top}",
+  ".cs-table tr:nth-child(even) td{background:var(--fill3)}",
+  ".cs-table .cs-vote{font-weight:700;text-align:right;white-space:nowrap}",
+  ".cs-table .cs-star{color:var(--gold);margin-right:2px}",
+  ".cs-table .cs-yes{color:var(--ok)}",
+  ".cs-table .cs-no{color:var(--bad)}",
+  ".cs-table .cs-yourcall{color:var(--warn)}",
+  ".cs-table .cs-uncontested{color:var(--text2)}",
+  ".cs-footer{text-align:center;padding:8px 0;font-size:11px;color:var(--text2)}",
+  ".cs-legend{display:flex;justify-content:center;gap:16px;font-size:11px;color:var(--text2);padding:4px 0}",
+  ".cs-actions{display:flex;gap:10px;justify-content:center;margin:12px 0}",
+  ".cs-actions .btn{padding:10px 20px;font-size:14px;width:auto}",
+
   // Print styles
-  "@media print{.tab-bar,.disclaimer,.party-row,.actions,.back-btn,.expand-toggle{display:none!important}#app{max-width:100%;padding:0}.card{box-shadow:none;break-inside:avoid;border:1px solid #ddd}}",
+  "@media print{" +
+    "#topnav,#tabs,.cs-actions,.back-btn{display:none!important}" +
+    "html,body{height:auto;display:block}" +
+    "#app{max-width:100%;padding:8px;overflow:visible;flex:none}" +
+    ".cs-header h2{font-size:18px}" +
+    ".cs-table{font-size:12px}" +
+    ".cs-table th{padding:4px 8px}" +
+    ".cs-table td{padding:3px 8px}" +
+    "@page{margin:0.4in;size:letter}" +
+  "}",
 
   // Misc
   ".text-center{text-align:center}",
@@ -329,7 +382,7 @@ var CSS = [
 
 var APP_JS = [
   // ============ VERSION CHECK ============
-  "var APP_VERSION=9;",
+  "var APP_VERSION=12;",
   // ============ DATA ============
   "var ISSUES=[" +
     '{v:"Economy & Cost of Living",icon:"\u{1F4B0}"},' +
@@ -438,7 +491,7 @@ var APP_JS = [
     "repBallot:null,demBallot:null,selectedParty:'republican'," +
     "guideComplete:false,summary:null,districts:null," +
     "isLoading:false,loadPhase:0,loadMsg:'',error:null," +
-    "expanded:{}" +
+    "expanded:{'vi-dates':true,'vi-id':true},disclaimerDismissed:false" +
     "};",
 
   // Shuffled arrays (set once per question display)
@@ -512,6 +565,7 @@ var APP_JS = [
     "if(!S.guideComplete){app.innerHTML=renderInterview();tabs.innerHTML='';tnav.innerHTML='';return}" +
     "var h=location.hash||'#/ballot';" +
     "if(h.indexOf('#/race/')===0){app.innerHTML=renderRaceDetail(parseInt(h.split('/')[2]));tabs.innerHTML=tabBar('#/ballot');tnav.innerHTML=topNav('#/ballot')}" +
+    "else if(h==='#/cheatsheet'){app.innerHTML=renderCheatSheet();tabs.innerHTML='';tnav.innerHTML=topNav('#/ballot')}" +
     "else if(h==='#/profile'){app.innerHTML=renderProfile();tabs.innerHTML=tabBar('#/profile');tnav.innerHTML=topNav('#/profile')}" +
     "else if(h==='#/info'){app.innerHTML=renderVoteInfo();tabs.innerHTML=tabBar('#/info');tnav.innerHTML=topNav('#/info')}" +
     "else{app.innerHTML=renderBallot();tabs.innerHTML=tabBar('#/ballot');tnav.innerHTML=topNav('#/ballot')}" +
@@ -682,14 +736,16 @@ var APP_JS = [
     "var keyRaces=contested.filter(function(r){return r.isKeyRace});" +
     "var otherContested=contested.filter(function(r){return!r.isKeyRace});" +
     "var h=renderPartySwitcher();" +
-    // Disclaimer
-    "h+='<div class=\"disclaimer\"><span style=\"font-size:20px\">\u26A0\u{FE0F}</span><div>" +
-      "<b>AI-Generated Recommendations</b>" +
-      "These recommendations are generated by AI based on your stated values. They may contain errors. Always do your own research before voting." +
-    "</div></div>';" +
+    // Disclaimer (dismissible)
+    "if(!S.disclaimerDismissed){" +
+      "h+='<div class=\"disclaimer\"><span style=\"font-size:20px\">\u26A0\u{FE0F}</span><div>" +
+        "<b>AI-Generated Recommendations</b>" +
+        "These recommendations are generated by AI based on your stated values. They may contain errors. Always do your own research before voting." +
+      "</div><button data-action=\"dismiss-disclaimer\" style=\"background:none;border:none;font-size:20px;cursor:pointer;padding:4px 8px;color:var(--text2);flex-shrink:0\">&times;</button></div>'" +
+    "}" +
     // Actions
     "h+='<div class=\"actions\">';" +
-    "h+='<button class=\"btn btn-secondary\" data-action=\"print\">\u{1F5A8}\u{FE0F} Print</button>';" +
+    "h+='<button class=\"btn btn-secondary\" data-action=\"nav\" data-to=\"#/cheatsheet\">\u{1F5A8}\u{FE0F} Print Cheat Sheet</button>';" +
     "h+='<button class=\"btn btn-secondary\" data-action=\"share\">\u{1F4E4} Share</button>';" +
     "h+='</div>';" +
     // Key races
@@ -726,6 +782,71 @@ var APP_JS = [
     "return h;" +
   "}",
 
+  // ============ CHEAT SHEET ============
+  "function renderCheatSheet(){" +
+    "var b=getBallot();" +
+    "if(!b)return '<p>No ballot available.</p>';" +
+    "var races=b.races.slice().sort(function(a,b){return sortOrder(a)-sortOrder(b)});" +
+    "var contested=races.filter(function(r){return r.isContested});" +
+    "var uncontested=races.filter(function(r){return!r.isContested});" +
+    "var profile=null;try{var p=localStorage.getItem('atx_votes_profile');if(p)profile=JSON.parse(p)}catch(e){}" +
+    "var addr=profile&&profile.address?profile.address:null;" +
+    "var partyName=S.selectedParty==='democrat'?'Democrat':'Republican';" +
+    "var partyCls=S.selectedParty==='democrat'?'cs-party-dem':'cs-party-rep';" +
+    // Header
+    "var h='<div class=\"cs-header\">';" +
+    "h+='<h2>Your Ballot Cheat Sheet</h2>';" +
+    "if(addr&&addr.street){h+='<div class=\"cs-meta\">'+esc(addr.street)+', '+esc(addr.city||'Austin')+' '+esc(addr.zip||'')+'</div>'}" +
+    "h+='<span class=\"cs-party '+partyCls+'\">'+esc(partyName)+' Primary</span>';" +
+    "h+='<div class=\"cs-meta\">March 3, 2026</div>';" +
+    "h+='</div>';" +
+    // Actions (hidden in print)
+    "h+='<div class=\"cs-actions\">';" +
+    "h+='<button class=\"btn btn-primary\" data-action=\"do-print\">Print Cheat Sheet</button>';" +
+    "h+='<button class=\"btn btn-secondary\" data-action=\"share\">Share</button>';" +
+    "h+='</div>';" +
+    // Contested races table
+    "if(contested.length){" +
+      "h+='<table class=\"cs-table\"><thead><tr><th>CONTESTED RACES</th><th style=\"text-align:right\">YOUR VOTE</th></tr></thead><tbody>';" +
+      "for(var i=0;i<contested.length;i++){" +
+        "var r=contested[i];" +
+        "var star=r.isKeyRace?'<span class=\"cs-star\">\u2B50</span>':'';" +
+        "var label=esc(r.office)+(r.district?' \\u2014 '+esc(r.district):'');" +
+        "var vote=r.recommendation?esc(r.recommendation.candidateName):'\\u2014';" +
+        "h+='<tr><td>'+star+label+'</td><td class=\"cs-vote\">'+vote+'</td></tr>'" +
+      "}" +
+      "h+='</tbody></table>'" +
+    "}" +
+    // Propositions table
+    "if(b.propositions&&b.propositions.length){" +
+      "h+='<table class=\"cs-table\" style=\"margin-top:8px\"><thead><tr><th>PROPOSITIONS</th><th style=\"text-align:right\">YOUR VOTE</th></tr></thead><tbody>';" +
+      "for(var i=0;i<b.propositions.length;i++){" +
+        "var p=b.propositions[i];" +
+        "var rec=p.recommendation||'';" +
+        "var cls='';if(rec==='Lean Yes'||rec==='FOR')cls='cs-yes';else if(rec==='Lean No'||rec==='AGAINST')cls='cs-no';else cls='cs-yourcall';" +
+        "h+='<tr><td>Prop '+esc(p.number||''+(i+1))+': '+esc(p.title)+'</td><td class=\"cs-vote '+cls+'\">'+esc(rec)+'</td></tr>'" +
+      "}" +
+      "h+='</tbody></table>'" +
+    "}" +
+    // Uncontested table
+    "if(uncontested.length){" +
+      "h+='<table class=\"cs-table\" style=\"margin-top:8px\"><thead><tr><th>UNCONTESTED</th><th style=\"text-align:right\">CANDIDATE</th></tr></thead><tbody>';" +
+      "for(var i=0;i<uncontested.length;i++){" +
+        "var r=uncontested[i];" +
+        "var name=r.candidates.length?esc(r.candidates[0].name):'TBD';" +
+        "var label=esc(r.office)+(r.district?' \\u2014 '+esc(r.district):'');" +
+        "h+='<tr><td>'+label+'</td><td class=\"cs-vote cs-uncontested\">'+name+'</td></tr>'" +
+      "}" +
+      "h+='</tbody></table>'" +
+    "}" +
+    // Legend & footer
+    "h+='<div class=\"cs-legend\"><span>\u2B50 = Key race</span><span>\u26A0\uFE0F AI-generated — do your own research</span></div>';" +
+    "h+='<div class=\"cs-footer\">Built with ATX Votes &middot; atxvotes.app</div>';" +
+    // Back link (hidden in print)
+    "h+='<div style=\"text-align:center;margin-top:8px\" class=\"cs-actions\"><button class=\"btn btn-secondary\" data-action=\"nav\" data-to=\"#/ballot\">&larr; Back to Ballot</button></div>';" +
+    "return h;" +
+  "}",
+
   "function renderPartySwitcher(){" +
     "var hasRep=!!S.repBallot,hasDem=!!S.demBallot;" +
     "if(!hasRep&&!hasDem)return'';" +
@@ -743,14 +864,18 @@ var APP_JS = [
     "var idx=-1;for(var i=0;i<allRaces.length;i++){if(allRaces[i].id===race.id){idx=i;break}}" +
     "var h='<div class=\"card card-touch\" data-action=\"nav\" data-to=\"#/race/'+idx+'\">';" +
     "h+='<div style=\"display:flex;justify-content:space-between;align-items:flex-start\">';" +
-    "h+='<div><div style=\"font-size:14px;color:var(--text2)\">'+esc(race.office)+(race.district?' \\u2014 '+esc(race.district):'')+'</div>';" +
+    "h+='<div style=\"flex:1;min-width:0\"><div style=\"font-size:14px;color:var(--text2)\">'+esc(race.office)+(race.district?' \\u2014 '+esc(race.district):'')+'</div>';" +
     "if(race.isKeyRace)h+='<span class=\"star\">\u2B50</span>';" +
     "if(race.recommendation){" +
       "h+='<div style=\"font-size:17px;font-weight:700;margin-top:4px\">'+esc(race.recommendation.candidateName)+'</div>';" +
       "h+='<div style=\"font-size:13px;color:var(--text2);margin-top:2px;line-height:1.4\">'+esc(race.recommendation.reasoning)+'</div>'" +
-    "}else{h+='<div style=\"font-size:15px;margin-top:4px\">'+race.candidates.length+' candidates</div>'}" +
+    "}" +
+    "h+='<div style=\"font-size:13px;color:var(--text2);margin-top:4px\">'+race.candidates.length+' candidate'+(race.candidates.length!==1?'s':'')+'</div>';" +
     "h+='</div>';" +
+    "h+='<div style=\"display:flex;align-items:center;gap:8px;flex-shrink:0\">';" +
     "if(race.recommendation){h+=confBadge(race.recommendation.confidence)}" +
+    "h+='<span style=\"color:var(--text2);font-size:18px\">&rsaquo;</span>';" +
+    "h+='</div>';" +
     "h+='</div></div>';" +
     "return h;" +
   "}",
@@ -871,41 +996,132 @@ var APP_JS = [
     // Address
     "if(S.address&&S.address.street){h+='<div class=\"profile-section\"><h3>Address</h3><p style=\"font-size:15px\">'+esc(S.address.street)+', '+esc(S.address.city)+', '+esc(S.address.state)+' '+esc(S.address.zip)+'</p></div>'}" +
     "h+='</div>';" +
+    // Send Feedback + Credits
+    "h+='<div class=\"card\" style=\"margin-top:16px;text-align:center\">';" +
+    "h+='<a href=\"mailto:howdy@atxvotes.app\" style=\"font-size:15px;font-weight:600\">Send Feedback &rarr;</a>';" +
+    "h+='<p style=\"font-size:13px;color:var(--text2);margin-top:8px\">Powered by Claude (Anthropic)</p>';" +
+    "h+='</div>';" +
     // Start Over
     "h+='<div style=\"margin-top:32px;padding-top:20px;border-top:1px solid var(--border)\">';" +
     "h+='<button class=\"btn btn-danger\" data-action=\"reset\">Start Over</button>';" +
     "h+='<p class=\"text-center mt-sm\" style=\"font-size:13px;color:var(--text2)\">This will erase your profile and recommendations.</p>';" +
     "h+='</div>';" +
+    // Footer links
+    "h+='<div style=\"text-align:center;padding:24px 0 8px;font-size:13px;color:var(--text2)\">';" +
+    "h+='<a href=\"/nonpartisan\" target=\"_blank\" style=\"color:var(--text2)\">Nonpartisan by Design</a>';" +
+    "h+=' &middot; ';" +
+    "h+='<a href=\"/privacy\" target=\"_blank\" style=\"color:var(--text2)\">Privacy Policy</a>';" +
+    "h+='</div>';" +
     "return h;" +
   "}",
 
   // ============ VOTE INFO VIEW ============
+  "function accSection(id,icon,title,body){" +
+    "var open=S.expanded[id];" +
+    "var h='<div class=\"acc\">';" +
+    "h+='<div class=\"acc-head\" data-action=\"toggle-expand\" data-id=\"'+id+'\">';" +
+    "h+='<span class=\"acc-icon\">'+icon+'</span>';" +
+    "h+=esc(title);" +
+    "h+='<span class=\"acc-chev'+(open?' open':'')+'\">&#x25BC;</span>';" +
+    "h+='</div>';" +
+    "if(open){h+='<div class=\"acc-body\">'+body+'</div>'}" +
+    "h+='</div>';" +
+    "return h;" +
+  "}",
+
   "function renderVoteInfo(){" +
     "var election=new Date(2026,2,3);" + // March 3, 2026
     "var now=new Date();" +
     "var diff=Math.ceil((election-now)/(1000*60*60*24));" +
     "var h='<h2 style=\"font-size:22px;font-weight:800;margin-bottom:16px\">Voting Info</h2>';" +
-    "h+='<div class=\"card\">';" +
+    // Countdown card
+    "h+='<div class=\"card\" style=\"text-align:center;margin-bottom:16px\">';" +
     "if(diff>0){h+='<div class=\"countdown\">'+diff+'</div><div class=\"countdown-label\">days until Election Day</div>'}" +
     "else if(diff===0){h+='<div class=\"countdown\">\u{1F5F3}\u{FE0F}</div><div class=\"countdown-label\">Today is Election Day!</div>'}" +
     "else{h+='<div class=\"countdown\">\u2705</div><div class=\"countdown-label\">Election Day has passed</div>'}" +
-    "h+='<div class=\"info-item\"><div class=\"info-label\">Election Day</div><div class=\"info-value\">Tuesday, March 3, 2026</div></div>';" +
-    "h+='<div class=\"info-item\"><div class=\"info-label\">Early Voting</div><div class=\"info-value\">February 17 \\u2013 27, 2026</div></div>';" +
-    "h+='<div class=\"info-item\"><div class=\"info-label\">Registration Deadline</div><div class=\"info-value\">February 2, 2026</div></div>';" +
     "h+='</div>';" +
-    // Voter ID
-    "h+='<div class=\"section-head\">Acceptable Voter ID</div>';" +
-    "h+='<div class=\"card\">';" +
-    "var ids=['Texas driver license','Texas personal ID card','Texas Election ID Certificate','Texas handgun license','US military ID with photo','US citizenship certificate with photo','US passport (book or card)'];" +
-    "for(var i=0;i<ids.length;i++)h+='<div style=\"padding:6px 0;font-size:15px;border-bottom:1px solid var(--border)\">'+esc(ids[i])+'</div>';" +
-    "h+='<p style=\"font-size:13px;color:var(--text2);margin-top:8px\">Expired IDs accepted if expired &lt; 4 years (any expiry for 70+).</p>';" +
+
+    // Polling location card
+    "h+='<div class=\"card\" style=\"margin-bottom:16px\">';" +
+    "h+='<div style=\"font-size:16px;font-weight:700;margin-bottom:4px\">Find Your Polling Location</div>';" +
+    "h+='<p style=\"font-size:14px;color:var(--text2);margin-bottom:12px\">Travis County uses Vote Centers \\u2014 you can vote at any location.</p>';" +
+    "h+='<div style=\"display:flex;gap:8px;flex-wrap:wrap\">';" +
+    "h+='<a href=\"https://countyclerk.traviscountytx.gov/departments/elections/current-election/\" target=\"_blank\" class=\"btn btn-primary\" style=\"flex:1;text-align:center;text-decoration:none\">Find Locations &rarr;</a>';" +
+    "h+='<a href=\"https://votetravis.gov\" target=\"_blank\" class=\"btn btn-secondary\" style=\"flex:1;text-align:center;text-decoration:none\">VoteTravis.gov</a>';" +
+    "h+='</div></div>';" +
+
+    // Key Dates accordion
+    "var kdBody='';" +
+    "var regPast=new Date(2026,1,2)<now;" + // Feb 2
+    "var mailDate=new Date(2026,1,20);" + // Feb 20
+    "var mailPast=mailDate<now;" +
+    "var evStart=new Date(2026,1,17);" + // Feb 17
+    "var evEnd=new Date(2026,1,27);" + // Feb 27
+    "var evActive=now>=evStart&&now<=evEnd;" +
+    "kdBody+='<div class=\"vi-row\"><span'+(regPast?' class=\"vi-strike\"':'')+'>Registration deadline</span><span'+(regPast?' class=\"vi-strike\"':'')+'>Feb 2, 2026</span></div>';" +
+    "kdBody+='<div class=\"vi-row\"><span'+(mailPast?' class=\"vi-strike\"':'')+'>Mail ballot application deadline</span><span'+(mailPast?' class=\"vi-strike\"':'')+'>Feb 20, 2026</span></div>';" +
+    "kdBody+='<div class=\"vi-row\"><span'+(evActive?' class=\"vi-highlight\"':'')+'>Early voting</span><span'+(evActive?' class=\"vi-highlight\"':'')+'>Feb 17 \\u2013 27, 2026</span></div>';" +
+    "kdBody+='<div class=\"vi-row\"><span class=\"vi-highlight\">Election Day</span><span class=\"vi-highlight\">March 3, 2026</span></div>';" +
+    "h+=accSection('vi-dates','\u{1F4C5}','Key Dates',kdBody);" +
+
+    // Early Voting accordion
+    "var evBody='';" +
+    "evBody+='<div class=\"vi-row\"><span>Feb 17 \\u2013 21</span><span>7:00 AM \\u2013 7:00 PM</span></div>';" +
+    "evBody+='<div class=\"vi-row\"><span>Feb 22 (Sunday)</span><span>12:00 PM \\u2013 6:00 PM</span></div>';" +
+    "evBody+='<div class=\"vi-row\"><span>Feb 23 \\u2013 25</span><span>7:00 AM \\u2013 7:00 PM</span></div>';" +
+    "evBody+='<div class=\"vi-row\"><span style=\"font-weight:600\">Feb 26 \\u2013 27</span><span style=\"font-weight:600\">7:00 AM \\u2013 10:00 PM</span></div>';" +
+    "evBody+='<p style=\"font-size:13px;color:var(--text2);margin-top:8px\">Vote at any early voting location in Travis County.</p>';" +
+    "h+=accSection('vi-early','\u{1F552}','Early Voting',evBody);" +
+
+    // Election Day accordion
+    "var edBody='';" +
+    "edBody+='<div class=\"vi-row\"><span style=\"font-weight:600\">Hours</span><span style=\"font-weight:600\">7:00 AM \\u2013 7:00 PM</span></div>';" +
+    "edBody+='<p style=\"margin-top:8px\">Vote at any Vote Center in Travis County with a \\u201CVote Here / Aqu\\u00ED\\u201D sign.</p>';" +
+    "edBody+='<p style=\"margin-top:8px;padding:10px;background:rgba(33,89,143,.06);border-radius:var(--rs);font-size:13px\">" +
+      "<b>Open Primary:</b> Texas has open primaries \\u2014 tell the poll worker which party\\u2019s primary you want. You can only vote in one.</p>';" +
+    "edBody+='<div style=\"margin-top:10px\"><a href=\"https://countyclerk.traviscountytx.gov/departments/elections/current-election/\" target=\"_blank\" style=\"font-size:14px;font-weight:600;color:var(--blue)\">Find Election Day locations &rarr;</a></div>';" +
+    "h+=accSection('vi-eday','\u{1F3DB}\u{FE0F}','Election Day',edBody);" +
+
+    // Voter ID accordion
+    "var idBody='';" +
+    "var ids=['Texas driver\\u2019s license or DPS ID','Texas Election ID Certificate (EIC)','Texas concealed handgun license','U.S. military ID with photo','U.S. citizenship certificate with photo','U.S. passport (book or card)'];" +
+    "for(var i=0;i<ids.length;i++){idBody+='<div class=\"vi-check\"><span class=\"vi-check-icon\">\\u2705</span>'+ids[i]+'</div>'}" +
+    "idBody+='<p style=\"font-size:13px;color:var(--text2);margin-top:8px\">Expired IDs accepted if expired less than 4 years. No expiration limit for voters 70+.</p>';" +
+    "h+=accSection('vi-id','\u{1F4CB}','Voter ID',idBody);" +
+
+    // What to Bring accordion
+    "var bringBody='';" +
+    "bringBody+='<div style=\"padding:8px 0;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)\">';" +
+    "bringBody+='<span>\u{1F4CB} Photo ID</span><span class=\"vi-badge vi-badge-req\">REQUIRED</span></div>';" +
+    "bringBody+='<div style=\"padding:8px 0;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)\">';" +
+    "bringBody+='<span>\u{1F4C4} Your cheat sheet (printed)</span><span class=\"vi-badge vi-badge-opt\">Optional</span></div>';" +
+    "bringBody+='<div style=\"padding:8px 0;display:flex;justify-content:space-between;align-items:center\">';" +
+    "bringBody+='<span>\u{1F4B3} Voter registration card</span><span class=\"vi-badge vi-badge-opt\">Optional</span></div>';" +
+    "bringBody+='<div class=\"vi-warn\"><span style=\"font-size:18px\">\u26A0\u{FE0F}</span><div><b>Travis County:</b> You may NOT use your phone in the voting booth. Print your cheat sheet before you go!</div></div>';" +
+    "h+=accSection('vi-bring','\u{1F6CD}\u{FE0F}','What to Bring',bringBody);" +
+
+    // Resources accordion
+    "var resBody='';" +
+    "resBody+='<div class=\"vi-link\"><a href=\"https://lwvaustin.org/voters-guide\" target=\"_blank\">League of Women Voters Guide &rarr;</a></div>';" +
+    "resBody+='<div class=\"vi-link\"><a href=\"https://vote411.org\" target=\"_blank\">VOTE411 \\u2014 Personalized ballot &rarr;</a></div>';" +
+    "resBody+='<div class=\"vi-link\"><a href=\"https://votetravis.gov\" target=\"_blank\">VoteTravis.gov \\u2014 Official info &rarr;</a></div>';" +
+    "resBody+='<div class=\"vi-link\"><a href=\"https://votetexas.gov\" target=\"_blank\">VoteTexas.gov \\u2014 State info &rarr;</a></div>';" +
+    "resBody+='<div class=\"vi-link\"><a href=\"https://www.kut.org\" target=\"_blank\">KUT Austin Voter Guide &rarr;</a></div>';" +
+    "h+=accSection('vi-res','\u{1F517}','Resources',resBody);" +
+
+    // Contact card
+    "h+='<div class=\"card\" style=\"margin-top:16px\">';" +
+    "h+='<div style=\"font-size:16px;font-weight:700;margin-bottom:8px\">Travis County Elections</div>';" +
+    "h+='<div style=\"padding:6px 0\"><a href=\"tel:5122388683\" style=\"font-size:15px;color:var(--blue);font-weight:600\">\u{1F4DE} (512) 238-8683</a></div>';" +
+    "h+='<div style=\"padding:6px 0\"><a href=\"https://votetravis.gov\" target=\"_blank\" style=\"font-size:15px;color:var(--blue);font-weight:600\">\u{1F310} votetravis.gov</a></div>';" +
     "h+='</div>';" +
-    // Resources
-    "h+='<div class=\"section-head\">Resources</div>';" +
-    "h+='<div class=\"card\">';" +
-    "h+='<div style=\"padding:8px 0\"><a href=\"https://teamrv-mvp.sos.texas.gov/MVP/mvp.do\" target=\"_blank\" style=\"font-size:15px;font-weight:600\">Find Your Polling Location &rarr;</a></div>';" +
-    "h+='<div style=\"padding:8px 0\"><a href=\"https://www.votetexas.gov\" target=\"_blank\" style=\"font-size:15px;font-weight:600\">VoteTexas.gov &rarr;</a></div>';" +
-    "h+='<div style=\"padding:8px 0\"><a href=\"https://countyclerk.traviscountytx.gov/elections/\" target=\"_blank\" style=\"font-size:15px;font-weight:600\">Travis County Elections &rarr;</a></div>';" +
+
+    // Footer links
+    "h+='<div style=\"text-align:center;padding:24px 0 8px;font-size:13px;color:var(--text2)\">';" +
+    "h+='<a href=\"/nonpartisan\" target=\"_blank\" style=\"color:var(--text2)\">Nonpartisan by Design</a>';" +
+    "h+=' &middot; ';" +
+    "h+='<a href=\"/privacy\" target=\"_blank\" style=\"color:var(--text2)\">Privacy Policy</a>';" +
+    "h+='<br><span style=\"margin-top:6px;display:inline-block\">Built in Austin, TX &middot; <a href=\"mailto:howdy@atxvotes.app\" style=\"color:var(--text2)\">howdy@atxvotes.app</a></span>';" +
     "h+='</div>';" +
     "return h;" +
   "}",
@@ -965,7 +1181,8 @@ var APP_JS = [
         "location.hash='#/';render()" +
       "}" +
     "}" +
-    "else if(action==='print'){window.print()}" +
+    "else if(action==='dismiss-disclaimer'){S.disclaimerDismissed=true;render()}" +
+    "else if(action==='do-print'){window.print()}" +
     "else if(action==='share'){shareGuide()}" +
   "});",
 
@@ -984,7 +1201,7 @@ var APP_JS = [
     "e.preventDefault();" +
     "var form=e.target;" +
     "var st=form.street.value;" +
-    "if(st.toLowerCase()==='station'){st='701 Brazos St.';form.zip.value='78701'}" +
+    "if(st.toLowerCase()==='station'){st='701 Brazos St.';form.city.value='Austin';form.zip.value='78701'}" +
     "S.address={street:st,city:form.city.value||'Austin',state:'TX',zip:form.zip.value};" +
     "buildGuide();" +
   "});",
@@ -1070,7 +1287,7 @@ var APP_JS = [
   // ============ SHARE ============
   "function shareGuide(){" +
     "var b=getBallot();if(!b)return;" +
-    "var lines=['ATX Votes \\u2014 My Voting Guide',''];" +
+    "var lines=['ATX Votes \\u2014 My Voting Guide','Build yours at atxvotes.app/app',''];" +
     "var races=b.races.slice().sort(function(a,b){return sortOrder(a)-sortOrder(b)}).filter(function(r){return r.isContested&&r.recommendation});" +
     "for(var i=0;i<races.length;i++){" +
       "var r=races[i];" +
@@ -1082,7 +1299,7 @@ var APP_JS = [
         "var p=b.propositions[i];lines.push('Prop '+p.number+': '+p.recommendation)" +
       "}" +
     "}" +
-    "lines.push('');lines.push('Build yours at atxvotes.app/app');" +
+    "" +
     "var text=lines.join('\\n');" +
     "if(navigator.share){" +
       "navigator.share({title:'ATX Votes',text:text}).catch(function(){})" +

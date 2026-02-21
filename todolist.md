@@ -18,8 +18,6 @@ Items recently fixed but not yet tested. **Test these before attempting again or
 
 ### Improvements
 
-- [ ] PWA: Recommendation badge wrapping — added `white-space:nowrap` on `.badge` and `flex-shrink:0` on `.cand-tags` to prevent "Good Match" and other badges from wrapping text.
-- [ ] PWA: Desktop top nav — added responsive top nav bar (`@media(min-width:600px)`) with brand + nav links + SVG icons, hides bottom tabs on desktop.
 
 ### Features
 
@@ -31,17 +29,12 @@ Items not yet attempted or needing a fresh approach after failed verification.
 
 ### Bugs
 
-- [ ] PWA: "Station" Easter egg not working — typing "station" in the address form should auto-fill "701 Brazos St." / Austin / 78701 and immediately build the guide. Debug the submit handler and station detection logic in pwa.js.
-
 ### Improvements
 
 #### Landing Page
-- [ ] Landing page: link directly to web app — change the landing page at `/` to link directly to `/app` instead of promoting the iOS TestFlight download. The web app is the primary experience.
 
 #### Ballot Display
 - [ ] PWA: Election info header card — add a header card to the ballot page showing election name, date, and the user's districts (Congressional, State House, State Senate). Show "Showing all races" fallback if no districts. Reference iOS `BallotOverviewView.swift` lines 241-301.
-- [ ] PWA: Make disclaimer banner dismissible — add a close/dismiss button to the AI-Generated Recommendations disclaimer. Store dismissed state in session (show again on next visit).
-- [ ] PWA: Race cards — candidate count and chevron — add candidate count text and a chevron-right indicator to `renderRaceCard` to signal tappability.
 - [ ] PWA: Candidate cards — avatar and color-coded pros/cons — add avatar circle (first letter), color-coded Strengths (green) / Concerns (red) headers, flow-layout position chips. Reference iOS `RaceDetailView.swift`.
 - [ ] PWA: Proposition cards — side-by-side layout and icons — add side-by-side supporters vs opponents, color-coded If Passes (green check) / If Fails (red X), brain icon for AI reasoning, confidence display. Reference iOS `BallotOverviewView.swift` lines 610-791.
 
@@ -51,18 +44,17 @@ Items not yet attempted or needing a fresh approach after failed verification.
 - [ ] PWA: Address verification — verify user-entered addresses are valid and within the service area (Austin/Travis County). Could involve geocoding or validating against a known address database.
 
 #### Pages
-- [ ] PWA: Footer links on Vote Info and Profile pages — the ballot page has footer links (Nonpartisan by Design, Privacy Policy, contact email) but Vote Info and Profile do not. Add to all post-interview pages.
-- [ ] PWA: Enhance Voting Info page — add 6 expandable accordion sections: Key Dates (strikethrough for passed dates), Early Voting hours by date range, Election Day details with open primary explanation, Voter ID (7 accepted IDs with icons), What to Bring (phone-not-allowed warning), Resources (5 links: LWV, VOTE411, VoteTravis, VoteTexas, KUT). Also: polling location link, Travis County Elections phone number. Reference `VotingInfoView.swift`.
-- [ ] PWA: Send Feedback link and credits on profile — add "Send Feedback" mailto link (howdy@atxvotes.app) and "Powered by Claude (Anthropic)" credits to profile page.
 - [ ] PWA: Regenerate profile summary — add button to regenerate the profile summary via Claude API. Needs server-side endpoint or reuse of existing guide endpoint.
 
 #### Print
-- [ ] PWA: Custom print cheat sheet — a dedicated print-optimized page designed to fit on one page and be easy to read at the polling booth. Table-style layout with race/candidate pairs, proposition recommendations, key race indicators, compact formatting. Accessible via "Print Cheat Sheet" button. Reference iOS `CheatSheetView.swift`.
+- [ ] PWA: Cheat sheet party switcher — add ability to switch between Republican and Democrat ballots on the cheat sheet page, similar to the ballot page party switcher.
+
+#### Share
 
 ### Features
 
 - [ ] PWA: "I Voted" tracking and sticker — toggle button to mark as voted on Vote Info page, update countdown to "You voted!", shareable "I Voted" graphic (CSS/SVG-based). Store in localStorage.
-- [ ] PWA: Spanish translation / i18n — add i18n system (translations object keyed by language) and translate all strings to Spanish. Detect browser language via `navigator.language`. iOS already has Spanish translation.
+- [ ] PWA: Spanish translation / i18n — add i18n system (translations object keyed by language) and translate all strings to Spanish. Default to browser language via `navigator.language`, but make it easy to switch between English and Spanish at any time (language toggle in nav/profile). Store preference in localStorage. iOS already has Spanish translation.
 - [ ] PWA: Accessibility — ARIA labels on interactive elements, ARIA roles, semantic HTML (real buttons instead of divs with data-action), focus management for navigation, `prefers-reduced-motion` media query to disable animations.
 - [ ] iOS: Light/dark mode support — currently forced to light mode via `.preferredColorScheme(.light)`. Define dark-mode variants for all Theme colors and remove forced light mode.
 - [ ] iOS: Election countdown widget — WidgetKit extension with systemSmall/systemMedium/lock screen families showing days until Election Day and next key date. App Group shared UserDefaults for data bridge.
@@ -127,27 +119,37 @@ Verified working. Collapsed for reference.
 </details>
 
 <details>
-<summary>PWA Bugs (1 resolved)</summary>
+<summary>PWA Bugs (2 resolved)</summary>
 
 - [x] White screen on first deploy — `APP_HTML` was defined before `CSS` and `APP_JS` variables. With `var` hoisting, they were `undefined` at assignment time. Fixed by moving `APP_HTML` to end of pwa.js.
+- [x] "Station" Easter egg — fixed by explicitly setting city field to "Austin" in addition to street and zip when station shortcut is detected.
 
 </details>
 
 <details>
-<summary>PWA Improvements (3 resolved)</summary>
+<summary>PWA Improvements (11 resolved)</summary>
 
 - [x] Service worker cache-first → network-first — old v1 SW served stale HTML. Changed to v2 network-first, added `/app/clear` cache-clearing route, added `Cache-Control: no-cache` header.
 - [x] Tab bar not visible — `position:fixed` tab bar inside `#app` wasn't rendering on some browsers. Moved to flex layout: body is `display:flex;flex-direction:column`, `#app` scrolls (`flex:1;overflow-y:auto`), tab bar is a natural flex child in separate `#tabs` div.
 - [x] Tab icons match iOS — replaced emoji tab icons with inline SVGs matching iOS SF Symbols: `checkmark.seal.fill`, `info.circle.fill`, `person.circle.fill`. Labels updated to match ("My Ballot").
+- [x] Landing page: link to web app — replaced TestFlight download CTA with "Build My Voting Guide" linking to `/app`. Added "Works on any device" note. Removed iOS-only messaging.
+- [x] Custom print cheat sheet — dedicated `#/cheatsheet` route with compact table layout matching iOS CheatSheetView. Contested races with star indicators, propositions with color-coded recommendations (green/red/orange), uncontested races. Print button triggers `window.print()` with `@media print` CSS that hides nav/buttons and fits on one page. Shows voter address, party badge, election date.
+- [x] Recommendation badge wrapping — added `white-space:nowrap` on `.badge` and `flex-shrink:0` on `.cand-tags`.
+- [x] Desktop top nav — responsive top nav bar (`@media(min-width:600px)`) with brand + nav links + SVG icons, hides bottom tabs on desktop.
+- [x] Dismissible disclaimer — added close button (×) to AI-Generated Recommendations banner, uses session state so it reappears on next visit.
+- [x] Race cards — candidate count and chevron — shows "N candidates" and a › chevron on every race card to signal tappability.
+- [x] Footer links on all pages — Nonpartisan by Design, Privacy Policy, and contact links now appear on Vote Info and Profile pages in addition to Ballot.
+- [x] Enhanced Voting Info page — 6 expandable accordion sections (Key Dates with strikethrough for past dates, Early Voting hours by date range, Election Day with open primary explanation, Voter ID with checkmarks, What to Bring with phone warning, Resources with 5 links). Plus polling location card and Travis County Elections contact info.
 
 </details>
 
 <details>
-<summary>PWA Features (3 resolved)</summary>
+<summary>PWA Features (4 resolved)</summary>
 
 - [x] PWA web app — full single-page app at `/app` with inline CSS/JS, no build step. Interview flow (7 phases), ballot display, race detail, propositions, profile, vote info. Hash router, localStorage persistence, dark mode via `prefers-color-scheme`.
 - [x] Server-side guide generation — `pwa-guide.js` handles Claude API calls server-side so APP_SECRET and prompts never reach the client. Model fallback: `claude-sonnet-4-6` → `claude-sonnet-4-20250514`.
 - [x] Background ballot refresh — `refreshBallots()` fetches latest ballot data on load and merges factual fields (endorsements, polling, fundraising, etc.) while preserving personalized recommendations.
+- [x] Send Feedback + credits on profile — "Send Feedback" mailto link (howdy@atxvotes.app) and "Powered by Claude (Anthropic)" credits added to profile page.
 
 </details>
 

@@ -168,20 +168,6 @@ function handleLandingPage() {
       transition: opacity 0.15s;
     }
     .cta:hover { opacity: 0.9; }
-    .cta-secondary {
-      display: inline-block;
-      background: transparent;
-      color: #21598e;
-      font-size: 1.1rem;
-      font-weight: 700;
-      padding: 0.9rem 2.5rem;
-      border-radius: 12px;
-      text-decoration: none;
-      border: 2px solid #21598e;
-      transition: opacity 0.15s;
-      margin-top: 0.75rem;
-    }
-    .cta-secondary:hover { opacity: 0.8; }
     .features {
       margin-top: 2rem;
       text-align: left;
@@ -204,9 +190,7 @@ function handleLandingPage() {
     <p class="subtitle">Your personalized voting guide for Austin &amp; Travis County elections.</p>
     <div class="badge">Texas Primary — March 3, 2026</div>
     <br>
-    <a class="cta" href="https://testflight.apple.com/join/19rYVCD6">Download for iPhone</a>
-    <br>
-    <a class="cta-secondary" href="/app">Use in Browser</a>
+    <a class="cta" href="/app">Build My Voting Guide</a>
     <div class="features">
       <div><span>✅</span> 5-minute interview learns your values</div>
       <div><span>📋</span> Personalized ballot with recommendations</div>
@@ -214,6 +198,7 @@ function handleLandingPage() {
       <div><span>📍</span> Find your polling location</div>
       <div><span>⚖️</span> <a href="/nonpartisan" style="color:inherit">Nonpartisan by design</a> — fairness is in our code</div>
     </div>
+    <p style="margin-top:1.5rem;font-size:0.85rem;color:#73737f">Works on any device — phone, tablet, or computer. No app download needed.</p>
   </div>
   <p class="footer">Built in Austin, TX &middot; <a href="mailto:howdy@atxvotes.app" style="color:inherit">howdy@atxvotes.app</a></p>
 </body>
