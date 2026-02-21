@@ -973,7 +973,7 @@ var APP_JS = [
       '{l:"Secure the border",d:"Enforcement first, then talk about reform"},' +
       '{l:"Enforce but reform",d:"Secure borders AND create legal pathways"},' +
       '{l:"Welcoming approach",d:"Immigrants strengthen Austin, expand protections"},' +
-      "{l:\"Local isn't federal\",d:\"City shouldn't spend resources on federal immigration enforcement\"}" +
+      "{l:\"Local isn\\u2019t federal\",d:\"City shouldn\\u2019t spend resources on federal immigration enforcement\"}" +
     "]}," +
     '"Civil Rights":{q:"On civil rights and equality?",opts:[' +
       '{l:"Equal treatment",d:"Same rules for everyone, no special categories"},' +
