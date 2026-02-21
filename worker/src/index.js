@@ -197,7 +197,7 @@ function handleLandingPage() {
       <div><span>⚖️</span> <a href="/nonpartisan" style="color:inherit">Nonpartisan by design</a> — fairness is in our code</div>
     </div>
   </div>
-  <p class="footer">Built in Austin, TX &middot; <a href="mailto:feedback@atxvotes.app" style="color:inherit">feedback@atxvotes.app</a></p>
+  <p class="footer">Built in Austin, TX &middot; <a href="mailto:howdy@atxvotes.app" style="color:inherit">howdy@atxvotes.app</a></p>
 </body>
 </html>`;
 
@@ -278,7 +278,7 @@ function handleNonpartisan() {
     <p>The full prompt sent to the AI and every design decision is documented. Nothing is hidden.</p>
 
     <a class="back" href="/">&larr; Back to ATX Votes</a>
-    <p style="margin-top: 1rem; font-size: 0.9rem; color: #73737f;">Questions? <a href="mailto:feedback@atxvotes.app">feedback@atxvotes.app</a></p>
+    <p style="margin-top: 1rem; font-size: 0.9rem; color: #73737f;">Questions? <a href="mailto:howdy@atxvotes.app">howdy@atxvotes.app</a></p>
   </div>
 </body>
 </html>`;
@@ -338,7 +338,7 @@ function handleSupport() {
     <h1>Support</h1>
     <p class="subtitle">We're here to help.</p>
 
-    <a class="email-btn" href="mailto:feedback@atxvotes.app">Email Us</a>
+    <a class="email-btn" href="mailto:howdy@atxvotes.app">Email Us</a>
 
     <div class="faq">
       <h2>Frequently Asked Questions</h2>
@@ -356,7 +356,7 @@ function handleSupport() {
       <p>ATX Votes currently covers the March 3, 2026 Texas Primary Election for Austin and Travis County voters, including both Republican and Democratic primaries.</p>
 
       <h2>I found wrong information about a candidate.</h2>
-      <p>Please <a href="mailto:feedback@atxvotes.app">email us</a> with details and we'll correct it as quickly as possible.</p>
+      <p>Please <a href="mailto:howdy@atxvotes.app">email us</a> with details and we'll correct it as quickly as possible.</p>
     </div>
 
     <a class="back" href="/">&larr; Back to ATX Votes</a>
@@ -454,7 +454,7 @@ function handlePrivacyPolicy() {
     <p>If this policy changes, we'll update the date above and publish the new version at this URL.</p>
 
     <h2>Contact</h2>
-    <p>Questions? Email <a href="mailto:feedback@atxvotes.app">feedback@atxvotes.app</a></p>
+    <p>Questions? Email <a href="mailto:howdy@atxvotes.app">howdy@atxvotes.app</a></p>
 
     <a class="back" href="/">&larr; Back to ATX Votes</a>
   </div>
