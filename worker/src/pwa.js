@@ -919,7 +919,7 @@ var APP_JS = [
       '{l:"Build, build, build",d:"Ease zoning, encourage density, let the market work"},' +
       '{l:"Smart growth",d:"More housing with affordability guardrails"},' +
       '{l:"Protect neighborhoods",d:"Preserve character, limit density changes"},' +
-      "{l:\"It's complicated\",d:\"Case by case \\u2014 depends on the neighborhood\"}" +
+      "{l:\"It\\u2019s complicated\",d:\"Case by case \\u2014 depends on the neighborhood\"}" +
     "]}," +
     '"Community Safety":{q:"On public safety, what\\u2019s your approach?",opts:[' +
       '{l:"Fully fund police",d:"Hire more officers, strong prosecution"},' +

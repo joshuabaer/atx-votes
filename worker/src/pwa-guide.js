@@ -458,3 +458,5 @@ function mergeRecommendations(guideResponse, ballot, lang) {
 
   return merged;
 }
+
+export { sortOrder, parseResponse, filterBallotToDistricts, buildUserPrompt, mergeRecommendations, buildCondensedBallotDescription };

@@ -15,18 +15,10 @@
 Items recently fixed but not yet tested. **Test these before attempting again or marking done.**
 
 ### Bugs
-- [ ] PWA: Proposition explanations not translated — updated Claude prompt to generate all text fields (reasoning, caveats, strategicNotes) in Spanish when `lang=es`. Added 46 Spanish translations for static ifPasses/ifFails data to TR dictionary. Rendering now passes ifPasses/ifFails through `t()`.
 
 ### Improvements
-- [ ] PWA: Skip welcome screen from landing page — landing page CTA now links to `/app?start=1`. PWA init detects the param and jumps to Phase 1 (issues picker) if user hasn't completed a guide. URL cleaned via `history.replaceState`. Direct `/app` visits still show welcome.
-- [ ] PWA: Remove "Print" from cheat sheet button — renamed ballot page button from "Print Cheat Sheet" to "Cheat Sheet" with clipboard icon. Print button on the cheat sheet page itself still says "Print Cheat Sheet."
-- [ ] PWA: Free-form "Anything else?" field — added phase 5 textarea between Qualities and Address. Optional field stored in `S.freeform`, persisted in localStorage, shown on profile page. Text passed to Claude in both guide and summary prompts as "Additional context." Spanish translations included. Skip button available.
-- [ ] PWA: Bouncing mascot loading animation — replaced single-icon-per-phase with alternating elephant/donkey bounce. Elephant bounces 3 times, then donkey 3 times, repeating on a 600ms timer. Decoupled from progress status text. Timer stops on completion or error. `prefers-reduced-motion` disables animation.
 
 ### Features
-- [ ] Footer links on all static pages — added consistent footer to all 4 public pages (landing, nonpartisan, support, privacy). Each links to the other key pages plus email, using muted centered text with middot separators. Replaces previous back links.
-- [ ] Cheat sheet print layout bigger — reversed print CSS from shrinking (12px) to enlarging (18px table text, 28px header, 16px metadata). Increased cell padding from 3px to 7px. Hardcoded even-row background for print. Legend/footer bumped to 14px. Page margins 0.5in.
-- [ ] Redesign research animation — replaced JS-driven single-emoji bounce with pure CSS tug-of-war: 🫏 ⭐ 🐘 side by side, alternating scale (1x↔1.35x) on a 1.6s loop. Star pulses gently at the midpoints. No JS timer needed — `startMascotTimer`/`stopMascotTimer` are now no-ops. `prefers-reduced-motion` disables all animation.
 
 ---
 
@@ -37,6 +29,9 @@ Items not yet attempted or needing a fresh approach after failed verification.
 ### Bugs
 
 ### Improvements
+
+#### Headshots
+- [ ] Try harder to find missing candidate photos — MANIFEST.md lists 3 candidates with placeholder SVGs (including Anthony Gupta, SBOE Dist 5 Republican). Search harder: campaign Facebook pages, LinkedIn, local news photos, candidate forums, Texas SOS filings, county party websites.
 
 #### Landing Page
 
@@ -70,8 +65,9 @@ Items not yet attempted or needing a fresh approach after failed verification.
 Verified working. Collapsed for reference.
 
 <details>
-<summary>PWA Bugs (7 resolved)</summary>
+<summary>PWA Bugs (8 resolved)</summary>
 
+- [x] PWA: Proposition explanations not translated — 46 Spanish translations for static ifPasses/ifFails data in TR dictionary. Rendering passes ifPasses/ifFails through `t()`. Claude prompt generates reasoning/caveats/strategicNotes in Spanish when `lang=es`. Verified: 392 TR keys, 45 prop translations working.
 - [x] Proposition badges not translated — added `t()` wrapping on prop badges and cheat sheet, added Spanish translations for "Lean Yes" → "A favor", "Lean No" → "En contra", "Your Call" → "Tu decisión", plus confidence labels.
 - [x] Profile summary not translated — pass `lang` parameter from client to `/app/api/summary` and `/app/api/guide` endpoints. Server adds "Write in Spanish" instruction to Claude prompt when `lang=es`.
 - [x] Language switcher low contrast in dark mode — added `.lang-on` class with blue background/white text for active language button, explicit `--border2` border on inactive buttons.
@@ -83,7 +79,7 @@ Verified working. Collapsed for reference.
 </details>
 
 <details>
-<summary>PWA Improvements (22 resolved)</summary>
+<summary>PWA Improvements (30 resolved)</summary>
 
 - [x] Service worker cache-first → network-first — old v1 SW served stale HTML. Changed to v2 network-first, added `/app/clear` cache-clearing route, added `Cache-Control: no-cache` header.
 - [x] Tab bar not visible — `position:fixed` tab bar inside `#app` wasn't rendering on some browsers. Moved to flex layout: body is `display:flex;flex-direction:column`, `#app` scrolls (`flex:1;overflow-y:auto`), tab bar is a natural flex child in separate `#tabs` div.
@@ -107,6 +103,14 @@ Verified working. Collapsed for reference.
 - [x] Candidate photos — headshots served via Cloudflare static assets at `/headshots/`. 62 real photos (JPG/PNG) with initial-letter fallback for 3 placeholder candidates. `onerror` cascade tries `.jpg` then `.png` then letter initial. Avatar bumped to 48px with `overflow:hidden` for circular crop.
 - [x] Proposition Spanish translations — 23 proposition titles and descriptions (13 Democrat + 10 Republican) translated to Spanish. Shown below English text in italic when language is set to Spanish, using `prop-trans` CSS class.
 - [x] Ballot race card headshots — small 30px candidate headshot row on each race card in the ballot overview. Recommended candidate highlighted with blue border. Same `.jpg → .png → initial` fallback cascade.
+- [x] PWA: Free-form "Anything else?" field — phase 5 textarea between Qualities and Address. Optional field stored in `S.freeform`, persisted in localStorage, shown on profile page. Text passed to Claude in both guide and summary prompts. Skip button available.
+- [x] PWA: Bouncing mascot loading animation → tug-of-war — replaced with pure CSS 🫏 ⭐ 🐘 tug-of-war animation. Animals scale alternately on 1.6s loop. Star is static. `prefers-reduced-motion` disables animation.
+- [x] Cheat sheet print layout bigger — 18px table text, 28px header, 16px metadata. Cell padding 7px. Hardcoded even-row background. Page margins 0.5in.
+- [x] Footer links on all static pages — consistent footer on all 4 public pages with Nonpartisan, Privacy, and contact links.
+- [x] Translate candidate ballot data for Spanish — guide generation now requests `candidateTranslations` from Claude when `lang=es`. Merges translated summary, keyPositions, pros, cons into ballot response. `max_tokens` doubled to 8192 for Spanish.
+- [x] Headshots on uncontested race cards — 40px circular headshot with initial fallback on uncontested races in ballot view.
+- [x] Skip welcome screen from landing page — landing page CTA links to `/app?start=1`, PWA init jumps to Phase 1 if user hasn't completed a guide. URL cleaned via `history.replaceState`.
+- [x] Remove "Print" from cheat sheet button — ballot page button renamed to "Cheat Sheet" with clipboard icon. Print button on cheat sheet page itself still says "Print Cheat Sheet."
 
 </details>
 
@@ -125,9 +129,11 @@ Verified working. Collapsed for reference.
 </details>
 
 <details>
-<summary>Infrastructure (1 resolved)</summary>
+<summary>Infrastructure (3 resolved)</summary>
 
 - [x] Add analytics — used Cloudflare Web Analytics instead of Google Analytics (privacy-friendly, no cookies, no personal data, GDPR-compliant). Beacon script injected at response level via HTMLRewriter in fetch handler — covers all HTML pages automatically. Token `9c181c37d90740429efef870887a9774` configured via `CF_BEACON_TOKEN` env var in wrangler.toml. Deployed and verified live. Updated privacy policy and nonpartisan page disclosures.
+- [x] /app/clear resets all user data — `localStorage.clear()` added to clear page, wiping profile, ballots, party selection, and language preference alongside SW cache flush. Full fresh start.
+- [x] Language switch debounce — changed welcome page language toggle from `<a href="#">` to `<button>`, added 500ms debounce guard to `setLang` to prevent phantom double-click from reverting language on mobile.
 
 </details>
 
