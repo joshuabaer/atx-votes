@@ -4,59 +4,149 @@ import SwiftUI
 
 struct IVotedStickerView: View {
     var size: CGFloat = 200
+    var isEarly: Bool = Date() < Election.date
 
     private var scale: CGFloat { size / 200 }
 
+    private let flagBlue = Color(red: 0.05, green: 0.15, blue: 0.55)
+    private let flagRed = Color(red: 0.80, green: 0.10, blue: 0.10)
+
     var body: some View {
         ZStack {
-            // Oval background
+            // White oval with subtle shadow
             Ellipse()
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            Color(red: 0.10, green: 0.25, blue: 0.55),
-                            Color(red: 0.15, green: 0.35, blue: 0.65)
-                        ],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                )
+                .fill(.white)
+                .shadow(color: .black.opacity(0.15), radius: 4 * scale, y: 2 * scale)
 
-            // Red border
+            // Light gray border
             Ellipse()
-                .strokeBorder(Color(red: 0.80, green: 0.15, blue: 0.15), lineWidth: 6 * scale)
+                .strokeBorder(Color.gray.opacity(0.25), lineWidth: 1.5 * scale)
 
-            VStack(spacing: 4 * scale) {
-                // Stars row
-                HStack(spacing: 6 * scale) {
-                    ForEach(0..<5) { _ in
-                        Image(systemName: "star.fill")
-                            .font(.system(size: 14 * scale))
-                            .foregroundColor(.white)
-                    }
+            VStack(spacing: 2 * scale) {
+                // Waving flag
+                WavingFlagShape(scale: scale)
+                    .frame(width: 70 * scale, height: 42 * scale)
+                    .padding(.top, isEarly ? 14 * scale : 20 * scale)
+
+                // "I Voted" text
+                Text("I Voted")
+                    .font(.system(size: isEarly ? 38 * scale : 44 * scale, weight: .bold, design: .serif))
+                    .italic()
+                    .foregroundColor(flagBlue)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+
+                if isEarly {
+                    // "Early!" text — only before election day
+                    Text("Early!")
+                        .font(.system(size: 26 * scale, weight: .bold, design: .serif))
+                        .italic()
+                        .foregroundColor(flagRed)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
                 }
-                .padding(.top, 20 * scale)
 
                 Spacer(minLength: 0)
-
-                // Main text
-                Text("I VOTED")
-                    .font(.system(size: 44 * scale, weight: .black, design: .rounded))
-                    .foregroundColor(.white)
-                    .tracking(2 * scale)
-
-                Spacer(minLength: 0)
-
-                // Subtitle
-                Text("TX PRIMARY 2026")
-                    .font(.system(size: 12 * scale, weight: .bold, design: .rounded))
-                    .foregroundColor(.white.opacity(0.8))
-                    .tracking(1.5 * scale)
-                    .padding(.bottom, 20 * scale)
             }
-            .padding(.horizontal, 16 * scale)
+            .padding(.horizontal, 12 * scale)
+            .padding(.bottom, 12 * scale)
         }
         .frame(width: size, height: size * 0.75)
+    }
+}
+
+// MARK: - Waving Flag
+
+private struct WavingFlagShape: View {
+    let scale: CGFloat
+
+    private let flagBlue = Color(red: 0.05, green: 0.15, blue: 0.55)
+    private let flagRed = Color(red: 0.80, green: 0.10, blue: 0.10)
+
+    var body: some View {
+        Canvas { context, canvasSize in
+            let w = canvasSize.width
+            let h = canvasSize.height
+
+            // Draw red and white stripes with a wave effect
+            let stripeCount = 13
+            let stripeH = h / CGFloat(stripeCount)
+
+            for i in 0..<stripeCount {
+                let y = CGFloat(i) * stripeH
+                let color: Color = i % 2 == 0 ? flagRed : .white
+
+                var path = Path()
+                let steps = 20
+                for step in 0...steps {
+                    let x = w * CGFloat(step) / CGFloat(steps)
+                    let wave = sin(Double(step) / Double(steps) * .pi * 1.2) * Double(h) * 0.08
+                    let py = y + CGFloat(wave)
+                    let nextY = py + stripeH
+
+                    if step == 0 {
+                        path.move(to: CGPoint(x: x, y: py))
+                    } else {
+                        path.addLine(to: CGPoint(x: x, y: py))
+                    }
+
+                    if step == steps {
+                        // Close across the bottom of the stripe
+                        for backStep in (0...steps).reversed() {
+                            let bx = w * CGFloat(backStep) / CGFloat(steps)
+                            let bWave = sin(Double(backStep) / Double(steps) * .pi * 1.2) * Double(h) * 0.08
+                            let bpy = y + stripeH + CGFloat(bWave)
+                            path.addLine(to: CGPoint(x: bx, y: bpy))
+                        }
+                    }
+                }
+                path.closeSubpath()
+                context.fill(path, with: .color(color))
+            }
+
+            // Blue canton (top-left)
+            let cantonW = w * 0.42
+            let cantonH = h * 0.55
+            let cantonWave = sin(0.0) * Double(h) * 0.08
+
+            var cantonPath = Path()
+            cantonPath.addRect(CGRect(x: 0, y: CGFloat(cantonWave), width: cantonW, height: cantonH))
+            context.fill(cantonPath, with: .color(flagBlue))
+
+            // Stars in canton
+            let starRows = 3
+            let starCols = 4
+            let starSize = min(cantonW / CGFloat(starCols + 1), cantonH / CGFloat(starRows + 1)) * 0.5
+            for row in 0..<starRows {
+                for col in 0..<starCols {
+                    let sx = cantonW * CGFloat(col + 1) / CGFloat(starCols + 1)
+                    let sy = CGFloat(cantonWave) + cantonH * CGFloat(row + 1) / CGFloat(starRows + 1)
+                    let starPath = starShape(center: CGPoint(x: sx, y: sy), size: starSize)
+                    context.fill(starPath, with: .color(.white))
+                }
+            }
+        }
+    }
+
+    private func starShape(center: CGPoint, size: CGFloat) -> Path {
+        var path = Path()
+        let points = 5
+        let outerRadius = size
+        let innerRadius = size * 0.4
+
+        for i in 0..<(points * 2) {
+            let angle = Double(i) * .pi / Double(points) - .pi / 2
+            let radius = i % 2 == 0 ? outerRadius : innerRadius
+            let x = center.x + CGFloat(cos(angle)) * radius
+            let y = center.y + CGFloat(sin(angle)) * radius
+            if i == 0 {
+                path.move(to: CGPoint(x: x, y: y))
+            } else {
+                path.addLine(to: CGPoint(x: x, y: y))
+            }
+        }
+        path.closeSubpath()
+        return path
     }
 }
 
