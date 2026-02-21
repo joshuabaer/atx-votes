@@ -248,9 +248,10 @@ actor ClaudeService: GuideGenerating {
                 request.addValue("Bearer \(appSecret)", forHTTPHeaderField: "Authorization")
                 request.addValue("application/json", forHTTPHeaderField: "Content-Type")
 
+                let maxTokens = model.contains("haiku") ? 8192 : 12288
                 let body: [String: Any] = [
                     "model": model,
-                    "max_tokens": 12288,
+                    "max_tokens": maxTokens,
                     "system": system,
                     "messages": [
                         ["role": "user", "content": userMessage]
