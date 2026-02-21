@@ -447,7 +447,10 @@ var APP_JS = [
 
   // ============ i18n ============
   "var LANG=localStorage.getItem('atx_votes_lang')||((navigator.language||'').slice(0,2)==='es'?'es':'en');",
-  "function setLang(l){LANG=l;localStorage.setItem('atx_votes_lang',l);shuffledIssues=null;shuffledSpectrum=null;shuffledQualities=null;shuffledDD={};render();" +
+  "var _lastLangSwitch=0;",
+  "function setLang(l){" +
+    "var now=Date.now();if(now-_lastLangSwitch<500)return;_lastLangSwitch=now;" +
+    "LANG=l;localStorage.setItem('atx_votes_lang',l);shuffledIssues=null;shuffledSpectrum=null;shuffledQualities=null;shuffledDD={};render();" +
     "if(S.summary&&S.guideComplete){regenerateSummary()}" +
   "}",
   "var TR={" +
@@ -1119,7 +1122,7 @@ var APP_JS = [
       "<button class=\"btn btn-primary mt-md\" data-action=\"start\">'+t('Build My Guide')+'</button>" +
     "</div>" +
     "<div style=\"text-align:center;margin-top:16px\">" +
-      "<a href=\"#\" data-action=\"set-lang\" data-value=\"'+(LANG==='es'?'en':'es')+'\" style=\"font-size:14px;color:var(--text2)\">'+(LANG==='es'?'Switch to English':'Cambiar a Espa\\u00F1ol')+'</a>" +
+      "<button data-action=\"set-lang\" data-value=\"'+(LANG==='es'?'en':'es')+'\" style=\"font-size:14px;color:var(--text2);background:none;border:none;cursor:pointer;font-family:inherit\">'+(LANG==='es'?'Switch to English':'Cambiar a Espa\\u00F1ol')+'</button>" +
     "</div>';" +
   "}",
 
