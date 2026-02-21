@@ -34,6 +34,7 @@ Items not yet attempted or needing a fresh approach after failed verification.
 #### Landing Page
 
 #### Ballot Display
+- [ ] PWA: Remove "Print" from cheat sheet button — the main ballot page shows a "Print Cheat Sheet" button; rename it to just "Cheat Sheet" since it navigates to a separate page (printing is an action on that page, not the button's purpose).
 
 #### Loading Animation
 - [ ] PWA: Bouncing mascot loading animation — replace the current icon-per-phase loading with an alternating elephant/donkey bounce animation. Show the elephant bouncing 3 times, then the donkey 3 times, repeating. Decouple the animation from the loading status text.

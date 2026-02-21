@@ -269,7 +269,13 @@ function handleNonpartisan() {
     <p>Every proposition shows supporters AND opponents, fiscal impact, outcomes if it passes or fails, and includes a "Your Call" option for genuinely contested issues.</p>
 
     <h2>AI Transparency &amp; Guardrails</h2>
-    <p>The AI is explicitly instructed to be a "non-partisan voting guide assistant." Disclaimers appear on every recommendation screen. Confidence levels (Strong Match, Good Match, Best Available) prevent false certainty.</p>
+    <p>Every AI prompt includes an explicit NONPARTISAN instruction block requiring: factual, issue-based reasoning only; no partisan framing or loaded terms; equal analytical rigor for all candidates regardless of position; and recommendations connected to the voter's specific stated values — never to party-line assumptions. Disclaimers appear on every recommendation screen. Confidence levels (Strong Match, Good Match, Best Available) prevent false certainty.</p>
+
+    <h2>Verified Candidate Data</h2>
+    <p>All candidates are cross-referenced against official filings from the Texas Secretary of State, Travis County Clerk, and Ballotpedia. Candidate data includes positions, endorsements, strengths, and concerns — presented with equal depth for every candidate in a race.</p>
+
+    <h2>Nonpartisan Translations</h2>
+    <p>All Spanish translations are reviewed for partisan bias. Proposition titles and descriptions use identical grammatical structures for both parties. Data terms (candidate names, positions) stay in English for accuracy; only the display layer is translated.</p>
 
     <h2>Encouraging Independent Research</h2>
     <p>Every screen says "Do your own research before voting." The app is a starting point, not the final word.</p>
