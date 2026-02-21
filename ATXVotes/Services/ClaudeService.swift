@@ -73,7 +73,8 @@ actor ClaudeService: GuideGenerating {
     func generateProfileSummary(profile: VoterProfile) async throws -> String {
         let userMessage = """
         Write 2-3 sentences describing this person's politics the way they might describe it to a friend. \
-        Be conversational, specific, and insightful — synthesize who they are as a voter, don't just list positions.
+        Be conversational, specific, and insightful — synthesize who they are as a voter, don't just list positions. \
+        NEVER say "I'm a Democrat" or "I'm a Republican" or identify with a party label — focus on their actual views, values, and priorities.
 
         - Political spectrum: \(profile.politicalSpectrum.rawValue)
         - Top issues: \(profile.topIssues.map(\.rawValue).joined(separator: ", "))
@@ -181,36 +182,34 @@ actor ClaudeService: GuideGenerating {
         }
 
         return """
-        Based on this voter's profile, recommend ONE candidate per race and a stance on each proposition.
+        Recommend ONE candidate per race and a stance on each proposition. Be concise.
 
-        IMPORTANT: For the profileSummary field, write 2-3 sentences in first person describing this person's politics the way they would explain it to a friend over coffee. Be conversational, specific, and avoid generic labels like "moderate Republican" — instead capture what actually drives their views.
+        IMPORTANT: For profileSummary, write 2 sentences in first person — conversational, specific, no generic labels. NEVER say "I'm a Democrat/Republican" — focus on values and priorities.
 
-        VOTER PROFILE:
-        - Primary: \(profile.primaryBallot.rawValue)
-        - Top issues: \(profile.topIssues.map(\.rawValue).joined(separator: ", "))
-        - Political spectrum: \(profile.politicalSpectrum.rawValue)
-        - Values in candidates: \(profile.candidateQualities.map(\.rawValue).joined(separator: ", "))
-        - Policy stances: \(profile.policyViews.map { "\($0.key): \($0.value)" }.joined(separator: "; "))
-        - Politicians admired: \(profile.admiredPoliticians.joined(separator: ", "))
-        - Politicians disliked: \(profile.dislikedPoliticians.joined(separator: ", "))
+        VOTER: \(profile.primaryBallot.rawValue) primary | Spectrum: \(profile.politicalSpectrum.rawValue)
+        Issues: \(profile.topIssues.map(\.rawValue).joined(separator: ", "))
+        Values: \(profile.candidateQualities.map(\.rawValue).joined(separator: ", "))
+        Stances: \(profile.policyViews.map { "\($0.key): \($0.value)" }.joined(separator: "; "))
+        Admires: \(profile.admiredPoliticians.joined(separator: ", "))
+        Dislikes: \(profile.dislikedPoliticians.joined(separator: ", "))
 
-        BALLOT DATA:
+        BALLOT:
         \(ballotDescription)
 
-        VALID CANDIDATES (you MUST only recommend names from this list):
+        VALID CANDIDATES (MUST only use these names):
         \(raceLines.joined(separator: "\n"))
 
-        Return this exact JSON structure:
+        Return ONLY this JSON:
         {
-          "profileSummary": "2-3 sentences describing this person's politics the way they'd describe it to a friend — conversational and specific",
+          "profileSummary": "2 sentences, first person, conversational",
           "races": [
             {
-              "office": "exact office name from ballot",
-              "district": "district string or null",
-              "recommendedCandidate": "exact candidate name from ballot",
-              "reasoning": "2-3 sentences connecting to voter profile",
-              "strategicNotes": "optional runoff/tactical note or null",
-              "caveats": "optional concern or null",
+              "office": "exact office name",
+              "district": "district or null",
+              "recommendedCandidate": "exact name from list",
+              "reasoning": "1 sentence why this candidate fits the voter",
+              "strategicNotes": null,
+              "caveats": null,
               "confidence": "Strong Match|Good Match|Best Available|Symbolic Race"
             }
           ],
@@ -218,8 +217,8 @@ actor ClaudeService: GuideGenerating {
             {
               "number": 1,
               "recommendation": "Lean Yes|Lean No|Your Call",
-              "reasoning": "1-2 sentences connecting to voter profile",
-              "caveats": "optional nuance or watch-out for this voter, or null",
+              "reasoning": "1 sentence connecting to voter",
+              "caveats": null,
               "confidence": "Clear Call|Lean|Genuinely Contested"
             }
           ]
@@ -249,7 +248,7 @@ actor ClaudeService: GuideGenerating {
 
                 let body: [String: Any] = [
                     "model": model,
-                    "max_tokens": 12288,
+                    "max_tokens": 4096,
                     "system": system,
                     "messages": [
                         ["role": "user", "content": userMessage]

@@ -146,7 +146,7 @@ class VotingGuideStore: ObservableObject {
     private var lastMessageChange = Date.distantPast
 
     /// Update the loading message, ensuring the previous message was shown for a minimum duration.
-    private func setLoadingPhase(_ message: String, minDisplayTime: TimeInterval = 1.5) async {
+    private func setLoadingPhase(_ message: String, minDisplayTime: TimeInterval = 0.8) async {
         let elapsed = Date().timeIntervalSince(lastMessageChange)
         if elapsed < minDisplayTime {
             try? await Task.sleep(for: .seconds(minDisplayTime - elapsed))
@@ -202,7 +202,7 @@ class VotingGuideStore: ObservableObject {
                     lastError = error
                 }
 
-                await setLoadingPhase("Researching Republicans...", minDisplayTime: 3.0)
+                await setLoadingPhase("Researching Republicans...", minDisplayTime: 1.5)
                 do {
                     let (ballot, summary) = try await repTask.value
                     republicanBallot = ballot
@@ -222,7 +222,7 @@ class VotingGuideStore: ObservableObject {
                     lastError = error
                 }
 
-                await setLoadingPhase("Researching Democrats...", minDisplayTime: 3.0)
+                await setLoadingPhase("Researching Democrats...", minDisplayTime: 1.5)
                 do {
                     let (ballot, summary) = try await demTask.value
                     democratBallot = ballot
@@ -233,7 +233,7 @@ class VotingGuideStore: ObservableObject {
                 }
             }
 
-            await setLoadingPhase("Finalizing recommendations...", minDisplayTime: 3.0)
+            await setLoadingPhase("Finalizing recommendations...", minDisplayTime: 1.5)
 
             // Default to inferred party and use its summary
             selectedParty = inferredParty
@@ -256,8 +256,8 @@ class VotingGuideStore: ObservableObject {
 
             // Ensure "Finalizing" step is visible before completing
             let finalElapsed = Date().timeIntervalSince(lastMessageChange)
-            if finalElapsed < 2.0 {
-                try? await Task.sleep(for: .seconds(2.0 - finalElapsed))
+            if finalElapsed < 1.0 {
+                try? await Task.sleep(for: .seconds(1.0 - finalElapsed))
             }
 
             withAnimation {

@@ -48,6 +48,9 @@ struct AddressEntryView: View {
                                         store.setAddress(address)
                                         store.advancePhase()
                                         Task { await store.buildVotingGuide() }
+                                    } else if street.lowercased() == "error" {
+                                        store.errorMessage = "All AI models are overloaded (sonnet-4-6, sonnet-4-20250514). Please try again in a minute."
+                                        store.advancePhase()
                                     }
                                 }
                                 .foregroundColor(Theme.textPrimary)
