@@ -34,6 +34,7 @@ export function handlePWA_Clear() {
     '(async function(){' +
       'var s=document.getElementById("status");' +
       'try{' +
+        'try{localStorage.clear()}catch(e){}' +
         'var swCount=0;' +
         'if("serviceWorker" in navigator){' +
           'var regs=await navigator.serviceWorker.getRegistrations();' +
