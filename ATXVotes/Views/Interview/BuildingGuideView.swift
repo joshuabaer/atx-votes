@@ -180,10 +180,14 @@ struct BuildingGuideView: View {
 
             if let error = store.errorMessage {
                 VStack(spacing: 12) {
-                    Text(error)
-                        .font(Theme.callout)
-                        .foregroundColor(Theme.danger)
-                        .multilineTextAlignment(.center)
+                    ScrollView {
+                        Text(error)
+                            .font(Theme.caption)
+                            .foregroundColor(Theme.danger)
+                            .multilineTextAlignment(.center)
+                            .textSelection(.enabled)
+                    }
+                    .frame(maxHeight: 100)
 
                     Button("Try Again") {
                         store.errorMessage = nil

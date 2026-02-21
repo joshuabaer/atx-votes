@@ -43,7 +43,6 @@ actor ClaudeService: GuideGenerating {
     private let models = [
         "claude-sonnet-4-6",
         "claude-sonnet-4-20250514",
-        "claude-haiku-4-5-20251001",
     ]
     private let appSecret = "atxvotes-2026-primary"
 
@@ -248,10 +247,9 @@ actor ClaudeService: GuideGenerating {
                 request.addValue("Bearer \(appSecret)", forHTTPHeaderField: "Authorization")
                 request.addValue("application/json", forHTTPHeaderField: "Content-Type")
 
-                let maxTokens = model.contains("haiku") ? 4096 : 12288
                 let body: [String: Any] = [
                     "model": model,
-                    "max_tokens": maxTokens,
+                    "max_tokens": 12288,
                     "system": system,
                     "messages": [
                         ["role": "user", "content": userMessage]
