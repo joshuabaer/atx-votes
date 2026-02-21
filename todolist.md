@@ -24,6 +24,9 @@ Items recently fixed but not yet tested. **Test these before attempting again or
 - [ ] PWA: Bouncing mascot loading animation — replaced single-icon-per-phase with alternating elephant/donkey bounce. Elephant bounces 3 times, then donkey 3 times, repeating on a 600ms timer. Decoupled from progress status text. Timer stops on completion or error. `prefers-reduced-motion` disables animation.
 
 ### Features
+- [ ] Footer links on all static pages — added consistent footer to all 4 public pages (landing, nonpartisan, support, privacy). Each links to the other key pages plus email, using muted centered text with middot separators. Replaces previous back links.
+- [ ] Cheat sheet print layout bigger — reversed print CSS from shrinking (12px) to enlarging (18px table text, 28px header, 16px metadata). Increased cell padding from 3px to 7px. Hardcoded even-row background for print. Legend/footer bumped to 14px. Page margins 0.5in.
+- [ ] Redesign research animation — replaced JS-driven single-emoji bounce with pure CSS tug-of-war: 🫏 ⭐ 🐘 side by side, alternating scale (1x↔1.35x) on a 1.6s loop. Star pulses gently at the midpoints. No JS timer needed — `startMascotTimer`/`stopMascotTimer` are now no-ops. `prefers-reduced-motion` disables all animation.
 
 ---
 
@@ -41,11 +44,11 @@ Items not yet attempted or needing a fresh approach after failed verification.
 
 #### Loading Animation
 
+
 #### Interview Flow
 
 #### Pages
 
-- [ ] Ensure all public web pages link to Privacy Policy and Nonpartisan page
 
 #### Print
 

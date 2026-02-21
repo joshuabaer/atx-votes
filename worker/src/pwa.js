@@ -291,8 +291,14 @@ var CSS = [
   ".spinner{width:48px;height:48px;border:4px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 24px}",
   "@keyframes spin{to{transform:rotate(360deg)}}",
   ".loading-icon{font-size:56px;margin-bottom:16px}",
-  ".mascot{display:inline-block;font-size:64px;animation:mascotBounce .45s ease-in-out}",
-  "@keyframes mascotBounce{0%{transform:translateY(0) scale(1)}35%{transform:translateY(-18px) scale(1.1)}65%{transform:translateY(-18px) scale(1.1)}100%{transform:translateY(0) scale(1)}}",
+  ".tug-arena{display:flex;align-items:center;justify-content:center;gap:2px;margin-bottom:16px}",
+  ".tug-left,.tug-right{font-size:64px;display:inline-block}",
+  ".tug-left{animation:tugLeft 1.6s ease-in-out infinite;transform:scaleX(-1)}",
+  ".tug-right{animation:tugRight 1.6s ease-in-out infinite}",
+  ".tug-star{font-size:28px;animation:tugStar 1.6s ease-in-out infinite}",
+  "@keyframes tugLeft{0%,100%{transform:scaleX(-1) scaleY(1)}50%{transform:scaleX(-1.35) scaleY(1.35)}}",
+  "@keyframes tugRight{0%,100%{transform:scale(1.35)}50%{transform:scale(1)}}",
+  "@keyframes tugStar{0%,100%{transform:scale(1)}25%,75%{transform:scale(1.15)}50%{transform:scale(1)}}",
   ".loading-msg{animation:fadeIn .4s ease}",
   "@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}",
   ".dots{display:flex;gap:8px;justify-content:center;margin-top:16px}",
@@ -384,16 +390,22 @@ var CSS = [
   ".cs-actions{display:flex;gap:10px;justify-content:center;margin:12px 0}",
   ".cs-actions .btn{padding:10px 20px;font-size:14px;width:auto}",
 
-  // Print styles
+  // Print styles — large and readable for the polling booth
   "@media print{" +
     "#topnav,#tabs,.cs-actions,.back-btn,.party-row{display:none!important}" +
-    "html,body{height:auto;display:block}" +
-    "#app{max-width:100%;padding:8px;overflow:visible;flex:none}" +
-    ".cs-header h2{font-size:18px}" +
-    ".cs-table{font-size:12px}" +
-    ".cs-table th{padding:4px 8px}" +
-    ".cs-table td{padding:3px 8px}" +
-    "@page{margin:0.4in;size:letter}" +
+    "html,body{height:auto;display:block;font-size:18px}" +
+    "#app{max-width:100%;padding:0;overflow:visible;flex:none}" +
+    ".cs-header{padding:8px 0 12px}" +
+    ".cs-header h2{font-size:28px}" +
+    ".cs-meta{font-size:16px}" +
+    ".cs-party{font-size:16px;padding:4px 14px}" +
+    ".cs-table{font-size:18px}" +
+    ".cs-table th{padding:8px 14px;font-size:15px}" +
+    ".cs-table td{padding:7px 14px}" +
+    ".cs-table tr:nth-child(even) td{background:#f5f5f5}" +
+    ".cs-legend{font-size:14px;padding:8px 0}" +
+    ".cs-footer{font-size:14px;padding:12px 0}" +
+    "@page{margin:0.5in;size:letter}" +
   "}",
 
   // Misc
@@ -409,7 +421,7 @@ var CSS = [
   // Accessibility: reduce motion
   "@media(prefers-reduced-motion:reduce){" +
     ".loading-icon{animation:none}" +
-    ".mascot{animation:none}" +
+    ".tug-left,.tug-right,.tug-star{animation:none}" +
     ".loading-msg{animation:none}" +
     ".dot-active{animation:none}" +
     ".spinner{animation:none}" +
@@ -1204,27 +1216,14 @@ var APP_JS = [
     "return h;" +
   "}",
 
-  // Building / Loading — bouncing mascot animation
-  "var _mascotTimer=null;var _mascotBounce=0;var _mascotAnimal='elephant';",
-  "function startMascotTimer(){" +
-    "if(_mascotTimer)return;" +
-    "_mascotBounce=0;_mascotAnimal='elephant';" +
-    "_mascotTimer=setInterval(function(){" +
-      "_mascotBounce++;" +
-      "if(_mascotBounce>=3){_mascotBounce=0;_mascotAnimal=_mascotAnimal==='elephant'?'donkey':'elephant'}" +
-      "var el=document.getElementById('mascot');" +
-      "if(el){" +
-        "el.textContent=_mascotAnimal==='elephant'?'\u{1F418}':'\u{1FACF}';" +
-        "el.style.animation='none';el.offsetHeight;el.style.animation='mascotBounce .45s ease-in-out'" +
-      "}else{clearInterval(_mascotTimer);_mascotTimer=null}" +
-    "},600)" +
-  "}",
-  "function stopMascotTimer(){if(_mascotTimer){clearInterval(_mascotTimer);_mascotTimer=null}}",
+  // Building / Loading — tug-of-war animation (pure CSS, no timer needed)
+  "function startMascotTimer(){}",
+  "function stopMascotTimer(){}",
 
   "function renderBuilding(){" +
     "var pct=Math.min(100,Math.round((S.loadPhase/5)*100));" +
     "var h='<div class=\"loading\">';" +
-    "h+='<div class=\"loading-icon\"><span id=\"mascot\" class=\"mascot\">\u{1F418}</span></div>';" +
+    "h+='<div class=\"tug-arena\"><span class=\"tug-left\">\u{1FACF}</span><span class=\"tug-star\">\u2B50</span><span class=\"tug-right\">\u{1F418}</span></div>';" +
     "h+='<h2>'+t('Building Your Guide')+'</h2>';" +
     "h+='<p style=\"min-height:24px\" class=\"loading-msg\" aria-live=\"polite\">'+t(S.loadMsg||'Finding your ballot...')+'</p>';" +
     "h+='<div class=\"progress\" style=\"max-width:240px;margin:20px auto 16px;height:6px\"><div class=\"progress-fill\" style=\"width:'+pct+'%;transition:width .5s ease\"></div></div>';" +

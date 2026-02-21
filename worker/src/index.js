@@ -184,7 +184,7 @@ function handleLandingPage() {
     </div>
     <p style="margin-top:1.5rem;font-size:0.85rem;color:#73737f">Works on any device — phone, tablet, or computer. No app download needed.</p>
   </div>
-  <p class="footer">Built in Austin, TX &middot; <a href="mailto:howdy@atxvotes.app" style="color:inherit">howdy@atxvotes.app</a></p>
+  <p class="footer"><a href="/nonpartisan" style="color:inherit">Nonpartisan by Design</a> &middot; <a href="/privacy" style="color:inherit">Privacy</a> &middot; <a href="mailto:howdy@atxvotes.app" style="color:inherit">howdy@atxvotes.app</a></p>
 </body>
 </html>`;
 
@@ -270,8 +270,7 @@ function handleNonpartisan() {
     <h2>Open Source Approach</h2>
     <p>The full prompt sent to the AI and every design decision is documented. Nothing is hidden.</p>
 
-    <a class="back" href="/">&larr; Back to ATX Votes</a>
-    <p style="margin-top: 1rem; font-size: 0.9rem; color: #73737f;">Questions? <a href="mailto:howdy@atxvotes.app">howdy@atxvotes.app</a></p>
+    <p style="margin-top: 2rem; font-size: 0.85rem; color: #73737f80; text-align: center;"><a href="/" style="color:inherit">ATX Votes</a> &middot; <a href="/privacy" style="color:inherit">Privacy</a> &middot; <a href="mailto:howdy@atxvotes.app" style="color:inherit">howdy@atxvotes.app</a></p>
   </div>
 </body>
 </html>`;
@@ -352,7 +351,7 @@ function handleSupport() {
       <p>Please <a href="mailto:howdy@atxvotes.app">email us</a> with details and we'll correct it as quickly as possible.</p>
     </div>
 
-    <a class="back" href="/">&larr; Back to ATX Votes</a>
+    <p style="margin-top: 2rem; font-size: 0.85rem; color: #73737f80; text-align: center;"><a href="/" style="color:inherit">ATX Votes</a> &middot; <a href="/nonpartisan" style="color:inherit">Nonpartisan by Design</a> &middot; <a href="/privacy" style="color:inherit">Privacy</a></p>
   </div>
 </body>
 </html>`;
@@ -451,7 +450,7 @@ function handlePrivacyPolicy() {
     <h2>Contact</h2>
     <p>Questions? Email <a href="mailto:howdy@atxvotes.app">howdy@atxvotes.app</a></p>
 
-    <a class="back" href="/">&larr; Back to ATX Votes</a>
+    <p style="margin-top: 2rem; font-size: 0.85rem; color: #73737f80; text-align: center;"><a href="/" style="color:inherit">ATX Votes</a> &middot; <a href="/nonpartisan" style="color:inherit">Nonpartisan by Design</a> &middot; <a href="mailto:howdy@atxvotes.app" style="color:inherit">howdy@atxvotes.app</a></p>
   </div>
 </body>
 </html>`;
