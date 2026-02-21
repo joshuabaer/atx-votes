@@ -194,9 +194,92 @@ function handleLandingPage() {
       <div><span>📋</span> Personalized ballot with recommendations</div>
       <div><span>🖨️</span> Print your cheat sheet for the booth</div>
       <div><span>📍</span> Find your polling location</div>
+      <div><span>⚖️</span> <a href="/nonpartisan" style="color:inherit">Nonpartisan by design</a> — fairness is in our code</div>
     </div>
   </div>
   <p class="footer">Built in Austin, TX &middot; <a href="mailto:feedback@atxvotes.app" style="color:inherit">feedback@atxvotes.app</a></p>
+</body>
+</html>`;
+
+  return new Response(html, {
+    headers: { "Content-Type": "text/html;charset=utf-8" },
+  });
+}
+
+function handleNonpartisan() {
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nonpartisan by Design — ATX Votes</title>
+  <meta name="description" content="How ATX Votes ensures fairness: randomized order, no party labels, neutral AI, privacy-first design, and more.">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #faf8f0;
+      color: #1e1e24;
+      padding: 2rem;
+      line-height: 1.7;
+    }
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      padding: 3rem 2.5rem;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    }
+    h1 { font-size: 1.8rem; font-weight: 800; color: #21598e; margin-bottom: 0.3rem; }
+    .subtitle { font-size: 1.05rem; color: #73737f; margin-bottom: 2rem; line-height: 1.6; }
+    h2 { font-size: 1.15rem; font-weight: 700; color: #1e1e24; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+    p { font-size: 1rem; color: #3a3a44; margin-bottom: 0.75rem; }
+    a { color: #21598e; }
+    .back { display: inline-block; margin-top: 1.5rem; font-size: 0.95rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Nonpartisan by Design</h1>
+    <p class="subtitle">ATX Votes matches candidates to your values, not your party. Every design decision is made to keep the experience fair for all voters — regardless of where you fall on the political spectrum.</p>
+
+    <h2>Randomized Candidate Order</h2>
+    <p>Candidates and answer options are shuffled every time so position on screen never creates bias.</p>
+
+    <h2>Both Ballots Generated Equally</h2>
+    <p>Republican and Democratic ballots are generated simultaneously with identical AI prompts and formatting. For undecided voters, even the loading order is randomized.</p>
+
+    <h2>No Party Labels on Candidates</h2>
+    <p>Party affiliation is intentionally hidden from candidate cards so you evaluate candidates on their positions, not partisan identity.</p>
+
+    <h2>Values-Based Matching</h2>
+    <p>Recommendations are based on your stated issues, priorities, and candidate qualities — not party registration.</p>
+
+    <h2>Neutral Interview Questions</h2>
+    <p>Every question is framed neutrally. Answer options are shuffled. The spectrum picker says "No wrong answers."</p>
+
+    <h2>Six-Point Political Spectrum</h2>
+    <p>Goes beyond left/right: Progressive, Liberal, Moderate, Conservative, Libertarian, and Independent. Moderate and Independent voters are never auto-assigned a party.</p>
+
+    <h2>Balanced Proposition Coverage</h2>
+    <p>Every proposition shows supporters AND opponents, fiscal impact, outcomes if it passes or fails, and includes a "Your Call" option for genuinely contested issues.</p>
+
+    <h2>AI Transparency &amp; Guardrails</h2>
+    <p>The AI is explicitly instructed to be a "non-partisan voting guide assistant." Disclaimers appear on every recommendation screen. Confidence levels (Strong Match, Good Match, Best Available) prevent false certainty.</p>
+
+    <h2>Encouraging Independent Research</h2>
+    <p>Every screen says "Do your own research before voting." The app is a starting point, not the final word.</p>
+
+    <h2>Privacy-First Design</h2>
+    <p>All data stays on your device. No analytics, no tracking, no ads. Your political views are never stored on our servers.</p>
+
+    <h2>Open Source Approach</h2>
+    <p>The full prompt sent to the AI and every design decision is documented. Nothing is hidden.</p>
+
+    <a class="back" href="/">&larr; Back to ATX Votes</a>
+    <p style="margin-top: 1rem; font-size: 0.9rem; color: #73737f;">Questions? <a href="mailto:feedback@atxvotes.app">feedback@atxvotes.app</a></p>
+  </div>
 </body>
 </html>`;
 
@@ -450,6 +533,9 @@ export default {
       }
       if (url.pathname === "/support") {
         return handleSupport();
+      }
+      if (url.pathname === "/nonpartisan") {
+        return handleNonpartisan();
       }
       if (url.pathname === "/api/election/manifest") {
         return handleManifest(env);
