@@ -142,10 +142,12 @@ struct PrimaryCard: View {
             .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadius))
             .overlay(
                 RoundedRectangle(cornerRadius: Theme.cornerRadius)
-                    .strokeBorder(isSelected ? color : Color.gray.opacity(0.15), lineWidth: isSelected ? 2 : 1)
+                    .strokeBorder(isSelected ? color : Theme.border, lineWidth: isSelected ? 2 : 1)
             )
         }
         .buttonStyle(.plain)
+        .accessibilityLabel("\(title), \(description)")
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
 

@@ -52,7 +52,7 @@ struct ProgressBarView: View {
             GeometryReader { geo in
                 ZStack(alignment: .leading) {
                     RoundedRectangle(cornerRadius: 3)
-                        .fill(Color.gray.opacity(0.15))
+                        .fill(Theme.progressTrack)
                         .frame(height: 6)
 
                     RoundedRectangle(cornerRadius: 3)

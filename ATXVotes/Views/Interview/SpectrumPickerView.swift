@@ -79,7 +79,7 @@ struct SpectrumOption: View {
                     .frame(width: 24, height: 24)
                     .overlay(
                         Circle()
-                            .strokeBorder(isSelected ? Theme.primaryBlue : Color.gray.opacity(0.35), lineWidth: 2)
+                            .strokeBorder(isSelected ? Theme.primaryBlue : Theme.borderStrong, lineWidth: 2)
                     )
                     .overlay(
                         isSelected ? Image(systemName: "checkmark")
@@ -104,10 +104,12 @@ struct SpectrumOption: View {
             .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadiusSmall))
             .overlay(
                 RoundedRectangle(cornerRadius: Theme.cornerRadiusSmall)
-                    .strokeBorder(isSelected ? Theme.primaryBlue : Color.gray.opacity(0.15), lineWidth: isSelected ? 2 : 1)
+                    .strokeBorder(isSelected ? Theme.primaryBlue : Theme.border, lineWidth: isSelected ? 2 : 1)
             )
         }
         .buttonStyle(.plain)
+        .accessibilityLabel("\(spectrum.localizedName), \(spectrum.localizedDescription)")
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
 

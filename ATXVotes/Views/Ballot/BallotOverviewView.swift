@@ -16,11 +16,11 @@ struct IVotedStickerView: View {
             // White oval with subtle shadow
             Ellipse()
                 .fill(.white)
-                .shadow(color: .black.opacity(0.15), radius: 4 * scale, y: 2 * scale)
+                .shadow(color: Theme.shadowStrong, radius: 4 * scale, y: 2 * scale)
 
             // Light gray border
             Ellipse()
-                .strokeBorder(Color.gray.opacity(0.25), lineWidth: 1.5 * scale)
+                .strokeBorder(Theme.borderStrong, lineWidth: 1.5 * scale)
 
             VStack(spacing: 2 * scale) {
                 // Waving flag
@@ -413,7 +413,7 @@ struct BallotOverviewView: View {
             }
             .background(Theme.cardBackground)
             .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadius))
-            .shadow(color: .black.opacity(0.06), radius: 8, y: 2)
+            .shadow(color: Theme.shadow, radius: 8, y: 2)
         }
     }
 
@@ -440,7 +440,7 @@ struct BallotOverviewView: View {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 8)
-        .background(isOdd ? Color.gray.opacity(0.04) : Color.clear)
+        .background(isOdd ? Theme.fillTertiary : Color.clear)
     }
 
     private func raceLabel(_ race: Race) -> String {
@@ -528,7 +528,7 @@ struct BallotOverviewView: View {
             }
             .background(Theme.cardBackground)
             .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadius))
-            .shadow(color: .black.opacity(0.04), radius: 4, y: 1)
+            .shadow(color: Theme.shadow, radius: 4, y: 1)
         }
     }
 }
@@ -748,7 +748,7 @@ struct PropositionCard: View {
                             }
                         }
                         .padding(10)
-                        .background(Color.gray.opacity(0.06))
+                        .background(Theme.fillTertiary)
                         .clipShape(RoundedRectangle(cornerRadius: 8))
                     }
 

@@ -150,7 +150,7 @@ struct VotingInfoView: View {
         .padding(.vertical, 24)
         .background(Theme.cardBackground)
         .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadius))
-        .shadow(color: .black.opacity(0.06), radius: 8, y: 2)
+        .shadow(color: Theme.shadow, radius: 8, y: 2)
     }
 
     // MARK: - Reminders
@@ -269,6 +269,7 @@ struct VotingInfoView: View {
                 Image(systemName: "mappin.and.ellipse")
                     .font(.system(size: 24))
                     .foregroundColor(Theme.primaryBlue)
+                    .accessibilityHidden(true)
                 Text("Find Your Polling Location")
                     .font(Theme.headline)
                     .foregroundColor(Theme.textPrimary)
@@ -484,6 +485,7 @@ struct InfoAccordion: View {
             Image(systemName: "checkmark.circle.fill")
                 .font(.system(size: 16))
                 .foregroundColor(Theme.success)
+                .accessibilityHidden(true)
             Text(text)
                 .font(Theme.caption)
                 .foregroundColor(Theme.textPrimary)
@@ -496,6 +498,7 @@ struct InfoAccordion: View {
                 .font(.system(size: 20))
                 .foregroundColor(Theme.primaryBlue)
                 .frame(width: 24)
+                .accessibilityHidden(true)
             Text(text)
                 .font(Theme.callout)
                 .foregroundColor(Theme.textPrimary)
@@ -521,6 +524,7 @@ struct InfoAccordion: View {
                 Image(systemName: "arrow.up.right")
                     .font(.caption)
                     .foregroundColor(Theme.textSecondary)
+                    .accessibilityHidden(true)
             }
         }
     }

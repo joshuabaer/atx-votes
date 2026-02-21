@@ -87,7 +87,7 @@ struct QualityOption: View {
             HStack(spacing: 14) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 8)
-                        .fill(isSelected ? Theme.primaryBlue : Color.gray.opacity(0.08))
+                        .fill(isSelected ? Theme.primaryBlue : Theme.fillTertiary)
                         .frame(width: 40, height: 40)
                     Image(systemName: icon)
                         .font(.system(size: 22))
@@ -111,10 +111,11 @@ struct QualityOption: View {
             .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadiusSmall))
             .overlay(
                 RoundedRectangle(cornerRadius: Theme.cornerRadiusSmall)
-                    .strokeBorder(isSelected ? Theme.primaryBlue : Color.gray.opacity(0.15), lineWidth: isSelected ? 2 : 1)
+                    .strokeBorder(isSelected ? Theme.primaryBlue : Theme.border, lineWidth: isSelected ? 2 : 1)
             )
         }
         .buttonStyle(.plain)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
 

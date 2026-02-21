@@ -56,10 +56,12 @@ struct PolicyDeepDiveView: View {
                         HStack(spacing: 4) {
                             ForEach(0..<deepDiveQuestions.count, id: \.self) { i in
                                 RoundedRectangle(cornerRadius: 2)
-                                    .fill(i <= currentQuestionIndex ? Theme.primaryBlue : Color.gray.opacity(0.2))
+                                    .fill(i <= currentQuestionIndex ? Theme.primaryBlue : Theme.progressTrack)
                                     .frame(height: 4)
                             }
                         }
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel(String(localized: "Question \(currentQuestionIndex + 1) of \(deepDiveQuestions.count)"))
 
                         VStack(alignment: .leading, spacing: 8) {
                             Text(question.text)
@@ -150,7 +152,7 @@ struct PolicyOptionButton: View {
                     .frame(width: 22, height: 22)
                     .overlay(
                         Circle()
-                            .strokeBorder(isSelected ? Theme.primaryBlue : Color.gray.opacity(0.35), lineWidth: 2)
+                            .strokeBorder(isSelected ? Theme.primaryBlue : Theme.borderStrong, lineWidth: 2)
                     )
                     .overlay(
                         isSelected ? Image(systemName: "checkmark")
@@ -177,10 +179,11 @@ struct PolicyOptionButton: View {
             .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadiusSmall))
             .overlay(
                 RoundedRectangle(cornerRadius: Theme.cornerRadiusSmall)
-                    .strokeBorder(isSelected ? Theme.primaryBlue : Color.gray.opacity(0.15), lineWidth: isSelected ? 2 : 1)
+                    .strokeBorder(isSelected ? Theme.primaryBlue : Theme.border, lineWidth: isSelected ? 2 : 1)
             )
         }
         .buttonStyle(.plain)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
 

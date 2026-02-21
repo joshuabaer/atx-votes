@@ -95,7 +95,7 @@ struct IssueCard: View {
             .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadiusSmall))
             .overlay(
                 RoundedRectangle(cornerRadius: Theme.cornerRadiusSmall)
-                    .strokeBorder(isSelected ? Theme.primaryBlue : Color.gray.opacity(0.15), lineWidth: 1.5)
+                    .strokeBorder(isSelected ? Theme.primaryBlue : Theme.border, lineWidth: 1.5)
             )
             .shadow(color: isSelected ? Theme.primaryBlue.opacity(0.3) : .clear, radius: 6, y: 2)
         }

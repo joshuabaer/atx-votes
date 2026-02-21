@@ -59,6 +59,7 @@ struct RaceDetailView: View {
                     HStack(alignment: .top, spacing: 10) {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .foregroundColor(Theme.warning)
+                            .accessibilityHidden(true)
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Strategic Notes")
                                 .font(Theme.headline)
@@ -78,6 +79,7 @@ struct RaceDetailView: View {
                     Image(systemName: "exclamationmark.triangle.fill")
                         .font(.system(size: 15))
                         .foregroundColor(Theme.warning)
+                        .accessibilityHidden(true)
                     Text("AI-generated recommendations may contain errors. Do your own research before voting.")
                         .font(.system(size: 16))
                         .foregroundColor(Theme.textSecondary)
@@ -157,7 +159,7 @@ struct CandidateCard: View {
                     // Avatar circle
                     ZStack {
                         Circle()
-                            .fill(candidate.isRecommended ? Theme.primaryBlue : Color.gray.opacity(0.12))
+                            .fill(candidate.isRecommended ? Theme.primaryBlue : Theme.fillTertiary)
                             .frame(width: 44, height: 44)
                         Text(candidate.name.prefix(1))
                             .font(.system(size: 22, weight: .bold))
@@ -178,7 +180,7 @@ struct CandidateCard: View {
                                     .foregroundColor(Theme.textSecondary)
                                     .padding(.horizontal, 6)
                                     .padding(.vertical, 2)
-                                    .background(Color.gray.opacity(0.1))
+                                    .background(Theme.fillTertiary)
                                     .clipShape(Capsule())
                             }
                         }
@@ -194,6 +196,7 @@ struct CandidateCard: View {
                         .rotationEffect(.degrees(isExpanded ? 180 : 0))
                         .foregroundColor(Theme.textSecondary)
                         .font(.caption)
+                        .accessibilityHidden(true)
                 }
             }
             .buttonStyle(.plain)
@@ -250,6 +253,7 @@ struct CandidateCard: View {
                             Text("Key Positions")
                                 .font(.system(size: 17, weight: .semibold))
                                 .foregroundColor(Theme.textSecondary)
+                                .accessibilityAddTraits(.isHeader)
                             FlowLayout(spacing: 6) {
                                 ForEach(candidate.keyPositions, id: \.self) { position in
                                     Text(position)
@@ -257,7 +261,7 @@ struct CandidateCard: View {
                                         .foregroundColor(Theme.textPrimary)
                                         .padding(.horizontal, 10)
                                         .padding(.vertical, 5)
-                                        .background(Color.gray.opacity(0.08))
+                                        .background(Theme.fillTertiary)
                                         .clipShape(Capsule())
                                 }
                             }

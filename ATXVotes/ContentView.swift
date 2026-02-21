@@ -11,7 +11,6 @@ struct ContentView: View {
                 OnboardingFlowView()
             }
         }
-        .preferredColorScheme(.light)
         .dynamicTypeSize(.xxLarge...)
     }
 }

@@ -120,7 +120,7 @@ struct CheatSheetView: View {
                 }
                 .background(Theme.cardBackground)
                 .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadius))
-                .shadow(color: .black.opacity(0.08), radius: 12, y: 4)
+                .shadow(color: Theme.shadow, radius: 12, y: 4)
                 .padding(.horizontal, Theme.paddingMedium)
                 .padding(.vertical, Theme.paddingSmall)
             }
@@ -183,7 +183,7 @@ struct CheatSheetView: View {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
-        .background(isOdd ? Color.gray.opacity(0.04) : Color.clear)
+        .background(isOdd ? Theme.fillTertiary : Color.clear)
         .accessibilityElement(children: .combine)
     }
 

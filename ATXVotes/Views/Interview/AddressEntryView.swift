@@ -36,6 +36,7 @@ struct AddressEntryView: View {
                                 .font(Theme.caption)
                                 .foregroundColor(Theme.textSecondary)
                             TextField("1234 Congress Ave", text: $street)
+                                .accessibilityLabel(String(localized: "Street address"))
                                 .focused($focusedField, equals: .street)
                                 .textContentType(.streetAddressLine1)
                                 .submitLabel(.next)
@@ -59,7 +60,7 @@ struct AddressEntryView: View {
                                 .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadiusSmall))
                                 .overlay(
                                     RoundedRectangle(cornerRadius: Theme.cornerRadiusSmall)
-                                        .strokeBorder(focusedField == .street ? Theme.primaryBlue : Color.gray.opacity(0.2), lineWidth: focusedField == .street ? 2 : 1)
+                                        .strokeBorder(focusedField == .street ? Theme.primaryBlue : Theme.border, lineWidth: focusedField == .street ? 2 : 1)
                                 )
                         }
 
@@ -70,6 +71,7 @@ struct AddressEntryView: View {
                                     .font(Theme.caption)
                                     .foregroundColor(Theme.textSecondary)
                                 TextField("Austin", text: $city)
+                                    .accessibilityLabel(String(localized: "City"))
                                     .focused($focusedField, equals: .city)
                                     .textContentType(.addressCity)
                                     .submitLabel(.next)
@@ -80,7 +82,7 @@ struct AddressEntryView: View {
                                     .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadiusSmall))
                                     .overlay(
                                         RoundedRectangle(cornerRadius: Theme.cornerRadiusSmall)
-                                            .strokeBorder(focusedField == .city ? Theme.primaryBlue : Color.gray.opacity(0.2), lineWidth: focusedField == .city ? 2 : 1)
+                                            .strokeBorder(focusedField == .city ? Theme.primaryBlue : Theme.border, lineWidth: focusedField == .city ? 2 : 1)
                                     )
                             }
 
@@ -92,11 +94,11 @@ struct AddressEntryView: View {
                                 Text("TX")
                                     .padding(14)
                                     .frame(maxWidth: .infinity, alignment: .leading)
-                                    .background(Color.gray.opacity(0.05))
+                                    .background(Theme.fillDisabled)
                                     .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadiusSmall))
                                     .overlay(
                                         RoundedRectangle(cornerRadius: Theme.cornerRadiusSmall)
-                                            .strokeBorder(Color.gray.opacity(0.15), lineWidth: 1)
+                                            .strokeBorder(Theme.border, lineWidth: 1)
                                     )
                                     .foregroundColor(Theme.textSecondary)
                             }
@@ -108,6 +110,7 @@ struct AddressEntryView: View {
                                     .font(Theme.caption)
                                     .foregroundColor(Theme.textSecondary)
                                 TextField("78701", text: $zip)
+                                    .accessibilityLabel(String(localized: "ZIP code"))
                                     .focused($focusedField, equals: .zip)
                                     .textContentType(.postalCode)
                                     .keyboardType(.numberPad)
@@ -118,7 +121,7 @@ struct AddressEntryView: View {
                                     .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadiusSmall))
                                     .overlay(
                                         RoundedRectangle(cornerRadius: Theme.cornerRadiusSmall)
-                                            .strokeBorder(focusedField == .zip ? Theme.primaryBlue : Color.gray.opacity(0.2), lineWidth: focusedField == .zip ? 2 : 1)
+                                            .strokeBorder(focusedField == .zip ? Theme.primaryBlue : Theme.border, lineWidth: focusedField == .zip ? 2 : 1)
                                     )
                             }
                             .frame(width: 110)
@@ -129,6 +132,7 @@ struct AddressEntryView: View {
                     HStack(alignment: .top, spacing: 10) {
                         Image(systemName: "lock.shield")
                             .foregroundColor(Theme.success)
+                            .accessibilityHidden(true)
                         Text("Your address stays on your device. It's only used to look up your ballot districts — we never store or share it.")
                             .font(Theme.caption)
                             .foregroundColor(Theme.textSecondary)

@@ -58,8 +58,8 @@ struct BuildingGuideView: View {
     private var circleTint: Color {
         if hasError { return Theme.danger }
         let emoji = steps[currentStep].emoji
-        if emoji == "🐘" { return Color.red }
-        if emoji == "🫏" { return Color.blue }
+        if emoji == "🐘" { return Theme.republican }
+        if emoji == "🫏" { return Theme.democrat }
         return Theme.primaryBlue
     }
 
@@ -105,6 +105,8 @@ struct BuildingGuideView: View {
                 }
             }
             .frame(width: 180, height: 180)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(store.guideComplete ? String(localized: "Complete") : hasError ? String(localized: "Error") : "\(steps[currentStep].emoji) \(steps[currentStep].label)")
 
             if hasError {
                 // Error state: message + retry button
@@ -147,19 +149,22 @@ struct BuildingGuideView: View {
                 VStack(alignment: .leading, spacing: 14) {
                     ForEach(Array(steps.enumerated()), id: \.offset) { index, step in
                         HStack(spacing: 12) {
-                            if store.guideComplete || index < currentStep {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .foregroundColor(Theme.success)
-                                    .transition(.scale)
-                            } else if index == currentStep {
-                                ProgressView()
-                                    .scaleEffect(0.8)
-                                    .frame(width: 20, height: 20)
-                            } else {
-                                Circle()
-                                    .fill(Color.gray.opacity(0.15))
-                                    .frame(width: 20, height: 20)
+                            Group {
+                                if store.guideComplete || index < currentStep {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .foregroundColor(Theme.success)
+                                        .transition(.scale)
+                                } else if index == currentStep {
+                                    ProgressView()
+                                        .scaleEffect(0.8)
+                                        .frame(width: 20, height: 20)
+                                } else {
+                                    Circle()
+                                        .fill(Theme.progressTrack)
+                                        .frame(width: 20, height: 20)
+                                }
                             }
+                            .accessibilityHidden(true)
 
                             HStack(spacing: 8) {
                                 Image(systemName: step.icon)
