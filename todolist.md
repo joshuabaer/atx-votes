@@ -17,7 +17,8 @@ Items recently fixed but not yet tested. **Test these before attempting again or
 ### Bugs
 
 ### Improvements
-
+- [ ] PWA: Remove "Print" from cheat sheet button — renamed ballot page button from "Print Cheat Sheet" to "Cheat Sheet" with clipboard icon. Print button on the cheat sheet page itself still says "Print Cheat Sheet."
+- [ ] PWA: Free-form "Anything else?" field — added phase 5 textarea between Qualities and Address. Optional field stored in `S.freeform`, persisted in localStorage, shown on profile page. Text passed to Claude in both guide and summary prompts as "Additional context." Spanish translations included. Skip button available.
 
 ### Features
 
@@ -28,19 +29,18 @@ Items recently fixed but not yet tested. **Test these before attempting again or
 Items not yet attempted or needing a fresh approach after failed verification.
 
 ### Bugs
+- [ ] PWA: Proposition AI explanations not translated — the "If Passes," "If Fails," and AI reasoning text on proposition cards stays in English when the app is in Spanish mode. These are AI-generated fields from the guide API, so the fix likely needs to happen server-side: pass `lang` to the Claude prompt so it generates proposition reasoning in the requested language.
 
 ### Improvements
 
 #### Landing Page
 
 #### Ballot Display
-- [ ] PWA: Remove "Print" from cheat sheet button — the main ballot page shows a "Print Cheat Sheet" button; rename it to just "Cheat Sheet" since it navigates to a separate page (printing is an action on that page, not the button's purpose).
 
 #### Loading Animation
 - [ ] PWA: Bouncing mascot loading animation — replace the current icon-per-phase loading with an alternating elephant/donkey bounce animation. Show the elephant bouncing 3 times, then the donkey 3 times, repeating. Decouple the animation from the loading status text.
 
 #### Interview Flow
-- [ ] PWA: Free-form "Anything else?" field — add a final free-form text input ("Anything else we should know about you?") at the end of the interview, before address entry. Include the response in the voter profile sent to the guide generation API so Claude can factor it into recommendations.
 
 #### Pages
 

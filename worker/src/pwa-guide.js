@@ -104,8 +104,9 @@ export async function handlePWA_Summary(request, env) {
       "- Political spectrum: " + (profile.politicalSpectrum || "Moderate") + "\n" +
       "- Top issues: " + issues + "\n" +
       "- Values in candidates: " + qualities + "\n" +
-      "- Policy stances: " + stances + "\n\n" +
-      "Return ONLY the summary text \u2014 no JSON, no quotes, no labels.";
+      "- Policy stances: " + stances + "\n" +
+      (profile.freeform ? "- Additional context: " + profile.freeform + "\n" : "") +
+      "\nReturn ONLY the summary text \u2014 no JSON, no quotes, no labels.";
 
     var text = await callClaude(env, SUMMARY_SYSTEM, userMessage);
     return json({ summary: text.trim() });
@@ -258,7 +259,9 @@ function buildUserPrompt(profile, ballotDesc, ballot, party, lang) {
     "\n" +
     "Stances: " +
     stances +
-    "\n\n" +
+    "\n" +
+    (profile.freeform ? "Additional context: " + profile.freeform + "\n" : "") +
+    "\n" +
     "BALLOT:\n" +
     ballotDesc +
     "\n\n" +
