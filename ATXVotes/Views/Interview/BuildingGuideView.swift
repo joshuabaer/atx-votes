@@ -116,7 +116,7 @@ struct BuildingGuideView: View {
                     .animation(.easeInOut, value: store.loadingMessage)
 
                 if !store.guideComplete {
-                    Text("This takes about 30 seconds")
+                    Text("This takes about a minute")
                         .font(Theme.callout)
                         .foregroundColor(Theme.textSecondary)
                 }

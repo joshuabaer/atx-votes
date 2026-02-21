@@ -145,11 +145,11 @@ class VotingGuideStore: ObservableObject {
     /// Tracks when the loading message last changed, so each phase displays for at least 1 second.
     private var lastMessageChange = Date.distantPast
 
-    /// Update the loading message, ensuring the previous message was shown for at least 1 second.
-    private func setLoadingPhase(_ message: String) async {
+    /// Update the loading message, ensuring the previous message was shown for a minimum duration.
+    private func setLoadingPhase(_ message: String, minDisplayTime: TimeInterval = 1.5) async {
         let elapsed = Date().timeIntervalSince(lastMessageChange)
-        if elapsed < 1.0 {
-            try? await Task.sleep(for: .seconds(1.0 - elapsed))
+        if elapsed < minDisplayTime {
+            try? await Task.sleep(for: .seconds(minDisplayTime - elapsed))
         }
         loadingMessage = message
         lastMessageChange = Date()
@@ -202,7 +202,7 @@ class VotingGuideStore: ObservableObject {
                     lastError = error
                 }
 
-                await setLoadingPhase("Researching Republicans...")
+                await setLoadingPhase("Researching Republicans...", minDisplayTime: 3.0)
                 do {
                     let (ballot, summary) = try await repTask.value
                     republicanBallot = ballot
@@ -222,7 +222,7 @@ class VotingGuideStore: ObservableObject {
                     lastError = error
                 }
 
-                await setLoadingPhase("Researching Democrats...")
+                await setLoadingPhase("Researching Democrats...", minDisplayTime: 3.0)
                 do {
                     let (ballot, summary) = try await demTask.value
                     democratBallot = ballot
@@ -233,7 +233,7 @@ class VotingGuideStore: ObservableObject {
                 }
             }
 
-            await setLoadingPhase("Finalizing recommendations...")
+            await setLoadingPhase("Finalizing recommendations...", minDisplayTime: 3.0)
 
             // Default to inferred party and use its summary
             selectedParty = inferredParty
@@ -253,6 +253,12 @@ class VotingGuideStore: ObservableObject {
 
             // Save
             saveProfile()
+
+            // Ensure "Finalizing" step is visible before completing
+            let finalElapsed = Date().timeIntervalSince(lastMessageChange)
+            if finalElapsed < 2.0 {
+                try? await Task.sleep(for: .seconds(2.0 - finalElapsed))
+            }
 
             withAnimation {
                 guideComplete = true
