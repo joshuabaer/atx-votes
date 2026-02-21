@@ -309,6 +309,13 @@ actor ClaudeService: GuideGenerating {
                         apiMessage = String(bodyStr.prefix(200))
                     }
                     logger.error("\(model) returned HTTP \(httpResponse.statusCode): \(apiMessage)")
+
+                    // Credit balance error is not model-specific — don't try fallbacks
+                    if apiMessage.lowercased().contains("credit balance") {
+                        logger.fault("API credit balance is too low! Top up at console.anthropic.com")
+                        throw ClaudeError.outOfCredits
+                    }
+
                     if index < modelsToTry.count - 1 {
                         logger.warning("Trying \(modelsToTry[index + 1])...")
                         break
@@ -408,6 +415,7 @@ enum ClaudeError: Error, LocalizedError {
     case invalidAPIKey
     case rateLimited
     case overloaded([String])
+    case outOfCredits
     case serverError(Int)
 
     var errorDescription: String? {
@@ -419,6 +427,8 @@ enum ClaudeError: Error, LocalizedError {
         case .overloaded(let models):
             let names = models.map { $0.replacingOccurrences(of: "claude-", with: "") }
             return "All AI models are overloaded (\(names.joined(separator: ", "))). Please try again in a minute."
+        case .outOfCredits:
+            return "Our AI hamsters have run out of snacks. The developer has been notified — please try again later!"
         case .serverError(let code): return "Server error (\(code)). Please try again later."
         }
     }
