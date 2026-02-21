@@ -262,6 +262,19 @@ var CSS = [
   ".prop-section{margin-bottom:10px}",
   ".prop-section h5{font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}",
   ".prop-section p{font-size:14px;line-height:1.5}",
+  ".prop-cols{display:flex;gap:12px;margin-bottom:10px}",
+  ".prop-col{flex:1;min-width:0}",
+  ".prop-col h5{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}",
+  ".prop-col.for h5{color:var(--ok)}",
+  ".prop-col.against h5{color:var(--bad)}",
+  ".prop-col ul{margin:0;padding-left:16px}",
+  ".prop-col li{font-size:13px;line-height:1.5;margin-bottom:2px}",
+  ".prop-outcome{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border-radius:var(--rs);margin-bottom:6px;font-size:13px;line-height:1.5}",
+  ".prop-outcome.pass{background:rgba(51,166,82,.06);border:1px solid rgba(51,166,82,.2)}",
+  ".prop-outcome.fail{background:rgba(209,51,51,.06);border:1px solid rgba(209,51,51,.2)}",
+  "@media(prefers-color-scheme:dark){.prop-outcome.pass{background:rgba(77,199,107,.08)}.prop-outcome.fail{background:rgba(255,89,89,.08)}}",
+  ".prop-reasoning{display:flex;gap:8px;align-items:flex-start;padding:10px;border-radius:var(--rs);background:rgba(33,89,143,.04);margin-top:8px;font-size:13px;line-height:1.5;font-style:italic;color:var(--text2)}",
+  "@media(prefers-color-scheme:dark){.prop-reasoning{background:rgba(102,153,217,.06)}}",
 
   // Section headers
   ".section-head{font-size:18px;font-weight:800;margin:24px 0 12px;display:flex;align-items:center;gap:8px}",
@@ -335,6 +348,11 @@ var CSS = [
   ".profile-section h3{font-size:14px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}",
   ".profile-summary{font-size:16px;line-height:1.6;font-style:italic;color:var(--text2);margin-bottom:20px}",
 
+  // I Voted sticker (oval, matching iOS)
+  ".voted-sticker{width:220px;height:165px;border-radius:50%;border:1.5px solid rgba(0,0,0,.15);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 16px;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.12);padding:12px;gap:2px}",
+  ".voted-text{font-size:42px;font-weight:700;font-style:italic;font-family:Georgia,'Times New Roman',serif;color:#0D2738;line-height:1}",
+  ".voted-early{font-size:24px;font-weight:700;font-style:italic;font-family:Georgia,'Times New Roman',serif;color:#CC1919;line-height:1}",
+
   // Actions row
   ".actions{display:flex;gap:10px;margin:16px 0}",
   ".actions .btn{flex:1;padding:10px;font-size:14px}",
@@ -388,7 +406,313 @@ var CSS = [
 
 var APP_JS = [
   // ============ VERSION CHECK ============
-  "var APP_VERSION=12;",
+  "var APP_VERSION=15;",
+
+  // ============ i18n ============
+  "var LANG=localStorage.getItem('atx_votes_lang')||((navigator.language||'').slice(0,2)==='es'?'es':'en');",
+  "function setLang(l){LANG=l;localStorage.setItem('atx_votes_lang',l);shuffledIssues=null;shuffledSpectrum=null;shuffledQualities=null;shuffledDD={};render()}",
+  "var TR={" +
+    // Welcome & General
+    "'Your personalized voting guide for Austin & Travis County elections.':'Tu gu\\u00EDa personalizada de votaci\\u00F3n para Austin y el condado de Travis.'," +
+    "'Texas Primary \\u2014 March 3, 2026':'Primaria de Texas \\u2014 3 de marzo, 2026'," +
+    "'5-minute interview learns your values':'Entrevista r\\u00E1pida sobre tus valores'," +
+    "'Personalized ballot with recommendations':'Boleta personalizada con recomendaciones'," +
+    "'Print your cheat sheet for the booth':'Imprime tu gu\\u00EDa r\\u00E1pida para la casilla'," +
+    "'Find your polling location':'Encuentra tu lugar de votaci\\u00F3n'," +
+    "'Nonpartisan by design':'Apartidista por dise\\u00F1o'," +
+    "'Build My Guide':'Crear mi gu\\u00EDa'," +
+    // Interview
+    "'What issues matter most to you?':'\\u00BFQu\\u00E9 temas te importan m\\u00E1s?'," +
+    "'Pick your top 3-5. We\\u2019ll dig deeper on these.':'Elige los 3 a 5 m\\u00E1s importantes. Profundizaremos en estos.'," +
+    "'of 3-5 selected':'de 3-5 seleccionados'," +
+    "'Continue':'Continuar'," +
+    "'Back':'Atr\\u00E1s'," +
+    "'How would you describe your political approach?':'\\u00BFC\\u00F3mo describir\\u00EDas tu enfoque pol\\u00EDtico?'," +
+    "'There\\u2019s no wrong answer. This helps us understand your lens.':'No hay respuesta incorrecta. Esto nos ayuda a entender tu perspectiva.'," +
+    "'What do you value most in a candidate?':'\\u00BFQu\\u00E9 es lo que m\\u00E1s valoras en un candidato?'," +
+    "'Pick 2-3 that matter most.':'Elige 2 o 3 que m\\u00E1s te importen.'," +
+    "'of 2-3 selected':'de 2-3 seleccionados'," +
+    "'Question':'Pregunta'," +
+    "'of':'de'," +
+    // Address
+    "'Where do you vote?':'\\u00BFD\\u00F3nde votas?'," +
+    "'We\\u2019ll look up your districts to show the right races.':'Buscaremos tus distritos para mostrar las contiendas correctas.'," +
+    "'Street Address':'Direcci\\u00F3n'," +
+    "'City':'Ciudad'," +
+    "'ZIP':'C\\u00F3digo postal'," +
+    "'State':'Estado'," +
+    "'Your address stays on your device. It\\u2019s only used to look up your ballot districts \\u2014 we never store or share it.':'Tu direcci\\u00F3n se queda en tu dispositivo. Solo se usa para buscar tus distritos electorales \\u2014 nunca la almacenamos ni compartimos.'," +
+    "'You can skip the address \\u2014 we\\u2019ll show all races.':'Puedes omitir la direcci\\u00F3n \\u2014 mostraremos todas las contiendas.'," +
+    "'Skip & Build Guide':'Omitir y crear gu\\u00EDa'," +
+    // Building
+    "'Building Your Guide':'Creando tu gu\\u00EDa'," +
+    "'Finding your ballot...':'Buscando tu boleta...'," +
+    "'Looking up your districts...':'Buscando tus distritos...'," +
+    "'Researching candidates...':'Investigando candidatos...'," +
+    "'Researching Republicans...':'Investigando republicanos...'," +
+    "'Researching Democrats...':'Investigando dem\\u00F3cratas...'," +
+    "'Finalizing recommendations...':'Finalizando recomendaciones...'," +
+    "'Failed to generate recommendations. Please try again.':'No se pudieron generar recomendaciones. Intenta de nuevo.'," +
+    "'Try Again':'Intentar de nuevo'," +
+    // Tab bar & nav
+    "'My Ballot':'Mi boleta'," +
+    "'Vote Info':'Info de votaci\\u00F3n'," +
+    "'Profile':'Perfil'," +
+    // Ballot
+    "'Republican':'Republicano'," +
+    "'Democratic':'Dem\\u00F3crata'," +
+    "'Democrat':'Dem\\u00F3crata'," +
+    "'Tuesday, March 3, 2026':'Martes, 3 de marzo, 2026'," +
+    "'Showing all races':'Mostrando todas las contiendas'," +
+    "'No ballot available for this party.':'No hay boleta disponible para este partido.'," +
+    "'AI-Generated Recommendations':'Recomendaciones generadas por IA'," +
+    "'These recommendations are generated by AI based on your stated values. They may contain errors. Always do your own research before voting.':'Estas recomendaciones son generadas por IA bas\\u00E1ndose en tus valores. Pueden contener errores. Siempre haz tu propia investigaci\\u00F3n antes de votar.'," +
+    "'Print Cheat Sheet':'Imprimir gu\\u00EDa r\\u00E1pida'," +
+    "'Share':'Compartir'," +
+    "'Key Races':'Contiendas clave'," +
+    "'Other Contested Races':'Otras contiendas competidas'," +
+    "'Propositions':'Proposiciones'," +
+    "'Uncontested Races':'Contiendas sin oposici\\u00F3n'," +
+    "'candidate':'candidato'," +
+    "'candidates':'candidatos'," +
+    // Race detail
+    "'Back to Ballot':'Volver a la boleta'," +
+    "'All Candidates':'Todos los candidatos'," +
+    "'Incumbent':'Titular'," +
+    "'Recommended':'Recomendado'," +
+    "'Strategy:':'Estrategia:'," +
+    "'Note:':'Nota:'," +
+    "'Key Positions':'Posiciones clave'," +
+    "'Strengths':'Fortalezas'," +
+    "'Concerns':'Preocupaciones'," +
+    "'Endorsements':'Respaldos'," +
+    "'Fundraising':'Recaudaci\\u00F3n de fondos'," +
+    "'Polling':'Encuestas'," +
+    "'Show Less':'Ver menos'," +
+    "'Show Details':'Ver detalles'," +
+    "'Learn More':'Saber m\\u00E1s'," +
+    // Confidence badges
+    "'Our Pick':'Nuestra recomendaci\\u00F3n'," +
+    "'Strong Match':'Altamente compatible'," +
+    "'Good Match':'Buena opci\\u00F3n'," +
+    "'Lean':'Inclinaci\\u00F3n'," +
+    "'Clear Call':'Decisi\\u00F3n clara'," +
+    "'Best Available':'Mejor opci\\u00F3n disponible'," +
+    "'Symbolic Race':'Contienda simb\\u00F3lica'," +
+    "'Genuinely Contested':'Verdaderamente competida'," +
+    "'Not Sure Yet':'A\\u00FAn no estoy seguro'," +
+    // Propositions
+    "'If it passes:':'Si se aprueba:'," +
+    "'If it fails:':'Si no se aprueba:'," +
+    "'Background':'Antecedentes'," +
+    "'Fiscal Impact':'Impacto fiscal'," +
+    "'Supporters':'Partidarios'," +
+    "'Opponents':'Opositores'," +
+    "'Caveats':'Advertencias'," +
+    // Cheat sheet
+    "'Your Ballot Cheat Sheet':'Tu gu\\u00EDa r\\u00E1pida de boleta'," +
+    "'Primary':'Primaria'," +
+    "'March 3, 2026':'3 de marzo, 2026'," +
+    "'Print Cheat Sheet':'Imprimir gu\\u00EDa r\\u00E1pida'," +
+    "'CONTESTED RACES':'CONTIENDAS COMPETIDAS'," +
+    "'YOUR VOTE':'TU VOTO'," +
+    "'PROPOSITIONS':'PROPOSICIONES'," +
+    "'UNCONTESTED':'SIN OPOSICI\\u00D3N'," +
+    "'CANDIDATE':'CANDIDATO'," +
+    "'= Key race':'= Contienda clave'," +
+    "'AI-generated \\u2014 do your own research':'Generado por IA \\u2014 haz tu propia investigaci\\u00F3n'," +
+    "'Built with ATX Votes':'Hecho con ATX Votes'," +
+    "'Back to Ballot':'Volver a la boleta'," +
+    // Profile
+    "'Your Profile':'Tu perfil'," +
+    "'Top Issues':'Temas principales'," +
+    "'Political Approach':'Perspectiva pol\\u00EDtica'," +
+    "'Policy Stances':'Posturas pol\\u00EDticas'," +
+    "'Candidate Qualities':'Cualidades del candidato'," +
+    "'Address':'Direcci\\u00F3n'," +
+    "'Send Feedback':'Enviar comentarios'," +
+    "'Powered by Claude (Anthropic)':'Desarrollado con Claude (Anthropic)'," +
+    "'Start Over':'Empezar de nuevo'," +
+    "'This will erase your profile and recommendations.':'Esto borrar\\u00E1 tu perfil y recomendaciones.'," +
+    "'Start over? This will erase your profile and recommendations.':'\\u00BFEmpezar de nuevo? Esto borrar\\u00E1 tu perfil y recomendaciones.'," +
+    // Vote Info
+    "'Voting Info':'Info de votaci\\u00F3n'," +
+    "'days until Election Day':'d\\u00EDas para el d\\u00EDa de elecciones'," +
+    "'Today is Election Day!':'\\u00A1Es d\\u00EDa de elecciones!'," +
+    "'Election Day has passed':'El d\\u00EDa de elecciones ha pasado'," +
+    "'I Voted!':'\\u00A1Yo vot\\u00E9!'," +
+    "'I Voted':'Yo vot\\u00E9'," +
+    "'Early!':'\\u00A1Anticipadamente!'," +
+    "'You voted! Thank you for participating in democracy.':'\\u00A1Ya votaste! Gracias por participar en la democracia.'," +
+    "'Actually, I didn\\u2019t vote yet.':'En realidad, a\\u00FAn no he votado.'," +
+    "'Find Your Polling Location':'Encuentra tu lugar de votaci\\u00F3n'," +
+    "'Travis County uses Vote Centers \\u2014 you can vote at any location.':'El condado de Travis usa centros de votaci\\u00F3n \\u2014 puedes votar en cualquier ubicaci\\u00F3n.'," +
+    "'Find Locations':'Encontrar ubicaciones'," +
+    "'Key Dates':'Fechas clave'," +
+    "'Registration deadline':'Fecha l\\u00EDmite de registro'," +
+    "'Mail ballot application deadline':'Fecha l\\u00EDmite para solicitud de boleta por correo'," +
+    "'Early voting':'Votaci\\u00F3n anticipada'," +
+    "'Election Day':'D\\u00EDa de elecciones'," +
+    "'Early Voting':'Votaci\\u00F3n anticipada'," +
+    "'Vote at any early voting location in Travis County.':'Vota en cualquier lugar de votaci\\u00F3n anticipada en el condado de Travis.'," +
+    "'Hours':'Horario'," +
+    "'Open Primary:':'Primaria abierta:'," +
+    "'Texas has open primaries \\u2014 tell the poll worker which party\\u2019s primary you want. You can only vote in one.':'Texas tiene primarias abiertas \\u2014 dile al trabajador electoral en cu\\u00E1l primaria quieres votar. Solo puedes votar en una.'," +
+    "'Find Election Day locations':'Encuentra lugares para el d\\u00EDa de elecciones'," +
+    "'Voter ID':'Identificaci\\u00F3n de votante'," +
+    "'Expired IDs accepted if expired less than 4 years. No expiration limit for voters 70+.':'Se aceptan identificaciones vencidas si tienen menos de 4 a\\u00F1os de vencimiento. Sin l\\u00EDmite para votantes de 70 a\\u00F1os o m\\u00E1s.'," +
+    "'What to Bring':'Qu\\u00E9 llevar'," +
+    "'Photo ID':'Identificaci\\u00F3n con foto'," +
+    "'Your cheat sheet (printed)':'Tu gu\\u00EDa r\\u00E1pida (impresa)'," +
+    "'Voter registration card':'Tarjeta de registro de votante'," +
+    "'REQUIRED':'OBLIGATORIO'," +
+    "'Optional':'Opcional'," +
+    "'Travis County:':'Condado de Travis:'," +
+    "'You may NOT use your phone in the voting booth. Print your cheat sheet before you go!':'NO puedes usar tu tel\\u00E9fono en la casilla de votaci\\u00F3n. \\u00A1Imprime tu gu\\u00EDa antes de ir!'," +
+    "'Resources':'Recursos'," +
+    "'Travis County Elections':'Elecciones del condado de Travis'," +
+    // Footer
+    "'Nonpartisan by Design':'Apartidista por dise\\u00F1o'," +
+    "'Privacy Policy':'Pol\\u00EDtica de privacidad'," +
+    "'Built in Austin, TX':'Hecho en Austin, TX'," +
+    // Issues
+    "'Economy & Cost of Living':'Econom\\u00EDa y costo de vida'," +
+    "'Housing':'Vivienda'," +
+    "'Community Safety':'Seguridad comunitaria'," +
+    "'Education':'Educaci\\u00F3n'," +
+    "'Healthcare':'Salud'," +
+    "'Environment & Climate':'Medio ambiente y clima'," +
+    "'Grid & Infrastructure':'Red el\\u00E9ctrica e infraestructura'," +
+    "'Tech & Innovation':'Tecnolog\\u00EDa e innovaci\\u00F3n'," +
+    "'Transportation':'Transporte'," +
+    "'Immigration':'Inmigraci\\u00F3n'," +
+    "'Taxes':'Impuestos'," +
+    "'Civil Rights':'Derechos civiles'," +
+    // Spectrum
+    "'Progressive':'Progresista'," +
+    "'Bold systemic change, social justice focused':'Cambio sist\\u00E9mico audaz, enfocado en la justicia social'," +
+    "'Liberal':'Liberal'," +
+    "'Expand rights and services, government as a force for good':'Expandir derechos y servicios, el gobierno como fuerza para el bien'," +
+    "'Moderate':'Moderado'," +
+    "'Pragmatic center, best ideas from both sides':'Centro pragm\\u00E1tico, las mejores ideas de ambos lados'," +
+    "'Conservative':'Conservador'," +
+    "'Limited government, traditional values, fiscal discipline':'Gobierno limitado, valores tradicionales, disciplina fiscal'," +
+    "'Libertarian':'Libertario'," +
+    "'Maximum freedom, minimal government':'M\\u00E1xima libertad, gobierno m\\u00EDnimo'," +
+    "'Independent / Issue-by-Issue':'Independiente / Tema por tema'," +
+    "'I decide issue by issue, not by party':'Decido tema por tema, no por partido'," +
+    // Qualities
+    "'Competence & Track Record':'Competencia y trayectoria'," +
+    "'Integrity & Honesty':'Integridad y honestidad'," +
+    "'Independence':'Independencia'," +
+    "'Experience':'Experiencia'," +
+    "'Fresh Perspective':'Perspectiva nueva'," +
+    "'Bipartisan / Works Across Aisle':'Bipartidista / Trabaja con ambos partidos'," +
+    "'Strong Leadership':'Liderazgo fuerte'," +
+    "'Community Ties':'Lazos comunitarios'," +
+    // Deep dive questions
+    "'On housing, where do you land?':'Sobre vivienda, \\u00BFcu\\u00E1l es tu postura?'," +
+    "'Build, build, build':'Construir, construir, construir'," +
+    "'Ease zoning, encourage density, let the market work':'Flexibilizar la zonificaci\\u00F3n, fomentar la densidad, dejar que el mercado funcione'," +
+    "'Smart growth':'Crecimiento inteligente'," +
+    "'More housing with affordability guardrails':'M\\u00E1s vivienda con protecciones de asequibilidad'," +
+    "'Protect neighborhoods':'Proteger los vecindarios'," +
+    "'Preserve character, limit density changes':'Preservar el car\\u00E1cter, limitar cambios de densidad'," +
+    "'It\\u2019s complicated':'Es complicado'," +
+    "'Case by case \\u2014 depends on the neighborhood':'Caso por caso \\u2014 depende del vecindario'," +
+    "'On public safety, what\\u2019s your approach?':'Sobre seguridad p\\u00FAblica, \\u00BFcu\\u00E1l es tu enfoque?'," +
+    "'Fully fund police':'Financiar completamente a la polic\\u00EDa'," +
+    "'Hire more officers, strong prosecution':'Contratar m\\u00E1s oficiales, fiscalizaci\\u00F3n firme'," +
+    "'Reform + fund':'Reformar y financiar'," +
+    "'Fund police but invest in alternatives too':'Financiar a la polic\\u00EDa pero tambi\\u00E9n invertir en alternativas'," +
+    "'Redirect funding':'Redirigir fondos'," +
+    "'Move money toward prevention and social services':'Destinar dinero a prevenci\\u00F3n y servicios sociales'," +
+    "'Major overhaul needed':'Se necesita una reforma profunda'," +
+    "'Fundamental changes to how we approach safety':'Cambios fundamentales en c\\u00F3mo abordamos la seguridad'," +
+    "'On taxes and government spending?':'\\u00BFSobre impuestos y gasto p\\u00FAblico?'," +
+    "'Cut taxes & spending':'Recortar impuestos y gasto'," +
+    "'Government does too much, let people keep their money':'El gobierno hace demasiado, dejar que la gente conserve su dinero'," +
+    "'Redirect spending':'Redirigir el gasto'," +
+    "'Same budget, better priorities':'Mismo presupuesto, mejores prioridades'," +
+    "'Invest more if it works':'Invertir m\\u00E1s si funciona'," +
+    "'Willing to pay more for effective programs':'Dispuesto a pagar m\\u00E1s por programas que funcionen'," +
+    "'Tax the wealthy more':'M\\u00E1s impuestos a los ricos'," +
+    "'Fund services through progressive taxation':'Financiar servicios mediante impuestos progresivos'," +
+    "'On tech and AI regulation?':'\\u00BFSobre regulaci\\u00F3n de tecnolog\\u00EDa e IA?'," +
+    "'Hands off':'No intervenir'," +
+    "'Let innovation lead, regulate later if needed':'Dejar que la innovaci\\u00F3n lidere, regular despu\\u00E9s si es necesario'," +
+    "'Light touch':'Regulaci\\u00F3n ligera'," +
+    "'Basic guardrails but don\\u2019t slow things down':'L\\u00EDmites b\\u00E1sicos pero sin frenar el avance'," +
+    "'Proactive regulation':'Regulaci\\u00F3n proactiva'," +
+    "'Get ahead of problems before they happen':'Adelantarse a los problemas antes de que ocurran'," +
+    "'Strong oversight':'Supervisi\\u00F3n estricta'," +
+    "'Tech companies have too much unchecked power':'Las empresas tecnol\\u00F3gicas tienen demasiado poder sin control'," +
+    "'On public education, what\\u2019s your priority?':'Sobre educaci\\u00F3n p\\u00FAblica, \\u00BFcu\\u00E1l es tu prioridad?'," +
+    "'School choice first':'Libertad de elecci\\u00F3n escolar'," +
+    "'Vouchers, charters, let parents decide':'Vales, escuelas ch\\u00E1rter, que los padres decidan'," +
+    "'Fix public schools':'Mejorar las escuelas p\\u00FAblicas'," +
+    "'More funding and support for neighborhood schools':'M\\u00E1s fondos y apoyo para las escuelas del vecindario'," +
+    "'Teacher-focused':'Enfocado en los maestros'," +
+    "'Raise pay, reduce class sizes, trust educators':'Aumentar salarios, reducir el tama\\u00F1o de las clases, confiar en los educadores'," +
+    "'Back to basics':'Volver a lo b\\u00E1sico'," +
+    "'Focus on core academics, less politics in schools':'Enfocarse en materias b\\u00E1sicas, menos pol\\u00EDtica en las escuelas'," +
+    "'On healthcare, where do you stand?':'Sobre salud, \\u00BFcu\\u00E1l es tu posici\\u00F3n?'," +
+    "'Free market':'Libre mercado'," +
+    "'Less regulation, more competition to lower costs':'Menos regulaci\\u00F3n, m\\u00E1s competencia para reducir costos'," +
+    "'Expand Medicaid':'Expandir Medicaid'," +
+    "'Texas should accept federal Medicaid expansion':'Texas deber\\u00EDa aceptar la expansi\\u00F3n federal de Medicaid'," +
+    "'Universal coverage':'Cobertura universal'," +
+    "'Everyone deserves healthcare regardless of income':'Todos merecen atenci\\u00F3n m\\u00E9dica sin importar sus ingresos'," +
+    "'Local solutions':'Soluciones locales'," +
+    "'Community health centers and county programs':'Centros de salud comunitarios y programas del condado'," +
+    "'On environment and climate?':'\\u00BFSobre medio ambiente y clima?'," +
+    "'Don\\u2019t overreact':'No exagerar'," +
+    "'Protect energy jobs, market-driven solutions':'Proteger empleos energ\\u00E9ticos, soluciones del mercado'," +
+    "'All of the above':'Todo lo anterior'," +
+    "'Renewables and fossil fuels, pragmatic transition':'Renovables y combustibles f\\u00F3siles, transici\\u00F3n pragm\\u00E1tica'," +
+    "'Go green fast':'Transici\\u00F3n verde r\\u00E1pida'," +
+    "'Aggressive renewable targets and climate action':'Metas agresivas de energ\\u00EDa renovable y acci\\u00F3n clim\\u00E1tica'," +
+    "'Local focus':'Enfoque local'," +
+    "'Clean air and water in Austin, green spaces, urban heat':'Aire y agua limpios en Austin, espacios verdes, calor urbano'," +
+    "'On the power grid and infrastructure?':'\\u00BFSobre la red el\\u00E9ctrica e infraestructura?'," +
+    "'Deregulate more':'Mayor desregulaci\\u00F3n'," +
+    "'Competition drives reliability, less ERCOT control':'La competencia mejora la fiabilidad, menos control de ERCOT'," +
+    "'Weatherize & invest':'Climatizar e invertir'," +
+    "'Mandate upgrades, spend what it takes to prevent outages':'Exigir mejoras, gastar lo necesario para prevenir apagones'," +
+    "'Connect the grid':'Conectar la red'," +
+    "'Link Texas to national grid for backup':'Conectar Texas a la red nacional como respaldo'," +
+    "'Local resilience':'Resiliencia local'," +
+    "'Microgrids, batteries, community-level solutions':'Microrredes, bater\\u00EDas, soluciones a nivel comunitario'," +
+    "'On Austin transportation, what\\u2019s the priority?':'Sobre transporte en Austin, \\u00BFcu\\u00E1l es la prioridad?'," +
+    "'Build more roads':'Construir m\\u00E1s carreteras'," +
+    "'Expand highways and reduce congestion for drivers':'Ampliar autopistas y reducir la congesti\\u00F3n para los conductores'," +
+    "'Public transit':'Transporte p\\u00FAblico'," +
+    "'Light rail, better buses, less car dependence':'Tren ligero, mejores autobuses, menos dependencia del auto'," +
+    "'Balanced approach':'Enfoque equilibrado'," +
+    "'Roads, transit, bikes, and walkability together':'Carreteras, transporte p\\u00FAblico, bicicletas y peatonalidad juntos'," +
+    "'Remote work first':'Primero el trabajo remoto'," +
+    "'Reduce the need to commute in the first place':'Reducir la necesidad de desplazarse en primer lugar'," +
+    "'On immigration, what\\u2019s your view?':'Sobre inmigraci\\u00F3n, \\u00BFcu\\u00E1l es tu opini\\u00F3n?'," +
+    "'Secure the border':'Asegurar la frontera'," +
+    "'Enforcement first, then talk about reform':'Primero aplicar la ley, despu\\u00E9s hablar de reforma'," +
+    "'Enforce but reform':'Aplicar la ley pero reformar'," +
+    "'Secure borders AND create legal pathways':'Asegurar fronteras Y crear v\\u00EDas legales'," +
+    "'Welcoming approach':'Enfoque acogedor'," +
+    "'Immigrants strengthen Austin, expand protections':'Los inmigrantes fortalecen Austin, ampliar protecciones'," +
+    "'Local isn\\u2019t federal':'Lo local no es federal'," +
+    "'City shouldn\\u2019t spend resources on federal immigration enforcement':'La ciudad no deber\\u00EDa gastar recursos en la aplicaci\\u00F3n federal de inmigraci\\u00F3n'," +
+    "'On civil rights and equality?':'\\u00BFSobre derechos civiles e igualdad?'," +
+    "'Equal treatment':'Trato igualitario'," +
+    "'Same rules for everyone, no special categories':'Las mismas reglas para todos, sin categor\\u00EDas especiales'," +
+    "'Protect what we have':'Proteger lo que tenemos'," +
+    "'Maintain current protections, don\\u2019t roll them back':'Mantener las protecciones actuales, no retroceder'," +
+    "'Expand protections':'Ampliar protecciones'," +
+    "'Stronger anti-discrimination laws and enforcement':'Leyes antidiscriminaci\\u00F3n m\\u00E1s fuertes y mejor aplicaci\\u00F3n'," +
+    "'Systemic change':'Cambio sist\\u00E9mico'," +
+    "'Address root causes of inequality, not just symptoms':'Abordar las causas ra\\u00EDz de la desigualdad, no solo los s\\u00EDntomas'" +
+  "};",
+  "function t(s){return LANG==='es'&&TR[s]||s}",
+
   // ============ DATA ============
   "var ISSUES=[" +
     '{v:"Economy & Cost of Living",icon:"\u{1F4B0}"},' +
@@ -497,7 +821,7 @@ var APP_JS = [
     "repBallot:null,demBallot:null,selectedParty:'republican'," +
     "guideComplete:false,summary:null,districts:null," +
     "isLoading:false,loadPhase:0,loadMsg:'',error:null," +
-    "expanded:{'vi-dates':true,'vi-bring':true},disclaimerDismissed:false" +
+    "expanded:{'vi-dates':true,'vi-bring':true},disclaimerDismissed:false,hasVoted:false" +
     "};",
 
   // Shuffled arrays (set once per question display)
@@ -535,6 +859,7 @@ var APP_JS = [
     "if(S.repBallot)localStorage.setItem('atx_votes_ballot_republican',JSON.stringify(S.repBallot));" +
     "if(S.demBallot)localStorage.setItem('atx_votes_ballot_democrat',JSON.stringify(S.demBallot));" +
     "localStorage.setItem('atx_votes_selected_party',S.selectedParty);" +
+    "localStorage.setItem('atx_votes_has_voted',S.hasVoted?'1':'');" +
     "}catch(e){}" +
   "}",
 
@@ -551,6 +876,7 @@ var APP_JS = [
     "if(db)S.demBallot=JSON.parse(db);" +
     "var sp=localStorage.getItem('atx_votes_selected_party');" +
     "if(sp)S.selectedParty=sp;" +
+    "S.hasVoted=!!localStorage.getItem('atx_votes_has_voted');" +
     "if(S.repBallot||S.demBallot)S.guideComplete=true;" +
     "}catch(e){}" +
   "}",
@@ -559,9 +885,9 @@ var APP_JS = [
   "function topNav(active){" +
     "return '<div class=\"topnav-inner\">" +
       "<span class=\"topnav-brand\">ATX Votes</span>" +
-      "<a class=\"topnav-link'+(active==='#/ballot'?' on':'')+'\" data-action=\"nav\" data-to=\"#/ballot\">'+ICON_BALLOT+'My Ballot</a>" +
-      "<a class=\"topnav-link'+(active==='#/info'?' on':'')+'\" data-action=\"nav\" data-to=\"#/info\">'+ICON_INFO+'Vote Info</a>" +
-      "<a class=\"topnav-link'+(active==='#/profile'?' on':'')+'\" data-action=\"nav\" data-to=\"#/profile\">'+ICON_PROFILE+'Profile</a>" +
+      "<a class=\"topnav-link'+(active==='#/ballot'?' on':'')+'\" data-action=\"nav\" data-to=\"#/ballot\">'+ICON_BALLOT+t('My Ballot')+'</a>" +
+      "<a class=\"topnav-link'+(active==='#/info'?' on':'')+'\" data-action=\"nav\" data-to=\"#/info\">'+ICON_INFO+t('Vote Info')+'</a>" +
+      "<a class=\"topnav-link'+(active==='#/profile'?' on':'')+'\" data-action=\"nav\" data-to=\"#/profile\">'+ICON_PROFILE+t('Profile')+'</a>" +
     "</div>';" +
   "}",
   "function render(){" +
@@ -584,9 +910,9 @@ var APP_JS = [
   "var ICON_PROFILE='<svg width=\"28\" height=\"28\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 5C13.66 5 15 6.34 15 8C15 9.66 13.66 11 12 11C10.34 11 9 9.66 9 8C9 6.34 10.34 5 12 5ZM12 19.2C9.5 19.2 7.29 17.92 6 15.98C6.03 13.99 10 12.9 12 12.9C13.99 12.9 17.97 13.99 18 15.98C16.71 17.92 14.5 19.2 12 19.2Z\"/></svg>';",
   "function tabBar(active){" +
     "return '<nav class=\"tab-bar\">" +
-      "<a class=\"tab'+(active==='#/ballot'?' tab-active':'')+'\" data-action=\"nav\" data-to=\"#/ballot\"><span class=\"tab-icon\">'+ICON_BALLOT+'</span>My Ballot</a>" +
-      "<a class=\"tab'+(active==='#/info'?' tab-active':'')+'\" data-action=\"nav\" data-to=\"#/info\"><span class=\"tab-icon\">'+ICON_INFO+'</span>Vote Info</a>" +
-      "<a class=\"tab'+(active==='#/profile'?' tab-active':'')+'\" data-action=\"nav\" data-to=\"#/profile\"><span class=\"tab-icon\">'+ICON_PROFILE+'</span>Profile</a>" +
+      "<a class=\"tab'+(active==='#/ballot'?' tab-active':'')+'\" data-action=\"nav\" data-to=\"#/ballot\"><span class=\"tab-icon\">'+ICON_BALLOT+'</span>'+t('My Ballot')+'</a>" +
+      "<a class=\"tab'+(active==='#/info'?' tab-active':'')+'\" data-action=\"nav\" data-to=\"#/info\"><span class=\"tab-icon\">'+ICON_INFO+'</span>'+t('Vote Info')+'</a>" +
+      "<a class=\"tab'+(active==='#/profile'?' tab-active':'')+'\" data-action=\"nav\" data-to=\"#/profile\"><span class=\"tab-icon\">'+ICON_PROFILE+'</span>'+t('Profile')+'</a>" +
     "</nav>';" +
   "}",
 
@@ -611,48 +937,51 @@ var APP_JS = [
     "return '<div class=\"hero\">" +
       "<div class=\"hero-icon\">\u{1F5F3}\u{FE0F}</div>" +
       "<h1>ATX Votes</h1>" +
-      "<p>Your personalized voting guide for Austin &amp; Travis County elections.</p>" +
+      "<p>'+t('Your personalized voting guide for Austin & Travis County elections.')+'</p>" +
     "</div>" +
     "<div class=\"card\"><div style=\"text-align:center;margin-bottom:16px\">" +
-      "<span class=\"badge badge-blue\">Texas Primary &mdash; March 3, 2026</span></div>" +
+      "<span class=\"badge badge-blue\">'+t('Texas Primary \\u2014 March 3, 2026')+'</span></div>" +
       "<div class=\"features\">" +
-        "<div><span>\u2705</span> 5-minute interview learns your values</div>" +
-        "<div><span>\u{1F4CB}</span> Personalized ballot with recommendations</div>" +
-        "<div><span>\u{1F5A8}\u{FE0F}</span> Print your cheat sheet for the booth</div>" +
-        "<div><span>\u{1F4CD}</span> Find your polling location</div>" +
-        "<div><span>\u2696\u{FE0F}</span> Nonpartisan by design</div>" +
+        "<div><span>\u2705</span> '+t('5-minute interview learns your values')+'</div>" +
+        "<div><span>\u{1F4CB}</span> '+t('Personalized ballot with recommendations')+'</div>" +
+        "<div><span>\u{1F5A8}\u{FE0F}</span> '+t('Print your cheat sheet for the booth')+'</div>" +
+        "<div><span>\u{1F4CD}</span> '+t('Find your polling location')+'</div>" +
+        "<div><span>\u2696\u{FE0F}</span> '+t('Nonpartisan by design')+'</div>" +
       "</div>" +
-      "<button class=\"btn btn-primary mt-md\" data-action=\"start\">Build My Guide</button>" +
+      "<button class=\"btn btn-primary mt-md\" data-action=\"start\">'+t('Build My Guide')+'</button>" +
+    "</div>" +
+    "<div style=\"text-align:center;margin-top:16px\">" +
+      "<a href=\"#\" data-action=\"set-lang\" data-value=\"'+(LANG==='es'?'en':'es')+'\" style=\"font-size:14px;color:var(--text2)\">'+(LANG==='es'?'Switch to English':'Cambiar a Espa\\u00F1ol')+'</a>" +
     "</div>';" +
   "}",
 
   // Issues
   "function renderIssues(){" +
     "if(!shuffledIssues)shuffledIssues=shuffle(ISSUES);" +
-    "var h='<div class=\"phase-header\"><h2>What issues matter most to you?</h2><p>Pick your top 3-5. We\\u2019ll dig deeper on these.</p></div>';" +
+    "var h='<div class=\"phase-header\"><h2>'+t('What issues matter most to you?')+'</h2><p>'+t('Pick your top 3-5. We\\u2019ll dig deeper on these.')+'</p></div>';" +
     "h+='<div class=\"chip-grid\">';" +
     "for(var i=0;i<shuffledIssues.length;i++){" +
       "var issue=shuffledIssues[i];" +
       "var on=S.issues.indexOf(issue.v)!==-1;" +
-      "h+='<div class=\"chip'+(on?' chip-on':'')+'\" data-action=\"toggle-issue\" data-value=\"'+esc(issue.v)+'\">'+issue.icon+' '+esc(issue.v)+'</div>'" +
+      "h+='<div class=\"chip'+(on?' chip-on':'')+'\" data-action=\"toggle-issue\" data-value=\"'+esc(issue.v)+'\">'+issue.icon+' '+t(issue.v)+'</div>'" +
     "}" +
     "h+='</div>';" +
     "var n=S.issues.length;" +
-    "h+='<p class=\"text-center mt-md\" style=\"font-size:14px;color:var(--text2)\">'+n+' of 3-5 selected</p>';" +
-    "h+='<button class=\"btn btn-primary mt-md\" data-action=\"next\"'+(n<3?' disabled':'')+'>Continue</button>';" +
+    "h+='<p class=\"text-center mt-md\" style=\"font-size:14px;color:var(--text2)\">'+n+' '+t('of 3-5 selected')+'</p>';" +
+    "h+='<button class=\"btn btn-primary mt-md\" data-action=\"next\"'+(n<3?' disabled':'')+'>'+t('Continue')+'</button>';" +
     "return h;" +
   "}",
 
   // Spectrum
   "function renderSpectrum(){" +
     "if(!shuffledSpectrum)shuffledSpectrum=shuffle(SPECTRUM);" +
-    "var h='<div class=\"phase-header\"><h2>How would you describe your political approach?</h2><p>There\\u2019s no wrong answer. This helps us understand your lens.</p></div>';" +
+    "var h='<div class=\"phase-header\"><h2>'+t('How would you describe your political approach?')+'</h2><p>'+t('There\\u2019s no wrong answer. This helps us understand your lens.')+'</p></div>';" +
     "for(var i=0;i<shuffledSpectrum.length;i++){" +
       "var sp=shuffledSpectrum[i];" +
       "var on=S.spectrum===sp.v;" +
-      "h+='<div class=\"radio'+(on?' radio-on':'')+'\" data-action=\"select-spectrum\" data-value=\"'+esc(sp.v)+'\"><b>'+esc(sp.v)+'</b><span class=\"desc\">'+esc(sp.d)+'</span></div>'" +
+      "h+='<div class=\"radio'+(on?' radio-on':'')+'\" data-action=\"select-spectrum\" data-value=\"'+esc(sp.v)+'\"><b>'+t(sp.v)+'</b><span class=\"desc\">'+t(sp.d)+'</span></div>'" +
     "}" +
-    "h+='<button class=\"btn btn-primary mt-md\" data-action=\"next\"'+(S.spectrum?'':' disabled')+'>Continue</button>';" +
+    "h+='<button class=\"btn btn-primary mt-md\" data-action=\"next\"'+(S.spectrum?'':' disabled')+'>'+t('Continue')+'</button>';" +
     "return h;" +
   "}",
 
@@ -664,46 +993,50 @@ var APP_JS = [
     "if(!shuffledDD[key])shuffledDD[key]=shuffle(dd.opts);" +
     "var opts=shuffledDD[key];" +
     "var current=S.policyViews[key]||null;" +
-    "var h='<div class=\"phase-header\"><h2>'+esc(dd.q)+'</h2><p>Question '+(S.ddIndex+1)+' of '+S.ddQuestions.length+'</p></div>';" +
+    "var h='<div class=\"phase-header\"><h2>'+t(dd.q)+'</h2><p>'+t('Question')+' '+(S.ddIndex+1)+' '+t('of')+' '+S.ddQuestions.length+'</p></div>';" +
     "for(var i=0;i<opts.length;i++){" +
       "var on=current===opts[i].l;" +
-      "h+='<div class=\"radio'+(on?' radio-on':'')+'\" data-action=\"select-dd\" data-value=\"'+esc(opts[i].l)+'\"><b>'+esc(opts[i].l)+'</b><span class=\"desc\">'+esc(opts[i].d)+'</span></div>'" +
+      "h+='<div class=\"radio'+(on?' radio-on':'')+'\" data-action=\"select-dd\" data-value=\"'+esc(opts[i].l)+'\"><b>'+t(opts[i].l)+'</b><span class=\"desc\">'+t(opts[i].d)+'</span></div>'" +
     "}" +
-    "h+='<button class=\"btn btn-primary mt-md\" data-action=\"next-dd\"'+(current?'':' disabled')+'>Continue</button>';" +
+    "h+='<button class=\"btn btn-primary mt-md\" data-action=\"next-dd\"'+(current?'':' disabled')+'>'+t('Continue')+'</button>';" +
     "return h;" +
   "}",
 
   // Qualities
   "function renderQualities(){" +
     "if(!shuffledQualities)shuffledQualities=shuffle(QUALITIES);" +
-    "var h='<div class=\"phase-header\"><h2>What do you value most in a candidate?</h2><p>Pick 2-3 that matter most.</p></div>';" +
+    "var h='<div class=\"phase-header\"><h2>'+t('What do you value most in a candidate?')+'</h2><p>'+t('Pick 2-3 that matter most.')+'</p></div>';" +
     "h+='<div class=\"chip-grid\">';" +
     "for(var i=0;i<shuffledQualities.length;i++){" +
       "var q=shuffledQualities[i];" +
       "var on=S.qualities.indexOf(q)!==-1;" +
-      "h+='<div class=\"chip'+(on?' chip-on':'')+'\" data-action=\"toggle-quality\" data-value=\"'+esc(q)+'\">'+esc(q)+'</div>'" +
+      "h+='<div class=\"chip'+(on?' chip-on':'')+'\" data-action=\"toggle-quality\" data-value=\"'+esc(q)+'\">'+t(q)+'</div>'" +
     "}" +
     "h+='</div>';" +
     "var n=S.qualities.length;" +
-    "h+='<p class=\"text-center mt-md\" style=\"font-size:14px;color:var(--text2)\">'+n+' of 2-3 selected</p>';" +
-    "h+='<button class=\"btn btn-primary mt-md\" data-action=\"next\"'+(n<2?' disabled':'')+'>Continue</button>';" +
+    "h+='<p class=\"text-center mt-md\" style=\"font-size:14px;color:var(--text2)\">'+n+' '+t('of 2-3 selected')+'</p>';" +
+    "h+='<button class=\"btn btn-primary mt-md\" data-action=\"next\"'+(n<2?' disabled':'')+'>'+t('Continue')+'</button>';" +
     "return h;" +
   "}",
 
   // Address
   "function renderAddress(){" +
-    "var h='<div class=\"phase-header\"><h2>Where do you vote?</h2><p>We\\u2019ll look up your districts to show the right races.</p></div>';" +
+    "var h='<div class=\"phase-header\"><h2>'+t('Where do you vote?')+'</h2><p>'+t('We\\u2019ll look up your districts to show the right races.')+'</p></div>';" +
     "h+='<form id=\"addr-form\">';" +
-    "h+='<div class=\"form-group\"><label>Street Address</label><input name=\"street\" placeholder=\"123 Congress Ave\" value=\"'+esc(S.address.street)+'\"></div>';" +
+    "h+='<div class=\"form-group\"><label>'+t('Street Address')+'</label><input name=\"street\" placeholder=\"123 Congress Ave\" value=\"'+esc(S.address.street)+'\" autofocus></div>';" +
     "h+='<div class=\"form-row\">';" +
-    "h+='<div class=\"form-group\"><label>City</label><input name=\"city\" value=\"'+esc(S.address.city)+'\"></div>';" +
-    "h+='<div class=\"form-group\" style=\"flex:.5\"><label>ZIP</label><input name=\"zip\" placeholder=\"78701\" value=\"'+esc(S.address.zip)+'\" inputmode=\"numeric\" maxlength=\"5\"></div>';" +
+    "h+='<div class=\"form-group\"><label>'+t('City')+'</label><input name=\"city\" value=\"'+esc(S.address.city)+'\"></div>';" +
+    "h+='<div class=\"form-group\" style=\"flex:.5\"><label>'+t('ZIP')+'</label><input name=\"zip\" placeholder=\"78701\" value=\"'+esc(S.address.zip)+'\" inputmode=\"numeric\" maxlength=\"5\"></div>';" +
     "h+='</div>';" +
-    "h+='<div class=\"form-group\"><label>State</label><input value=\"TX\" disabled></div>';" +
-    "h+='<button type=\"submit\" class=\"btn btn-primary mt-md\">Build My Guide</button>';" +
+    "h+='<div class=\"form-group\"><label>'+t('State')+'</label><input value=\"TX\" disabled></div>';" +
+    "h+='<div style=\"display:flex;align-items:flex-start;gap:10px;padding:12px;background:rgba(51,166,82,.05);border-radius:var(--rs);margin-top:8px\">';" +
+    "h+='<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" style=\"flex-shrink:0;margin-top:1px\"><path d=\"M12 1C8.7 1 6 3.7 6 7v3H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7c0-3.3-2.7-6-6-6zm0 2c2.2 0 4 1.8 4 4v3H8V7c0-2.2 1.8-4 4-4zm0 11a2 2 0 1 1 0 4 2 2 0 0 1 0-4z\" fill=\"var(--ok)\"/></svg>';" +
+    "h+='<span style=\"font-size:13px;color:var(--text2);line-height:1.4\">'+t('Your address stays on your device. It\\u2019s only used to look up your ballot districts \\u2014 we never store or share it.')+'</span>';" +
+    "h+='</div>';" +
+    "h+='<button type=\"submit\" class=\"btn btn-primary mt-md\">'+t('Build My Guide')+'</button>';" +
     "h+='</form>';" +
-    "h+='<p class=\"text-center mt-md\" style=\"font-size:13px;color:var(--text2)\">You can skip the address &mdash; we\\u2019ll show all races.</p>';" +
-    "h+='<button class=\"btn btn-secondary mt-sm\" data-action=\"skip-address\">Skip &amp; Build Guide</button>';" +
+    "h+='<p class=\"text-center mt-md\" style=\"font-size:13px;color:var(--text2)\">'+t('You can skip the address \\u2014 we\\u2019ll show all races.')+'</p>';" +
+    "h+='<button class=\"btn btn-secondary mt-sm\" data-action=\"skip-address\">'+t('Skip & Build Guide')+'</button>';" +
     "return h;" +
   "}",
 
@@ -715,10 +1048,10 @@ var APP_JS = [
     "var pct=Math.min(100,Math.round((S.loadPhase/5)*100));" +
     "var h='<div class=\"loading\">';" +
     "h+='<div class=\"loading-icon\">'+(icons[S.loadPhase]||'\u{1F5F3}\u{FE0F}')+'</div>';" +
-    "h+='<h2>Building Your Guide</h2>';" +
-    "h+='<p style=\"min-height:24px\" class=\"loading-msg\">'+esc(S.loadMsg||msgs[0])+'</p>';" +
+    "h+='<h2>'+t('Building Your Guide')+'</h2>';" +
+    "h+='<p style=\"min-height:24px\" class=\"loading-msg\">'+t(S.loadMsg||msgs[0])+'</p>';" +
     "h+='<div class=\"progress\" style=\"max-width:240px;margin:20px auto 16px;height:6px\"><div class=\"progress-fill\" style=\"width:'+pct+'%;transition:width .5s ease\"></div></div>';" +
-    "if(S.error){h+='<div class=\"error-box\" style=\"margin-top:16px\"><p>'+esc(S.error)+'</p></div><button class=\"btn btn-primary mt-md\" data-action=\"retry\">Try Again</button>'}" +
+    "if(S.error){h+='<div class=\"error-box\" style=\"margin-top:16px\"><p>'+t(S.error)+'</p></div><button class=\"btn btn-primary mt-md\" data-action=\"retry\">'+t('Try Again')+'</button>'}" +
     "h+='<div class=\"dots\" style=\"margin-top:20px\">';" +
     "for(var i=0;i<6;i++){" +
       "var cls='dot';if(i<S.loadPhase)cls+=' dot-done';else if(i===S.loadPhase&&!S.error)cls+=' dot-active';" +
@@ -735,7 +1068,7 @@ var APP_JS = [
 
   "function renderBallot(){" +
     "var b=getBallot();" +
-    "if(!b)return '<div class=\"card\"><p>No ballot available for this party.</p></div>'+renderPartySwitcher();" +
+    "if(!b)return '<div class=\"card\"><p>'+t('No ballot available for this party.')+'</p></div>'+renderPartySwitcher();" +
     "var races=b.races.slice().sort(function(a,b){return sortOrder(a)-sortOrder(b)});" +
     "var contested=races.filter(function(r){return r.isContested});" +
     "var uncontested=races.filter(function(r){return!r.isContested});" +
@@ -743,10 +1076,10 @@ var APP_JS = [
     "var otherContested=contested.filter(function(r){return!r.isKeyRace});" +
     "var h=renderPartySwitcher();" +
     // Election info header
-    "var partyLabel=S.selectedParty==='democrat'?'Democratic':'Republican';" +
+    "var partyLabel=S.selectedParty==='democrat'?t('Democratic'):t('Republican');" +
     "h+='<div class=\"card\" style=\"margin-bottom:16px;text-align:center\">';" +
-    "h+='<div style=\"font-size:18px;font-weight:800\">Texas '+esc(partyLabel)+' Primary</div>';" +
-    "h+='<div style=\"font-size:14px;color:var(--text2);margin-top:2px\">Tuesday, March 3, 2026</div>';" +
+    "h+='<div style=\"font-size:18px;font-weight:800\">Texas '+esc(partyLabel)+' '+t('Primary')+'</div>';" +
+    "h+='<div style=\"font-size:14px;color:var(--text2);margin-top:2px\">'+t('Tuesday, March 3, 2026')+'</div>';" +
     "if(S.districts&&(S.districts.congressional||S.districts.stateSenate||S.districts.stateHouse)){" +
       "h+='<div style=\"display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px\">';" +
       "if(S.districts.congressional)h+='<span class=\"badge badge-blue\">CD-'+esc(S.districts.congressional)+'</span>';" +
@@ -754,39 +1087,39 @@ var APP_JS = [
       "if(S.districts.stateHouse)h+='<span class=\"badge badge-blue\">HD-'+esc(S.districts.stateHouse)+'</span>';" +
       "h+='</div>'" +
     "}else{" +
-      "h+='<div style=\"font-size:13px;color:var(--text2);margin-top:6px\">Showing all races</div>'" +
+      "h+='<div style=\"font-size:13px;color:var(--text2);margin-top:6px\">'+t('Showing all races')+'</div>'" +
     "}" +
     "h+='</div>';" +
     // Disclaimer (dismissible)
     "if(!S.disclaimerDismissed){" +
       "h+='<div class=\"disclaimer\"><span style=\"font-size:20px\">\u26A0\u{FE0F}</span><div>" +
-        "<b>AI-Generated Recommendations</b>" +
-        "These recommendations are generated by AI based on your stated values. They may contain errors. Always do your own research before voting." +
+        "<b>'+t('AI-Generated Recommendations')+'</b>" +
+        "'+t('These recommendations are generated by AI based on your stated values. They may contain errors. Always do your own research before voting.')+'" +
       "</div><button data-action=\"dismiss-disclaimer\" style=\"background:none;border:none;font-size:20px;cursor:pointer;padding:4px 8px;color:var(--text2);flex-shrink:0\">&times;</button></div>'" +
     "}" +
     // Actions
     "h+='<div class=\"actions\">';" +
-    "h+='<button class=\"btn btn-secondary\" data-action=\"nav\" data-to=\"#/cheatsheet\">\u{1F5A8}\u{FE0F} Print Cheat Sheet</button>';" +
-    "h+='<button class=\"btn btn-secondary\" data-action=\"share\">\u{1F4E4} Share</button>';" +
+    "h+='<button class=\"btn btn-secondary\" data-action=\"nav\" data-to=\"#/cheatsheet\">\u{1F5A8}\u{FE0F} '+t('Print Cheat Sheet')+'</button>';" +
+    "h+='<button class=\"btn btn-secondary\" data-action=\"share\">\u{1F4E4} '+t('Share')+'</button>';" +
     "h+='</div>';" +
     // Key races
     "if(keyRaces.length){" +
-      "h+='<div class=\"section-head\">\u2B50 Key Races</div>';" +
+      "h+='<div class=\"section-head\">\u2B50 '+t('Key Races')+'</div>';" +
       "for(var i=0;i<keyRaces.length;i++)h+=renderRaceCard(keyRaces[i],races)" +
     "}" +
     // Other contested
     "if(otherContested.length){" +
-      "h+='<div class=\"section-head\">Other Contested Races</div>';" +
+      "h+='<div class=\"section-head\">'+t('Other Contested Races')+'</div>';" +
       "for(var i=0;i<otherContested.length;i++)h+=renderRaceCard(otherContested[i],races)" +
     "}" +
     // Propositions
     "if(b.propositions&&b.propositions.length){" +
-      "h+='<div class=\"section-head\">Propositions</div>';" +
+      "h+='<div class=\"section-head\">'+t('Propositions')+'</div>';" +
       "for(var i=0;i<b.propositions.length;i++)h+=renderPropCard(b.propositions[i])" +
     "}" +
     // Uncontested
     "if(uncontested.length){" +
-      "h+='<div class=\"section-head\">Uncontested Races</div>';" +
+      "h+='<div class=\"section-head\">'+t('Uncontested Races')+'</div>';" +
       "for(var i=0;i<uncontested.length;i++){" +
         "var r=uncontested[i];var name=r.candidates.length?r.candidates[0].name:'TBD';" +
         "h+='<div class=\"card\"><div style=\"font-size:14px;color:var(--text2)\">'+esc(r.office)+(r.district?' \\u2014 '+esc(r.district):'')+'</div>" +
@@ -795,9 +1128,9 @@ var APP_JS = [
     "}" +
     // Footer links
     "h+='<div style=\"text-align:center;padding:24px 0 8px;font-size:13px;color:var(--text2)\">';" +
-    "h+='<a href=\"/nonpartisan\" target=\"_blank\" style=\"color:var(--text2)\">Nonpartisan by Design</a>';" +
+    "h+='<a href=\"/nonpartisan\" target=\"_blank\" style=\"color:var(--text2)\">'+t('Nonpartisan by Design')+'</a>';" +
     "h+=' &middot; ';" +
-    "h+='<a href=\"/privacy\" target=\"_blank\" style=\"color:var(--text2)\">Privacy Policy</a>';" +
+    "h+='<a href=\"/privacy\" target=\"_blank\" style=\"color:var(--text2)\">'+t('Privacy Policy')+'</a>';" +
     "h+='<br><span style=\"margin-top:6px;display:inline-block\">Built in Austin, TX &middot; <a href=\"mailto:howdy@atxvotes.app\" style=\"color:var(--text2)\">howdy@atxvotes.app</a> &middot; v'+APP_VERSION+'</span>';" +
     "h+='</div>';" +
     "return h;" +
@@ -816,19 +1149,19 @@ var APP_JS = [
     "var partyCls=S.selectedParty==='democrat'?'cs-party-dem':'cs-party-rep';" +
     // Header
     "var h='<div class=\"cs-header\">';" +
-    "h+='<h2>Your Ballot Cheat Sheet</h2>';" +
+    "h+='<h2>'+t('Your Ballot Cheat Sheet')+'</h2>';" +
     "if(addr&&addr.street){h+='<div class=\"cs-meta\">'+esc(addr.street)+', '+esc(addr.city||'Austin')+' '+esc(addr.zip||'')+'</div>'}" +
-    "h+='<span class=\"cs-party '+partyCls+'\">'+esc(partyName)+' Primary</span>';" +
-    "h+='<div class=\"cs-meta\">March 3, 2026</div>';" +
+    "h+='<span class=\"cs-party '+partyCls+'\">'+esc(partyName)+' '+t('Primary')+'</span>';" +
+    "h+='<div class=\"cs-meta\">'+t('March 3, 2026')+'</div>';" +
     "h+='</div>';" +
     // Actions (hidden in print)
     "h+='<div class=\"cs-actions\">';" +
-    "h+='<button class=\"btn btn-primary\" data-action=\"do-print\">Print Cheat Sheet</button>';" +
-    "h+='<button class=\"btn btn-secondary\" data-action=\"share\">Share</button>';" +
+    "h+='<button class=\"btn btn-primary\" data-action=\"do-print\">'+t('Print Cheat Sheet')+'</button>';" +
+    "h+='<button class=\"btn btn-secondary\" data-action=\"share\">'+t('Share')+'</button>';" +
     "h+='</div>';" +
     // Contested races table
     "if(contested.length){" +
-      "h+='<table class=\"cs-table\"><thead><tr><th>CONTESTED RACES</th><th style=\"text-align:right\">YOUR VOTE</th></tr></thead><tbody>';" +
+      "h+='<table class=\"cs-table\"><thead><tr><th>'+t('CONTESTED RACES')+'</th><th style=\"text-align:right\">'+t('YOUR VOTE')+'</th></tr></thead><tbody>';" +
       "for(var i=0;i<contested.length;i++){" +
         "var r=contested[i];" +
         "var star=r.isKeyRace?'<span class=\"cs-star\">\u2B50</span>':'';" +
@@ -840,7 +1173,7 @@ var APP_JS = [
     "}" +
     // Propositions table
     "if(b.propositions&&b.propositions.length){" +
-      "h+='<table class=\"cs-table\" style=\"margin-top:8px\"><thead><tr><th>PROPOSITIONS</th><th style=\"text-align:right\">YOUR VOTE</th></tr></thead><tbody>';" +
+      "h+='<table class=\"cs-table\" style=\"margin-top:8px\"><thead><tr><th>'+t('PROPOSITIONS')+'</th><th style=\"text-align:right\">'+t('YOUR VOTE')+'</th></tr></thead><tbody>';" +
       "for(var i=0;i<b.propositions.length;i++){" +
         "var p=b.propositions[i];" +
         "var rec=p.recommendation||'';" +
@@ -851,7 +1184,7 @@ var APP_JS = [
     "}" +
     // Uncontested table
     "if(uncontested.length){" +
-      "h+='<table class=\"cs-table\" style=\"margin-top:8px\"><thead><tr><th>UNCONTESTED</th><th style=\"text-align:right\">CANDIDATE</th></tr></thead><tbody>';" +
+      "h+='<table class=\"cs-table\" style=\"margin-top:8px\"><thead><tr><th>'+t('UNCONTESTED')+'</th><th style=\"text-align:right\">'+t('CANDIDATE')+'</th></tr></thead><tbody>';" +
       "for(var i=0;i<uncontested.length;i++){" +
         "var r=uncontested[i];" +
         "var name=r.candidates.length?esc(r.candidates[0].name):'TBD';" +
@@ -861,11 +1194,11 @@ var APP_JS = [
       "h+='</tbody></table>'" +
     "}" +
     // Legend & footer
-    "h+='<div class=\"cs-legend\"><span>\u2B50 = Key race</span><span>\u26A0\uFE0F AI-generated — do your own research</span></div>';" +
-    "h+='<div class=\"cs-footer\">Built with ATX Votes &middot; atxvotes.app</div>';" +
+    "h+='<div class=\"cs-legend\"><span>\u2B50 '+t('= Key race')+'</span><span>\u26A0\uFE0F '+t('AI-generated \\u2014 do your own research')+'</span></div>';" +
+    "h+='<div class=\"cs-footer\">'+t('Built with ATX Votes')+' &middot; atxvotes.app</div>';" +
     // Party switcher + back link (hidden in print)
     "h+=renderPartySwitcher();" +
-    "h+='<div style=\"text-align:center;margin-top:8px\" class=\"cs-actions\"><button class=\"btn btn-secondary\" data-action=\"nav\" data-to=\"#/ballot\">&larr; Back to Ballot</button></div>';" +
+    "h+='<div style=\"text-align:center;margin-top:8px\" class=\"cs-actions\"><button class=\"btn btn-secondary\" data-action=\"nav\" data-to=\"#/ballot\">&larr; '+t('Back to Ballot')+'</button></div>';" +
     "return h;" +
   "}",
 
@@ -876,9 +1209,9 @@ var APP_JS = [
     "if(!hasRep&&hasDem){S.selectedParty='democrat';return''}" +
     "return '<div class=\"party-row\">" +
       "<button class=\"party-btn party-rep'+(S.selectedParty==='republican'?' on':'')+'\" data-action=\"set-party\" data-value=\"republican\">" +
-        "\u{1F418} Republican</button>" +
+        "\u{1F418} '+t('Republican')+'</button>" +
       "<button class=\"party-btn party-dem'+(S.selectedParty==='democrat'?' on':'')+'\" data-action=\"set-party\" data-value=\"democrat\">" +
-        "\u{1FACF} Democrat</button>" +
+        "\u{1FACF} '+t('Democrat')+'</button>" +
     "</div>';" +
   "}",
 
@@ -892,7 +1225,7 @@ var APP_JS = [
       "h+='<div style=\"font-size:17px;font-weight:700;margin-top:4px\">'+esc(race.recommendation.candidateName)+'</div>';" +
       "h+='<div style=\"font-size:13px;color:var(--text2);margin-top:2px;line-height:1.4\">'+esc(race.recommendation.reasoning)+'</div>'" +
     "}" +
-    "h+='<div style=\"font-size:13px;color:var(--text2);margin-top:4px\">'+race.candidates.length+' candidate'+(race.candidates.length!==1?'s':'')+'</div>';" +
+    "h+='<div style=\"font-size:13px;color:var(--text2);margin-top:4px\">'+race.candidates.length+' '+(race.candidates.length!==1?t('candidates'):t('candidate'))+'</div>';" +
     "h+='</div>';" +
     "h+='<div style=\"display:flex;align-items:center;gap:8px;flex-shrink:0\">';" +
     "if(race.recommendation){h+=confBadge(race.recommendation.confidence)}" +
@@ -905,7 +1238,7 @@ var APP_JS = [
   "function confBadge(c){" +
     "var cls='badge-ok';" +
     "if(c==='Best Available'||c==='Symbolic Race')cls='badge-warn';" +
-    "return '<span class=\"badge '+cls+'\">'+esc(c)+'</span>'" +
+    "return '<span class=\"badge '+cls+'\">'+t(c)+'</span>'" +
   "}",
 
   "function renderPropCard(prop){" +
@@ -918,19 +1251,38 @@ var APP_JS = [
     "h+='<div class=\"prop-header\"><div class=\"prop-title\">Prop '+prop.number+': '+esc(prop.title)+'</div>';" +
     "h+='<span class=\"badge '+recClass+'\">'+esc(prop.recommendation)+'</span></div>';" +
     "h+='<div class=\"prop-desc\">'+esc(prop.description)+'</div>';" +
-    "if(prop.reasoning){h+='<div style=\"font-size:14px;color:var(--text2);margin-top:6px;font-style:italic\">'+esc(prop.reasoning)+'</div>'}" +
-    "if(isOpen){" +
-      "h+='<div class=\"prop-details\">';" +
-      "if(prop.background){h+='<div class=\"prop-section\"><h5>Background</h5><p>'+esc(prop.background)+'</p></div>'}" +
-      "if(prop.fiscalImpact){h+='<div class=\"prop-section\"><h5>Fiscal Impact</h5><p>'+esc(prop.fiscalImpact)+'</p></div>'}" +
-      "if(prop.supporters&&prop.supporters.length){h+='<div class=\"prop-section\"><h5>Supporters</h5><p>'+prop.supporters.map(esc).join('; ')+'</p></div>'}" +
-      "if(prop.opponents&&prop.opponents.length){h+='<div class=\"prop-section\"><h5>Opponents</h5><p>'+prop.opponents.map(esc).join('; ')+'</p></div>'}" +
-      "if(prop.ifPasses){h+='<div class=\"prop-section\"><h5>If It Passes</h5><p>'+esc(prop.ifPasses)+'</p></div>'}" +
-      "if(prop.ifFails){h+='<div class=\"prop-section\"><h5>If It Fails</h5><p>'+esc(prop.ifFails)+'</p></div>'}" +
-      "if(prop.caveats){h+='<div class=\"prop-section\"><h5>Caveats</h5><p>'+esc(prop.caveats)+'</p></div>'}" +
+    // If Passes / If Fails (always visible, color-coded)
+    "if(prop.ifPasses||prop.ifFails){" +
+      "h+='<div style=\"margin-top:10px\">';" +
+      "if(prop.ifPasses){h+='<div class=\"prop-outcome pass\"><span style=\"flex-shrink:0\">\u2705</span><div><b>'+t('If it passes:')+'</b> '+esc(prop.ifPasses)+'</div></div>'}" +
+      "if(prop.ifFails){h+='<div class=\"prop-outcome fail\"><span style=\"flex-shrink:0\">\u274C</span><div><b>'+t('If it fails:')+'</b> '+esc(prop.ifFails)+'</div></div>'}" +
       "h+='</div>'" +
     "}" +
-    "h+='<button class=\"expand-toggle\" data-action=\"toggle-expand\" data-id=\"'+eid+'\">'+(isOpen?'Show Less':'Learn More')+'</button>';" +
+    // AI reasoning (always visible)
+    "if(prop.reasoning){h+='<div class=\"prop-reasoning\"><span style=\"flex-shrink:0\">\u{1F9E0}</span><div>'+esc(prop.reasoning)+'</div></div>'}" +
+    "if(isOpen){" +
+      "h+='<div class=\"prop-details\">';" +
+      "if(prop.background){h+='<div class=\"prop-section\"><h5>'+t('Background')+'</h5><p>'+esc(prop.background)+'</p></div>'}" +
+      "if(prop.fiscalImpact){h+='<div class=\"prop-section\"><h5>\u{1F4B0} '+t('Fiscal Impact')+'</h5><p>'+esc(prop.fiscalImpact)+'</p></div>'}" +
+      // Side-by-side supporters vs opponents
+      "if((prop.supporters&&prop.supporters.length)||(prop.opponents&&prop.opponents.length)){" +
+        "h+='<div class=\"prop-cols\">';" +
+        "if(prop.supporters&&prop.supporters.length){" +
+          "h+='<div class=\"prop-col for\"><h5>\u{1F44D} '+t('Supporters')+'</h5><ul>';" +
+          "for(var j=0;j<prop.supporters.length;j++)h+='<li>'+esc(prop.supporters[j])+'</li>';" +
+          "h+='</ul></div>'" +
+        "}" +
+        "if(prop.opponents&&prop.opponents.length){" +
+          "h+='<div class=\"prop-col against\"><h5>\u{1F44E} '+t('Opponents')+'</h5><ul>';" +
+          "for(var j=0;j<prop.opponents.length;j++)h+='<li>'+esc(prop.opponents[j])+'</li>';" +
+          "h+='</ul></div>'" +
+        "}" +
+        "h+='</div>'" +
+      "}" +
+      "if(prop.caveats){h+='<div class=\"prop-section\"><h5>\u26A0\u{FE0F} '+t('Caveats')+'</h5><p>'+esc(prop.caveats)+'</p></div>'}" +
+      "h+='</div>'" +
+    "}" +
+    "h+='<button class=\"expand-toggle\" data-action=\"toggle-expand\" data-id=\"'+eid+'\">'+(isOpen?t('Show Less'):t('Learn More'))+'</button>';" +
     "h+='</div>';" +
     "return h;" +
   "}",
@@ -941,7 +1293,7 @@ var APP_JS = [
     "var races=b.races.slice().sort(function(a,b){return sortOrder(a)-sortOrder(b)});" +
     "var race=races[idx];if(!race)return '<p>Race not found</p>';" +
     "var candidates=shuffle(race.candidates);" +
-    "var h='<button class=\"back-btn\" data-action=\"nav\" data-to=\"#/ballot\">&larr; Back to Ballot</button>';" +
+    "var h='<button class=\"back-btn\" data-action=\"nav\" data-to=\"#/ballot\">&larr; '+t('Back to Ballot')+'</button>';" +
     "h+='<h2 style=\"font-size:22px;font-weight:800;margin-bottom:4px\">'+esc(race.office)+'</h2>';" +
     "if(race.district)h+='<div style=\"font-size:15px;color:var(--text2);margin-bottom:16px\">'+esc(race.district)+'</div>';" +
     "else h+='<div style=\"margin-bottom:16px\"></div>';" +
@@ -954,12 +1306,12 @@ var APP_JS = [
       "h+=confBadge(rec.confidence);" +
       "h+='</div>';" +
       "h+='<p>'+esc(rec.reasoning)+'</p>';" +
-      "if(rec.strategicNotes)h+='<p style=\"margin-top:6px\"><b>Strategy:</b> '+esc(rec.strategicNotes)+'</p>';" +
-      "if(rec.caveats)h+='<p style=\"margin-top:6px\"><b>Note:</b> '+esc(rec.caveats)+'</p>';" +
+      "if(rec.strategicNotes)h+='<p style=\"margin-top:6px\"><b>'+t('Strategy:')+'</b> '+esc(rec.strategicNotes)+'</p>';" +
+      "if(rec.caveats)h+='<p style=\"margin-top:6px\"><b>'+t('Note:')+'</b> '+esc(rec.caveats)+'</p>';" +
       "h+='</div>'" +
     "}" +
     // Candidates
-    "h+='<div class=\"section-head\">All Candidates</div>';" +
+    "h+='<div class=\"section-head\">'+t('All Candidates')+'</div>';" +
     "for(var i=0;i<candidates.length;i++){" +
       "var c=candidates[i];" +
       "var eid='cand-'+c.id;" +
@@ -974,22 +1326,22 @@ var APP_JS = [
       "h+='<div style=\"display:flex;justify-content:space-between;align-items:flex-start\">';" +
       "h+='<div class=\"cand-name\">'+esc(c.name)+'</div>';" +
       "h+='<div class=\"cand-tags\">';" +
-      "if(c.isIncumbent)h+='<span class=\"badge badge-blue\">Incumbent</span>';" +
-      "if(c.isRecommended)h+='<span class=\"badge badge-ok\">Recommended</span>';" +
+      "if(c.isIncumbent)h+='<span class=\"badge badge-blue\">'+t('Incumbent')+'</span>';" +
+      "if(c.isRecommended)h+='<span class=\"badge badge-ok\">'+t('Recommended')+'</span>';" +
       "h+='</div></div>';" +
       "h+='<div class=\"cand-summary\">'+esc(c.summary)+'</div>';" +
       "h+='</div></div>';" +
       "if(isOpen){" +
         "h+='<div class=\"cand-details\">';" +
-        "if(c.keyPositions&&c.keyPositions.length){h+='<div class=\"cand-section\"><h5>Key Positions</h5><div class=\"pos-chips\">';for(var j=0;j<c.keyPositions.length;j++)h+='<span class=\"pos-chip\">'+esc(c.keyPositions[j])+'</span>';h+='</div></div>'}" +
-        "if(c.pros&&c.pros.length){h+='<div class=\"cand-section pros\"><h5>\u2705 Strengths</h5><ul>';for(var j=0;j<c.pros.length;j++)h+='<li>'+esc(c.pros[j])+'</li>';h+='</ul></div>'}" +
-        "if(c.cons&&c.cons.length){h+='<div class=\"cand-section cons\"><h5>\u26A0\u{FE0F} Concerns</h5><ul>';for(var j=0;j<c.cons.length;j++)h+='<li>'+esc(c.cons[j])+'</li>';h+='</ul></div>'}" +
-        "if(c.endorsements&&c.endorsements.length){h+='<div class=\"cand-section\"><h5>Endorsements</h5><ul>';for(var j=0;j<c.endorsements.length;j++)h+='<li>'+esc(c.endorsements[j])+'</li>';h+='</ul></div>'}" +
-        "if(c.fundraising){h+='<div class=\"cand-section\"><h5>Fundraising</h5><p>'+esc(c.fundraising)+'</p></div>'}" +
-        "if(c.polling){h+='<div class=\"cand-section\"><h5>Polling</h5><p>'+esc(c.polling)+'</p></div>'}" +
+        "if(c.keyPositions&&c.keyPositions.length){h+='<div class=\"cand-section\"><h5>'+t('Key Positions')+'</h5><div class=\"pos-chips\">';for(var j=0;j<c.keyPositions.length;j++)h+='<span class=\"pos-chip\">'+esc(c.keyPositions[j])+'</span>';h+='</div></div>'}" +
+        "if(c.pros&&c.pros.length){h+='<div class=\"cand-section pros\"><h5>\u2705 '+t('Strengths')+'</h5><ul>';for(var j=0;j<c.pros.length;j++)h+='<li>'+esc(c.pros[j])+'</li>';h+='</ul></div>'}" +
+        "if(c.cons&&c.cons.length){h+='<div class=\"cand-section cons\"><h5>\u26A0\u{FE0F} '+t('Concerns')+'</h5><ul>';for(var j=0;j<c.cons.length;j++)h+='<li>'+esc(c.cons[j])+'</li>';h+='</ul></div>'}" +
+        "if(c.endorsements&&c.endorsements.length){h+='<div class=\"cand-section\"><h5>'+t('Endorsements')+'</h5><ul>';for(var j=0;j<c.endorsements.length;j++)h+='<li>'+esc(c.endorsements[j])+'</li>';h+='</ul></div>'}" +
+        "if(c.fundraising){h+='<div class=\"cand-section\"><h5>'+t('Fundraising')+'</h5><p>'+esc(c.fundraising)+'</p></div>'}" +
+        "if(c.polling){h+='<div class=\"cand-section\"><h5>'+t('Polling')+'</h5><p>'+esc(c.polling)+'</p></div>'}" +
         "h+='</div>'" +
       "}" +
-      "h+='<button class=\"expand-toggle\" data-action=\"toggle-expand\" data-id=\"'+eid+'\">'+(isOpen?'Show Less':'Show Details')+'</button>';" +
+      "h+='<button class=\"expand-toggle\" data-action=\"toggle-expand\" data-id=\"'+eid+'\">'+(isOpen?t('Show Less'):t('Show Details'))+'</button>';" +
       "h+='</div>'" +
     "}" +
     "return h;" +
@@ -997,49 +1349,56 @@ var APP_JS = [
 
   // ============ PROFILE VIEW ============
   "function renderProfile(){" +
-    "var h='<h2 style=\"font-size:22px;font-weight:800;margin-bottom:16px\">Your Profile</h2>';" +
+    "var h='<h2 style=\"font-size:22px;font-weight:800;margin-bottom:16px\">'+t('Your Profile')+'</h2>';" +
     "if(S.summary){h+='<div class=\"profile-summary\">\"'+esc(S.summary)+'\"</div>'}" +
     "h+='<div class=\"card\">';" +
     // Issues
-    "h+='<div class=\"profile-section\"><h3>Top Issues</h3><div class=\"chip-grid\">';" +
+    "h+='<div class=\"profile-section\"><h3>'+t('Top Issues')+'</h3><div class=\"chip-grid\">';" +
     "for(var i=0;i<S.issues.length;i++){" +
       "var issue=ISSUES.find(function(x){return x.v===S.issues[i]});" +
-      "h+='<span class=\"chip chip-on\">'+(issue?issue.icon+' ':'')+esc(S.issues[i])+'</span>'" +
+      "h+='<span class=\"chip chip-on\">'+(issue?issue.icon+' ':'')+t(S.issues[i])+'</span>'" +
     "}" +
     "h+='</div></div>';" +
     // Spectrum
-    "if(S.spectrum){h+='<div class=\"profile-section\"><h3>Political Approach</h3><p style=\"font-size:16px\">'+esc(S.spectrum)+'</p></div>'}" +
+    "if(S.spectrum){h+='<div class=\"profile-section\"><h3>'+t('Political Approach')+'</h3><p style=\"font-size:16px\">'+t(S.spectrum)+'</p></div>'}" +
     // Policy views
     "var pvKeys=Object.keys(S.policyViews);" +
     "if(pvKeys.length){" +
-      "h+='<div class=\"profile-section\"><h3>Policy Stances</h3>';" +
-      "for(var i=0;i<pvKeys.length;i++){h+='<div style=\"margin-bottom:6px\"><span style=\"font-size:13px;color:var(--text2)\">'+esc(pvKeys[i])+'</span><br><span style=\"font-size:15px;font-weight:600\">'+esc(S.policyViews[pvKeys[i]])+'</span></div>'}" +
+      "h+='<div class=\"profile-section\"><h3>'+t('Policy Stances')+'</h3>';" +
+      "for(var i=0;i<pvKeys.length;i++){h+='<div style=\"margin-bottom:6px\"><span style=\"font-size:13px;color:var(--text2)\">'+t(pvKeys[i])+'</span><br><span style=\"font-size:15px;font-weight:600\">'+t(S.policyViews[pvKeys[i]])+'</span></div>'}" +
       "h+='</div>'" +
     "}" +
     // Qualities
     "if(S.qualities.length){" +
-      "h+='<div class=\"profile-section\"><h3>Candidate Qualities</h3><div class=\"chip-grid\">';" +
-      "for(var i=0;i<S.qualities.length;i++)h+='<span class=\"chip chip-on\">'+esc(S.qualities[i])+'</span>';" +
+      "h+='<div class=\"profile-section\"><h3>'+t('Candidate Qualities')+'</h3><div class=\"chip-grid\">';" +
+      "for(var i=0;i<S.qualities.length;i++)h+='<span class=\"chip chip-on\">'+t(S.qualities[i])+'</span>';" +
       "h+='</div></div>'" +
     "}" +
     // Address
-    "if(S.address&&S.address.street){h+='<div class=\"profile-section\"><h3>Address</h3><p style=\"font-size:15px\">'+esc(S.address.street)+', '+esc(S.address.city)+', '+esc(S.address.state)+' '+esc(S.address.zip)+'</p></div>'}" +
+    "if(S.address&&S.address.street){h+='<div class=\"profile-section\"><h3>'+t('Address')+'</h3><p style=\"font-size:15px\">'+esc(S.address.street)+', '+esc(S.address.city)+', '+esc(S.address.state)+' '+esc(S.address.zip)+'</p></div>'}" +
     "h+='</div>';" +
     // Send Feedback + Credits
     "h+='<div class=\"card\" style=\"margin-top:16px;text-align:center\">';" +
-    "h+='<a href=\"mailto:howdy@atxvotes.app\" style=\"font-size:15px;font-weight:600\">Send Feedback &rarr;</a>';" +
-    "h+='<p style=\"font-size:13px;color:var(--text2);margin-top:8px\">Powered by Claude (Anthropic)</p>';" +
+    "h+='<a href=\"mailto:howdy@atxvotes.app\" style=\"font-size:15px;font-weight:600\">'+t('Send Feedback')+' &rarr;</a>';" +
+    "h+='<p style=\"font-size:13px;color:var(--text2);margin-top:8px\">'+t('Powered by Claude (Anthropic)')+'</p>';" +
     "h+='</div>';" +
+    // Language toggle
+    "h+='<div class=\"card\" style=\"margin-top:16px;text-align:center\">';" +
+    "h+='<div style=\"font-size:15px;font-weight:600;margin-bottom:8px\">\u{1F310} Language / Idioma</div>';" +
+    "h+='<div class=\"party-row\" style=\"margin:0\">';" +
+    "h+='<button class=\"party-btn'+(LANG==='en'?' on':'')+'\" data-action=\"set-lang\" data-value=\"en\">English</button>';" +
+    "h+='<button class=\"party-btn'+(LANG==='es'?' on':'')+'\" data-action=\"set-lang\" data-value=\"es\">Espa\\u00F1ol</button>';" +
+    "h+='</div></div>';" +
     // Start Over
     "h+='<div style=\"margin-top:32px;padding-top:20px;border-top:1px solid var(--border)\">';" +
-    "h+='<button class=\"btn btn-danger\" data-action=\"reset\">Start Over</button>';" +
-    "h+='<p class=\"text-center mt-sm\" style=\"font-size:13px;color:var(--text2)\">This will erase your profile and recommendations.</p>';" +
+    "h+='<button class=\"btn btn-danger\" data-action=\"reset\">'+t('Start Over')+'</button>';" +
+    "h+='<p class=\"text-center mt-sm\" style=\"font-size:13px;color:var(--text2)\">'+t('This will erase your profile and recommendations.')+'</p>';" +
     "h+='</div>';" +
     // Footer links
     "h+='<div style=\"text-align:center;padding:24px 0 8px;font-size:13px;color:var(--text2)\">';" +
-    "h+='<a href=\"/nonpartisan\" target=\"_blank\" style=\"color:var(--text2)\">Nonpartisan by Design</a>';" +
+    "h+='<a href=\"/nonpartisan\" target=\"_blank\" style=\"color:var(--text2)\">'+t('Nonpartisan by Design')+'</a>';" +
     "h+=' &middot; ';" +
-    "h+='<a href=\"/privacy\" target=\"_blank\" style=\"color:var(--text2)\">Privacy Policy</a>';" +
+    "h+='<a href=\"/privacy\" target=\"_blank\" style=\"color:var(--text2)\">'+t('Privacy Policy')+'</a>';" +
     "h+='</div>';" +
     "return h;" +
   "}",
@@ -1062,20 +1421,51 @@ var APP_JS = [
     "var election=new Date(2026,2,3);" + // March 3, 2026
     "var now=new Date();" +
     "var diff=Math.ceil((election-now)/(1000*60*60*24));" +
-    "var h='<h2 style=\"font-size:22px;font-weight:800;margin-bottom:16px\">Voting Info</h2>';" +
+    "var h='<h2 style=\"font-size:22px;font-weight:800;margin-bottom:16px\">'+t('Voting Info')+'</h2>';" +
     // Countdown card
     "h+='<div class=\"card\" style=\"text-align:center;margin-bottom:16px\">';" +
-    "if(diff>0){h+='<div class=\"countdown\">'+diff+'</div><div class=\"countdown-label\">days until Election Day</div>'}" +
-    "else if(diff===0){h+='<div class=\"countdown\">\u{1F5F3}\u{FE0F}</div><div class=\"countdown-label\">Today is Election Day!</div>'}" +
-    "else{h+='<div class=\"countdown\">\u2705</div><div class=\"countdown-label\">Election Day has passed</div>'}" +
+    "var isEarly=diff>0;" +
+    "if(S.hasVoted){" +
+      "h+='<div class=\"voted-sticker\">';" +
+      // Inline waving flag SVG
+      "h+='<svg width=\"70\" height=\"42\" viewBox=\"0 0 70 42\" style=\"margin-top:'+(isEarly?'6':'12')+'px\">';" +
+      // 13 stripes
+      "var sH=42/13;for(var si=0;si<13;si++){" +
+        "var sc=si%2===0?'#CC1919':'#fff';" +
+        "h+='<rect x=\"0\" y=\"'+(si*sH)+'\" width=\"70\" height=\"'+(sH+.5)+'\" fill=\"'+sc+'\"/>';" +
+      "}" +
+      // Canton (blue rectangle with stars)
+      "h+='<rect x=\"0\" y=\"0\" width=\"29\" height=\"23\" fill=\"#0D2738\"/>';" +
+      // 12 stars (3 rows x 4 cols)
+      "for(var sr=0;sr<3;sr++){for(var sc2=0;sc2<4;sc2++){" +
+        "var sx=4+sc2*6.5;var sy=4+sr*6.5;" +
+        "h+='<circle cx=\"'+sx+'\" cy=\"'+sy+'\" r=\"1.5\" fill=\"#fff\"/>';" +
+      "}}" +
+      "h+='</svg>';" +
+      "h+='<div class=\"voted-text\">'+t('I Voted')+'</div>';" +
+      "if(isEarly)h+='<div class=\"voted-early\">'+t('Early!')+'</div>';" +
+      "h+='</div>';" +
+      "h+='<div class=\"countdown-label\" style=\"margin-bottom:8px\">'+t('You voted! Thank you for participating in democracy.')+'</div>';" +
+      "h+='<button class=\"btn btn-secondary\" style=\"font-size:13px\" data-action=\"share-voted\">\u{1F4E4} '+t('Share')+'</button>';" +
+      "h+='<div style=\"margin-top:8px\"><a href=\"#\" data-action=\"unvote\" style=\"font-size:13px;color:var(--text2)\">'+t('Actually, I didn\\u2019t vote yet.')+'</a></div>'" +
+    "}else if(diff>0){" +
+      "h+='<div class=\"countdown\">'+diff+'</div><div class=\"countdown-label\">'+t('days until Election Day')+'</div>';" +
+      "h+='<button class=\"btn btn-primary\" style=\"margin-top:12px\" data-action=\"mark-voted\">\u{1F5F3}\u{FE0F} '+t('I Voted!')+'</button>'" +
+    "}else if(diff===0){" +
+      "h+='<div class=\"countdown\">\u{1F5F3}\u{FE0F}</div><div class=\"countdown-label\">'+t('Today is Election Day!')+'</div>';" +
+      "h+='<button class=\"btn btn-primary\" style=\"margin-top:12px\" data-action=\"mark-voted\">\u{1F5F3}\u{FE0F} '+t('I Voted!')+'</button>'" +
+    "}else{" +
+      "h+='<div class=\"countdown\">\u2705</div><div class=\"countdown-label\">'+t('Election Day has passed')+'</div>';" +
+      "h+='<button class=\"btn btn-primary\" style=\"margin-top:12px\" data-action=\"mark-voted\">\u{1F5F3}\u{FE0F} '+t('I Voted!')+'</button>'" +
+    "}" +
     "h+='</div>';" +
 
     // Polling location card
     "h+='<div class=\"card\" style=\"margin-bottom:16px\">';" +
-    "h+='<div style=\"font-size:16px;font-weight:700;margin-bottom:4px\">Find Your Polling Location</div>';" +
-    "h+='<p style=\"font-size:14px;color:var(--text2);margin-bottom:12px\">Travis County uses Vote Centers \\u2014 you can vote at any location.</p>';" +
+    "h+='<div style=\"font-size:16px;font-weight:700;margin-bottom:4px\">'+t('Find Your Polling Location')+'</div>';" +
+    "h+='<p style=\"font-size:14px;color:var(--text2);margin-bottom:12px\">'+t('Travis County uses Vote Centers \\u2014 you can vote at any location.')+'</p>';" +
     "h+='<div style=\"display:flex;gap:8px;flex-wrap:wrap\">';" +
-    "h+='<a href=\"https://countyclerk.traviscountytx.gov/departments/elections/current-election/\" target=\"_blank\" class=\"btn btn-primary\" style=\"flex:1;text-align:center;text-decoration:none\">Find Locations &rarr;</a>';" +
+    "h+='<a href=\"https://countyclerk.traviscountytx.gov/departments/elections/current-election/\" target=\"_blank\" class=\"btn btn-primary\" style=\"flex:1;text-align:center;text-decoration:none\">'+t('Find Locations')+' &rarr;</a>';" +
     "h+='<a href=\"https://votetravis.gov\" target=\"_blank\" class=\"btn btn-secondary\" style=\"flex:1;text-align:center;text-decoration:none\">VoteTravis.gov</a>';" +
     "h+='</div></div>';" +
 
@@ -1087,11 +1477,11 @@ var APP_JS = [
     "var evStart=new Date(2026,1,17);" + // Feb 17
     "var evEnd=new Date(2026,1,27);" + // Feb 27
     "var evActive=now>=evStart&&now<=evEnd;" +
-    "kdBody+='<div class=\"vi-row\"><span'+(regPast?' class=\"vi-strike\"':'')+'>Registration deadline</span><span'+(regPast?' class=\"vi-strike\"':'')+'>Feb 2, 2026</span></div>';" +
-    "kdBody+='<div class=\"vi-row\"><span'+(mailPast?' class=\"vi-strike\"':'')+'>Mail ballot application deadline</span><span'+(mailPast?' class=\"vi-strike\"':'')+'>Feb 20, 2026</span></div>';" +
-    "kdBody+='<div class=\"vi-row\"><span'+(evActive?' class=\"vi-highlight\"':'')+'>Early voting</span><span'+(evActive?' class=\"vi-highlight\"':'')+'>Feb 17 \\u2013 27, 2026</span></div>';" +
-    "kdBody+='<div class=\"vi-row\"><span class=\"vi-highlight\">Election Day</span><span class=\"vi-highlight\">March 3, 2026</span></div>';" +
-    "h+=accSection('vi-dates','\u{1F4C5}','Key Dates',kdBody);" +
+    "kdBody+='<div class=\"vi-row\"><span'+(regPast?' class=\"vi-strike\"':'')+'>'+t('Registration deadline')+'</span><span'+(regPast?' class=\"vi-strike\"':'')+'>Feb 2, 2026</span></div>';" +
+    "kdBody+='<div class=\"vi-row\"><span'+(mailPast?' class=\"vi-strike\"':'')+'>'+t('Mail ballot application deadline')+'</span><span'+(mailPast?' class=\"vi-strike\"':'')+'>Feb 20, 2026</span></div>';" +
+    "kdBody+='<div class=\"vi-row\"><span'+(evActive?' class=\"vi-highlight\"':'')+'>'+t('Early voting')+'</span><span'+(evActive?' class=\"vi-highlight\"':'')+'>Feb 17 \\u2013 27, 2026</span></div>';" +
+    "kdBody+='<div class=\"vi-row\"><span class=\"vi-highlight\">'+t('Election Day')+'</span><span class=\"vi-highlight\">'+t('March 3, 2026')+'</span></div>';" +
+    "h+=accSection('vi-dates','\u{1F4C5}',t('Key Dates'),kdBody);" +
 
     // Early Voting accordion
     "var evBody='';" +
@@ -1099,35 +1489,35 @@ var APP_JS = [
     "evBody+='<div class=\"vi-row\"><span>Feb 22 (Sunday)</span><span>12:00 PM \\u2013 6:00 PM</span></div>';" +
     "evBody+='<div class=\"vi-row\"><span>Feb 23 \\u2013 25</span><span>7:00 AM \\u2013 7:00 PM</span></div>';" +
     "evBody+='<div class=\"vi-row\"><span style=\"font-weight:600\">Feb 26 \\u2013 27</span><span style=\"font-weight:600\">7:00 AM \\u2013 10:00 PM</span></div>';" +
-    "evBody+='<p style=\"font-size:13px;color:var(--text2);margin-top:8px\">Vote at any early voting location in Travis County.</p>';" +
-    "h+=accSection('vi-early','\u{1F552}','Early Voting',evBody);" +
+    "evBody+='<p style=\"font-size:13px;color:var(--text2);margin-top:8px\">'+t('Vote at any early voting location in Travis County.')+'</p>';" +
+    "h+=accSection('vi-early','\u{1F552}',t('Early Voting'),evBody);" +
 
     // Election Day accordion
     "var edBody='';" +
-    "edBody+='<div class=\"vi-row\"><span style=\"font-weight:600\">Hours</span><span style=\"font-weight:600\">7:00 AM \\u2013 7:00 PM</span></div>';" +
+    "edBody+='<div class=\"vi-row\"><span style=\"font-weight:600\">'+t('Hours')+'</span><span style=\"font-weight:600\">7:00 AM \\u2013 7:00 PM</span></div>';" +
     "edBody+='<p style=\"margin-top:8px\">Vote at any Vote Center in Travis County with a \\u201CVote Here / Aqu\\u00ED\\u201D sign.</p>';" +
     "edBody+='<p style=\"margin-top:8px;padding:10px;background:rgba(33,89,143,.06);border-radius:var(--rs);font-size:13px\">" +
-      "<b>Open Primary:</b> Texas has open primaries \\u2014 tell the poll worker which party\\u2019s primary you want. You can only vote in one.</p>';" +
-    "edBody+='<div style=\"margin-top:10px\"><a href=\"https://countyclerk.traviscountytx.gov/departments/elections/current-election/\" target=\"_blank\" style=\"font-size:14px;font-weight:600;color:var(--blue)\">Find Election Day locations &rarr;</a></div>';" +
-    "h+=accSection('vi-eday','\u{1F3DB}\u{FE0F}','Election Day',edBody);" +
+      "<b>'+t('Open Primary:')+'</b> '+t('Texas has open primaries \\u2014 tell the poll worker which party\\u2019s primary you want. You can only vote in one.')+'</p>';" +
+    "edBody+='<div style=\"margin-top:10px\"><a href=\"https://countyclerk.traviscountytx.gov/departments/elections/current-election/\" target=\"_blank\" style=\"font-size:14px;font-weight:600;color:var(--blue)\">'+t('Find Election Day locations')+' &rarr;</a></div>';" +
+    "h+=accSection('vi-eday','\u{1F3DB}\u{FE0F}',t('Election Day'),edBody);" +
 
     // Voter ID accordion
     "var idBody='';" +
     "var ids=['Texas driver\\u2019s license or DPS ID','Texas Election ID Certificate (EIC)','Texas concealed handgun license','U.S. military ID with photo','U.S. citizenship certificate with photo','U.S. passport (book or card)'];" +
     "for(var i=0;i<ids.length;i++){idBody+='<div class=\"vi-check\"><span class=\"vi-check-icon\">\\u2705</span>'+ids[i]+'</div>'}" +
-    "idBody+='<p style=\"font-size:13px;color:var(--text2);margin-top:8px\">Expired IDs accepted if expired less than 4 years. No expiration limit for voters 70+.</p>';" +
-    "h+=accSection('vi-id','\u{1F4CB}','Voter ID',idBody);" +
+    "idBody+='<p style=\"font-size:13px;color:var(--text2);margin-top:8px\">'+t('Expired IDs accepted if expired less than 4 years. No expiration limit for voters 70+.')+'</p>';" +
+    "h+=accSection('vi-id','\u{1F4CB}',t('Voter ID'),idBody);" +
 
     // What to Bring accordion
     "var bringBody='';" +
     "bringBody+='<div style=\"padding:8px 0;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)\">';" +
-    "bringBody+='<span>\u{1F4CB} Photo ID</span><span class=\"vi-badge vi-badge-req\">REQUIRED</span></div>';" +
+    "bringBody+='<span>\u{1F4CB} '+t('Photo ID')+'</span><span class=\"vi-badge vi-badge-req\">'+t('REQUIRED')+'</span></div>';" +
     "bringBody+='<div style=\"padding:8px 0;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)\">';" +
-    "bringBody+='<span>\u{1F4C4} Your cheat sheet (printed)</span><span class=\"vi-badge vi-badge-opt\">Optional</span></div>';" +
+    "bringBody+='<span>\u{1F4C4} '+t('Your cheat sheet (printed)')+'</span><span class=\"vi-badge vi-badge-opt\">'+t('Optional')+'</span></div>';" +
     "bringBody+='<div style=\"padding:8px 0;display:flex;justify-content:space-between;align-items:center\">';" +
-    "bringBody+='<span>\u{1F4B3} Voter registration card</span><span class=\"vi-badge vi-badge-opt\">Optional</span></div>';" +
-    "bringBody+='<div class=\"vi-warn\"><span style=\"font-size:18px\">\u26A0\u{FE0F}</span><div><b>Travis County:</b> You may NOT use your phone in the voting booth. Print your cheat sheet before you go!</div></div>';" +
-    "h+=accSection('vi-bring','\u{1F6CD}\u{FE0F}','What to Bring',bringBody);" +
+    "bringBody+='<span>\u{1F4B3} '+t('Voter registration card')+'</span><span class=\"vi-badge vi-badge-opt\">'+t('Optional')+'</span></div>';" +
+    "bringBody+='<div class=\"vi-warn\"><span style=\"font-size:18px\">\u26A0\u{FE0F}</span><div><b>'+t('Travis County:')+'</b> '+t('You may NOT use your phone in the voting booth. Print your cheat sheet before you go!')+'</div></div>';" +
+    "h+=accSection('vi-bring','\u{1F6CD}\u{FE0F}',t('What to Bring'),bringBody);" +
 
     // Resources accordion
     "var resBody='';" +
@@ -1136,20 +1526,20 @@ var APP_JS = [
     "resBody+='<div class=\"vi-link\"><a href=\"https://votetravis.gov\" target=\"_blank\">VoteTravis.gov \\u2014 Official info &rarr;</a></div>';" +
     "resBody+='<div class=\"vi-link\"><a href=\"https://votetexas.gov\" target=\"_blank\">VoteTexas.gov \\u2014 State info &rarr;</a></div>';" +
     "resBody+='<div class=\"vi-link\"><a href=\"https://www.kut.org\" target=\"_blank\">KUT Austin Voter Guide &rarr;</a></div>';" +
-    "h+=accSection('vi-res','\u{1F517}','Resources',resBody);" +
+    "h+=accSection('vi-res','\u{1F517}',t('Resources'),resBody);" +
 
     // Contact card
     "h+='<div class=\"card\" style=\"margin-top:16px\">';" +
-    "h+='<div style=\"font-size:16px;font-weight:700;margin-bottom:8px\">Travis County Elections</div>';" +
+    "h+='<div style=\"font-size:16px;font-weight:700;margin-bottom:8px\">'+t('Travis County Elections')+'</div>';" +
     "h+='<div style=\"padding:6px 0\"><a href=\"tel:5122388683\" style=\"font-size:15px;color:var(--blue);font-weight:600\">\u{1F4DE} (512) 238-8683</a></div>';" +
     "h+='<div style=\"padding:6px 0\"><a href=\"https://votetravis.gov\" target=\"_blank\" style=\"font-size:15px;color:var(--blue);font-weight:600\">\u{1F310} votetravis.gov</a></div>';" +
     "h+='</div>';" +
 
     // Footer links
     "h+='<div style=\"text-align:center;padding:24px 0 8px;font-size:13px;color:var(--text2)\">';" +
-    "h+='<a href=\"/nonpartisan\" target=\"_blank\" style=\"color:var(--text2)\">Nonpartisan by Design</a>';" +
+    "h+='<a href=\"/nonpartisan\" target=\"_blank\" style=\"color:var(--text2)\">'+t('Nonpartisan by Design')+'</a>';" +
     "h+=' &middot; ';" +
-    "h+='<a href=\"/privacy\" target=\"_blank\" style=\"color:var(--text2)\">Privacy Policy</a>';" +
+    "h+='<a href=\"/privacy\" target=\"_blank\" style=\"color:var(--text2)\">'+t('Privacy Policy')+'</a>';" +
     "h+='<br><span style=\"margin-top:6px;display:inline-block\">Built in Austin, TX &middot; <a href=\"mailto:howdy@atxvotes.app\" style=\"color:var(--text2)\">howdy@atxvotes.app</a></span>';" +
     "h+='</div>';" +
     "return h;" +
@@ -1199,18 +1589,22 @@ var APP_JS = [
     "}" +
     "else if(action==='nav'){location.hash=el.dataset.to}" +
     "else if(action==='reset'){" +
-      "if(confirm('Start over? This will erase your profile and recommendations.')){" +
+      "if(confirm(t('Start over? This will erase your profile and recommendations.'))){" +
         "S.phase=0;S.issues=[];S.spectrum=null;S.policyViews={};S.qualities=[];" +
         "S.address={street:'',city:'Austin',state:'TX',zip:''};S.ddIndex=0;S.ddQuestions=[];" +
         "S.repBallot=null;S.demBallot=null;S.selectedParty='republican';" +
         "S.guideComplete=false;S.summary=null;S.districts=null;S.expanded={};" +
         "shuffledIssues=null;shuffledSpectrum=null;shuffledQualities=null;shuffledDD={};" +
         "try{localStorage.removeItem('atx_votes_profile');localStorage.removeItem('atx_votes_ballot_republican');" +
-        "localStorage.removeItem('atx_votes_ballot_democrat');localStorage.removeItem('atx_votes_selected_party')}catch(e){}" +
+        "localStorage.removeItem('atx_votes_ballot_democrat');localStorage.removeItem('atx_votes_selected_party');localStorage.removeItem('atx_votes_has_voted')}catch(e){}" +
         "location.hash='#/';render()" +
       "}" +
     "}" +
     "else if(action==='dismiss-disclaimer'){S.disclaimerDismissed=true;render()}" +
+    "else if(action==='set-lang'){setLang(el.dataset.value)}" +
+    "else if(action==='mark-voted'){S.hasVoted=true;save();render()}" +
+    "else if(action==='unvote'){S.hasVoted=false;save();render()}" +
+    "else if(action==='share-voted'){shareStickerImage()}" +
     "else if(action==='do-print'){window.print()}" +
     "else if(action==='share'){shareGuide()}" +
   "});",
@@ -1335,6 +1729,53 @@ var APP_JS = [
     "}else{" +
       "navigator.clipboard.writeText(text).then(function(){alert('Copied to clipboard!')}).catch(function(){alert(text)})" +
     "}" +
+  "}",
+
+  // ============ SHARE STICKER ============
+  "function shareStickerImage(){" +
+    "var W=440,H=330;" +
+    "var c=document.createElement('canvas');c.width=W;c.height=H;" +
+    "var ctx=c.getContext('2d');" +
+    // White oval background
+    "ctx.save();ctx.beginPath();ctx.ellipse(W/2,H/2,W/2-4,H/2-4,0,0,Math.PI*2);ctx.closePath();" +
+    "ctx.fillStyle='#fff';ctx.fill();" +
+    "ctx.strokeStyle='rgba(0,0,0,.15)';ctx.lineWidth=3;ctx.stroke();ctx.clip();" +
+    // Flag — 13 stripes
+    "var fw=140,fh=84,fx=(W-fw)/2,fy=24;" +
+    "var sH=fh/13;" +
+    "for(var si=0;si<13;si++){" +
+      "ctx.fillStyle=si%2===0?'#CC1919':'#fff';" +
+      "ctx.fillRect(fx,fy+si*sH,fw,sH+1);" +
+    "}" +
+    // Canton
+    "var cw=58,ch=46;" +
+    "ctx.fillStyle='#0D2738';ctx.fillRect(fx,fy,cw,ch);" +
+    // Stars (3x4 grid)
+    "ctx.fillStyle='#fff';" +
+    "for(var sr=0;sr<3;sr++){for(var sc=0;sc<4;sc++){" +
+      "ctx.beginPath();ctx.arc(fx+8+sc*13,fy+8+sr*13,3,0,Math.PI*2);ctx.fill();" +
+    "}}" +
+    // "I Voted" text
+    "ctx.fillStyle='#0D2738';ctx.font='bold italic 84px Georgia,serif';ctx.textAlign='center';ctx.textBaseline='top';" +
+    "ctx.fillText('I Voted',W/2,fy+fh+8);" +
+    // "Early!" text if during early voting
+    "var election=new Date(2026,2,3);var now=new Date();var diff=Math.ceil((election-now)/(1000*60*60*24));" +
+    "if(diff>0){ctx.fillStyle='#CC1919';ctx.font='bold italic 48px Georgia,serif';ctx.fillText('Early!',W/2,fy+fh+88);}" +
+    // "atxvotes.app" at bottom
+    "ctx.fillStyle='#888';ctx.font='24px -apple-system,sans-serif';ctx.fillText('atxvotes.app',W/2,H-40);" +
+    "ctx.restore();" +
+    // Convert to blob and share
+    "c.toBlob(function(blob){" +
+      "var vText='I voted in the Texas Primary! \\u{1F5F3}\\uFE0F\\n\\nBuild your personalized voting guide at atxvotes.app/app';" +
+      "if(navigator.share&&navigator.canShare){" +
+        "var file=new File([blob],'i-voted.png',{type:'image/png'});" +
+        "var shareData={title:'I Voted!',text:vText,files:[file]};" +
+        "if(navigator.canShare(shareData)){navigator.share(shareData).catch(function(){});return}" +
+      "}" +
+      // Fallback: text share
+      "if(navigator.share){navigator.share({title:'I Voted!',text:vText}).catch(function(){})}" +
+      "else{navigator.clipboard.writeText(vText).then(function(){alert('Copied to clipboard!')}).catch(function(){alert(vText)})}" +
+    "},'image/png');" +
   "}",
 
   // ============ BACKGROUND REFRESH ============

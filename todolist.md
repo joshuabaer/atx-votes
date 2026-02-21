@@ -34,11 +34,9 @@ Items not yet attempted or needing a fresh approach after failed verification.
 #### Landing Page
 
 #### Ballot Display
-- [ ] PWA: Proposition cards — side-by-side layout and icons — add side-by-side supporters vs opponents, color-coded If Passes (green check) / If Fails (red X), brain icon for AI reasoning, confidence display. Reference iOS `BallotOverviewView.swift` lines 610-791.
 
 #### Interview Flow
 - [ ] PWA: Qualities picker icons — add SVG icons matching iOS SF Symbols for each of the 8 qualities. PWA currently shows text-only chips. Reference `QualitiesPickerView.swift`.
-- [ ] PWA: Address form — privacy note and focus management — add privacy note with lock icon ("Your address stays on your device..."), auto-focus on street input, ensure proper `inputmode` attributes.
 - [ ] PWA: Address verification — verify user-entered addresses are valid and within the service area (Austin/Travis County). Could involve geocoding or validating against a known address database.
 
 #### Pages
@@ -50,8 +48,6 @@ Items not yet attempted or needing a fresh approach after failed verification.
 
 ### Features
 
-- [ ] PWA: "I Voted" tracking and sticker — toggle button to mark as voted on Vote Info page, update countdown to "You voted!", shareable "I Voted" graphic (CSS/SVG-based). Store in localStorage.
-- [ ] PWA: Spanish translation / i18n — add i18n system (translations object keyed by language) and translate all strings to Spanish. Default to browser language via `navigator.language`, but make it easy to switch between English and Spanish at any time (language toggle in nav/profile). Store preference in localStorage. iOS already has Spanish translation.
 - [ ] PWA: Accessibility — ARIA labels on interactive elements, ARIA roles, semantic HTML (real buttons instead of divs with data-action), focus management for navigation, `prefers-reduced-motion` media query to disable animations.
 - [ ] iOS: Light/dark mode support — currently forced to light mode via `.preferredColorScheme(.light)`. Define dark-mode variants for all Theme colors and remove forced light mode.
 - [ ] iOS: Election countdown widget — WidgetKit extension with systemSmall/systemMedium/lock screen families showing days until Election Day and next key date. App Group shared UserDefaults for data bridge.
@@ -124,7 +120,7 @@ Verified working. Collapsed for reference.
 </details>
 
 <details>
-<summary>PWA Improvements (14 resolved)</summary>
+<summary>PWA Improvements (16 resolved)</summary>
 
 - [x] Service worker cache-first → network-first — old v1 SW served stale HTML. Changed to v2 network-first, added `/app/clear` cache-clearing route, added `Cache-Control: no-cache` header.
 - [x] Tab bar not visible — `position:fixed` tab bar inside `#app` wasn't rendering on some browsers. Moved to flex layout: body is `display:flex;flex-direction:column`, `#app` scrolls (`flex:1;overflow-y:auto`), tab bar is a natural flex child in separate `#tabs` div.
@@ -140,16 +136,20 @@ Verified working. Collapsed for reference.
 - [x] Cheat sheet party switcher — added party switcher to cheat sheet page, hidden in print via `@media print`.
 - [x] Election info header card — centered card at top of ballot showing "Texas [Party] Primary", date, and user's district badges (CD/SD/HD) or "Showing all races" fallback.
 - [x] Candidate cards — avatar circle (first letter, rotating colors), color-coded Strengths (green) / Concerns (red) headers, flow-layout position chips replacing bullet lists.
+- [x] Proposition cards — color-coded If Passes (green check) / If Fails (red X) boxes always visible, brain icon AI reasoning, side-by-side supporters vs opponents columns, fiscal impact and caveats with icons.
+- [x] Address form privacy note — lock icon with green-tinted privacy reassurance ("Your address stays on your device..."), auto-focus on street input, proper inputmode attributes.
 
 </details>
 
 <details>
-<summary>PWA Features (4 resolved)</summary>
+<summary>PWA Features (6 resolved)</summary>
 
 - [x] PWA web app — full single-page app at `/app` with inline CSS/JS, no build step. Interview flow (7 phases), ballot display, race detail, propositions, profile, vote info. Hash router, localStorage persistence, dark mode via `prefers-color-scheme`.
 - [x] Server-side guide generation — `pwa-guide.js` handles Claude API calls server-side so APP_SECRET and prompts never reach the client. Model fallback: `claude-sonnet-4-6` → `claude-sonnet-4-20250514`.
 - [x] Background ballot refresh — `refreshBallots()` fetches latest ballot data on load and merges factual fields (endorsements, polling, fundraising, etc.) while preserving personalized recommendations.
 - [x] Send Feedback + credits on profile — "Send Feedback" mailto link (howdy@atxvotes.app) and "Powered by Claude (Anthropic)" credits added to profile page.
+- [x] "I Voted" tracking and sticker — CSS sticker graphic on Vote Info page, "I Voted!" button on countdown, replaces countdown with sticker + thank you message when marked, shareable via Web Share API, undo option, persists in localStorage.
+- [x] Spanish translation / i18n — English-as-key translation system with 200+ Spanish translations ported from iOS. Auto-detects browser language, language toggle on welcome page and profile. Translates all UI strings including interview questions, deep dives, ballot labels, vote info, and cheat sheet. Data values stay English for API compatibility.
 
 </details>
 
