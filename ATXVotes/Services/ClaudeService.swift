@@ -242,7 +242,7 @@ actor ClaudeService: GuideGenerating {
 
             // Try up to 2 attempts per model (initial + 1 retry for 529)
             for attempt in 0...1 {
-                var request = URLRequest(url: url, timeoutInterval: 60)
+                var request = URLRequest(url: url, timeoutInterval: 120)
                 request.httpMethod = "POST"
                 request.addValue("Bearer \(appSecret)", forHTTPHeaderField: "Authorization")
                 request.addValue("application/json", forHTTPHeaderField: "Content-Type")

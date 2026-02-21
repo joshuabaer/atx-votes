@@ -263,6 +263,9 @@ class VotingGuideStore: ObservableObject {
         } catch let error as ClaudeError {
             errorMessage = error.localizedDescription
             isLoading = false
+        } catch let error as URLError where error.code == .timedOut {
+            errorMessage = "The AI is taking longer than usual. Please try again — it usually works on the second attempt."
+            isLoading = false
         } catch {
             errorMessage = "Something went wrong building your guide. Please try again."
             isLoading = false
