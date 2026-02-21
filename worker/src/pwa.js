@@ -714,6 +714,12 @@ var APP_JS = [
     "'Texas has open primaries \\u2014 tell the poll worker which party\\u2019s primary you want. You can only vote in one.':'Texas tiene primarias abiertas \\u2014 dile al trabajador electoral en cu\\u00E1l primaria quieres votar. Solo puedes votar en una.'," +
     "'Find Election Day locations':'Encuentra lugares para el d\\u00EDa de elecciones'," +
     "'Voter ID':'Identificaci\\u00F3n de votante'," +
+    "'Texas driver\\u2019s license or DPS ID':'Licencia de conducir de Texas o ID del DPS'," +
+    "'Texas Election ID Certificate (EIC)':'Certificado de Identificaci\\u00F3n Electoral de Texas (EIC)'," +
+    "'Texas concealed handgun license':'Licencia de portaci\\u00F3n oculta de armas de Texas'," +
+    "'U.S. military ID with photo':'Identificaci\\u00F3n militar de EE.UU. con foto'," +
+    "'U.S. citizenship certificate with photo':'Certificado de ciudadan\\u00EDa de EE.UU. con foto'," +
+    "'U.S. passport (book or card)':'Pasaporte de EE.UU. (libro o tarjeta)'," +
     "'Expired IDs accepted if expired less than 4 years. No expiration limit for voters 70+.':'Se aceptan identificaciones vencidas si tienen menos de 4 a\\u00F1os de vencimiento. Sin l\\u00EDmite para votantes de 70 a\\u00F1os o m\\u00E1s.'," +
     "'What to Bring':'Qu\\u00E9 llevar'," +
     "'Photo ID':'Identificaci\\u00F3n con foto'," +
@@ -943,7 +949,7 @@ var APP_JS = [
       '{l:"Local solutions",d:"Community health centers and county programs"}' +
     "]}," +
     '"Environment & Climate":{q:"On environment and climate?",opts:[' +
-      "{l:\"Don't overreact\",d:\"Protect energy jobs, market-driven solutions\"}," +
+      "{l:\"Don\\u2019t overreact\",d:\"Protect energy jobs, market-driven solutions\"}," +
       '{l:"All of the above",d:"Renewables and fossil fuels, pragmatic transition"},' +
       '{l:"Go green fast",d:"Aggressive renewable targets and climate action"},' +
       '{l:"Local focus",d:"Clean air and water in Austin, green spaces, urban heat"}' +
@@ -1707,7 +1713,7 @@ var APP_JS = [
     // Voter ID accordion
     "var idBody='';" +
     "var ids=['Texas driver\\u2019s license or DPS ID','Texas Election ID Certificate (EIC)','Texas concealed handgun license','U.S. military ID with photo','U.S. citizenship certificate with photo','U.S. passport (book or card)'];" +
-    "for(var i=0;i<ids.length;i++){idBody+='<div class=\"vi-check\"><span class=\"vi-check-icon\">\\u2705</span>'+ids[i]+'</div>'}" +
+    "for(var i=0;i<ids.length;i++){idBody+='<div class=\"vi-check\"><span class=\"vi-check-icon\">\\u2705</span>'+t(ids[i])+'</div>'}" +
     "idBody+='<p style=\"font-size:13px;color:var(--text2);margin-top:8px\">'+t('Expired IDs accepted if expired less than 4 years. No expiration limit for voters 70+.')+'</p>';" +
     "h+=accSection('vi-id','\u{1F4CB}',t('Voter ID'),idBody);" +
 

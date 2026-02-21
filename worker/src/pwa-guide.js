@@ -55,11 +55,11 @@ export async function handlePWA_Guide(request, env) {
     var userPrompt = buildUserPrompt(profile, ballotDesc, ballot, party, lang);
 
     // Call Claude with model fallback
-    var responseText = await callClaude(env, SYSTEM_PROMPT, userPrompt);
+    var responseText = await callClaude(env, SYSTEM_PROMPT, userPrompt, lang);
 
     // Parse and merge
     var guideResponse = parseResponse(responseText);
-    var mergedBallot = mergeRecommendations(guideResponse, ballot);
+    var mergedBallot = mergeRecommendations(guideResponse, ballot, lang);
 
     return json({
       ballot: mergedBallot,
@@ -290,14 +290,26 @@ function buildUserPrompt(profile, ballotDesc, ballot, party, lang) {
     '      "caveats": null,\n' +
     '      "confidence": "Clear Call|Lean|Genuinely Contested"\n' +
     "    }\n" +
-    "  ]\n" +
+    "  ]" +
+    (lang === "es"
+      ? ',\n  "candidateTranslations": [\n' +
+        "    {\n" +
+        '      "name": "exact candidate name (do not translate)",\n' +
+        '      "summary": "Spanish translation of candidate summary",\n' +
+        '      "keyPositions": ["Spanish translation of each position"],\n' +
+        '      "pros": ["Spanish translation of each pro"],\n' +
+        '      "cons": ["Spanish translation of each con"]\n' +
+        "    }\n" +
+        "  ]\n"
+      : "\n") +
     "}"
   );
 }
 
 // MARK: - Claude API Call
 
-async function callClaude(env, system, userMessage) {
+async function callClaude(env, system, userMessage, lang) {
+  var maxTokens = lang === "es" ? 8192 : 4096;
   for (var i = 0; i < MODELS.length; i++) {
     var model = MODELS[i];
     for (var attempt = 0; attempt <= 1; attempt++) {
@@ -310,7 +322,7 @@ async function callClaude(env, system, userMessage) {
         },
         body: JSON.stringify({
           model: model,
-          max_tokens: 4096,
+          max_tokens: maxTokens,
           system: system,
           messages: [{ role: "user", content: userMessage }],
         }),
@@ -357,9 +369,29 @@ function parseResponse(text) {
 
 // MARK: - Merge Recommendations
 
-function mergeRecommendations(guideResponse, ballot) {
+function mergeRecommendations(guideResponse, ballot, lang) {
   // Deep clone
   var merged = JSON.parse(JSON.stringify(ballot));
+
+  // Merge candidate translations for Spanish
+  if (lang === "es" && guideResponse.candidateTranslations) {
+    var txMap = {};
+    for (var t = 0; t < guideResponse.candidateTranslations.length; t++) {
+      var tx = guideResponse.candidateTranslations[t];
+      txMap[tx.name] = tx;
+    }
+    for (var ri2 = 0; ri2 < merged.races.length; ri2++) {
+      for (var ci2 = 0; ci2 < merged.races[ri2].candidates.length; ci2++) {
+        var cand = merged.races[ri2].candidates[ci2];
+        var tr = txMap[cand.name];
+        if (!tr) continue;
+        if (tr.summary) cand.summary = tr.summary;
+        if (tr.keyPositions && tr.keyPositions.length) cand.keyPositions = tr.keyPositions;
+        if (tr.pros && tr.pros.length) cand.pros = tr.pros;
+        if (tr.cons && tr.cons.length) cand.cons = tr.cons;
+      }
+    }
+  }
 
   // Merge race recommendations
   for (var ri = 0; ri < merged.races.length; ri++) {
