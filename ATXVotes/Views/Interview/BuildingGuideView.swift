@@ -1,5 +1,34 @@
 import SwiftUI
 
+/// Self-contained pulse animation that won't be disrupted by parent animation modifiers.
+private struct PulseScale: ViewModifier {
+    let active: Bool
+    @State private var pulsing = false
+
+    func body(content: Content) -> some View {
+        content
+            .scaleEffect(pulsing ? 1.1 : 1.0)
+            .onChange(of: active) {
+                if active {
+                    withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
+                        pulsing = true
+                    }
+                } else {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        pulsing = false
+                    }
+                }
+            }
+            .onAppear {
+                if active {
+                    withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
+                        pulsing = true
+                    }
+                }
+            }
+    }
+}
+
 struct BuildingGuideView: View {
     @EnvironmentObject var store: VotingGuideStore
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -56,27 +85,29 @@ struct BuildingGuideView: View {
                 Circle()
                     .fill(circleTint.opacity(0.08))
                     .frame(width: 140, height: 140)
+                    .animation(.easeInOut(duration: 0.3), value: circleTint)
 
                 Circle()
                     .fill(circleTint.opacity(0.05))
                     .frame(width: 180, height: 180)
-                    .scaleEffect(store.isLoading && !reduceMotion ? 1.1 : 1.0)
-                    .animation(reduceMotion ? nil : .easeInOut(duration: 1.5).repeatForever(autoreverses: true), value: store.isLoading)
+                    .modifier(PulseScale(active: store.isLoading && !reduceMotion))
+                    .animation(.easeInOut(duration: 0.3), value: circleTint)
 
                 if store.guideComplete {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.system(size: 74))
                         .foregroundColor(Theme.success)
                         .transition(reduceMotion ? .opacity : .scale.combined(with: .opacity))
+                        .animation(.spring(response: 0.4, dampingFraction: 0.7), value: store.guideComplete)
                 } else {
                     Text(steps[currentStep].emoji)
                         .font(.system(size: 64))
                         .id(currentStep)
-                        .transition(reduceMotion ? .opacity : .scale.combined(with: .opacity))
+                        .transition(.opacity)
+                        .animation(.easeInOut(duration: 0.25), value: currentStep)
                 }
             }
-            .animation(.spring(response: 0.4, dampingFraction: 0.7), value: currentStep)
-            .animation(.spring(response: 0.4, dampingFraction: 0.7), value: store.guideComplete)
+            .frame(width: 180, height: 180)
 
             VStack(spacing: 8) {
                 Text(store.guideComplete ? "Your guide is ready!" : store.loadingMessage)
