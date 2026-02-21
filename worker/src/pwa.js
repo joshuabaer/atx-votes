@@ -291,14 +291,13 @@ var CSS = [
   ".spinner{width:48px;height:48px;border:4px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 24px}",
   "@keyframes spin{to{transform:rotate(360deg)}}",
   ".loading-icon{font-size:56px;margin-bottom:16px}",
-  ".tug-arena{display:flex;align-items:center;justify-content:center;gap:2px;margin-bottom:16px}",
+  ".tug-arena{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:16px}",
   ".tug-left,.tug-right{font-size:64px;display:inline-block}",
   ".tug-left{animation:tugLeft 1.6s ease-in-out infinite;transform:scaleX(-1)}",
   ".tug-right{animation:tugRight 1.6s ease-in-out infinite}",
-  ".tug-star{font-size:28px;animation:tugStar 1.6s ease-in-out infinite}",
+  ".tug-star{font-size:28px}",
   "@keyframes tugLeft{0%,100%{transform:scaleX(-1) scaleY(1)}50%{transform:scaleX(-1.35) scaleY(1.35)}}",
   "@keyframes tugRight{0%,100%{transform:scale(1.35)}50%{transform:scale(1)}}",
-  "@keyframes tugStar{0%,100%{transform:scale(1)}25%,75%{transform:scale(1.15)}50%{transform:scale(1)}}",
   ".loading-msg{animation:fadeIn .4s ease}",
   "@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}",
   ".dots{display:flex;gap:8px;justify-content:center;margin-top:16px}",
@@ -421,7 +420,7 @@ var CSS = [
   // Accessibility: reduce motion
   "@media(prefers-reduced-motion:reduce){" +
     ".loading-icon{animation:none}" +
-    ".tug-left,.tug-right,.tug-star{animation:none}" +
+    ".tug-left,.tug-right{animation:none}" +
     ".loading-msg{animation:none}" +
     ".dot-active{animation:none}" +
     ".spinner{animation:none}" +
