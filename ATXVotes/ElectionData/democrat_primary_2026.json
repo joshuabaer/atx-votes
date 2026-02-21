@@ -652,91 +652,169 @@
       "title": "Expand Medicaid",
       "description": "Texas should expand Medicaid to ensure access to affordable healthcare for all residents.",
       "recommendation": "Lean Yes",
-      "reasoning": "Texas has the highest uninsured rate in the nation. Medicaid expansion would cover over a million Texans using available federal funding."
+      "reasoning": "Texas has the highest uninsured rate in the nation. Medicaid expansion would cover over a million Texans using available federal funding.",
+      "background": "Texas has the nation's highest uninsured rate and has not expanded Medicaid under the Affordable Care Act, leaving it as one of only 10 states that have declined expansion. Over 950,000 working-age adults fall into a 'coverage gap' — earning too much for current Medicaid but too little for marketplace subsidies. Forty other states have already expanded Medicaid. Texas currently forgoes an estimated $5-6 billion in annual federal funding by refusing expansion.",
+      "fiscalImpact": "Non-binding advisory. If enacted, Texas would receive approximately $6 billion annually in federal funding with a 90/10 federal-state match. Over ten years, the economic ripple effect is projected at $100 billion. The state's share would cost roughly $600 million per year, but could be partially offset by reductions in the $5.5 billion Texas currently spends annually on uncompensated hospital care.",
+      "supporters": ["Cover Texas Now (coalition of 188+ organizations)", "Every Texan (policy organization)", "Texas Hospital Association", "Episcopal Health Foundation", "Texas Medical Association", "AARP Texas"],
+      "opponents": ["Gov. Greg Abbott", "Lt. Gov. Dan Patrick", "Texas Public Policy Foundation", "Heritage Foundation", "Some fiscal conservatives who argue expansion would 'bust' the state budget"],
+      "ifPasses": "Signals strong Democratic voter support for Medicaid expansion. Strengthens the case for Democratic candidates to make expansion a central 2026 general election issue. Could pressure moderate Republicans, given that 73% of Texas voters (including 63% of strong Republicans) support expansion in polling.",
+      "ifFails": "Unlikely to fail among Democratic primary voters. A weak showing would suggest healthcare is not the top motivating issue for Democratic base voters, reducing its prominence as a campaign centerpiece."
     },
     {
       "number": 2,
       "title": "Humane immigration reform",
       "description": "Texas should adopt humane and dignified immigration policies and clear pathways to citizenship.",
       "recommendation": "Your Call",
-      "reasoning": "Depends on your immigration priorities. Both humanitarian and practical arguments exist."
+      "reasoning": "Depends on your immigration priorities. Both humanitarian and practical arguments exist.",
+      "background": "Texas is at the center of the national immigration debate. Reports have documented inhumane conditions at detention facilities such as Fort Bliss. The state's Operation Lone Star border initiative has cost over $11 billion since 2021. In 2025, the Trump administration's DOJ dropped its challenge to Texas's SB 4, which would have allowed state law enforcement to arrest and deport migrants. ICE enforcement operations in Texas have intensified, prompting school walkouts and community protests across the state.",
+      "fiscalImpact": "Non-binding advisory. Immigration policy is primarily set at the federal level. Texas currently spends billions on border enforcement through Operation Lone Star. Comprehensive immigration reform at the federal level could generate economic growth — immigrants contribute significantly to Texas's $2 trillion economy.",
+      "supporters": ["ACLU of Texas", "Las Americas Immigrant Advocacy Center", "American Immigration Council", "Catholic Bishops of Texas", "Texas business groups (who rely on immigrant labor)", "Presente.org"],
+      "opponents": ["Gov. Greg Abbott", "Republican Party of Texas", "Heritage Foundation", "Federation for American Immigration Reform (FAIR)", "Texas border security advocacy groups"],
+      "ifPasses": "Signals Democratic voter support for humane immigration reform and pathways to citizenship. Provides a clear contrast with Republican enforcement-first messaging in the 2026 general election. Could shape Democratic candidates' immigration platforms statewide.",
+      "ifFails": "Unlikely to fail among Democratic primary voters. A weak showing would suggest the Democratic base is conflicted on immigration messaging, potentially encouraging more moderate or enforcement-inclusive positions."
     },
     {
       "number": 3,
       "title": "Reproductive rights",
       "description": "Texans should have the right to make their own healthcare decisions, including reproductive rights, with removal of insurance barriers to treatment.",
       "recommendation": "Lean Yes",
-      "reasoning": "Core Democratic platform issue. Aligns with bodily autonomy and personal healthcare decision-making."
+      "reasoning": "Core Democratic platform issue. Aligns with bodily autonomy and personal healthcare decision-making.",
+      "background": "Texas enforces some of the nation's strictest abortion restrictions, banning nearly all abortions except when the mother's life is at imminent risk. The state also prohibits gender-affirming care for minors. Since the 2022 Dobbs decision overturning Roe v. Wade, Texas has prosecuted providers and some localities have attempted to restrict residents from traveling out of state for abortion care. A major Texas Supreme Court challenge to the ban was pending as of early 2026. Insurance barriers also limit access to contraception and fertility treatments.",
+      "fiscalImpact": "Non-binding advisory. Reproductive healthcare restrictions have economic consequences — Texas has seen increases in maternal mortality, unplanned pregnancies, and emergency room visits for pregnancy complications. The state funnels millions to crisis pregnancy centers with limited oversight.",
+      "supporters": ["Avow Texas", "Planned Parenthood Texas Votes", "ACLU of Texas", "Lilith Fund", "Fund Texas Choice", "Texas Freedom Network", "Jane's Due Process", "Frontera Fund", "Every Body Texas"],
+      "opponents": ["Texas Right to Life", "Texas Alliance for Life", "Gov. Greg Abbott", "Texas Values", "Texas Eagle Forum"],
+      "ifPasses": "Signals overwhelming Democratic voter support for reproductive autonomy. Strengthens the issue as a major motivator for Democratic turnout in the November general election. Could fuel efforts to put a reproductive rights constitutional amendment before Texas voters.",
+      "ifFails": "Extremely unlikely to fail among Democratic primary voters. Any weakness would suggest the party base is divided on the scope of healthcare autonomy, which would be a significant surprise."
     },
     {
       "number": 4,
       "title": "Housing affordability",
       "description": "The state should use funding and regulation to address the housing crisis in urban and rural communities.",
       "recommendation": "Lean Yes",
-      "reasoning": "Housing costs are a top concern across Texas, especially in Austin."
+      "reasoning": "Housing costs are a top concern across Texas, especially in Austin.",
+      "background": "Texas median home prices jumped roughly 40% between 2019 and 2023, while mortgage rates hit 23-year highs. The state needs an estimated 320,000 more homes than it currently has, according to housing policy organization Up For Growth. Despite leading the nation in new housing construction, Texas's rapid population growth has outpaced supply. The Texas Comptroller has called housing affordability a 'looming economic threat.' The 2025 Legislature pursued zoning reforms to allow more residential development, but housing advocates say much more is needed.",
+      "fiscalImpact": "Non-binding advisory. Addressing the housing crisis would require significant state investment in affordable housing programs, down-payment assistance, and regulatory changes. The economic cost of inaction is also substantial — the Comptroller warns that housing unaffordability threatens the state's economic competitiveness and ability to attract workers.",
+      "supporters": ["Texas Housers (statewide housing advocacy)", "Up For Growth", "Texas Low Income Housing Information Service", "Habitat for Humanity Texas", "Local housing authorities", "Austin City Council"],
+      "opponents": ["Some property rights advocates who oppose new regulations", "NIMBY groups opposing density increases", "Developers who oppose affordability mandates", "Some fiscal conservatives who oppose state spending on housing programs"],
+      "ifPasses": "Signals strong Democratic voter demand for state action on housing. Provides a mandate for Democratic candidates to make housing affordability a central platform issue. Could pressure the legislature to increase housing funds and strengthen renter protections.",
+      "ifFails": "Unlikely to fail. A weak showing would suggest Democratic voters prioritize other economic issues over housing, reducing its visibility as a campaign issue."
     },
     {
       "number": 5,
       "title": "Public school funding",
       "description": "Texas should equalize per-pupil spending to the national average. Texas currently ranks 42nd.",
       "recommendation": "Lean Yes",
-      "reasoning": "Texas ranks near the bottom in per-pupil education spending despite a growing economy."
+      "reasoning": "Texas ranks near the bottom in per-pupil education spending despite a growing economy.",
+      "background": "Texas ranks 42nd nationally in per-student funding at approximately $13,189 per pupil — about $4,000 to $5,664 below the national average depending on the measure used. Per-pupil funding remained essentially flat from 2019 through 2024 despite significant inflation. The 2025 Legislature passed HB 2, an $8.5 billion school funding bill that included teacher pay raises, but education advocates say Texas would need roughly $19.6 billion in new funding just to restore 2019 purchasing power. Meanwhile, the state launched a controversial school voucher program that critics say diverts scarce public education funds to private schools.",
+      "fiscalImpact": "Non-binding advisory. Reaching the national per-pupil average would require billions in additional annual spending — estimates range from $5 billion to $8.5 billion depending on the baseline. The 2025 Legislature invested $8.5 billion but advocates at Raise Your Hand Texas say it still falls short.",
+      "supporters": ["Texas State Teachers Association (TSTA)", "Texas AFT", "Texas Association of School Administrators", "Raise Your Hand Texas", "Texas Association of School Boards", "Education Austin"],
+      "opponents": ["Some fiscal conservatives who oppose higher state spending", "School voucher proponents who prioritize school choice over increased per-pupil funding", "Texas Public Policy Foundation (favors market-based education reforms)"],
+      "ifPasses": "Signals strong Democratic voter support for substantially increased public school funding. Strengthens the argument against school vouchers by emphasizing the underfunding of existing public schools. Could become a key general election contrast with Republicans.",
+      "ifFails": "Unlikely to fail. A weak result would suggest Democratic voters are ambivalent about the specific target of reaching the national average, though support for schools generally would remain strong."
     },
     {
       "number": 6,
       "title": "Online voter registration",
       "description": "Texas should implement secure online voter registration, already used by 42 other states.",
       "recommendation": "Lean Yes",
-      "reasoning": "42 other states already do this. Modernizes voter access without compromising security."
+      "reasoning": "42 other states already do this. Modernizes voter access without compromising security.",
+      "background": "Texas is one of only eight states without universal online voter registration. Voters must submit paper forms by mail or in person — a process plagued by lost applications, handwriting errors, and processing delays. A bipartisan bill in 2015 had 76 House co-authors (a majority) but was never brought to a vote. A similar bill received a public hearing in 2025 but missed its deadline to become law. The Texas Association of County Election Officials, comprising both Republican and Democratic officials, has endorsed online registration, noting it would improve the accuracy of voter records.",
+      "fiscalImpact": "Non-binding advisory. Implementation would require an initial investment in a secure online registration system, but would reduce ongoing costs associated with processing paper forms, fixing errors, and mailing materials. Other states report long-term cost savings after implementing online registration.",
+      "supporters": ["League of Women Voters of Texas", "Texas Association of County Election Officials (bipartisan)", "ACLU of Texas", "Common Cause Texas", "MOVE Texas (youth voter engagement)", "Texas Civil Rights Project"],
+      "opponents": ["Some Republican legislators who have blocked bills from reaching a vote", "Groups concerned about cybersecurity risks (though 42 states have successfully implemented secure systems)", "Texas Secretary of State's office has been slow to adopt"],
+      "ifPasses": "Signals broad Democratic voter demand for modernized voter registration. Provides ammunition for continued legislative efforts — especially given bipartisan support from county election officials. Could be paired with other voting access measures in future sessions.",
+      "ifFails": "Extremely unlikely to fail. Online voter registration is among the least controversial modernization proposals. A failure would be a major surprise."
     },
     {
       "number": 7,
       "title": "Environmental standards",
       "description": "Texas should enforce stricter environmental standards for air, water, and biodiversity.",
       "recommendation": "Lean Yes",
-      "reasoning": "Austin and Texas face growing environmental challenges including air quality, water scarcity, and urban heat."
+      "reasoning": "Austin and Texas face growing environmental challenges including air quality, water scarcity, and urban heat.",
+      "background": "Texas hosts eight of the nation's top 50 greenhouse gas emitters and faces growing pollution challenges from its massive petrochemical, oil, and gas industries. The Trump administration's rollback of federal EPA protections has raised concerns that Texas, which has historically shown little interest in exceeding federal environmental standards, will see increased pollution. The Texas Commission on Environmental Quality (TCEQ) is currently revising surface water quality standards. Texas voters overwhelmingly approved a $20 billion water infrastructure bond in November 2025, showing broad bipartisan support for environmental investment.",
+      "fiscalImpact": "Non-binding advisory. Stricter enforcement would require additional TCEQ funding and staffing. However, environmental degradation carries its own economic costs — pollution-related healthcare expenses, water treatment costs, and climate-related disaster damage run into billions annually for Texas.",
+      "supporters": ["Sierra Club Lone Star Chapter", "Environment Texas", "Texas Campaign for the Environment", "Environmental Defense Fund", "Texas Living Waters Project", "Clean Air Task Force"],
+      "opponents": ["Texas Oil and Gas Association", "Texas Chemical Council", "Some business groups who oppose additional regulation", "Texas Public Policy Foundation (argues market-based solutions are preferable)", "Some Republican legislators who view regulation as anti-business"],
+      "ifPasses": "Signals Democratic voter demand for stronger environmental protections, particularly as federal standards are rolled back. Provides a mandate for Democratic candidates to campaign on clean air and water. Could influence TCEQ's ongoing water quality standards revision.",
+      "ifFails": "Unlikely to fail among Democratic primary voters. A weak showing would suggest the environment is not a top-tier motivating issue for the Democratic base in 2026."
     },
     {
       "number": 8,
       "title": "Cannabis legalization",
       "description": "Texas should legalize adult cannabis use and automatically expunge past cannabis-related convictions.",
       "recommendation": "Your Call",
-      "reasoning": "Combines drug policy reform with criminal justice reform. Depends on your personal stance."
+      "reasoning": "Combines drug policy reform with criminal justice reform. Depends on your personal stance.",
+      "background": "Recreational marijuana remains illegal in Texas despite growing public support — a 2025 poll found 53% of Texans oppose hemp product bans, and broader legalization polls even higher. Texas arrested over 26,000 people for cannabis possession in 2024 alone. The state's hemp industry already generates an estimated $8-10 billion annually and employs over 50,000 Texans. Lt. Gov. Dan Patrick has pushed to ban hemp-derived THC products, but Governor Abbott vetoed the ban bill (SB 3) after an outcry from veterans and other advocates. Multiple legalization bills (HB 1208, SB 335) were filed in 2025 but received no hearings.",
+      "fiscalImpact": "Non-binding advisory. If enacted, cannabis legalization could generate over $1 billion in annual tax revenue within a few years, based on projected $2.7 billion in annual sales. A regulated market could also create 20,000-40,000 direct jobs. Expungement provisions would reduce incarceration costs but require administrative processing resources.",
+      "supporters": ["Marijuana Policy Project", "Texas Cannabis Policy Center", "Foundation for an Informed Texas", "NORML Texas", "Veterans advocacy groups", "Criminal justice reform organizations", "ACLU of Texas"],
+      "opponents": ["Lt. Gov. Dan Patrick", "Texas Alliance for Life", "Some law enforcement organizations", "Anti-drug advocacy groups", "Smart Approaches to Marijuana (SAM)"],
+      "ifPasses": "Signals strong Democratic voter support for full legalization and criminal justice reform. Strengthens the issue as a general election differentiator. Could pressure moderate Republicans given that legalization polls above 50% statewide.",
+      "ifFails": "Unlikely to fail, but a close vote would suggest the Democratic base has reservations about full legalization, particularly the automatic expungement component. Could lead candidates to adopt a more incremental approach (decriminalization first)."
     },
     {
       "number": 9,
       "title": "Raise state employee wages",
       "description": "State and school employee salaries should be raised to national averages with biennial cost-of-living adjustments.",
       "recommendation": "Lean Yes",
-      "reasoning": "Texas state employees and teachers are paid below national averages, contributing to recruitment and retention challenges."
+      "reasoning": "Texas state employees and teachers are paid below national averages, contributing to recruitment and retention challenges.",
+      "background": "Texas ranks 31st nationally in average teacher salary at $62,463, with 77% of teachers reporting their pay is insufficient. Texas's 135,000 state employees received two 5% pay raises in 2024-2025, but advocacy groups say these do not keep pace with inflation. The Texas Public Employees Association (TPEA) is requesting a minimum $10,000/year raise for every state employee to restore their standard of living. The 2025 Legislature passed a $4.3 billion teacher pay raise bill — the largest single investment in teachers in the nation — but educators say it still does not close the gap with national averages.",
+      "fiscalImpact": "Non-binding advisory. Raising all state employee and teacher salaries to national averages with cost-of-living adjustments would cost billions annually. The 2025 teacher pay raise alone cost $4.3 billion. Proponents argue higher wages improve recruitment, retention, and the quality of public services, reducing costly turnover.",
+      "supporters": ["Texas State Teachers Association (TSTA)", "Texas AFT", "Texas Public Employees Association (TPEA)", "Texas State Employees Union (CWA Local 6186)", "Texas AFL-CIO", "Education Austin"],
+      "opponents": ["Fiscal conservatives who oppose increased state spending", "Texas Public Policy Foundation (favors targeted raises over across-the-board increases)", "Some legislators who argue the 2025 pay raise was sufficient"],
+      "ifPasses": "Signals strong Democratic voter support for raising public employee wages to competitive levels. Strengthens labor-backed candidates and provides a clear general election message on valuing public servants. Could influence future legislative budget priorities.",
+      "ifFails": "Unlikely to fail. A weak showing would suggest Democratic voters see the recent $4.3 billion investment as adequate, reducing pressure for additional raises."
     },
     {
       "number": 10,
       "title": "Redistricting reform",
       "description": "Texas should ban racially motivated and mid-decade redistricting.",
       "recommendation": "Lean Yes",
-      "reasoning": "Fair maps are foundational to representative democracy. Texas has a long history of redistricting controversies."
+      "reasoning": "Fair maps are foundational to representative democracy. Texas has a long history of redistricting controversies.",
+      "background": "Texas conducted a controversial mid-decade redistricting in 2025, with the Republican-controlled Legislature redrawing congressional maps to shore up GOP seats. The U.S. Supreme Court allowed the new maps to stand for the 2026 midterms. Nationally, 51% of Americans say an independent commission should draw districts, while only 19% say the legislature should. Texas does not allow citizens to vote directly on redistricting reforms — any changes must come from the Legislature. The Redistricting Reform Act of 2025 was introduced at the federal level to ban mid-decade redistricting and require independent commissions.",
+      "fiscalImpact": "Non-binding advisory. Creating a nonpartisan redistricting commission would have modest administrative costs. However, the current system generates significant legal costs — Texas has spent millions defending redistricting maps in court over multiple cycles.",
+      "supporters": ["Common Cause Texas", "League of Women Voters of Texas", "Texas Civil Rights Project", "NAACP Texas", "MALDEF", "Fair Maps Texas", "Two-thirds of American voters in polling"],
+      "opponents": ["Republican legislative leadership (who control current redistricting)", "Some incumbents in both parties who benefit from current maps", "Texas Attorney General's office (has defended current maps in court)"],
+      "ifPasses": "Signals strong Democratic voter demand for fair redistricting. Strengthens the case for Democratic candidates to campaign on democracy reform. Could support federal legislation requiring independent commissions. Highlights the 2025 mid-decade redistricting as a general election issue.",
+      "ifFails": "Unlikely to fail. A weak showing would suggest Democratic voters do not prioritize process reforms over policy issues, reducing its prominence as a campaign theme."
     },
     {
       "number": 11,
       "title": "Fair taxation",
       "description": "The federal tax burden should shift to the wealthiest individuals with working-class income tax relief.",
       "recommendation": "Your Call",
-      "reasoning": "Depends on your views on federal tax policy and progressivity."
+      "reasoning": "Depends on your views on federal tax policy and progressivity.",
+      "background": "Texas has no state income tax, but its heavy reliance on sales and property taxes creates one of the most regressive tax systems in the country — the Institute on Taxation and Economic Policy (ITEP) ranks Texas 7th most regressive. Lower-income Texans pay a higher percentage of their income in taxes than the wealthy. This proposition addresses federal tax policy, calling for the wealthiest individuals to bear more of the burden while providing relief to working-class earners. The 2017 Trump tax cuts disproportionately benefited high earners and are set for partial expiration.",
+      "fiscalImpact": "Non-binding advisory. This is a federal tax policy question that the Texas Legislature cannot directly enact. Changes to federal income tax rates would require Congressional action. Proponents of progressive taxation argue it would generate significant federal revenue while providing working-class relief; opponents argue it would reduce economic growth and investment.",
+      "supporters": ["Every Texan (Texas policy organization)", "Americans for Tax Fairness", "Center on Budget and Policy Priorities", "Progressive labor unions", "Texas AFL-CIO"],
+      "opponents": ["Americans for Prosperity", "Tax Foundation (argues U.S. system is already highly progressive)", "Business Roundtable", "Heritage Foundation", "Some economists who argue higher marginal rates reduce investment"],
+      "ifPasses": "Signals Democratic voter support for progressive federal tax reform. Provides a platform position for Texas Democrats heading into the 2026 midterms. Could influence the federal debate over expiring Trump-era tax cuts.",
+      "ifFails": "Would suggest Democratic primary voters are skeptical of tax-the-wealthy messaging or view it as outside the scope of state politics. Could indicate a preference for addressing Texas's regressive state tax structure instead."
     },
     {
       "number": 12,
       "title": "Expand public transit",
       "description": "Texas should expand accessible transit in rural and urban areas.",
       "recommendation": "Lean Yes",
-      "reasoning": "Transportation is a top Austin concern. Expanded transit reduces congestion and improves access."
+      "reasoning": "Transportation is a top Austin concern. Expanded transit reduces congestion and improves access.",
+      "background": "Texas's rapid population growth has intensified traffic congestion, but the state's investment in public transit lags far behind peer states. A TxDOT survey found 1 in 3 Texans see a need to expand public transit in both rural and urban areas. The state spends nothing on public transit in major urban areas — agencies like DART and CapMetro rely on local sales tax revenue. Younger Texans want more transit options, while older rural Texans increasingly need them as car ownership costs rise. TxDOT's draft Statewide Multimodal Transit Plan acknowledges the gap. Meanwhile, Austin's Project Connect faces legal challenges from AG Paxton's office.",
+      "fiscalImpact": "Non-binding advisory. Expanding transit statewide would require significant investment — Governor Abbott announced a $146 billion transportation plan, but most goes to highways. Dedicated state transit funding would require new revenue sources or budget reallocation. Proponents argue transit investment generates economic returns through reduced congestion, improved workforce access, and lower household transportation costs.",
+      "supporters": ["Transit advocacy organizations", "Texas AFL-CIO", "AARP Texas", "Environmental groups", "CapMetro (Austin)", "DART (Dallas)", "Disability rights organizations", "Urban planning groups"],
+      "opponents": ["Some fiscal conservatives who oppose new state spending", "Highway-focused transportation advocates", "Oil and gas interests concerned about reduced driving", "Some suburban/rural voters who prioritize road investment over transit"],
+      "ifPasses": "Signals strong Democratic voter support for public transit investment. Strengthens the case for state transit funding and bolsters local initiatives like Austin's Project Connect. Could influence TxDOT's multimodal transit plan.",
+      "ifFails": "Unlikely to fail. A weak showing would suggest even Democratic voters prioritize other spending over transit, reducing momentum for state-level transit funding."
     },
     {
       "number": 13,
       "title": "Red flag gun safety laws",
       "description": "Texas should enact Extreme Risk Protection Orders to prevent individuals with a history of domestic abuse from purchasing firearms.",
       "recommendation": "Your Call",
-      "reasoning": "Gun policy is deeply personal. Balances public safety with Second Amendment concerns."
+      "reasoning": "Gun policy is deeply personal. Balances public safety with Second Amendment concerns.",
+      "background": "One in three Texans experience domestic violence, and guns are the most common weapon used in domestic violence homicides. In June 2025, Governor Abbott signed SB 1362, an 'Anti-Red Flag Act' that bans the enactment or enforcement of Extreme Risk Protection Orders (ERPOs) in Texas — moving in the opposite direction from this proposition. A multistate study found that one suicide was averted for every 17 ERPOs issued. Twenty-one states and D.C. currently have red flag laws. The proposition specifically targets the intersection of domestic violence and firearms, calling for ERPOs when there is documented domestic abuse history.",
+      "fiscalImpact": "Non-binding advisory. Implementation would require judicial infrastructure for ERPO hearings and a firearms tracking system. Studies from other states show ERPOs are cost-effective compared to the economic toll of gun violence — the average gun homicide costs society an estimated $1.4 million in medical, criminal justice, and lost productivity costs.",
+      "supporters": ["Texas Gun Sense", "Moms Demand Action Texas", "Everytown for Gun Safety", "Texas Council on Family Violence", "National Domestic Violence Hotline (headquartered in Austin)", "American Medical Association"],
+      "opponents": ["National Rifle Association (NRA)", "Gun Owners of America", "Texas State Rifle Association", "Gov. Greg Abbott (signed the Anti-Red Flag Act)", "Some civil liberties advocates concerned about due process in ERPO proceedings"],
+      "ifPasses": "Signals Democratic voter support for red flag laws focused on domestic violence, directly contradicting the 2025 Anti-Red Flag Act. Provides a sharp general election contrast on gun safety. Could motivate suburban voters, particularly women, who support common-sense gun measures.",
+      "ifFails": "Would suggest the Democratic base is divided on gun policy, perhaps due to concerns about government overreach or Second Amendment protections. Could lead candidates to soften gun safety messaging."
     }
   ]
 }

@@ -583,20 +583,131 @@ struct PropositionCard: View {
             .accessibilityHint(isExpanded ? "Double tap to collapse" : "Double tap to expand")
 
             if isExpanded {
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: 10) {
                     Text(proposition.description)
                         .font(Theme.callout)
                         .foregroundColor(Theme.textPrimary)
 
+                    // Background
+                    if let background = proposition.background {
+                        Text(background)
+                            .font(Theme.caption)
+                            .foregroundColor(Theme.textSecondary)
+                    }
+
+                    // Supporters / Opponents
+                    if !proposition.supporters.isEmpty || !proposition.opponents.isEmpty {
+                        HStack(alignment: .top, spacing: 12) {
+                            if !proposition.supporters.isEmpty {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Supporters")
+                                        .font(.system(size: 13, weight: .semibold))
+                                        .foregroundColor(Theme.success)
+                                    ForEach(proposition.supporters, id: \.self) { s in
+                                        Text("· \(s)")
+                                            .font(.system(size: 12))
+                                            .foregroundColor(Theme.textSecondary)
+                                    }
+                                }
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+                            if !proposition.opponents.isEmpty {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Opponents")
+                                        .font(.system(size: 13, weight: .semibold))
+                                        .foregroundColor(Theme.danger)
+                                    ForEach(proposition.opponents, id: \.self) { o in
+                                        Text("· \(o)")
+                                            .font(.system(size: 12))
+                                            .foregroundColor(Theme.textSecondary)
+                                    }
+                                }
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+                        }
+                    }
+
+                    // Fiscal impact
+                    if let fiscal = proposition.fiscalImpact {
+                        HStack(alignment: .top, spacing: 8) {
+                            Image(systemName: "dollarsign.circle")
+                                .foregroundColor(Theme.warning)
+                                .font(.caption)
+                            Text(fiscal)
+                                .font(.system(size: 12))
+                                .foregroundColor(Theme.textSecondary)
+                        }
+                    }
+
+                    // If Passes / If Fails
+                    if proposition.ifPasses != nil || proposition.ifFails != nil {
+                        VStack(alignment: .leading, spacing: 6) {
+                            if let passes = proposition.ifPasses {
+                                HStack(alignment: .top, spacing: 6) {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .foregroundColor(Theme.success)
+                                        .font(.caption2)
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text("If it passes")
+                                            .font(.system(size: 12, weight: .semibold))
+                                            .foregroundColor(Theme.success)
+                                        Text(passes)
+                                            .font(.system(size: 12))
+                                            .foregroundColor(Theme.textSecondary)
+                                    }
+                                }
+                            }
+                            if let fails = proposition.ifFails {
+                                HStack(alignment: .top, spacing: 6) {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .foregroundColor(Theme.danger)
+                                        .font(.caption2)
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text("If it fails")
+                                            .font(.system(size: 12, weight: .semibold))
+                                            .foregroundColor(Theme.danger)
+                                        Text(fails)
+                                            .font(.system(size: 12))
+                                            .foregroundColor(Theme.textSecondary)
+                                    }
+                                }
+                            }
+                        }
+                        .padding(10)
+                        .background(Color.gray.opacity(0.06))
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                    }
+
                     Divider()
 
+                    // Claude reasoning
                     HStack(alignment: .top, spacing: 8) {
                         Image(systemName: "brain.head.profile")
                             .foregroundColor(Theme.primaryBlue)
                             .font(.caption)
-                        Text(proposition.reasoning)
-                            .font(Theme.caption)
-                            .foregroundColor(Theme.textSecondary)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(proposition.reasoning)
+                                .font(Theme.caption)
+                                .foregroundColor(Theme.textSecondary)
+                            if let confidence = proposition.confidence {
+                                Text(confidence.rawValue)
+                                    .font(.system(size: 13, weight: .medium))
+                                    .foregroundColor(Theme.primaryBlue)
+                            }
+                        }
+                    }
+
+                    // Caveats
+                    if let caveats = proposition.caveats {
+                        HStack(alignment: .top, spacing: 8) {
+                            Image(systemName: "info.circle")
+                                .foregroundColor(Theme.warning)
+                                .font(.caption)
+                            Text(caveats)
+                                .font(Theme.caption)
+                                .italic()
+                                .foregroundColor(Theme.textSecondary)
+                        }
                     }
                 }
                 .transition(.opacity.combined(with: .move(edge: .top)))

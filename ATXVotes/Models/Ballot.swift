@@ -87,10 +87,28 @@ struct Proposition: Codable, Identifiable {
     var recommendation: PropRecommendation
     var reasoning: String
 
+    // Static research fields (from JSON)
+    var background: String?             // 2-4 sentence context
+    var fiscalImpact: String?           // estimated cost/savings
+    var supporters: [String]
+    var opponents: [String]
+    var ifPasses: String?               // what happens if Yes wins
+    var ifFails: String?                // what happens if No wins
+
+    // Claude-generated fields (personalized at runtime)
+    var caveats: String?
+    var confidence: PropConfidence?
+
     enum PropRecommendation: String, Codable {
         case leanYes = "Lean Yes"
         case leanNo = "Lean No"
         case yourCall = "Your Call"
+    }
+
+    enum PropConfidence: String, Codable {
+        case clearCall = "Clear Call"
+        case lean = "Lean"
+        case genuinelyContested = "Genuinely Contested"
     }
 }
 

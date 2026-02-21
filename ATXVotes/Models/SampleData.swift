@@ -150,6 +150,12 @@ private struct RawProposition: Decodable {
     let description: String
     let recommendation: String      // "Lean Yes", "Lean No", "Your Call"
     let reasoning: String
+    let background: String?
+    let fiscalImpact: String?
+    let supporters: [String]?
+    let opponents: [String]?
+    let ifPasses: String?
+    let ifFails: String?
 
     func toProposition() -> Proposition {
         Proposition(
@@ -158,7 +164,13 @@ private struct RawProposition: Decodable {
             title: title,
             description: description,
             recommendation: Proposition.PropRecommendation(rawValue: recommendation) ?? .yourCall,
-            reasoning: reasoning
+            reasoning: reasoning,
+            background: background,
+            fiscalImpact: fiscalImpact,
+            supporters: supporters ?? [],
+            opponents: opponents ?? [],
+            ifPasses: ifPasses,
+            ifFails: ifFails
         )
     }
 }

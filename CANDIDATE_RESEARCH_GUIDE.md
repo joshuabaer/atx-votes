@@ -154,27 +154,50 @@ Prompt:
 
 ## Propositions Research
 
-Propositions use a different data structure than candidates.
+Propositions use a different data structure than candidates. Each proposition needs:
 
-Prompt:
+| Field | Required | Description |
+|-------|----------|-------------|
+| `number` | Yes | Proposition number on the ballot |
+| `title` | Yes | Short title (3-6 words) |
+| `description` | Yes | Plain-language explanation of what a Yes vote means |
+| `recommendation` | No | Set later during guide generation ("Lean Yes", "Lean No", "Your Call") |
+| `reasoning` | No | Set later during guide generation |
+| `background` | Yes | 2-4 sentences: what's the current law, why it's on the ballot |
+| `fiscalImpact` | Yes | Estimated cost/savings, or "Non-binding advisory" for platform signals |
+| `supporters` | Yes | Array of organizations/groups supporting |
+| `opponents` | Yes | Array of organizations/groups opposing |
+| `ifPasses` | Yes | What happens if Yes wins |
+| `ifFails` | Yes | What happens if No wins |
+
+**Note:** `caveats` and `confidence` are generated at runtime by the AI guide builder based on the voter's profile, similar to race recommendations.
+
+### Proposition Research Prompt
+
 > Research [PROPOSITION DESCRIPTION] on the [YEAR] [PARTY] primary ballot in Texas.
 >
 > Provide:
-> - Plain-language explanation of what it does
-> - Who supports it and why
-> - Who opposes it and why
-> - What happens if it passes vs. fails
-> - Any important context (fiscal impact, legal implications, similar measures elsewhere)
+> - 2-4 sentence background (what's the current law, why it's on the ballot, relevant recent legislation)
+> - Fiscal impact (estimated cost/savings, or note if non-binding)
+> - Organizations/groups supporting (as a list)
+> - Organizations/groups opposing (as a list)
+> - What happens if it passes
+> - What happens if it fails
 >
 > Format as:
 > ```json
 > {
 >   "number": 1,
 >   "title": "Short Title",
->   "fullText": "Official ballot language",
->   "explanation": "Plain-language explanation",
->   "recommendation": "support/oppose",
->   "reasoning": "Why this recommendation"
+>   "description": "Plain-language explanation of what a Yes vote means",
+>   "recommendation": "Your Call",
+>   "reasoning": "Brief neutral reasoning",
+>   "background": "2-4 sentences of context",
+>   "fiscalImpact": "Non-binding advisory. If enacted, ...",
+>   "supporters": ["Org 1", "Org 2"],
+>   "opponents": ["Org 1", "Org 2"],
+>   "ifPasses": "What happens if Yes wins",
+>   "ifFails": "What happens if No wins"
 > }
 > ```
 
@@ -195,6 +218,15 @@ Before finalizing candidate data:
 - [ ] Uncontested races are marked `isContested: false`
 - [ ] Key races are identified based on competitiveness and impact
 - [ ] No duplicate candidates across races
+
+Before finalizing proposition data:
+
+- [ ] Every proposition on the official ballot is included
+- [ ] Proposition numbers match the official ballot
+- [ ] Background provides accurate legal/legislative context
+- [ ] Fiscal impact is specific (or clearly marked "Non-binding advisory")
+- [ ] Supporters and opponents arrays are populated with real organizations
+- [ ] ifPasses and ifFails describe concrete outcomes
 - [ ] JSON validates without errors
 
 ---

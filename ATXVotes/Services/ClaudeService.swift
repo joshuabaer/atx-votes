@@ -32,6 +32,8 @@ struct ClaudePropositionRecommendation: Decodable {
     let number: Int
     let recommendation: String
     let reasoning: String
+    let caveats: String?
+    let confidence: String?
 }
 
 // MARK: - Service
@@ -137,6 +139,18 @@ actor ClaudeService: GuideGenerating {
             for prop in ballot.propositions {
                 lines.append("PROPOSITION \(prop.number): \(prop.title)")
                 lines.append("  \(prop.description)")
+                if let bg = prop.background {
+                    lines.append("  Background: \(bg)")
+                }
+                if let fiscal = prop.fiscalImpact {
+                    lines.append("  Fiscal impact: \(fiscal)")
+                }
+                if !prop.supporters.isEmpty {
+                    lines.append("  Supporters: \(prop.supporters.joined(separator: "; "))")
+                }
+                if !prop.opponents.isEmpty {
+                    lines.append("  Opponents: \(prop.opponents.joined(separator: "; "))")
+                }
                 lines.append("")
             }
         }
@@ -200,7 +214,9 @@ actor ClaudeService: GuideGenerating {
             {
               "number": 1,
               "recommendation": "Lean Yes|Lean No|Your Call",
-              "reasoning": "1-2 sentences connecting to voter profile"
+              "reasoning": "1-2 sentences connecting to voter profile",
+              "caveats": "optional nuance or watch-out for this voter, or null",
+              "confidence": "Clear Call|Lean|Genuinely Contested"
             }
           ]
         }
@@ -345,6 +361,11 @@ actor ClaudeService: GuideGenerating {
                 merged.propositions[index].recommendation =
                     Proposition.PropRecommendation(rawValue: rec.recommendation) ?? .yourCall
                 merged.propositions[index].reasoning = rec.reasoning
+                merged.propositions[index].caveats = rec.caveats
+                if let conf = rec.confidence {
+                    merged.propositions[index].confidence =
+                        Proposition.PropConfidence(rawValue: conf)
+                }
             }
         }
 

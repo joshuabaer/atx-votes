@@ -485,70 +485,130 @@
       "title": "Phase out property taxes",
       "description": "Texas property taxes should be assessed at the purchase price and phased out entirely over the next six years through spending reductions.",
       "recommendation": "Lean Yes",
-      "reasoning": "Aspirational but popular. Signals strong support for property tax relief."
+      "reasoning": "Aspirational but popular. Signals strong support for property tax relief.",
+      "background": "Texas has no state income tax but relies heavily on property taxes, which totaled $86.8 billion in 2024 — up $23.6 billion since 2018. School districts alone collected $42 billion. Governor Abbott has proposed eliminating school property taxes via constitutional amendment, but replacing that revenue would cost $39.5 billion annually according to the Legislative Budget Board. This proposition goes further, calling for all property taxes to be assessed at purchase price (like California's Prop 13) and then phased out entirely over six years.",
+      "fiscalImpact": "Non-binding advisory. If enacted, would require replacing $86.8 billion in annual property tax revenue through spending cuts or alternative revenue sources. Critics warn this could necessitate dramatically higher sales taxes or deep cuts to schools, roads, and public services.",
+      "supporters": ["Texas Public Policy Foundation", "Americans for Prosperity - Texas", "Texans for Fiscal Responsibility", "Gov. Greg Abbott (school property tax elimination)", "Libertarian Party of Texas", "True Texas Project"],
+      "opponents": ["Texas Association of School Boards", "Texas Municipal League", "Texas AFT (teachers' union)", "Lt. Gov. Dan Patrick (supports exemptions, opposes full elimination as unrealistic)", "Tax Policy Center"],
+      "ifPasses": "Signals overwhelming Republican voter support for aggressive property tax elimination. Strengthens Governor Abbott's hand to push school property tax elimination in the 2027 legislative session. Could become a GOP platform plank at the June 2026 convention.",
+      "ifFails": "Weakens the case for full property tax elimination. Legislators would likely pursue incremental relief (higher homestead exemptions, lower caps) rather than wholesale phase-out."
     },
     {
       "number": 2,
       "title": "Voter approval for local tax hikes",
       "description": "Texas should require any local government budget that raises property taxes to be approved by voters at a November general election.",
       "recommendation": "Lean Yes",
-      "reasoning": "Direct accountability mechanism for local government spending."
+      "reasoning": "Direct accountability mechanism for local government spending.",
+      "background": "Under current Texas law (SB 2, passed in 2019), local governments cannot increase property tax revenue by more than 3.5% per year without triggering an automatic election. However, increases below that 3.5% threshold are approved by city councils and county commissioners without a public vote. This proposition would require voter approval for any increase at all, shifting power from elected officials to voters at November general elections.",
+      "fiscalImpact": "Non-binding advisory. If enacted, would add election costs for local governments and could slow revenue growth. Proponents argue it would restrain spending; opponents say it would hamstring local governments' ability to fund services like police, fire, and infrastructure.",
+      "supporters": ["Texans for Fiscal Responsibility", "Texas Public Policy Foundation", "True Texas Project", "Gov. Greg Abbott"],
+      "opponents": ["Texas Municipal League", "Texas Association of Counties", "Local government officials", "City managers and budget officers"],
+      "ifPasses": "Signals strong voter demand for direct control over local tax increases. Strengthens legislative efforts to tighten the 3.5% revenue cap or require elections for any increase. Could shape 2027 legislation.",
+      "ifFails": "Suggests Republican voters are satisfied with the current 3.5% cap and automatic election trigger from SB 2. Reduces pressure for further restrictions on local government taxing authority."
     },
     {
       "number": 3,
       "title": "Healthcare & vaccination status",
       "description": "Texas should prohibit denial of healthcare or any medical service based solely on the patient's vaccination status.",
       "recommendation": "Your Call",
-      "reasoning": "Medical freedom issue. Not directly related to most voters' top priorities."
+      "reasoning": "Medical freedom issue. Not directly related to most voters' top priorities.",
+      "background": "During the COVID-19 pandemic, some healthcare providers required vaccination for certain services or prioritized vaccinated patients. Texas already permits conscientious, religious, and medical exemptions to physician vaccination policies. House Bill 44 was filed in the 88th Legislature to address healthcare discrimination based on vaccination status. The broader medical freedom movement has gained traction in Texas, with multiple bills filed in 2025 to weaken vaccine mandates, coinciding with declining vaccination rates in some communities.",
+      "fiscalImpact": "Non-binding advisory. If enacted as law, minimal direct fiscal impact to the state. Could increase healthcare costs if providers must accommodate unvaccinated patients in settings where infection control protocols currently require vaccination.",
+      "supporters": ["Texans for Vaccine Choice", "Texas Attorney General Ken Paxton", "Medical freedom advocacy groups", "True Texas Project"],
+      "opponents": ["Texas Hospital Association", "Texas Medical Association", "American Medical Association", "Public health officials", "Immunization advocacy groups"],
+      "ifPasses": "Signals Republican voter support for medical freedom legislation. Could lead to bills in the 2027 session prohibiting healthcare providers from denying services based on vaccination status. Becomes a platform priority.",
+      "ifFails": "Unlikely to fail among Republican primary voters. A weak showing would suggest the COVID-era medical freedom movement has lost momentum within the GOP base."
     },
     {
       "number": 4,
       "title": "Life at fertilization in schools",
       "description": "Texas should require its public schools to teach that life begins at fertilization.",
       "recommendation": "Your Call",
-      "reasoning": "Social conservative priority. Depends on your views on school curriculum."
+      "reasoning": "Social conservative priority. Depends on your views on school curriculum.",
+      "background": "Following the 2022 overturn of Roe v. Wade, Texas enacted one of the nation's strictest abortion bans. The Texas GOP platform (Plank 117) already urges legislators to require life-affirming fetal development education, including teaching that life begins at fertilization, showing fetal models, live ultrasounds, and educational videos. Only about 19% of Texas schools currently offer sex education, with most emphasizing abstinence-only approaches. This proposition would mandate a specific scientific/philosophical position as curriculum.",
+      "fiscalImpact": "Non-binding advisory. If enacted, minimal direct cost — primarily curriculum development and teacher training expenses. Could invite costly legal challenges on First Amendment grounds.",
+      "supporters": ["Texas Right to Life", "Texas Alliance for Life", "Republican Party of Texas (Platform Plank 117)", "True Texas Project", "Pro-life advocacy organizations"],
+      "opponents": ["Texas Women's Health Caucus", "ACLU of Texas", "Science education advocacy groups", "Planned Parenthood Texas Votes", "Some medical professionals who note fertilization is one of several scientifically recognized developmental milestones"],
+      "ifPasses": "Signals strong GOP voter support for incorporating pro-life principles into school curriculum. Could lead to 2027 legislation mandating life-begins-at-fertilization instruction in sex education classes. Reinforces the post-Roe legislative agenda.",
+      "ifFails": "Would suggest even Republican primary voters have reservations about mandating this specific curriculum content. Could indicate nuanced views on abortion policy, as polling shows many Texans hold complex positions on the issue."
     },
     {
       "number": 5,
       "title": "Ban school health clinics",
       "description": "Texas should ban gender, sexuality, and reproductive clinics and services in K-12 schools.",
       "recommendation": "Your Call",
-      "reasoning": "Social conservative priority. Depends on your views on school health services."
+      "reasoning": "Social conservative priority. Depends on your views on school health services.",
+      "background": "Texas has already enacted several laws restricting gender-related services for minors, including a ban on gender-affirming care for minors (upheld by the Texas Supreme Court) and Senate Bill 12, which bans DEI programs, Gender and Sexuality Alliance clubs, and restricts discussions of gender identity and sexual orientation in K-12 schools. The ACLU has sued over SB 12. This proposition targets any remaining school-based clinics or services related to gender, sexuality, or reproductive health, pushing these services entirely off campus.",
+      "fiscalImpact": "Non-binding advisory. If enacted, would shift costs for affected services from school districts to families and community health providers. Texas has teen birth rates of 19.4 per 1,000 females aged 15-19, above the national average.",
+      "supporters": ["True Texas Project", "Texas Values", "Parental rights advocacy groups", "Texas Eagle Forum", "Gov. Greg Abbott"],
+      "opponents": ["ACLU of Texas", "Equality Texas", "LGBTQ+ advocacy organizations", "American Medical Association", "School counselor associations", "Planned Parenthood Texas Votes"],
+      "ifPasses": "Signals strong voter support for removing all gender, sexuality, and reproductive health services from public schools. Could lead to 2027 legislation banning school-based health clinics that provide these services, building on existing restrictions in SB 12.",
+      "ifFails": "Would suggest GOP voters see value in some school-based health services, or that existing restrictions (SB 12, gender-affirming care ban) are sufficient. Reduces pressure for additional legislation."
     },
     {
       "number": 6,
       "title": "Term limits",
       "description": "Texas should enact term limits on all elected officials.",
       "recommendation": "Lean Yes",
-      "reasoning": "Broadly popular across the political spectrum. Limits entrenchment of career politicians."
+      "reasoning": "Broadly popular across the political spectrum. Limits entrenchment of career politicians.",
+      "background": "The Texas Constitution currently imposes no term limits on state legislators, statewide officeholders, or most elected officials. The governor has no term limit (Abbott is in his third term). The average age of the current Texas Senate is 62.1, with 26 of 31 senators being incumbents. Fifteen states have legislative term limits. The idea polls well across party lines but faces resistance from incumbents who would have to vote to limit their own power. U.S. Term Limits, a national organization, has been pushing for a federal constitutional convention on the issue.",
+      "fiscalImpact": "Non-binding advisory. If enacted, no direct fiscal impact. Critics argue term limits lead to higher reliance on lobbyists and unelected staff who retain institutional knowledge as legislators cycle out.",
+      "supporters": ["U.S. Term Limits", "True Texas Project", "Texas Public Policy Foundation", "Grassroots conservative groups", "Most Republican and Democratic voters (polls show 70-80% support)"],
+      "opponents": ["Most incumbent legislators (both parties)", "Some political scientists who argue term limits increase lobbyist influence", "Legislative staff organizations"],
+      "ifPasses": "Signals overwhelming voter demand for term limits. Adds pressure on the legislature to pass a constitutional amendment, though incumbents historically resist limiting their own tenure. Could become a litmus-test issue in future primaries.",
+      "ifFails": "Extremely unlikely to fail. Term limits consistently poll as one of the most popular reform proposals. A failure here would be a major surprise and would effectively kill the issue for years."
     },
     {
       "number": 7,
       "title": "Protect Texas water",
       "description": "Texas should ban the large-scale export, or sale, of our groundwater and surface water to any single private or public entity.",
       "recommendation": "Lean Yes",
-      "reasoning": "Water security is a growing Texas concern. Protects a critical resource."
+      "reasoning": "Water security is a growing Texas concern. Protects a critical resource.",
+      "background": "This proposition was driven by businessman Kyle Bass's company (Conservation Equity Management) applying to drill 43 high-capacity wells in East Texas to pump up to 15.9 billion gallons per year from the Carrizo-Wilcox Aquifer — more than triple what the city of Longview uses annually. The plan sparked a rural uprising. State Rep. Cody Harris authored HB 27 during a special session to stop it, and the Texas House passed the bill, but it ultimately failed in the Senate. Texas voters approved $20 billion in water infrastructure bonds in November 2025. At least six other large-scale groundwater pipelines are planned or under consideration.",
+      "fiscalImpact": "Non-binding advisory. If enacted, could limit private water markets but protect rural aquifers from depletion. The San Antonio Water System's similar 48,000 acre-feet extraction from the Carrizo-Wilcox already caused water levels to drop in Lee County, forcing landowners to sink pumps deeper.",
+      "supporters": ["East Texas landowners and ranchers", "Wayne-Sanderson Farms (filed lawsuit to block Bass permits)", "State Rep. Cody Harris", "Environmental Defense Fund", "Texas Living Waters Project", "True Texas Project", "Rural community organizations"],
+      "opponents": ["Conservation Equity Management (Kyle Bass)", "Some free-market advocates who oppose restricting private water rights", "Developers and municipalities seeking new water sources for growing cities"],
+      "ifPasses": "Strong signal to the legislature to pass water export restrictions in 2027. Strengthens the case for legislation similar to HB 27 that failed in the Senate. Protects rural water sources from large-scale commercial extraction.",
+      "ifFails": "Would suggest Republican voters prioritize free-market water rights over rural water protection. Weakens the legislative push to restrict groundwater exports, emboldening large-scale extraction projects."
     },
     {
       "number": 8,
       "title": "End services for undocumented immigrants",
       "description": "The Texas Legislature should reduce the burden of illegal immigration on taxpayers by ending public services for illegal immigrants.",
       "recommendation": "Your Call",
-      "reasoning": "Depends on how broadly you define 'public services' and your immigration views."
+      "reasoning": "Depends on how broadly you define 'public services' and your immigration views.",
+      "background": "Federal law already restricts most public benefits for undocumented immigrants. Currently, undocumented immigrants in Texas are eligible for emergency medical treatment, disease immunizations, disaster relief, and K-12 public education (mandated by the 1982 Supreme Court ruling in Plyler v. Doe). Undocumented immigrants pay an estimated $12 billion annually in property taxes nationally and contribute payroll taxes. A federal judge ruled in 2025 that Texas's in-state tuition policy for undocumented students violates federal law. AG Paxton sued Harris County for funding legal defense services for undocumented immigrants. Polling shows 64% of Texans believe there should be a legal pathway for undocumented immigrants.",
+      "fiscalImpact": "Non-binding advisory. The proposition is vague about which services would be cut. Ending emergency healthcare could shift costs to hospitals (federally required to treat emergencies regardless). Ending K-12 education would require overturning Plyler v. Doe, a Supreme Court precedent.",
+      "supporters": ["Federation for American Immigration Reform (FAIR)", "Texas Attorney General Ken Paxton", "True Texas Project", "Texas border security advocacy groups", "Gov. Greg Abbott"],
+      "opponents": ["Texas Hospital Association", "ACLU of Texas", "Tahirih Justice Center", "Texas business groups (who rely on immigrant labor)", "School districts", "Catholic Bishops of Texas"],
+      "ifPasses": "Signals strong GOP voter demand for restricting services to undocumented immigrants. Could push the 2027 legislature to pass bills cutting in-state tuition eligibility, restricting county-funded legal services, or tightening benefits verification. Many proposals would face federal legal challenges.",
+      "ifFails": "Unlikely to fail among Republican primary voters. A weak showing would suggest even the GOP base recognizes the complexity of completely ending services, particularly emergency healthcare and K-12 education."
     },
     {
       "number": 9,
       "title": "No Democratic committee chairs",
       "description": "The Republican-controlled Texas Legislature should stop awarding leadership positions, including committee chairmanships, to Democrats.",
       "recommendation": "Lean No",
-      "reasoning": "Hyper-partisan. Cross-aisle governance and bipartisan committee work have long Texas traditions."
+      "reasoning": "Hyper-partisan. Cross-aisle governance and bipartisan committee work have long Texas traditions.",
+      "background": "The Texas House has a long tradition of bipartisan committee leadership. Former Speaker Dade Phelan appointed Democrats to chair 8 of 34 standing committees (down from 13 in the prior session), while keeping Republicans in control of the most powerful committees (spending and taxes). In 2024, 46 incoming Republican House members pledged to only support a speaker who commits to ending Democratic chairmanships. This was a major factor in House leadership dynamics and became one of the Republican Party of Texas's official legislative priorities for 2025. New Speaker Dustin Burrows has continued some bipartisan appointments.",
+      "fiscalImpact": "Non-binding advisory. No direct fiscal impact. Political scientists note that committee composition already heavily favors the majority party, so removing Democratic chairs would have minimal policy impact.",
+      "supporters": ["Texas Freedom Caucus", "Texas Scorecard", "True Texas Project", "Hardline conservative Republican caucus members"],
+      "opponents": ["Moderate House Republicans", "Democratic members", "Former Speaker Dade Phelan (defended the bipartisan tradition)", "Political scientists who argue bipartisan committees produce more durable legislation"],
+      "ifPasses": "Pressures House leadership to end the tradition of bipartisan committee appointments. Could become a litmus test for future speaker races. Signals the GOP base wants fully partisan governance in the legislature.",
+      "ifFails": "Vindicates the bipartisan tradition. Signals that Republican primary voters value pragmatic governance over pure partisanship. Reduces pressure on House leadership to strip Democrats of all committee roles."
     },
     {
       "number": 10,
       "title": "Prohibit Sharia Law",
       "description": "Texas should prohibit Sharia Law.",
       "recommendation": "Lean No",
-      "reasoning": "Foreign religious law has no legal standing in Texas courts already. Purely symbolic."
+      "reasoning": "Foreign religious law has no legal standing in Texas courts already. Purely symbolic.",
+      "background": "Sharia law has no legal authority in Texas or any U.S. state — the Constitution's Supremacy Clause, Establishment Clause, and Free Exercise Clause already prevent any religious legal system from superseding civil law. In 2025, Governor Abbott signed HB 4211 banning Sharia-based residential compounds (targeting the proposed EPIC City development). Senator Cornyn introduced the federal 'Defeat Sharia Law in America Act.' A federal appeals court previously blocked Oklahoma's similar ban, finding it likely violated the Establishment Clause by singling out Islam. Baylor philosophy professor Dr. Francis Beckwith called such bans 'unconstitutional' and argued they 'underestimate the ways in which people from diverse religious groups wind up being good Americans.'",
+      "fiscalImpact": "Non-binding advisory. No fiscal impact. Legal scholars note that any enacted ban specifically targeting Sharia (rather than all foreign law) would likely face costly constitutional challenges, as occurred in Oklahoma.",
+      "supporters": ["True Texas Project (calls it 'probably the most important' proposition)", "Sen. John Cornyn (federal legislation)", "ACT for America", "Some conservative legal organizations"],
+      "opponents": ["ACLU of Texas", "Council on American-Islamic Relations (CAIR)", "Cato Institute (argues 'no Sharia law is coming to Texas')", "Constitutional law scholars", "Federalist Society scholars (raised Establishment Clause concerns)", "Interfaith advocacy groups"],
+      "ifPasses": "Signals GOP voter support for explicit anti-Sharia legislation. Could lead to a Texas foreign law ban in 2027, though legal scholars warn it would face immediate constitutional challenges if it singles out Islamic law specifically rather than all foreign legal systems.",
+      "ifFails": "Would suggest Republican voters view the issue as already addressed by existing constitutional protections and recent legislation (HB 4211). Reduces pressure for additional anti-Sharia legislation."
     }
   ]
 }
