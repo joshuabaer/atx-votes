@@ -1,0 +1,3096 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Economy & Cost of Living" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Economía y costo de vida"
+          }
+        }
+      }
+    },
+    "Housing" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vivienda"
+          }
+        }
+      }
+    },
+    "Community Safety" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seguridad comunitaria"
+          }
+        }
+      }
+    },
+    "Education" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Educación"
+          }
+        }
+      }
+    },
+    "Healthcare" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salud"
+          }
+        }
+      }
+    },
+    "Environment & Climate" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Medio ambiente y clima"
+          }
+        }
+      }
+    },
+    "Grid & Infrastructure" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Red eléctrica e infraestructura"
+          }
+        }
+      }
+    },
+    "Tech & Innovation" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tecnología e innovación"
+          }
+        }
+      }
+    },
+    "Transportation" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transporte"
+          }
+        }
+      }
+    },
+    "Immigration" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inmigración"
+          }
+        }
+      }
+    },
+    "Taxes" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impuestos"
+          }
+        }
+      }
+    },
+    "Civil Rights" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Derechos civiles"
+          }
+        }
+      }
+    },
+    "Progressive" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Progresista"
+          }
+        }
+      }
+    },
+    "Liberal" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liberal"
+          }
+        }
+      }
+    },
+    "Moderate" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moderado"
+          }
+        }
+      }
+    },
+    "Conservative" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conservador"
+          }
+        }
+      }
+    },
+    "Libertarian" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Libertario"
+          }
+        }
+      }
+    },
+    "Independent / Issue-by-Issue" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Independiente / Tema por tema"
+          }
+        }
+      }
+    },
+    "Competence & Track Record" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Competencia y trayectoria"
+          }
+        }
+      }
+    },
+    "Integrity & Honesty" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Integridad y honestidad"
+          }
+        }
+      }
+    },
+    "Independence" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Independencia"
+          }
+        }
+      }
+    },
+    "Experience" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Experiencia"
+          }
+        }
+      }
+    },
+    "Fresh Perspective" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Perspectiva nueva"
+          }
+        }
+      }
+    },
+    "Bipartisan / Works Across Aisle" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bipartidista / Trabaja con ambos partidos"
+          }
+        }
+      }
+    },
+    "Strong Leadership" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liderazgo fuerte"
+          }
+        }
+      }
+    },
+    "Community Ties" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lazos comunitarios"
+          }
+        }
+      }
+    },
+    "Republican" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Republicano"
+          }
+        }
+      }
+    },
+    "Democrat" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Demócrata"
+          }
+        }
+      }
+    },
+    "Not Sure Yet" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aún no estoy seguro"
+          }
+        }
+      }
+    },
+    "Strong Match" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Altamente compatible"
+          }
+        }
+      }
+    },
+    "Good Match" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buena opción"
+          }
+        }
+      }
+    },
+    "Best Available" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mejor opción disponible"
+          }
+        }
+      }
+    },
+    "Symbolic Race" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contienda simbólica"
+          }
+        }
+      }
+    },
+    "Lean Yes" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inclinación a favor"
+          }
+        }
+      }
+    },
+    "Lean No" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inclinación en contra"
+          }
+        }
+      }
+    },
+    "Your Call" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tú decides"
+          }
+        }
+      }
+    },
+    "Clear Call" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Decisión clara"
+          }
+        }
+      }
+    },
+    "Lean" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inclinación"
+          }
+        }
+      }
+    },
+    "Genuinely Contested" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verdaderamente competida"
+          }
+        }
+      }
+    },
+    "Bold systemic change, social justice focused" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambio sistémico audaz, enfocado en la justicia social"
+          }
+        }
+      }
+    },
+    "Expand rights and services, government as a force for good" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expandir derechos y servicios, el gobierno como fuerza para el bien"
+          }
+        }
+      }
+    },
+    "Pragmatic center, best ideas from both sides" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centro pragmático, las mejores ideas de ambos lados"
+          }
+        }
+      }
+    },
+    "Limited government, traditional values, fiscal discipline" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gobierno limitado, valores tradicionales, disciplina fiscal"
+          }
+        }
+      }
+    },
+    "Maximum freedom, minimal government" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Máxima libertad, gobierno mínimo"
+          }
+        }
+      }
+    },
+    "I decide issue by issue, not by party" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Decido tema por tema, no por partido"
+          }
+        }
+      }
+    },
+    "Welcome" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bienvenido"
+          }
+        }
+      }
+    },
+    "Your Issues" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus temas"
+          }
+        }
+      }
+    },
+    "Your Approach" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu enfoque"
+          }
+        }
+      }
+    },
+    "Your Views" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus opiniones"
+          }
+        }
+      }
+    },
+    "What Matters" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lo que importa"
+          }
+        }
+      }
+    },
+    "Your Address" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu dirección"
+          }
+        }
+      }
+    },
+    "Building Guide" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Creando tu guía"
+          }
+        }
+      }
+    },
+    "What issues matter most to you?" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Qué temas te importan más?"
+          }
+        }
+      }
+    },
+    "Pick your top 3-5. We'll dig deeper on these." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige los 3 a 5 más importantes. Profundizaremos en estos."
+          }
+        }
+      }
+    },
+    "How would you describe your political approach?" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Cómo describirías tu enfoque político?"
+          }
+        }
+      }
+    },
+    "There's no wrong answer. This helps us understand your lens." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay respuesta incorrecta. Esto nos ayuda a entender tu perspectiva."
+          }
+        }
+      }
+    },
+    "What do you value most in a candidate?" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Qué es lo que más valoras en un candidato?"
+          }
+        }
+      }
+    },
+    "Pick 2-3 that matter most." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige 2 o 3 que más te importen."
+          }
+        }
+      }
+    },
+    "On housing, where do you land?" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sobre vivienda, ¿cuál es tu postura?"
+          }
+        }
+      }
+    },
+    "On public safety, what's your approach?" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sobre seguridad pública, ¿cuál es tu enfoque?"
+          }
+        }
+      }
+    },
+    "On taxes and government spending?" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Sobre impuestos y gasto público?"
+          }
+        }
+      }
+    },
+    "On tech and AI regulation?" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Sobre regulación de tecnología e IA?"
+          }
+        }
+      }
+    },
+    "On public education, what's your priority?" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sobre educación pública, ¿cuál es tu prioridad?"
+          }
+        }
+      }
+    },
+    "On healthcare, where do you stand?" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sobre salud, ¿cuál es tu posición?"
+          }
+        }
+      }
+    },
+    "On environment and climate?" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Sobre medio ambiente y clima?"
+          }
+        }
+      }
+    },
+    "On the power grid and infrastructure?" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Sobre la red eléctrica e infraestructura?"
+          }
+        }
+      }
+    },
+    "On Austin transportation, what's the priority?" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sobre transporte en Austin, ¿cuál es la prioridad?"
+          }
+        }
+      }
+    },
+    "On immigration, what's your view?" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sobre inmigración, ¿cuál es tu opinión?"
+          }
+        }
+      }
+    },
+    "On civil rights and equality?" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Sobre derechos civiles e igualdad?"
+          }
+        }
+      }
+    },
+    "Build, build, build" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Construir, construir, construir"
+          }
+        }
+      }
+    },
+    "Ease zoning, encourage density, let the market work" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flexibilizar la zonificación, fomentar la densidad, dejar que el mercado funcione"
+          }
+        }
+      }
+    },
+    "Smart growth" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crecimiento inteligente"
+          }
+        }
+      }
+    },
+    "More housing with affordability guardrails" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Más vivienda con protecciones de asequibilidad"
+          }
+        }
+      }
+    },
+    "Protect neighborhoods" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Proteger los vecindarios"
+          }
+        }
+      }
+    },
+    "Preserve character, limit density changes" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preservar el carácter, limitar cambios de densidad"
+          }
+        }
+      }
+    },
+    "It's complicated" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es complicado"
+          }
+        }
+      }
+    },
+    "Case by case — depends on the neighborhood" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Caso por caso — depende del vecindario"
+          }
+        }
+      }
+    },
+    "Fully fund police" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Financiar completamente a la policía"
+          }
+        }
+      }
+    },
+    "Hire more officers, strong prosecution" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contratar más oficiales, fiscalización firme"
+          }
+        }
+      }
+    },
+    "Reform + fund" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reformar y financiar"
+          }
+        }
+      }
+    },
+    "Fund police but invest in alternatives too" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Financiar a la policía pero también invertir en alternativas"
+          }
+        }
+      }
+    },
+    "Redirect funding" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Redirigir fondos"
+          }
+        }
+      }
+    },
+    "Move money toward prevention and social services" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Destinar dinero a prevención y servicios sociales"
+          }
+        }
+      }
+    },
+    "Major overhaul needed" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se necesita una reforma profunda"
+          }
+        }
+      }
+    },
+    "Fundamental changes to how we approach safety" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambios fundamentales en cómo abordamos la seguridad"
+          }
+        }
+      }
+    },
+    "Cut taxes & spending" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recortar impuestos y gasto"
+          }
+        }
+      }
+    },
+    "Government does too much, let people keep their money" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El gobierno hace demasiado, dejar que la gente conserve su dinero"
+          }
+        }
+      }
+    },
+    "Redirect spending" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Redirigir el gasto"
+          }
+        }
+      }
+    },
+    "Same budget, better priorities" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mismo presupuesto, mejores prioridades"
+          }
+        }
+      }
+    },
+    "Invest more if it works" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invertir más si funciona"
+          }
+        }
+      }
+    },
+    "Willing to pay more for effective programs" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dispuesto a pagar más por programas que funcionen"
+          }
+        }
+      }
+    },
+    "Tax the wealthy more" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Más impuestos a los ricos"
+          }
+        }
+      }
+    },
+    "Fund services through progressive taxation" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Financiar servicios mediante impuestos progresivos"
+          }
+        }
+      }
+    },
+    "Hands off" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No intervenir"
+          }
+        }
+      }
+    },
+    "Let innovation lead, regulate later if needed" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dejar que la innovación lidere, regular después si es necesario"
+          }
+        }
+      }
+    },
+    "Light touch" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Regulación ligera"
+          }
+        }
+      }
+    },
+    "Basic guardrails but don't slow things down" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Límites básicos pero sin frenar el avance"
+          }
+        }
+      }
+    },
+    "Proactive regulation" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Regulación proactiva"
+          }
+        }
+      }
+    },
+    "Get ahead of problems before they happen" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adelantarse a los problemas antes de que ocurran"
+          }
+        }
+      }
+    },
+    "Strong oversight" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supervisión estricta"
+          }
+        }
+      }
+    },
+    "Tech companies have too much unchecked power" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las empresas tecnológicas tienen demasiado poder sin control"
+          }
+        }
+      }
+    },
+    "School choice first" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Libertad de elección escolar"
+          }
+        }
+      }
+    },
+    "Vouchers, charters, let parents decide" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vales, escuelas chárter, que los padres decidan"
+          }
+        }
+      }
+    },
+    "Fix public schools" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mejorar las escuelas públicas"
+          }
+        }
+      }
+    },
+    "More funding and support for neighborhood schools" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Más fondos y apoyo para las escuelas del vecindario"
+          }
+        }
+      }
+    },
+    "Teacher-focused" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enfocado en los maestros"
+          }
+        }
+      }
+    },
+    "Raise pay, reduce class sizes, trust educators" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aumentar salarios, reducir el tamaño de las clases, confiar en los educadores"
+          }
+        }
+      }
+    },
+    "Back to basics" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volver a lo básico"
+          }
+        }
+      }
+    },
+    "Focus on core academics, less politics in schools" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enfocarse en materias básicas, menos política en las escuelas"
+          }
+        }
+      }
+    },
+    "Free market" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Libre mercado"
+          }
+        }
+      }
+    },
+    "Less regulation, more competition to lower costs" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Menos regulación, más competencia para reducir costos"
+          }
+        }
+      }
+    },
+    "Expand Medicaid" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expandir Medicaid"
+          }
+        }
+      }
+    },
+    "Texas should accept federal Medicaid expansion" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Texas debería aceptar la expansión federal de Medicaid"
+          }
+        }
+      }
+    },
+    "Universal coverage" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cobertura universal"
+          }
+        }
+      }
+    },
+    "Everyone deserves healthcare regardless of income" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todos merecen atención médica sin importar sus ingresos"
+          }
+        }
+      }
+    },
+    "Local solutions" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Soluciones locales"
+          }
+        }
+      }
+    },
+    "Community health centers and county programs" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centros de salud comunitarios y programas del condado"
+          }
+        }
+      }
+    },
+    "Don't overreact" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No exagerar"
+          }
+        }
+      }
+    },
+    "Protect energy jobs, market-driven solutions" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Proteger empleos energéticos, soluciones del mercado"
+          }
+        }
+      }
+    },
+    "All of the above" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todo lo anterior"
+          }
+        }
+      }
+    },
+    "Renewables and fossil fuels, pragmatic transition" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Renovables y combustibles fósiles, transición pragmática"
+          }
+        }
+      }
+    },
+    "Go green fast" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transición verde rápida"
+          }
+        }
+      }
+    },
+    "Aggressive renewable targets and climate action" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Metas agresivas de energía renovable y acción climática"
+          }
+        }
+      }
+    },
+    "Local focus" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enfoque local"
+          }
+        }
+      }
+    },
+    "Clean air and water in Austin, green spaces, urban heat" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aire y agua limpios en Austin, espacios verdes, calor urbano"
+          }
+        }
+      }
+    },
+    "Deregulate more" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mayor desregulación"
+          }
+        }
+      }
+    },
+    "Competition drives reliability, less ERCOT control" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La competencia mejora la fiabilidad, menos control de ERCOT"
+          }
+        }
+      }
+    },
+    "Weatherize & invest" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Climatizar e invertir"
+          }
+        }
+      }
+    },
+    "Mandate upgrades, spend what it takes to prevent outages" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exigir mejoras, gastar lo necesario para prevenir apagones"
+          }
+        }
+      }
+    },
+    "Connect the grid" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conectar la red"
+          }
+        }
+      }
+    },
+    "Link Texas to national grid for backup" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conectar Texas a la red nacional como respaldo"
+          }
+        }
+      }
+    },
+    "Local resilience" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resiliencia local"
+          }
+        }
+      }
+    },
+    "Microgrids, batteries, community-level solutions" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Microrredes, baterías, soluciones a nivel comunitario"
+          }
+        }
+      }
+    },
+    "Build more roads" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Construir más carreteras"
+          }
+        }
+      }
+    },
+    "Expand highways and reduce congestion for drivers" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ampliar autopistas y reducir la congestión para los conductores"
+          }
+        }
+      }
+    },
+    "Public transit" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transporte público"
+          }
+        }
+      }
+    },
+    "Light rail, better buses, less car dependence" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tren ligero, mejores autobuses, menos dependencia del auto"
+          }
+        }
+      }
+    },
+    "Balanced approach" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enfoque equilibrado"
+          }
+        }
+      }
+    },
+    "Roads, transit, bikes, and walkability together" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Carreteras, transporte público, bicicletas y peatonalidad juntos"
+          }
+        }
+      }
+    },
+    "Remote work first" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Primero el trabajo remoto"
+          }
+        }
+      }
+    },
+    "Reduce the need to commute in the first place" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reducir la necesidad de desplazarse en primer lugar"
+          }
+        }
+      }
+    },
+    "Secure the border" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Asegurar la frontera"
+          }
+        }
+      }
+    },
+    "Enforcement first, then talk about reform" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Primero aplicar la ley, después hablar de reforma"
+          }
+        }
+      }
+    },
+    "Enforce but reform" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aplicar la ley pero reformar"
+          }
+        }
+      }
+    },
+    "Secure borders AND create legal pathways" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Asegurar fronteras Y crear vías legales"
+          }
+        }
+      }
+    },
+    "Welcoming approach" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enfoque acogedor"
+          }
+        }
+      }
+    },
+    "Immigrants strengthen Austin, expand protections" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los inmigrantes fortalecen Austin, ampliar protecciones"
+          }
+        }
+      }
+    },
+    "Local isn't federal" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lo local no es federal"
+          }
+        }
+      }
+    },
+    "City shouldn't spend resources on federal immigration enforcement" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La ciudad no debería gastar recursos en la aplicación federal de inmigración"
+          }
+        }
+      }
+    },
+    "Equal treatment" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trato igualitario"
+          }
+        }
+      }
+    },
+    "Same rules for everyone, no special categories" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las mismas reglas para todos, sin categorías especiales"
+          }
+        }
+      }
+    },
+    "Protect what we have" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Proteger lo que tenemos"
+          }
+        }
+      }
+    },
+    "Maintain current protections, don't roll them back" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantener las protecciones actuales, no retroceder"
+          }
+        }
+      }
+    },
+    "Expand protections" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ampliar protecciones"
+          }
+        }
+      }
+    },
+    "Stronger anti-discrimination laws and enforcement" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leyes antidiscriminación más fuertes y mejor aplicación"
+          }
+        }
+      }
+    },
+    "Systemic change" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambio sistémico"
+          }
+        }
+      }
+    },
+    "Address root causes of inequality, not just symptoms" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abordar las causas raíz de la desigualdad, no solo los síntomas"
+          }
+        }
+      }
+    },
+    "Researching your ballot..." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Investigando tu boleta..."
+          }
+        }
+      }
+    },
+    "Finding your ballot..." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscando tu boleta..."
+          }
+        }
+      }
+    },
+    "Looking up your districts..." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscando tus distritos..."
+          }
+        }
+      }
+    },
+    "Researching candidates..." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Investigando candidatos..."
+          }
+        }
+      }
+    },
+    "Researching Democrats..." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Investigando demócratas..."
+          }
+        }
+      }
+    },
+    "Researching Republicans..." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Investigando republicanos..."
+          }
+        }
+      }
+    },
+    "Finalizing recommendations..." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finalizando recomendaciones..."
+          }
+        }
+      }
+    },
+    "Finding your ballot" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscando tu boleta"
+          }
+        }
+      }
+    },
+    "Looking up districts" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscando distritos"
+          }
+        }
+      }
+    },
+    "Researching candidates" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Investigando candidatos"
+          }
+        }
+      }
+    },
+    "Researching Democrats" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Investigando demócratas"
+          }
+        }
+      }
+    },
+    "Researching Republicans" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Investigando republicanos"
+          }
+        }
+      }
+    },
+    "Finalizing recommendations" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finalizando recomendaciones"
+          }
+        }
+      }
+    },
+    "Something went wrong" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Algo salió mal"
+          }
+        }
+      }
+    },
+    "This takes about a minute" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esto toma aproximadamente un minuto"
+          }
+        }
+      }
+    },
+    "Your guide is ready!" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Tu guía está lista!"
+          }
+        }
+      }
+    },
+    "Help your friends vote informed!" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Ayuda a tus amigos a votar informados!"
+          }
+        }
+      }
+    },
+    "Share ATX Votes" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compartir ATX Votes"
+          }
+        }
+      }
+    },
+    "I just built my personalized voting guide for the March 2026 Texas primary with ATX Votes! Build yours in 5 minutes and know exactly who to vote for." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Acabo de crear mi guía personalizada de votación para la primaria de Texas de marzo 2026 con ATX Votes! Crea la tuya en 5 minutos y sabe exactamente por quién votar."
+          }
+        }
+      }
+    },
+    "Authentication error. Please update the app." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error de autenticación. Por favor actualiza la app."
+          }
+        }
+      }
+    },
+    "Too many requests. Please wait a moment and try again." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Demasiadas solicitudes. Espera un momento e intenta de nuevo."
+          }
+        }
+      }
+    },
+    "All AI models are overloaded (%@). Please try again in a minute." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todos los modelos de IA están sobrecargados (%@). Intenta de nuevo en un minuto."
+          }
+        }
+      }
+    },
+    "Our AI hamsters have run out of snacks. The developer has been notified — please try again later!" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuestros hámsters de IA se quedaron sin bocadillos. El desarrollador ha sido notificado — ¡intenta de nuevo más tarde!"
+          }
+        }
+      }
+    },
+    "Server error (%lld). Please try again later." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error del servidor (%lld). Intenta de nuevo más tarde."
+          }
+        }
+      }
+    },
+    "The AI is taking longer than usual. Please try again — it usually works on the second attempt." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La IA está tardando más de lo normal. Intenta de nuevo — generalmente funciona en el segundo intento."
+          }
+        }
+      }
+    },
+    "Something went wrong building your guide. Please try again." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Algo salió mal al crear tu guía. Intenta de nuevo."
+          }
+        }
+      }
+    },
+    "We couldn't find that address. Showing all races in your area." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No pudimos encontrar esa dirección. Mostrando todas las contiendas en tu área."
+          }
+        }
+      }
+    },
+    "District lookup failed. Showing all races." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudieron buscar los distritos. Mostrando todas las contiendas."
+          }
+        }
+      }
+    },
+    "Early Voting Starts Today!" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡La votación anticipada comienza hoy!"
+          }
+        }
+      }
+    },
+    "Vote at any Travis County Vote Center through Feb 27. Check your cheat sheet before you go!" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vota en cualquier centro de votación del condado de Travis hasta el 27 de febrero. ¡Revisa tu guía antes de ir!"
+          }
+        }
+      }
+    },
+    "Early Voting Reminder" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recordatorio de votación anticipada"
+          }
+        }
+      }
+    },
+    "Early voting ends Friday. Beat the lines — vote today at any Vote Center in Travis County." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La votación anticipada termina el viernes. Evita las filas — vota hoy en cualquier centro de votación del condado de Travis."
+          }
+        }
+      }
+    },
+    "Last Day of Early Voting!" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Último día de votación anticipada!"
+          }
+        }
+      }
+    },
+    "Today's your last chance to vote early. Extended hours until 10 PM at all Vote Centers." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hoy es tu última oportunidad para votar anticipadamente. Horario extendido hasta las 10 PM en todos los centros de votación."
+          }
+        }
+      }
+    },
+    "Election Day is Tomorrow" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El día de elecciones es mañana"
+          }
+        }
+      }
+    },
+    "Print your cheat sheet tonight — phones aren't allowed in the voting booth in Travis County." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imprime tu guía esta noche — no se permiten teléfonos en la casilla de votación en el condado de Travis."
+          }
+        }
+      }
+    },
+    "It's Election Day!" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Es día de elecciones!"
+          }
+        }
+      }
+    },
+    "Polls are open 7 AM - 7 PM. Vote at any Vote Center. Don't forget your photo ID!" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las casillas están abiertas de 7 AM a 7 PM. Vota en cualquier centro de votación. ¡No olvides tu identificación con foto!"
+          }
+        }
+      }
+    },
+    "March 2026 Texas Primary" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Primaria de Texas — Marzo 2026"
+          }
+        }
+      }
+    },
+    "My Ballot" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mi boleta"
+          }
+        }
+      }
+    },
+    "Vote Info" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Info de votación"
+          }
+        }
+      }
+    },
+    "Profile" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Perfil"
+          }
+        }
+      }
+    },
+    "ATX Votes" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ATX Votes"
+          }
+        }
+      }
+    },
+    "Your personalized Austin\nvoting guide in 5 minutes" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu guía personalizada de\nvotación en Austin en 5 minutos"
+          }
+        }
+      }
+    },
+    "Quick interview about your values" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entrevista rápida sobre tus valores"
+          }
+        }
+      }
+    },
+    "We research every race on your ballot" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Investigamos cada contienda en tu boleta"
+          }
+        }
+      }
+    },
+    "Personalized recommendations" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recomendaciones personalizadas"
+          }
+        }
+      }
+    },
+    "Printable cheat sheet for the polls" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guía imprimible para las casillas"
+          }
+        }
+      }
+    },
+    "Build My Voting Guide" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crear mi guía de votación"
+          }
+        }
+      }
+    },
+    "Which primary will you vote in?" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿En qué primaria vas a votar?"
+          }
+        }
+      }
+    },
+    "Texas has open primaries — you choose at the polls. You can only vote in one party's primary." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Texas tiene primarias abiertas — tú eliges en las casillas. Solo puedes votar en la primaria de un partido."
+          }
+        }
+      }
+    },
+    "Republican Primary" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Primaria Republicana"
+          }
+        }
+      }
+    },
+    "Democratic Primary" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Primaria Demócrata"
+          }
+        }
+      }
+    },
+    "We'll build guides for both parties so you can compare." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crearemos guías para ambos partidos para que puedas comparar."
+          }
+        }
+      }
+    },
+    "How Texas primaries work" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cómo funcionan las primarias en Texas"
+          }
+        }
+      }
+    },
+    "You don't register with a party in Texas. At the polls, you tell them which primary you want. You'll only see races from that party. In the general election (November), you can vote for anyone." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En Texas no te registras con un partido. En las casillas, les dices en qué primaria quieres votar. Solo verás las contiendas de ese partido. En la elección general (noviembre), puedes votar por quien quieras."
+          }
+        }
+      }
+    },
+    "What's your\nhome address?" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Cuál es tu\ndirección?"
+          }
+        }
+      }
+    },
+    "We need this to find your exact ballot — your districts depend on where you live." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Necesitamos esto para encontrar tu boleta exacta — tus distritos dependen de dónde vives."
+          }
+        }
+      }
+    },
+    "Street Address" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dirección"
+          }
+        }
+      }
+    },
+    "City" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ciudad"
+          }
+        }
+      }
+    },
+    "State" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estado"
+          }
+        }
+      }
+    },
+    "ZIP" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Código postal"
+          }
+        }
+      }
+    },
+    "Your address stays on your device. It's only used to look up your ballot districts — we never store or share it." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu dirección se queda en tu dispositivo. Solo se usa para buscar tus distritos electorales — nunca la almacenamos ni compartimos."
+          }
+        }
+      }
+    },
+    "Build My Guide" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crear mi guía"
+          }
+        }
+      }
+    },
+    "Back" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atrás"
+          }
+        }
+      }
+    },
+    "Continue" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuar"
+          }
+        }
+      }
+    },
+    "Key Races" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contiendas clave"
+          }
+        }
+      }
+    },
+    "Other Contested Races" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otras contiendas competidas"
+          }
+        }
+      }
+    },
+    "Propositions" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Proposiciones"
+          }
+        }
+      }
+    },
+    "Cheat Sheet" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guía rápida"
+          }
+        }
+      }
+    },
+    "Uncontested Races" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contiendas sin oposición"
+          }
+        }
+      }
+    },
+    "Showing all races — district lookup unavailable" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrando todas las contiendas — búsqueda de distritos no disponible"
+          }
+        }
+      }
+    },
+    "candidates" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "candidatos"
+          }
+        }
+      }
+    },
+    "PROPOSITIONS" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PROPOSICIONES"
+          }
+        }
+      }
+    },
+    "MY BALLOT CHEAT SHEET" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MI GUÍA RÁPIDA DE BOLETA"
+          }
+        }
+      }
+    },
+    "Primary" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Primaria"
+          }
+        }
+      }
+    },
+    "AI-generated recommendations — do your own research." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recomendaciones generadas por IA — haz tu propia investigación."
+          }
+        }
+      }
+    },
+    "Built with ATX Votes — atxvotes.app" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hecho con ATX Votes — atxvotes.app"
+          }
+        }
+      }
+    },
+    "= Key race" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "= Contienda clave"
+          }
+        }
+      }
+    },
+    "AI-generated — do your own research." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Generado por IA — haz tu propia investigación."
+          }
+        }
+      }
+    },
+    "Your Ballot Cheat Sheet" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu guía rápida de boleta"
+          }
+        }
+      }
+    },
+    "CONTESTED RACES" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CONTIENDAS COMPETIDAS"
+          }
+        }
+      }
+    },
+    "UNCONTESTED" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SIN OPOSICIÓN"
+          }
+        }
+      }
+    },
+    "= Key race where your vote matters most" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "= Contienda clave donde tu voto importa más"
+          }
+        }
+      }
+    },
+    "AI-generated recommendations may contain errors. Do your own research before voting." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las recomendaciones generadas por IA pueden contener errores. Haz tu propia investigación antes de votar."
+          }
+        }
+      }
+    },
+    "Built with ATX Votes" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hecho con ATX Votes"
+          }
+        }
+      }
+    },
+    "Our Pick" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuestra recomendación"
+          }
+        }
+      }
+    },
+    "Incumbent" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Titular"
+          }
+        }
+      }
+    },
+    "Strengths" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fortalezas"
+          }
+        }
+      }
+    },
+    "Concerns" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preocupaciones"
+          }
+        }
+      }
+    },
+    "Key Positions" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Posiciones clave"
+          }
+        }
+      }
+    },
+    "Fundraising" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recaudación de fondos"
+          }
+        }
+      }
+    },
+    "Polling" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encuestas"
+          }
+        }
+      }
+    },
+    "Endorsements" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Respaldos"
+          }
+        }
+      }
+    },
+    "Strategic Notes" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notas estratégicas"
+          }
+        }
+      }
+    },
+    "How you might describe your politics to a friend" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cómo describirías tu postura política a un amigo"
+          }
+        }
+      }
+    },
+    "Your Top Issues" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus temas principales"
+          }
+        }
+      }
+    },
+    "What You Value in Candidates" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lo que valoras en los candidatos"
+          }
+        }
+      }
+    },
+    "Your Policy Stances" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus posturas políticas"
+          }
+        }
+      }
+    },
+    "Admire" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Admiro"
+          }
+        }
+      }
+    },
+    "Dislike" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No me gustan"
+          }
+        }
+      }
+    },
+    "Start Over" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Empezar de nuevo"
+          }
+        }
+      }
+    },
+    "Send Feedback" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviar comentarios"
+          }
+        }
+      }
+    },
+    "Powered by Claude (Anthropic)" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desarrollado con Claude (Anthropic)"
+          }
+        }
+      }
+    },
+    "Start Over?" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Empezar de nuevo?"
+          }
+        }
+      }
+    },
+    "This will erase your voter profile and recommendations. You'll need to go through the interview again." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esto borrará tu perfil de votante y recomendaciones. Tendrás que hacer la entrevista de nuevo."
+          }
+        }
+      }
+    },
+    "Cancel" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelar"
+          }
+        }
+      }
+    },
+    "Reset" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reiniciar"
+          }
+        }
+      }
+    },
+    "Could not refresh summary. Check your connection and try again." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo actualizar el resumen. Revisa tu conexión e intenta de nuevo."
+          }
+        }
+      }
+    },
+    "My Voter Profile — ATX Votes" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mi perfil de votante — ATX Votes"
+          }
+        }
+      }
+    },
+    "Political Outlook" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Perspectiva política"
+          }
+        }
+      }
+    },
+    "Top Issues" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Temas principales"
+          }
+        }
+      }
+    },
+    "I value" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Valoro"
+          }
+        }
+      }
+    },
+    "Policy Stances:" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Posturas políticas:"
+          }
+        }
+      }
+    },
+    "Politicians I admire" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Políticos que admiro"
+          }
+        }
+      }
+    },
+    "Politicians I dislike" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Políticos que no me gustan"
+          }
+        }
+      }
+    },
+    "Key Dates" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fechas clave"
+          }
+        }
+      }
+    },
+    "Early Voting" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votación anticipada"
+          }
+        }
+      }
+    },
+    "Election Day" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Día de elecciones"
+          }
+        }
+      }
+    },
+    "Voter ID" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Identificación de votante"
+          }
+        }
+      }
+    },
+    "What to Bring" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qué llevar"
+          }
+        }
+      }
+    },
+    "Resources" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recursos"
+          }
+        }
+      }
+    },
+    "You voted!" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Ya votaste!"
+          }
+        }
+      }
+    },
+    "days until Election Day" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "días para el día de elecciones"
+          }
+        }
+      }
+    },
+    "TODAY" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HOY"
+          }
+        }
+      }
+    },
+    "is Election Day!" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡es día de elecciones!"
+          }
+        }
+      }
+    },
+    "Election Complete" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elección completada"
+          }
+        }
+      }
+    },
+    "Election Reminders" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recordatorios de elección"
+          }
+        }
+      }
+    },
+    "Reminders paused — you voted!" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recordatorios pausados — ¡ya votaste!"
+          }
+        }
+      }
+    },
+    "Get notified for early voting and Election Day" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recibe notificaciones para la votación anticipada y el día de elecciones"
+          }
+        }
+      }
+    },
+    "Find Your Polling Location" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encuentra tu lugar de votación"
+          }
+        }
+      }
+    },
+    "Travis County uses Vote Centers — you can vote at any location." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El condado de Travis usa centros de votación — puedes votar en cualquier ubicación."
+          }
+        }
+      }
+    },
+    "Texas has open primaries — tell the poll worker which party's primary you want. You can only vote in one." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Texas tiene primarias abiertas — dile al trabajador electoral en cuál primaria quieres votar. Solo puedes votar en una."
+          }
+        }
+      }
+    },
+    "Texas requires photo ID to vote in person:" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Texas requiere identificación con foto para votar en persona:"
+          }
+        }
+      }
+    },
+    "Expired IDs accepted if expired less than 4 years. No expiration limit for voters 70+." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se aceptan identificaciones vencidas si tienen menos de 4 años de vencimiento. Sin límite de vencimiento para votantes de 70 años o más."
+          }
+        }
+      }
+    },
+    "Travis County: You may NOT use your phone in the voting booth. Print your cheat sheet before you go!" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Condado de Travis: NO puedes usar tu teléfono en la casilla de votación. ¡Imprime tu guía antes de ir!"
+          }
+        }
+      }
+    },
+    "Required" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obligatorio"
+          }
+        }
+      }
+    },
+    "Travis County Elections" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elecciones del condado de Travis"
+          }
+        }
+      }
+    },
+    "Actually, I didn't vote yet" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En realidad, aún no he votado"
+          }
+        }
+      }
+    },
+    "Get your sticker" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obtén tu sticker"
+          }
+        }
+      }
+    },
+    "I Voted" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yo voté"
+          }
+        }
+      }
+    },
+    "Early!" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Anticipadamente!"
+          }
+        }
+      }
+    },
+    "Find early voting locations" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encuentra lugares de votación anticipada"
+          }
+        }
+      }
+    },
+    "Find Election Day locations" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encuentra lugares para el día de elecciones"
+          }
+        }
+      }
+    },
+    "Vote at any early voting location in Travis County" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vota en cualquier lugar de votación anticipada en el condado de Travis"
+          }
+        }
+      }
+    },
+    "Vote at any Vote Center in Travis County" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vota en cualquier centro de votación en el condado de Travis"
+          }
+        }
+      }
+    },
+    "Open in Maps" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir en Mapas"
+          }
+        }
+      }
+    },
+    "Recommended" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recomendado"
+          }
+        }
+      }
+    },
+    "AI-Generated Recommendations" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recomendaciones generadas por IA"
+          }
+        }
+      }
+    },
+    "These recommendations are generated by AI based on your stated values and publicly available candidate information. They may contain errors. Always do your own research before voting." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estas recomendaciones son generadas por IA basándose en tus valores declarados e información pública de los candidatos. Pueden contener errores. Siempre haz tu propia investigación antes de votar."
+          }
+        }
+      }
+    },
+    "Step %lld of %lld" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paso %lld de %lld"
+          }
+        }
+      }
+    },
+    "%@ Primary Election" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elección primaria de %@"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

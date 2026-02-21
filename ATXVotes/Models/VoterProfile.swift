@@ -42,6 +42,10 @@ enum Issue: String, Codable, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
+    var localizedName: String {
+        String(localized: String.LocalizationValue(rawValue))
+    }
+
     var icon: String {
         switch self {
         case .economy: "dollarsign.circle"
@@ -69,6 +73,21 @@ enum PoliticalSpectrum: String, Codable, CaseIterable, Identifiable {
     case independent = "Independent / Issue-by-Issue"
 
     var id: String { rawValue }
+
+    var localizedName: String {
+        String(localized: String.LocalizationValue(rawValue))
+    }
+
+    var localizedDescription: String {
+        switch self {
+        case .progressive: String(localized: "Bold systemic change, social justice focused")
+        case .liberal: String(localized: "Expand rights and services, government as a force for good")
+        case .moderate: String(localized: "Pragmatic center, best ideas from both sides")
+        case .conservative: String(localized: "Limited government, traditional values, fiscal discipline")
+        case .libertarian: String(localized: "Maximum freedom, minimal government")
+        case .independent: String(localized: "I decide issue by issue, not by party")
+        }
+    }
 }
 
 enum CandidateQuality: String, Codable, CaseIterable, Identifiable {
@@ -82,6 +101,10 @@ enum CandidateQuality: String, Codable, CaseIterable, Identifiable {
     case communityTies = "Community Ties"
 
     var id: String { rawValue }
+
+    var localizedName: String {
+        String(localized: String.LocalizationValue(rawValue))
+    }
 }
 
 enum PrimaryBallot: String, Codable, CaseIterable, Identifiable {
@@ -90,6 +113,10 @@ enum PrimaryBallot: String, Codable, CaseIterable, Identifiable {
     case undecided = "Not Sure Yet"
 
     var id: String { rawValue }
+
+    var localizedName: String {
+        String(localized: String.LocalizationValue(rawValue))
+    }
 }
 
 struct Address: Codable, Equatable {

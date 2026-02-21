@@ -10,10 +10,10 @@ struct ProfileView: View {
 
     private var shareableProfileText: String {
         var lines: [String] = []
-        lines.append("My Voter Profile — ATX Votes")
+        lines.append(String(localized: "My Voter Profile — ATX Votes"))
         lines.append("")
 
-        lines.append("Political Outlook: \(profile.politicalSpectrum.rawValue)")
+        lines.append("\(String(localized: "Political Outlook")): \(profile.politicalSpectrum.localizedName)")
         lines.append("")
 
         if let summary = profile.summaryText {
@@ -22,16 +22,16 @@ struct ProfileView: View {
         }
 
         if !profile.topIssues.isEmpty {
-            lines.append("Top Issues: \(profile.topIssues.map(\.rawValue).joined(separator: ", "))")
+            lines.append("\(String(localized: "Top Issues")): \(profile.topIssues.map(\.localizedName).joined(separator: ", "))")
         }
 
         if !profile.candidateQualities.isEmpty {
-            lines.append("I value: \(profile.candidateQualities.map(\.rawValue).joined(separator: ", "))")
+            lines.append("\(String(localized: "I value")): \(profile.candidateQualities.map(\.localizedName).joined(separator: ", "))")
         }
 
         if !profile.policyViews.isEmpty {
             lines.append("")
-            lines.append("Policy Stances:")
+            lines.append(String(localized: "Policy Stances:"))
             for key in profile.policyViews.keys.sorted() {
                 lines.append("  \(key): \(profile.policyViews[key] ?? "")")
             }
@@ -39,14 +39,14 @@ struct ProfileView: View {
 
         if !profile.admiredPoliticians.isEmpty {
             lines.append("")
-            lines.append("Politicians I admire: \(profile.admiredPoliticians.joined(separator: ", "))")
+            lines.append("\(String(localized: "Politicians I admire")): \(profile.admiredPoliticians.joined(separator: ", "))")
         }
         if !profile.dislikedPoliticians.isEmpty {
-            lines.append("Politicians I dislike: \(profile.dislikedPoliticians.joined(separator: ", "))")
+            lines.append("\(String(localized: "Politicians I dislike")): \(profile.dislikedPoliticians.joined(separator: ", "))")
         }
 
         lines.append("")
-        lines.append("Built with ATX Votes — atxvotes.app")
+        lines.append(String(localized: "Built with ATX Votes — atxvotes.app"))
         return lines.joined(separator: "\n")
     }
 
@@ -64,7 +64,7 @@ struct ProfileView: View {
                                 Text("How you might describe your politics to a friend")
                                     .font(Theme.headline)
                                     .foregroundColor(Theme.textPrimary)
-                                Text(profile.politicalSpectrum.rawValue)
+                                Text(profile.politicalSpectrum.localizedName)
                                     .font(Theme.caption)
                                     .foregroundColor(Theme.textSecondary)
                             }
@@ -107,7 +107,7 @@ struct ProfileView: View {
                                 HStack(spacing: 6) {
                                     Image(systemName: issue.icon)
                                         .font(.system(size: 16))
-                                    Text(issue.rawValue)
+                                    Text(issue.localizedName)
                                         .font(.system(size: 17, weight: .medium))
                                 }
                                 .foregroundColor(Theme.primaryBlue)
@@ -131,7 +131,7 @@ struct ProfileView: View {
                                 Image(systemName: "checkmark.circle.fill")
                                     .foregroundColor(Theme.success)
                                     .font(.caption)
-                                Text(quality.rawValue)
+                                Text(quality.localizedName)
                                     .font(Theme.callout)
                                     .foregroundColor(Theme.textPrimary)
                             }

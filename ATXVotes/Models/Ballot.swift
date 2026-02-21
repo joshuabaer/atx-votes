@@ -76,6 +76,10 @@ struct RaceRecommendation: Codable {
         case moderate = "Good Match"
         case weak = "Best Available"
         case symbolic = "Symbolic Race"
+
+        var localizedName: String {
+            String(localized: String.LocalizationValue(rawValue))
+        }
     }
 }
 
@@ -103,12 +107,20 @@ struct Proposition: Codable, Identifiable {
         case leanYes = "Lean Yes"
         case leanNo = "Lean No"
         case yourCall = "Your Call"
+
+        var localizedName: String {
+            String(localized: String.LocalizationValue(rawValue))
+        }
     }
 
     enum PropConfidence: String, Codable {
         case clearCall = "Clear Call"
         case lean = "Lean"
         case genuinelyContested = "Genuinely Contested"
+
+        var localizedName: String {
+            String(localized: String.LocalizationValue(rawValue))
+        }
     }
 
     // Custom decoder so cached ballots from before the enrichment fields existed

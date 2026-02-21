@@ -42,6 +42,10 @@ struct VotingInfoView: View {
 
         var id: String { rawValue }
 
+        var localizedName: String {
+            String(localized: String.LocalizationValue(rawValue))
+        }
+
         var icon: String {
             switch self {
             case .dates: "calendar"
@@ -352,7 +356,7 @@ struct InfoAccordion: View {
                         .frame(width: 28)
                         .accessibilityHidden(true)
 
-                    Text(section.rawValue)
+                    Text(section.localizedName)
                         .font(Theme.headline)
                         .foregroundColor(Theme.textPrimary)
 
@@ -366,7 +370,7 @@ struct InfoAccordion: View {
                 }
             }
             .buttonStyle(.plain)
-            .accessibilityLabel(section.rawValue)
+            .accessibilityLabel(section.localizedName)
             .accessibilityHint(isExpanded ? "Double tap to collapse" : "Double tap to expand")
             .accessibilityAddTraits(isExpanded ? .isSelected : [])
 

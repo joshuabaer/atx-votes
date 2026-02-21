@@ -19,10 +19,16 @@ class VotingGuideStore: ObservableObject {
     @Published var guideComplete = false
     @Published var hasVoted = false
     @Published var isLoading = false
-    @Published var loadingMessage = "Researching your ballot..."
+    @Published var loadingMessage = String(localized: "Researching your ballot...")
+    @Published var loadingPhase: LoadingPhase = .findingBallot
     @Published var errorMessage: String?
     @Published var districtLookupFailed = false
     @Published var demFirstOrder = false
+
+    enum LoadingPhase: Int {
+        case findingBallot, lookingUpDistricts, researchingCandidates,
+             firstParty, secondParty, finalizing
+    }
 
     var ballot: Ballot? {
         switch selectedParty {
@@ -146,11 +152,12 @@ class VotingGuideStore: ObservableObject {
     private var lastMessageChange = Date.distantPast
 
     /// Update the loading message, ensuring the previous message was shown for a minimum duration.
-    private func setLoadingPhase(_ message: String, minDisplayTime: TimeInterval = 0.8) async {
+    private func setLoadingStep(_ phase: LoadingPhase, message: String, minDisplayTime: TimeInterval = 0.8) async {
         let elapsed = Date().timeIntervalSince(lastMessageChange)
         if elapsed < minDisplayTime {
             try? await Task.sleep(for: .seconds(minDisplayTime - elapsed))
         }
+        loadingPhase = phase
         loadingMessage = message
         lastMessageChange = Date()
     }
@@ -158,11 +165,12 @@ class VotingGuideStore: ObservableObject {
     func buildVotingGuide() async {
         isLoading = true
         lastMessageChange = Date()
-        loadingMessage = "Finding your ballot..."
+        loadingPhase = .findingBallot
+        loadingMessage = String(localized: "Finding your ballot...")
 
         do {
             // Step 1: Look up districts based on address
-            await setLoadingPhase("Looking up your districts...")
+            await setLoadingStep(.lookingUpDistricts, message: String(localized: "Looking up your districts..."))
             if let address = voterProfile.address, voterProfile.districts == nil {
                 do {
                     voterProfile.districts = try await districtService.lookupDistricts(for: address)
@@ -174,7 +182,7 @@ class VotingGuideStore: ObservableObject {
             }
 
             // Step 2: Generate personalized recommendations for both parties in parallel
-            await setLoadingPhase("Researching candidates...")
+            await setLoadingStep(.researchingCandidates, message: String(localized: "Researching candidates..."))
 
             var repProfile = voterProfile
             repProfile.primaryBallot = .republican
@@ -192,7 +200,7 @@ class VotingGuideStore: ObservableObject {
             // For undecided voters, randomly pick which party to show first
             demFirstOrder = inferredParty == .democrat || (inferredParty == .undecided && Bool.random())
             if demFirstOrder {
-                await setLoadingPhase("Researching Democrats...")
+                await setLoadingStep(.firstParty, message: String(localized: "Researching Democrats..."))
                 do {
                     let (ballot, summary) = try await demTask.value
                     democratBallot = ballot
@@ -202,7 +210,7 @@ class VotingGuideStore: ObservableObject {
                     lastError = error
                 }
 
-                await setLoadingPhase("Researching Republicans...", minDisplayTime: 1.5)
+                await setLoadingStep(.secondParty, message: String(localized: "Researching Republicans..."), minDisplayTime: 1.5)
                 do {
                     let (ballot, summary) = try await repTask.value
                     republicanBallot = ballot
@@ -212,7 +220,7 @@ class VotingGuideStore: ObservableObject {
                     lastError = error
                 }
             } else {
-                await setLoadingPhase("Researching Republicans...")
+                await setLoadingStep(.firstParty, message: String(localized: "Researching Republicans..."))
                 do {
                     let (ballot, summary) = try await repTask.value
                     republicanBallot = ballot
@@ -222,7 +230,7 @@ class VotingGuideStore: ObservableObject {
                     lastError = error
                 }
 
-                await setLoadingPhase("Researching Democrats...", minDisplayTime: 1.5)
+                await setLoadingStep(.secondParty, message: String(localized: "Researching Democrats..."), minDisplayTime: 1.5)
                 do {
                     let (ballot, summary) = try await demTask.value
                     democratBallot = ballot
@@ -233,7 +241,7 @@ class VotingGuideStore: ObservableObject {
                 }
             }
 
-            await setLoadingPhase("Finalizing recommendations...", minDisplayTime: 1.5)
+            await setLoadingStep(.finalizing, message: String(localized: "Finalizing recommendations..."), minDisplayTime: 1.5)
 
             // Default to inferred party and use its summary
             selectedParty = inferredParty
@@ -270,10 +278,10 @@ class VotingGuideStore: ObservableObject {
             errorMessage = error.localizedDescription
             isLoading = false
         } catch let error as URLError where error.code == .timedOut {
-            errorMessage = "The AI is taking longer than usual. Please try again — it usually works on the second attempt."
+            errorMessage = String(localized: "The AI is taking longer than usual. Please try again — it usually works on the second attempt.")
             isLoading = false
         } catch {
-            errorMessage = "Something went wrong building your guide. Please try again."
+            errorMessage = String(localized: "Something went wrong building your guide. Please try again.")
             isLoading = false
         }
     }

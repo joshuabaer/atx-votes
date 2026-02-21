@@ -123,7 +123,7 @@ struct RaceDetailView: View {
             }
 
             HStack {
-                Text(rec.confidence.rawValue)
+                Text(rec.confidence.localizedName)
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundColor(Theme.primaryBlue)
                     .padding(.horizontal, 10)

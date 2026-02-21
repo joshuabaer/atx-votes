@@ -166,13 +166,13 @@ struct PartySwitcher: View {
         HStack(spacing: 12) {
             partyButton(
                 party: .republican,
-                label: "Republican",
+                label: String(localized: "Republican"),
                 emoji: "\u{1F418}",
                 color: Theme.republican
             )
             partyButton(
                 party: .democrat,
-                label: "Democrat",
+                label: String(localized: "Democrat"),
                 emoji: "\u{1FACF}",
                 color: Theme.democrat
             )
@@ -229,10 +229,10 @@ struct RecommendationBadge: View {
 
     var label: String {
         switch style {
-        case .recommended: "Recommended"
-        case .leanYes: "Lean Yes"
-        case .leanNo: "Lean No"
-        case .yourCall: "Your Call"
+        case .recommended: String(localized: "Recommended")
+        case .leanYes: String(localized: "Lean Yes")
+        case .leanNo: String(localized: "Lean No")
+        case .yourCall: String(localized: "Your Call")
         }
     }
 

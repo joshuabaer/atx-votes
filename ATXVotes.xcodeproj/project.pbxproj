@@ -37,6 +37,7 @@
 		A1001D00000000000000001D /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2001D00000000000000001D /* NotificationService.swift */; };
 		A1001F00000000000000001F /* ElectionDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2001F00000000000000001F /* ElectionDataService.swift */; };
 		A1001E00000000000000001F /* Election.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2001E00000000000000001F /* Election.swift */; };
+		A10020000000000000000020 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = A20020000000000000000020 /* Localizable.xcstrings */; };
 		B10001000000000000000001 /* VotingGuideStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20001000000000000000001 /* VotingGuideStoreTests.swift */; };
 		B10002000000000000000002 /* BallotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20002000000000000000002 /* BallotTests.swift */; };
 		B10003000000000000000003 /* VoterProfileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20003000000000000000003 /* VoterProfileTests.swift */; };
@@ -85,6 +86,7 @@
 		A2001F00000000000000001F /* ElectionDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElectionDataService.swift; sourceTree = "<group>"; };
 		A2001E00000000000000001E /* ATXVotes.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ATXVotes.entitlements; sourceTree = "<group>"; };
 		A2001E00000000000000001F /* Election.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Election.swift; sourceTree = "<group>"; };
+		A20020000000000000000020 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		A30000000000000000000001 /* ATXVotes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ATXVotes.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B20001000000000000000001 /* VotingGuideStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VotingGuideStoreTests.swift; sourceTree = "<group>"; };
 		B20002000000000000000002 /* BallotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BallotTests.swift; sourceTree = "<group>"; };
@@ -132,6 +134,7 @@
 				A50000000000000000000008 /* Services */,
 				A50000000000000000000009 /* ElectionData */,
 				A20018000000000000000018 /* Assets.xcassets */,
+				A20020000000000000000020 /* Localizable.xcstrings */,
 			);
 			path = ATXVotes;
 			sourceTree = "<group>";
@@ -297,6 +300,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				es,
 				Base,
 			);
 			mainGroup = A50000000000000000000001;
@@ -318,6 +322,7 @@
 				A10018000000000000000018 /* Assets.xcassets in Resources */,
 				A10019000000000000000019 /* republican_primary_2026.json in Resources */,
 				A1001A00000000000000001A /* democrat_primary_2026.json in Resources */,
+				A10020000000000000000020 /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

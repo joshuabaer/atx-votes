@@ -70,8 +70,8 @@ enum DistrictError: Error, LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .addressNotFound: "We couldn't find that address. Showing all races in your area."
-        case .networkError(let msg): "District lookup failed: \(msg). Showing all races."
+        case .addressNotFound: String(localized: "We couldn't find that address. Showing all races in your area.")
+        case .networkError: String(localized: "District lookup failed. Showing all races.")
         }
     }
 }

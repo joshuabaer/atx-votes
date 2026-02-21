@@ -94,7 +94,7 @@ struct QualityOption: View {
                         .foregroundColor(isSelected ? .white : Theme.primaryBlue)
                 }
 
-                Text(quality.rawValue)
+                Text(quality.localizedName)
                     .font(Theme.headline)
                     .foregroundColor(Theme.textPrimary)
 

@@ -37,12 +37,12 @@ struct PolicyDeepDiveView: View {
     }
 
     private func optionsForQuestion(_ question: InterviewQuestion) -> [InterviewQuestion.QuestionOption] {
-        if let cached = shuffledOptions[question.text] {
+        if let cached = shuffledOptions[question.key] {
             return cached
         }
         let shuffled = question.options.shuffled()
         DispatchQueue.main.async {
-            shuffledOptions[question.text] = shuffled
+            shuffledOptions[question.key] = shuffled
         }
         return shuffled
     }
@@ -77,11 +77,11 @@ struct PolicyDeepDiveView: View {
                                 PolicyOptionButton(
                                     label: option.label,
                                     description: option.description,
-                                    isSelected: answers[question.text] == option.label
+                                    isSelected: answers[question.key] == option.label
                                 ) {
                                     withAnimation(.spring(response: 0.25)) {
-                                        answers[question.text] = option.label
-                                        store.setPolicyView(issue: question.text, stance: option.label)
+                                        answers[question.key] = option.label
+                                        store.setPolicyView(issue: question.key, stance: option.label)
                                     }
                                 }
                             }
@@ -125,8 +125,8 @@ struct PolicyDeepDiveView: View {
                         }
                     }
                     .buttonStyle(PrimaryButtonStyle())
-                    .disabled(currentQuestion != nil && answers[currentQuestion!.text] == nil)
-                    .opacity(currentQuestion != nil && answers[currentQuestion!.text] == nil ? 0.5 : 1)
+                    .disabled(currentQuestion != nil && answers[currentQuestion!.key] == nil)
+                    .opacity(currentQuestion != nil && answers[currentQuestion!.key] == nil ? 0.5 : 1)
                 }
                 .padding(.horizontal, Theme.paddingLarge)
                 .padding(.vertical, 16)

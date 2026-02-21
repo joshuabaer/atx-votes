@@ -203,7 +203,7 @@ struct BallotOverviewView: View {
 
                     // Key Races
                     if !contestedRaces.filter(\.isKeyRace).isEmpty {
-                        sectionHeader("Key Races", icon: "star.fill", color: Theme.accentGold)
+                        sectionHeader(String(localized: "Key Races"), icon: "star.fill", color: Theme.accentGold)
 
                         ForEach(contestedRaces.filter(\.isKeyRace)) { race in
                             NavigationLink(destination: RaceDetailView(race: race)) {
@@ -216,7 +216,7 @@ struct BallotOverviewView: View {
                     // Other Contested Races
                     let otherContested = contestedRaces.filter { !$0.isKeyRace }
                     if !otherContested.isEmpty {
-                        sectionHeader("Other Contested Races", icon: "person.2.fill", color: Theme.primaryBlue)
+                        sectionHeader(String(localized: "Other Contested Races"), icon: "person.2.fill", color: Theme.primaryBlue)
 
                         ForEach(otherContested) { race in
                             NavigationLink(destination: RaceDetailView(race: race)) {
@@ -228,7 +228,7 @@ struct BallotOverviewView: View {
 
                     // Propositions
                     if let props = ballot?.propositions, !props.isEmpty {
-                        sectionHeader("Propositions", icon: "doc.text", color: Theme.primaryBlue)
+                        sectionHeader(String(localized: "Propositions"), icon: "doc.text", color: Theme.primaryBlue)
 
                         ForEach(props) { prop in
                             PropositionCard(proposition: prop)
@@ -339,7 +339,7 @@ struct BallotOverviewView: View {
     private var cheatSheetSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                sectionHeader("Cheat Sheet", icon: "list.clipboard.fill", color: Theme.primaryBlue)
+                sectionHeader(String(localized: "Cheat Sheet"), icon: "list.clipboard.fill", color: Theme.primaryBlue)
                 Spacer()
                 HStack(spacing: 16) {
                     Button {
@@ -371,7 +371,7 @@ struct BallotOverviewView: View {
                         .font(Theme.caption)
                         .foregroundColor(.white.opacity(0.8))
                     Spacer()
-                    Text(ballot?.party.rawValue ?? store.selectedParty.rawValue)
+                    Text(ballot?.party.localizedName ?? store.selectedParty.localizedName)
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundColor(.white)
                 }
@@ -392,7 +392,7 @@ struct BallotOverviewView: View {
                 // Propositions
                 if let props = ballot?.propositions, !props.isEmpty {
                     HStack {
-                        Text("PROPOSITIONS")
+                        Text(String(localized: "PROPOSITIONS"))
                             .font(.system(size: 13, weight: .bold, design: .monospaced))
                             .foregroundColor(.white)
                         Spacer()
@@ -404,7 +404,7 @@ struct BallotOverviewView: View {
                     ForEach(Array(props.enumerated()), id: \.element.id) { index, prop in
                         cheatSheetRow(
                             office: "Prop \(prop.number)",
-                            vote: prop.recommendation.rawValue,
+                            vote: prop.recommendation.localizedName,
                             isKeyRace: false,
                             isOdd: index % 2 == 1,
                             voteColor: propColor(prop.recommendation)
@@ -419,11 +419,11 @@ struct BallotOverviewView: View {
                         Image(systemName: "star.fill")
                             .font(.system(size: 14))
                             .foregroundColor(Theme.accentGold)
-                        Text("= Key race")
+                        Text(String(localized: "= Key race"))
                             .font(Theme.caption)
                             .foregroundColor(Theme.textSecondary)
                     }
-                    Text("AI-generated — do your own research.")
+                    Text(String(localized: "AI-generated — do your own research."))
                         .font(Theme.caption)
                         .foregroundColor(Theme.textSecondary)
                 }
@@ -477,9 +477,9 @@ struct BallotOverviewView: View {
 
     private var cheatSheetText: String {
         var lines: [String] = []
-        lines.append("MY BALLOT CHEAT SHEET")
+        lines.append(String(localized: "MY BALLOT CHEAT SHEET"))
         lines.append(store.voterProfile.address?.formatted ?? "Austin, TX")
-        lines.append("\(ballot?.party.rawValue ?? store.selectedParty.rawValue) Primary — \(Election.dateFormatted)")
+        lines.append("\(ballot?.party.localizedName ?? store.selectedParty.localizedName) \(String(localized: "Primary")) — \(Election.dateFormatted)")
         lines.append("")
 
         for race in recommendedRaces {
@@ -490,13 +490,13 @@ struct BallotOverviewView: View {
         if let props = ballot?.propositions, !props.isEmpty {
             lines.append("")
             for prop in props {
-                lines.append("Prop \(prop.number) (\(prop.title)): \(prop.recommendation.rawValue)")
+                lines.append("Prop \(prop.number) (\(prop.title)): \(prop.recommendation.localizedName)")
             }
         }
 
         lines.append("")
-        lines.append("AI-generated recommendations — do your own research.")
-        lines.append("Built with ATX Votes — atxvotes.app")
+        lines.append(String(localized: "AI-generated recommendations — do your own research."))
+        lines.append(String(localized: "Built with ATX Votes — atxvotes.app"))
         return lines.joined(separator: "\n")
     }
 
@@ -516,7 +516,7 @@ struct BallotOverviewView: View {
 
     private var uncontestedSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            sectionHeader("Uncontested Races", icon: "checkmark.circle", color: Theme.textSecondary)
+            sectionHeader(String(localized: "Uncontested Races"), icon: "checkmark.circle", color: Theme.textSecondary)
 
             VStack(spacing: 0) {
                 ForEach(Array(uncontestedRaces.enumerated()), id: \.element.id) { index, race in
@@ -610,7 +610,7 @@ struct RaceCard: View {
                 if let rec = race.recommendation {
                     Text("·")
                         .foregroundColor(Theme.textSecondary)
-                    Text(rec.confidence.rawValue)
+                    Text(rec.confidence.localizedName)
                         .font(.system(size: 16, weight: .medium))
                         .foregroundColor(Theme.primaryBlue)
                 }
@@ -669,7 +669,7 @@ struct PropositionCard: View {
                 }
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("Proposition \(proposition.number): \(proposition.title), \(proposition.recommendation.rawValue)")
+            .accessibilityLabel("Proposition \(proposition.number): \(proposition.title), \(proposition.recommendation.localizedName)")
             .accessibilityHint(isExpanded ? "Double tap to collapse" : "Double tap to expand")
 
             if isExpanded {
@@ -780,7 +780,7 @@ struct PropositionCard: View {
                                 .font(Theme.caption)
                                 .foregroundColor(Theme.textSecondary)
                             if let confidence = proposition.confidence {
-                                Text(confidence.rawValue)
+                                Text(confidence.localizedName)
                                     .font(.system(size: 13, weight: .medium))
                                     .foregroundColor(Theme.primaryBlue)
                             }

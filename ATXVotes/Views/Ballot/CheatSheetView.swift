@@ -27,7 +27,7 @@ struct CheatSheetView: View {
                             .font(.system(size: 36))
                             .foregroundColor(Theme.primaryBlue)
 
-                        Text("Your Ballot Cheat Sheet")
+                        Text(String(localized: "Your Ballot Cheat Sheet"))
                             .font(Theme.title2)
                             .foregroundColor(Theme.textPrimary)
 
@@ -37,7 +37,7 @@ struct CheatSheetView: View {
                                 .foregroundColor(Theme.textSecondary)
                         }
 
-                        Text(ballot?.party.rawValue ?? store.selectedParty.rawValue)
+                        Text(ballot?.party.localizedName ?? store.selectedParty.localizedName)
                             .font(.system(size: 17, weight: .semibold))
                             .foregroundColor(.white)
                             .padding(.horizontal, 12)
@@ -55,7 +55,7 @@ struct CheatSheetView: View {
 
                     // Contested races table
                     VStack(spacing: 0) {
-                        cheatSheetHeader("CONTESTED RACES")
+                        cheatSheetHeader(String(localized: "CONTESTED RACES"))
 
                         ForEach(Array(contestedRaces.enumerated()), id: \.element.id) { index, race in
                             cheatSheetRow(
@@ -70,12 +70,12 @@ struct CheatSheetView: View {
                     // Propositions table
                     if let props = ballot?.propositions, !props.isEmpty {
                         VStack(spacing: 0) {
-                            cheatSheetHeader("PROPOSITIONS")
+                            cheatSheetHeader(String(localized: "PROPOSITIONS"))
 
                             ForEach(Array(props.enumerated()), id: \.element.id) { index, prop in
                                 cheatSheetRow(
                                     office: "Prop \(prop.number): \(prop.title)",
-                                    vote: prop.recommendation.rawValue,
+                                    vote: prop.recommendation.localizedName,
                                     isKeyRace: false,
                                     isOdd: index % 2 == 1,
                                     voteColor: propColor(prop.recommendation)
@@ -87,7 +87,7 @@ struct CheatSheetView: View {
                     // Uncontested
                     if !uncontestedRaces.isEmpty {
                         VStack(spacing: 0) {
-                            cheatSheetHeader("UNCONTESTED")
+                            cheatSheetHeader(String(localized: "UNCONTESTED"))
 
                             ForEach(Array(uncontestedRaces.enumerated()), id: \.element.id) { index, race in
                                 cheatSheetRow(
@@ -108,7 +108,7 @@ struct CheatSheetView: View {
                             Image(systemName: "star.fill")
                                 .font(.system(size: 17))
                                 .foregroundColor(Theme.accentGold)
-                            Text("= Key race where your vote matters most")
+                            Text(String(localized: "= Key race where your vote matters most"))
                                 .font(Theme.caption)
                                 .foregroundColor(Theme.textSecondary)
                         }
@@ -117,13 +117,13 @@ struct CheatSheetView: View {
                             Image(systemName: "exclamationmark.triangle.fill")
                                 .font(.system(size: 17))
                                 .foregroundColor(Theme.warning)
-                            Text("AI-generated recommendations may contain errors. Do your own research before voting.")
+                            Text(String(localized: "AI-generated recommendations may contain errors. Do your own research before voting."))
                                 .font(.system(size: 18))
                                 .foregroundColor(Theme.textSecondary)
                                 .multilineTextAlignment(.center)
                         }
 
-                        Text("Built with ATX Votes")
+                        Text(String(localized: "Built with ATX Votes"))
                             .font(.system(size: 15, weight: .medium))
                             .foregroundColor(Theme.textSecondary.opacity(0.5))
                     }
@@ -213,16 +213,16 @@ struct CheatSheetView: View {
     // MARK: - Share App
 
     private var shareAppMessage: String {
-        "I just built my personalized voting guide for the March 2026 Texas primary with ATX Votes! Build yours in 5 minutes and know exactly who to vote for."
+        String(localized: "I just built my personalized voting guide for the March 2026 Texas primary with ATX Votes! Build yours in 5 minutes and know exactly who to vote for.")
     }
 
     // MARK: - Share Text
 
     private var cheatSheetText: String {
         var lines: [String] = []
-        lines.append("MY BALLOT CHEAT SHEET")
+        lines.append(String(localized: "MY BALLOT CHEAT SHEET"))
         lines.append(store.voterProfile.address?.formatted ?? "Austin, TX")
-        lines.append("\(ballot?.party.rawValue ?? store.selectedParty.rawValue) Primary — \(Election.dateFormatted)")
+        lines.append("\(ballot?.party.localizedName ?? store.selectedParty.localizedName) \(String(localized: "Primary")) — \(Election.dateFormatted)")
         lines.append("")
 
         for race in contestedRaces {
@@ -232,12 +232,12 @@ struct CheatSheetView: View {
 
         lines.append("")
         for prop in ballot?.propositions ?? [] {
-            lines.append("Prop \(prop.number) (\(prop.title)): \(prop.recommendation.rawValue)")
+            lines.append("Prop \(prop.number) (\(prop.title)): \(prop.recommendation.localizedName)")
         }
 
         lines.append("")
-        lines.append("⚠️ AI-generated recommendations — do your own research.")
-        lines.append("Built with ATX Votes")
+        lines.append(String(localized: "⚠️ AI-generated recommendations — do your own research."))
+        lines.append(String(localized: "Built with ATX Votes"))
         return lines.joined(separator: "\n")
     }
 }

@@ -36,18 +36,18 @@ struct BuildingGuideView: View {
     private var steps: [(icon: String, label: String, emoji: String)] {
         let demFirst = store.demFirstOrder
         let firstParty = (icon: "brain.head.profile",
-                          label: demFirst ? "Researching Democrats" : "Researching Republicans",
+                          label: demFirst ? String(localized: "Researching Democrats") : String(localized: "Researching Republicans"),
                           emoji: demFirst ? "🫏" : "🐘")
         let secondParty = (icon: "brain.head.profile",
-                           label: demFirst ? "Researching Republicans" : "Researching Democrats",
+                           label: demFirst ? String(localized: "Researching Republicans") : String(localized: "Researching Democrats"),
                            emoji: demFirst ? "🐘" : "🫏")
         return [
-            ("magnifyingglass", "Finding your ballot", "🔍"),
-            ("doc.text.magnifyingglass", "Looking up districts", "🗺️"),
-            ("person.2.fill", "Researching candidates", "👥"),
+            ("magnifyingglass", String(localized: "Finding your ballot"), "🔍"),
+            ("doc.text.magnifyingglass", String(localized: "Looking up districts"), "🗺️"),
+            ("person.2.fill", String(localized: "Researching candidates"), "👥"),
             firstParty,
             secondParty,
-            ("checkmark.seal.fill", "Finalizing recommendations", "✨"),
+            ("checkmark.seal.fill", String(localized: "Finalizing recommendations"), "✨"),
         ]
     }
 
@@ -63,21 +63,9 @@ struct BuildingGuideView: View {
         return Theme.primaryBlue
     }
 
-    /// Which step we're on, derived from the store's loading message.
+    /// Which step we're on, derived from the store's loading phase.
     private var currentStep: Int {
-        let message = store.loadingMessage
-        let demFirst = store.demFirstOrder
-        if message.contains("Finalizing") { return 5 }
-        if demFirst {
-            if message.contains("Republican") { return 4 }
-            if message.contains("Democrat") { return 3 }
-        } else {
-            if message.contains("Democrat") { return 4 }
-            if message.contains("Republican") { return 3 }
-        }
-        if message.contains("Researching") { return 2 }
-        if message.contains("districts") { return 1 }
-        return 0
+        store.loadingPhase.rawValue
     }
 
     var body: some View {
@@ -216,7 +204,7 @@ struct BuildingGuideView: View {
     }
 
     private var shareAppMessage: String {
-        "I just built my personalized voting guide for the March 2026 Texas primary with ATX Votes! Build yours in 5 minutes and know exactly who to vote for."
+        String(localized: "I just built my personalized voting guide for the March 2026 Texas primary with ATX Votes! Build yours in 5 minutes and know exactly who to vote for.")
     }
 }
 

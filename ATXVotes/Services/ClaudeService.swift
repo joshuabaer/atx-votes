@@ -421,14 +421,14 @@ enum ClaudeError: Error, LocalizedError {
         switch self {
         case .apiError(let msg): return msg
         case .parseError(let msg): return msg
-        case .invalidAPIKey: return "Authentication error. Please update the app."
-        case .rateLimited: return "Too many requests. Please wait a moment and try again."
+        case .invalidAPIKey: return String(localized: "Authentication error. Please update the app.")
+        case .rateLimited: return String(localized: "Too many requests. Please wait a moment and try again.")
         case .overloaded(let models):
             let names = models.map { $0.replacingOccurrences(of: "claude-", with: "") }
-            return "All AI models are overloaded (\(names.joined(separator: ", "))). Please try again in a minute."
+            return String(localized: "All AI models are overloaded (\(names.joined(separator: ", "))). Please try again in a minute.")
         case .outOfCredits:
-            return "Our AI hamsters have run out of snacks. The developer has been notified — please try again later!"
-        case .serverError(let code): return "Server error (\(code)). Please try again later."
+            return String(localized: "Our AI hamsters have run out of snacks. The developer has been notified — please try again later!")
+        case .serverError(let code): return String(localized: "Server error (\(code)). Please try again later.")
         }
     }
 }

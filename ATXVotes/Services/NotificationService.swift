@@ -36,32 +36,32 @@ class NotificationService {
         [
             Reminder(
                 id: "early_voting_starts",
-                title: "Early Voting Starts Today!",
-                body: "Vote at any Travis County Vote Center through Feb 27. Check your cheat sheet before you go!",
+                title: String(localized: "Early Voting Starts Today!"),
+                body: String(localized: "Vote at any Travis County Vote Center through Feb 27. Check your cheat sheet before you go!"),
                 date: DateComponents(year: 2026, month: 2, day: 17, hour: 8, minute: 0)
             ),
             Reminder(
                 id: "early_voting_midweek",
-                title: "Early Voting Reminder",
-                body: "Early voting ends Friday. Beat the lines — vote today at any Vote Center in Travis County.",
+                title: String(localized: "Early Voting Reminder"),
+                body: String(localized: "Early voting ends Friday. Beat the lines — vote today at any Vote Center in Travis County."),
                 date: DateComponents(year: 2026, month: 2, day: 24, hour: 10, minute: 0)
             ),
             Reminder(
                 id: "early_voting_last_day",
-                title: "Last Day of Early Voting!",
-                body: "Today's your last chance to vote early. Extended hours until 10 PM at all Vote Centers.",
+                title: String(localized: "Last Day of Early Voting!"),
+                body: String(localized: "Today's your last chance to vote early. Extended hours until 10 PM at all Vote Centers."),
                 date: DateComponents(year: 2026, month: 2, day: 27, hour: 8, minute: 0)
             ),
             Reminder(
                 id: "election_day_eve",
-                title: "Election Day is Tomorrow",
-                body: "Print your cheat sheet tonight — phones aren't allowed in the voting booth in Travis County.",
+                title: String(localized: "Election Day is Tomorrow"),
+                body: String(localized: "Print your cheat sheet tonight — phones aren't allowed in the voting booth in Travis County."),
                 date: DateComponents(year: 2026, month: 3, day: 2, hour: 18, minute: 0)
             ),
             Reminder(
                 id: "election_day",
-                title: "It's Election Day!",
-                body: "Polls are open 7 AM - 7 PM. Vote at any Vote Center. Don't forget your photo ID!",
+                title: String(localized: "It's Election Day!"),
+                body: String(localized: "Polls are open 7 AM - 7 PM. Vote at any Vote Center. Don't forget your photo ID!"),
                 date: DateComponents(year: 2026, month: 3, day: 3, hour: 8, minute: 0)
             ),
         ]

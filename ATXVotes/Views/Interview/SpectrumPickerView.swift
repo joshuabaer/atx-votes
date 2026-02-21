@@ -68,14 +68,7 @@ struct SpectrumOption: View {
     let action: () -> Void
 
     private var description: String {
-        switch spectrum {
-        case .progressive: "Bold systemic change, social justice focused"
-        case .liberal: "Expand rights and services, government as a force for good"
-        case .moderate: "Pragmatic center, best ideas from both sides"
-        case .conservative: "Limited government, traditional values, fiscal discipline"
-        case .libertarian: "Maximum freedom, minimal government"
-        case .independent: "I decide issue by issue, not by party"
-        }
+        spectrum.localizedDescription
     }
 
     var body: some View {
@@ -96,7 +89,7 @@ struct SpectrumOption: View {
                     )
 
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(spectrum.rawValue)
+                    Text(spectrum.localizedName)
                         .font(Theme.headline)
                         .foregroundColor(Theme.textPrimary)
                     Text(description)

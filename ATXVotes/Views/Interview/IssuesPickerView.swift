@@ -82,7 +82,7 @@ struct IssueCard: View {
                     .font(.system(size: 32))
                     .foregroundColor(isSelected ? .white : Theme.primaryBlue)
 
-                Text(issue.rawValue)
+                Text(issue.localizedName)
                     .font(.system(size: 18, weight: .medium))
                     .foregroundColor(isSelected ? .white : Theme.textPrimary)
                     .multilineTextAlignment(.center)
@@ -100,7 +100,7 @@ struct IssueCard: View {
             .shadow(color: isSelected ? Theme.primaryBlue.opacity(0.3) : .clear, radius: 6, y: 2)
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(issue.rawValue)
+        .accessibilityLabel(issue.localizedName)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
