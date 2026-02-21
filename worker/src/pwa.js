@@ -161,6 +161,7 @@ var CSS = [
   // Chips
   ".chip{display:inline-flex;align-items:center;gap:6px;padding:10px 16px;border-radius:99px;border:1.5px solid var(--border2);background:var(--fill3);font-size:15px;cursor:pointer;transition:all .15s;user-select:none}",
   ".chip-on{background:var(--blue);color:#fff;border-color:var(--blue)}",
+  ".chip svg{flex-shrink:0}",
   ".chip-grid{display:flex;flex-wrap:wrap;gap:10px}",
 
   // Radio options
@@ -201,7 +202,7 @@ var CSS = [
   // Bottom tab bar (mobile)
   ".tab-bar{background:var(--card);border-top:2px solid var(--border2);display:flex;max-width:480px;margin:0 auto;width:100%;padding:8px 0;padding-bottom:calc(8px + env(safe-area-inset-bottom,8px));box-shadow:0 -2px 8px var(--shadow)}",
   "#tabs{background:var(--card);box-shadow:0 -2px 8px var(--shadow)}",
-  ".tab{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 0 6px;font-size:13px;font-weight:700;color:var(--text2);text-decoration:none;gap:4px;cursor:pointer;border:none;background:none;font-family:inherit;transition:color .15s}",
+  ".tab{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 0 6px;font-size:13px;font-weight:700;color:var(--text2);text-decoration:none;gap:4px;cursor:pointer;border:none;background:none;font-family:inherit;transition:color .15s;white-space:nowrap}",
   ".tab:hover{color:var(--blue)}",
   ".tab-active{color:var(--blue)}",
   ".tab-icon{display:flex;align-items:center;justify-content:center;height:28px}",
@@ -214,6 +215,8 @@ var CSS = [
   ".party-rep.on{background:var(--rep);color:#fff;border-color:var(--rep)}",
   ".party-dem{color:var(--dem);border-color:rgba(38,77,191,.3)}",
   ".party-dem.on{background:var(--dem);color:#fff;border-color:var(--dem)}",
+  ".lang-on{background:var(--blue);color:#fff;border-color:var(--blue)}",
+  ".lang-off{background:var(--fill3);border-color:var(--border2);color:var(--text)}",
 
   // Badges
   ".badge{display:inline-block;font-size:14px;font-weight:600;padding:3px 10px;border-radius:99px;white-space:nowrap}",
@@ -400,17 +403,38 @@ var CSS = [
   "a{color:var(--blue)}",
   ".error-box{padding:16px;background:rgba(209,51,51,.08);border:1px solid rgba(209,51,51,.3);border-radius:var(--rs);margin-bottom:16px;text-align:center}",
   ".error-box p{font-size:14px;color:var(--bad);line-height:1.5}",
+
+  // Accessibility: reduce motion
+  "@media(prefers-reduced-motion:reduce){" +
+    ".loading-icon{animation:none}" +
+    ".loading-msg{animation:none}" +
+    ".dot-active{animation:none}" +
+    ".spinner{animation:none}" +
+    ".card-touch{transition:none}" +
+    ".chip,.radio,.btn,.tab,.topnav-link,.party-btn,.acc-chev,.progress-fill{transition:none}" +
+  "}",
+
+  // Accessibility: focus visible
+  "[data-action]:focus-visible,.btn:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:var(--rs)}",
+  ".chip:focus-visible{outline:2px solid var(--blue);outline-offset:2px}",
+  ".radio:focus-visible{outline:2px solid var(--blue);outline-offset:2px}",
+
+  // Skip link
+  ".skip-link{position:absolute;top:-40px;left:0;background:var(--blue);color:#fff;padding:8px 16px;z-index:100;font-size:14px;font-weight:600;text-decoration:none;border-radius:0 0 var(--rs) 0}",
+  ".skip-link:focus{top:0}",
 ].join("\n");
 
 // MARK: - App JavaScript
 
 var APP_JS = [
   // ============ VERSION CHECK ============
-  "var APP_VERSION=15;",
+  "var APP_VERSION=23;",
 
   // ============ i18n ============
   "var LANG=localStorage.getItem('atx_votes_lang')||((navigator.language||'').slice(0,2)==='es'?'es':'en');",
-  "function setLang(l){LANG=l;localStorage.setItem('atx_votes_lang',l);shuffledIssues=null;shuffledSpectrum=null;shuffledQualities=null;shuffledDD={};render()}",
+  "function setLang(l){LANG=l;localStorage.setItem('atx_votes_lang',l);shuffledIssues=null;shuffledSpectrum=null;shuffledQualities=null;shuffledDD={};render();" +
+    "if(S.summary&&S.guideComplete){regenerateSummary()}" +
+  "}",
   "var TR={" +
     // Welcome & General
     "'Your personalized voting guide for Austin & Travis County elections.':'Tu gu\\u00EDa personalizada de votaci\\u00F3n para Austin y el condado de Travis.'," +
@@ -455,8 +479,8 @@ var APP_JS = [
     "'Failed to generate recommendations. Please try again.':'No se pudieron generar recomendaciones. Intenta de nuevo.'," +
     "'Try Again':'Intentar de nuevo'," +
     // Tab bar & nav
-    "'My Ballot':'Mi boleta'," +
-    "'Vote Info':'Info de votaci\\u00F3n'," +
+    "'My Ballot':'Boleta'," +
+    "'Vote Info':'Info'," +
     "'Profile':'Perfil'," +
     // Ballot
     "'Republican':'Republicano'," +
@@ -496,6 +520,11 @@ var APP_JS = [
     "'Strong Match':'Altamente compatible'," +
     "'Good Match':'Buena opci\\u00F3n'," +
     "'Lean':'Inclinaci\\u00F3n'," +
+    "'Lean Yes':'A favor'," +
+    "'Lean No':'En contra'," +
+    "'Your Call':'Tu decisi\\u00F3n'," +
+    "'Clear Call':'Clara'," +
+    "'Genuinely Contested':'Realmente disputada'," +
     "'Clear Call':'Decisi\\u00F3n clara'," +
     "'Best Available':'Mejor opci\\u00F3n disponible'," +
     "'Symbolic Race':'Contienda simb\\u00F3lica'," +
@@ -533,6 +562,13 @@ var APP_JS = [
     "'Send Feedback':'Enviar comentarios'," +
     "'Powered by Claude (Anthropic)':'Desarrollado con Claude (Anthropic)'," +
     "'Start Over':'Empezar de nuevo'," +
+    "'Regenerate Summary':'Regenerar resumen'," +
+    "'Regenerating...':'Regenerando...'," +
+    "'Please enter your street address.':'Por favor, ingresa tu direcci\\u00F3n.'," +
+    "'Please enter a valid 5-digit ZIP code.':'Por favor, ingresa un c\\u00F3digo postal v\\u00E1lido de 5 d\\u00EDgitos.'," +
+    "'We couldn\\u2019t find that address. Please check your street and ZIP, or skip to see all races.':'No pudimos encontrar esa direcci\\u00F3n. Verifica tu calle y c\\u00F3digo postal, o salta para ver todas las contiendas.'," +
+    "'Verifying address...':'Verificando direcci\\u00F3n...'," +
+    "'Could not regenerate summary. Please try again.':'No se pudo regenerar el resumen. Por favor, int\\u00E9ntalo de nuevo.'," +
     "'This will erase your profile and recommendations.':'Esto borrar\\u00E1 tu perfil y recomendaciones.'," +
     "'Start over? This will erase your profile and recommendations.':'\\u00BFEmpezar de nuevo? Esto borrar\\u00E1 tu perfil y recomendaciones.'," +
     // Vote Info
@@ -738,10 +774,17 @@ var APP_JS = [
     '{v:"Independent / Issue-by-Issue",d:"I decide issue by issue, not by party"}' +
     "];",
 
-  'var QUALITIES=[' +
-    '"Competence & Track Record","Integrity & Honesty","Independence","Experience",' +
-    '"Fresh Perspective","Bipartisan / Works Across Aisle","Strong Leadership","Community Ties"' +
-    "];",
+  'var QUAL_ICONS={' +
+    '"Competence & Track Record":"<svg width=\\"16\\" height=\\"16\\" viewBox=\\"0 0 24 24\\" fill=\\"currentColor\\"><path d=\\"M3 20h2v-8H3v8zm4 0h2V9H7v11zm4 0h2V4h-2v16zm4 0h2v-6h-2v6zm4 0h2v-2h-2v2z\\"/></svg>",' +
+    '"Integrity & Honesty":"<svg width=\\"16\\" height=\\"16\\" viewBox=\\"0 0 24 24\\" fill=\\"currentColor\\"><path d=\\"M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-1 6h2v2h-2V7zm0 4h2v6h-2v-6z\\"/></svg>",' +
+    '"Independence":"<svg width=\\"16\\" height=\\"16\\" viewBox=\\"0 0 24 24\\" fill=\\"currentColor\\"><path d=\\"M12 5.5A1.5 1.5 0 1 0 12 2.5a1.5 1.5 0 0 0 0 3zM10 22V13H8l2-8h4l2 8h-2v9h-4z\\"/></svg>",' +
+    '"Experience":"<svg width=\\"16\\" height=\\"16\\" viewBox=\\"0 0 24 24\\" fill=\\"currentColor\\"><path d=\\"M20 7h-4V5l-2-2h-4L8 5v2H4c-1.1 0-2 .9-2 2v5h4v-2h2v2h8v-2h2v2h4V9c0-1.1-.9-2-2-2zm-6 0h-4V5h4v2zM4 20c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-4h-4v1h-2v-1H8v1H6v-1H4v4z\\"/></svg>",' +
+    '"Fresh Perspective":"<svg width=\\"16\\" height=\\"16\\" viewBox=\\"0 0 24 24\\" fill=\\"currentColor\\"><path d=\\"M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z\\"/></svg>",' +
+    '"Bipartisan / Works Across Aisle":"<svg width=\\"16\\" height=\\"16\\" viewBox=\\"0 0 24 24\\" fill=\\"currentColor\\"><path d=\\"M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z\\"/></svg>",' +
+    '"Strong Leadership":"<svg width=\\"16\\" height=\\"16\\" viewBox=\\"0 0 24 24\\" fill=\\"currentColor\\"><path d=\\"M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6h-5.6z\\"/></svg>",' +
+    '"Community Ties":"<svg width=\\"16\\" height=\\"16\\" viewBox=\\"0 0 24 24\\" fill=\\"currentColor\\"><path d=\\"M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z\\"/></svg>"' +
+  '};',
+  'var QUALITIES=Object.keys(QUAL_ICONS);',
 
   // Deep dive questions keyed by issue
   "var DEEP_DIVES={" +
@@ -909,10 +952,10 @@ var APP_JS = [
   "var ICON_INFO='<svg width=\"28\" height=\"28\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 17H11V11H13V17ZM13 9H11V7H13V9Z\"/></svg>';",
   "var ICON_PROFILE='<svg width=\"28\" height=\"28\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 5C13.66 5 15 6.34 15 8C15 9.66 13.66 11 12 11C10.34 11 9 9.66 9 8C9 6.34 10.34 5 12 5ZM12 19.2C9.5 19.2 7.29 17.92 6 15.98C6.03 13.99 10 12.9 12 12.9C13.99 12.9 17.97 13.99 18 15.98C16.71 17.92 14.5 19.2 12 19.2Z\"/></svg>';",
   "function tabBar(active){" +
-    "return '<nav class=\"tab-bar\">" +
-      "<a class=\"tab'+(active==='#/ballot'?' tab-active':'')+'\" data-action=\"nav\" data-to=\"#/ballot\"><span class=\"tab-icon\">'+ICON_BALLOT+'</span>'+t('My Ballot')+'</a>" +
-      "<a class=\"tab'+(active==='#/info'?' tab-active':'')+'\" data-action=\"nav\" data-to=\"#/info\"><span class=\"tab-icon\">'+ICON_INFO+'</span>'+t('Vote Info')+'</a>" +
-      "<a class=\"tab'+(active==='#/profile'?' tab-active':'')+'\" data-action=\"nav\" data-to=\"#/profile\"><span class=\"tab-icon\">'+ICON_PROFILE+'</span>'+t('Profile')+'</a>" +
+    "return '<nav class=\"tab-bar\" role=\"tablist\">" +
+      "<a class=\"tab'+(active==='#/ballot'?' tab-active':'')+'\" data-action=\"nav\" data-to=\"#/ballot\" role=\"tab\" aria-selected=\"'+(active==='#/ballot')+'\"><span class=\"tab-icon\" aria-hidden=\"true\">'+ICON_BALLOT+'</span>'+t('My Ballot')+'</a>" +
+      "<a class=\"tab'+(active==='#/info'?' tab-active':'')+'\" data-action=\"nav\" data-to=\"#/info\" role=\"tab\" aria-selected=\"'+(active==='#/info')+'\"><span class=\"tab-icon\" aria-hidden=\"true\">'+ICON_INFO+'</span>'+t('Vote Info')+'</a>" +
+      "<a class=\"tab'+(active==='#/profile'?' tab-active':'')+'\" data-action=\"nav\" data-to=\"#/profile\" role=\"tab\" aria-selected=\"'+(active==='#/profile')+'\"><span class=\"tab-icon\" aria-hidden=\"true\">'+ICON_PROFILE+'</span>'+t('Profile')+'</a>" +
     "</nav>';" +
   "}",
 
@@ -963,7 +1006,7 @@ var APP_JS = [
     "for(var i=0;i<shuffledIssues.length;i++){" +
       "var issue=shuffledIssues[i];" +
       "var on=S.issues.indexOf(issue.v)!==-1;" +
-      "h+='<div class=\"chip'+(on?' chip-on':'')+'\" data-action=\"toggle-issue\" data-value=\"'+esc(issue.v)+'\">'+issue.icon+' '+t(issue.v)+'</div>'" +
+      "h+='<div class=\"chip'+(on?' chip-on':'')+'\" data-action=\"toggle-issue\" data-value=\"'+esc(issue.v)+'\" role=\"option\" aria-selected=\"'+on+'\" tabindex=\"0\">'+issue.icon+' '+t(issue.v)+'</div>'" +
     "}" +
     "h+='</div>';" +
     "var n=S.issues.length;" +
@@ -979,7 +1022,7 @@ var APP_JS = [
     "for(var i=0;i<shuffledSpectrum.length;i++){" +
       "var sp=shuffledSpectrum[i];" +
       "var on=S.spectrum===sp.v;" +
-      "h+='<div class=\"radio'+(on?' radio-on':'')+'\" data-action=\"select-spectrum\" data-value=\"'+esc(sp.v)+'\"><b>'+t(sp.v)+'</b><span class=\"desc\">'+t(sp.d)+'</span></div>'" +
+      "h+='<div class=\"radio'+(on?' radio-on':'')+'\" data-action=\"select-spectrum\" data-value=\"'+esc(sp.v)+'\" role=\"radio\" aria-checked=\"'+on+'\" tabindex=\"0\"><b>'+t(sp.v)+'</b><span class=\"desc\">'+t(sp.d)+'</span></div>'" +
     "}" +
     "h+='<button class=\"btn btn-primary mt-md\" data-action=\"next\"'+(S.spectrum?'':' disabled')+'>'+t('Continue')+'</button>';" +
     "return h;" +
@@ -996,7 +1039,7 @@ var APP_JS = [
     "var h='<div class=\"phase-header\"><h2>'+t(dd.q)+'</h2><p>'+t('Question')+' '+(S.ddIndex+1)+' '+t('of')+' '+S.ddQuestions.length+'</p></div>';" +
     "for(var i=0;i<opts.length;i++){" +
       "var on=current===opts[i].l;" +
-      "h+='<div class=\"radio'+(on?' radio-on':'')+'\" data-action=\"select-dd\" data-value=\"'+esc(opts[i].l)+'\"><b>'+t(opts[i].l)+'</b><span class=\"desc\">'+t(opts[i].d)+'</span></div>'" +
+      "h+='<div class=\"radio'+(on?' radio-on':'')+'\" data-action=\"select-dd\" data-value=\"'+esc(opts[i].l)+'\" role=\"radio\" aria-checked=\"'+on+'\" tabindex=\"0\"><b>'+t(opts[i].l)+'</b><span class=\"desc\">'+t(opts[i].d)+'</span></div>'" +
     "}" +
     "h+='<button class=\"btn btn-primary mt-md\" data-action=\"next-dd\"'+(current?'':' disabled')+'>'+t('Continue')+'</button>';" +
     "return h;" +
@@ -1010,7 +1053,7 @@ var APP_JS = [
     "for(var i=0;i<shuffledQualities.length;i++){" +
       "var q=shuffledQualities[i];" +
       "var on=S.qualities.indexOf(q)!==-1;" +
-      "h+='<div class=\"chip'+(on?' chip-on':'')+'\" data-action=\"toggle-quality\" data-value=\"'+esc(q)+'\">'+t(q)+'</div>'" +
+      "h+='<div class=\"chip'+(on?' chip-on':'')+'\" data-action=\"toggle-quality\" data-value=\"'+esc(q)+'\" role=\"option\" aria-selected=\"'+on+'\" tabindex=\"0\">'+(QUAL_ICONS[q]||'')+' '+t(q)+'</div>'" +
     "}" +
     "h+='</div>';" +
     "var n=S.qualities.length;" +
@@ -1033,7 +1076,12 @@ var APP_JS = [
     "h+='<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" style=\"flex-shrink:0;margin-top:1px\"><path d=\"M12 1C8.7 1 6 3.7 6 7v3H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7c0-3.3-2.7-6-6-6zm0 2c2.2 0 4 1.8 4 4v3H8V7c0-2.2 1.8-4 4-4zm0 11a2 2 0 1 1 0 4 2 2 0 0 1 0-4z\" fill=\"var(--ok)\"/></svg>';" +
     "h+='<span style=\"font-size:13px;color:var(--text2);line-height:1.4\">'+t('Your address stays on your device. It\\u2019s only used to look up your ballot districts \\u2014 we never store or share it.')+'</span>';" +
     "h+='</div>';" +
-    "h+='<button type=\"submit\" class=\"btn btn-primary mt-md\">'+t('Build My Guide')+'</button>';" +
+    "if(S.addressError){h+='<div class=\"error-box\" style=\"margin-top:12px\"><p>'+S.addressError+'</p></div>'}" +
+    "if(S.verifyingAddress){" +
+      "h+='<button type=\"button\" class=\"btn btn-primary mt-md\" disabled><span class=\"spinner\" style=\"width:16px;height:16px;display:inline-block;vertical-align:middle;margin-right:8px\"></span>'+t('Verifying address...')+'</button>'" +
+    "}else{" +
+      "h+='<button type=\"submit\" class=\"btn btn-primary mt-md\">'+t('Build My Guide')+'</button>'" +
+    "}" +
     "h+='</form>';" +
     "h+='<p class=\"text-center mt-md\" style=\"font-size:13px;color:var(--text2)\">'+t('You can skip the address \\u2014 we\\u2019ll show all races.')+'</p>';" +
     "h+='<button class=\"btn btn-secondary mt-sm\" data-action=\"skip-address\">'+t('Skip & Build Guide')+'</button>';" +
@@ -1049,7 +1097,7 @@ var APP_JS = [
     "var h='<div class=\"loading\">';" +
     "h+='<div class=\"loading-icon\">'+(icons[S.loadPhase]||'\u{1F5F3}\u{FE0F}')+'</div>';" +
     "h+='<h2>'+t('Building Your Guide')+'</h2>';" +
-    "h+='<p style=\"min-height:24px\" class=\"loading-msg\">'+t(S.loadMsg||msgs[0])+'</p>';" +
+    "h+='<p style=\"min-height:24px\" class=\"loading-msg\" aria-live=\"polite\">'+t(S.loadMsg||msgs[0])+'</p>';" +
     "h+='<div class=\"progress\" style=\"max-width:240px;margin:20px auto 16px;height:6px\"><div class=\"progress-fill\" style=\"width:'+pct+'%;transition:width .5s ease\"></div></div>';" +
     "if(S.error){h+='<div class=\"error-box\" style=\"margin-top:16px\"><p>'+t(S.error)+'</p></div><button class=\"btn btn-primary mt-md\" data-action=\"retry\">'+t('Try Again')+'</button>'}" +
     "h+='<div class=\"dots\" style=\"margin-top:20px\">';" +
@@ -1178,7 +1226,7 @@ var APP_JS = [
         "var p=b.propositions[i];" +
         "var rec=p.recommendation||'';" +
         "var cls='';if(rec==='Lean Yes'||rec==='FOR')cls='cs-yes';else if(rec==='Lean No'||rec==='AGAINST')cls='cs-no';else cls='cs-yourcall';" +
-        "h+='<tr><td>Prop '+esc(p.number||''+(i+1))+': '+esc(p.title)+'</td><td class=\"cs-vote '+cls+'\">'+esc(rec)+'</td></tr>'" +
+        "h+='<tr><td>Prop '+esc(p.number||''+(i+1))+': '+esc(p.title)+'</td><td class=\"cs-vote '+cls+'\">'+t(rec)+'</td></tr>'" +
       "}" +
       "h+='</tbody></table>'" +
     "}" +
@@ -1217,7 +1265,8 @@ var APP_JS = [
 
   "function renderRaceCard(race,allRaces){" +
     "var idx=-1;for(var i=0;i<allRaces.length;i++){if(allRaces[i].id===race.id){idx=i;break}}" +
-    "var h='<div class=\"card card-touch\" data-action=\"nav\" data-to=\"#/race/'+idx+'\">';" +
+    "var label=race.office+(race.district?' \\u2014 '+race.district:'')+(race.recommendation?' \\u2014 Recommended: '+race.recommendation.candidateName:'');" +
+    "var h='<div class=\"card card-touch\" data-action=\"nav\" data-to=\"#/race/'+idx+'\" role=\"link\" aria-label=\"'+esc(label)+'\" tabindex=\"0\">';" +
     "h+='<div style=\"display:flex;justify-content:space-between;align-items:flex-start\">';" +
     "h+='<div style=\"flex:1;min-width:0\"><div style=\"font-size:14px;color:var(--text2)\">'+esc(race.office)+(race.district?' \\u2014 '+esc(race.district):'')+'</div>';" +
     "if(race.isKeyRace)h+='<span class=\"star\">\u2B50</span>';" +
@@ -1249,7 +1298,7 @@ var APP_JS = [
     "if(prop.recommendation==='Lean No')recClass='badge-bad';" +
     "var h='<div class=\"card\">';" +
     "h+='<div class=\"prop-header\"><div class=\"prop-title\">Prop '+prop.number+': '+esc(prop.title)+'</div>';" +
-    "h+='<span class=\"badge '+recClass+'\">'+esc(prop.recommendation)+'</span></div>';" +
+    "h+='<span class=\"badge '+recClass+'\">'+t(prop.recommendation)+'</span></div>';" +
     "h+='<div class=\"prop-desc\">'+esc(prop.description)+'</div>';" +
     // If Passes / If Fails (always visible, color-coded)
     "if(prop.ifPasses||prop.ifFails){" +
@@ -1282,7 +1331,7 @@ var APP_JS = [
       "if(prop.caveats){h+='<div class=\"prop-section\"><h5>\u26A0\u{FE0F} '+t('Caveats')+'</h5><p>'+esc(prop.caveats)+'</p></div>'}" +
       "h+='</div>'" +
     "}" +
-    "h+='<button class=\"expand-toggle\" data-action=\"toggle-expand\" data-id=\"'+eid+'\">'+(isOpen?t('Show Less'):t('Learn More'))+'</button>';" +
+    "h+='<button class=\"expand-toggle\" data-action=\"toggle-expand\" data-id=\"'+eid+'\" aria-expanded=\"'+!!isOpen+'\">'+(isOpen?t('Show Less'):t('Learn More'))+'</button>';" +
     "h+='</div>';" +
     "return h;" +
   "}",
@@ -1320,7 +1369,7 @@ var APP_JS = [
       "var avatarColor=colors[i%colors.length];" +
       "var initial=c.name.charAt(0).toUpperCase();" +
       "h+='<div class=\"cand-card'+(c.isRecommended?' recommended':'')+'\">';" +
-      "h+='<div style=\"display:flex;gap:12px;align-items:flex-start\">';" +
+      "h+='<div style=\"display:flex;gap:12px;align-items:center\">';" +
       "h+='<div class=\"cand-avatar\" style=\"background:'+avatarColor+'\">'+initial+'</div>';" +
       "h+='<div style=\"flex:1;min-width:0\">';" +
       "h+='<div style=\"display:flex;justify-content:space-between;align-items:flex-start\">';" +
@@ -1329,8 +1378,8 @@ var APP_JS = [
       "if(c.isIncumbent)h+='<span class=\"badge badge-blue\">'+t('Incumbent')+'</span>';" +
       "if(c.isRecommended)h+='<span class=\"badge badge-ok\">'+t('Recommended')+'</span>';" +
       "h+='</div></div>';" +
-      "h+='<div class=\"cand-summary\">'+esc(c.summary)+'</div>';" +
       "h+='</div></div>';" +
+      "h+='<div class=\"cand-summary\">'+esc(c.summary)+'</div>';" +
       "if(isOpen){" +
         "h+='<div class=\"cand-details\">';" +
         "if(c.keyPositions&&c.keyPositions.length){h+='<div class=\"cand-section\"><h5>'+t('Key Positions')+'</h5><div class=\"pos-chips\">';for(var j=0;j<c.keyPositions.length;j++)h+='<span class=\"pos-chip\">'+esc(c.keyPositions[j])+'</span>';h+='</div></div>'}" +
@@ -1341,7 +1390,7 @@ var APP_JS = [
         "if(c.polling){h+='<div class=\"cand-section\"><h5>'+t('Polling')+'</h5><p>'+esc(c.polling)+'</p></div>'}" +
         "h+='</div>'" +
       "}" +
-      "h+='<button class=\"expand-toggle\" data-action=\"toggle-expand\" data-id=\"'+eid+'\">'+(isOpen?t('Show Less'):t('Show Details'))+'</button>';" +
+      "h+='<button class=\"expand-toggle\" data-action=\"toggle-expand\" data-id=\"'+eid+'\" aria-expanded=\"'+!!isOpen+'\">'+(isOpen?t('Show Less'):t('Show Details'))+'</button>';" +
       "h+='</div>'" +
     "}" +
     "return h;" +
@@ -1350,7 +1399,13 @@ var APP_JS = [
   // ============ PROFILE VIEW ============
   "function renderProfile(){" +
     "var h='<h2 style=\"font-size:22px;font-weight:800;margin-bottom:16px\">'+t('Your Profile')+'</h2>';" +
-    "if(S.summary){h+='<div class=\"profile-summary\">\"'+esc(S.summary)+'\"</div>'}" +
+    "if(S.summary){" +
+      "h+='<div class=\"profile-summary\">\"'+esc(S.summary)+'\"</div>';" +
+      "h+='<div style=\"text-align:center;margin-bottom:16px\">';" +
+      "if(S.regenerating){h+='<span style=\"font-size:13px;color:var(--text2)\">'+t('Regenerating...')+'</span>'}" +
+      "else{h+='<button class=\"btn\" style=\"font-size:13px;padding:6px 14px\" data-action=\"regen-summary\">\\u2728 '+t('Regenerate Summary')+'</button>'}" +
+      "h+='</div>'" +
+    "}" +
     "h+='<div class=\"card\">';" +
     // Issues
     "h+='<div class=\"profile-section\"><h3>'+t('Top Issues')+'</h3><div class=\"chip-grid\">';" +
@@ -1371,7 +1426,7 @@ var APP_JS = [
     // Qualities
     "if(S.qualities.length){" +
       "h+='<div class=\"profile-section\"><h3>'+t('Candidate Qualities')+'</h3><div class=\"chip-grid\">';" +
-      "for(var i=0;i<S.qualities.length;i++)h+='<span class=\"chip chip-on\">'+t(S.qualities[i])+'</span>';" +
+      "for(var i=0;i<S.qualities.length;i++)h+='<span class=\"chip chip-on\">'+(QUAL_ICONS[S.qualities[i]]||'')+' '+t(S.qualities[i])+'</span>';" +
       "h+='</div></div>'" +
     "}" +
     // Address
@@ -1386,8 +1441,8 @@ var APP_JS = [
     "h+='<div class=\"card\" style=\"margin-top:16px;text-align:center\">';" +
     "h+='<div style=\"font-size:15px;font-weight:600;margin-bottom:8px\">\u{1F310} Language / Idioma</div>';" +
     "h+='<div class=\"party-row\" style=\"margin:0\">';" +
-    "h+='<button class=\"party-btn'+(LANG==='en'?' on':'')+'\" data-action=\"set-lang\" data-value=\"en\">English</button>';" +
-    "h+='<button class=\"party-btn'+(LANG==='es'?' on':'')+'\" data-action=\"set-lang\" data-value=\"es\">Espa\\u00F1ol</button>';" +
+    "h+='<button class=\"party-btn'+(LANG==='en'?' lang-on':' lang-off')+'\" data-action=\"set-lang\" data-value=\"en\">English</button>';" +
+    "h+='<button class=\"party-btn'+(LANG==='es'?' lang-on':' lang-off')+'\" data-action=\"set-lang\" data-value=\"es\">Espa\\u00F1ol</button>';" +
     "h+='</div></div>';" +
     // Start Over
     "h+='<div style=\"margin-top:32px;padding-top:20px;border-top:1px solid var(--border)\">';" +
@@ -1407,10 +1462,10 @@ var APP_JS = [
   "function accSection(id,icon,title,body){" +
     "var open=S.expanded[id];" +
     "var h='<div class=\"acc\">';" +
-    "h+='<div class=\"acc-head\" data-action=\"toggle-expand\" data-id=\"'+id+'\">';" +
-    "h+='<span class=\"acc-icon\">'+icon+'</span>';" +
+    "h+='<div class=\"acc-head\" data-action=\"toggle-expand\" data-id=\"'+id+'\" role=\"button\" aria-expanded=\"'+!!open+'\" tabindex=\"0\">';" +
+    "h+='<span class=\"acc-icon\" aria-hidden=\"true\">'+icon+'</span>';" +
     "h+=esc(title);" +
-    "h+='<span class=\"acc-chev'+(open?' open':'')+'\">&#x25BC;</span>';" +
+    "h+='<span class=\"acc-chev'+(open?' open':'')+'\" aria-hidden=\"true\">&#x25BC;</span>';" +
     "h+='</div>';" +
     "if(open){h+='<div class=\"acc-body\">'+body+'</div>'}" +
     "h+='</div>';" +
@@ -1593,7 +1648,7 @@ var APP_JS = [
         "S.phase=0;S.issues=[];S.spectrum=null;S.policyViews={};S.qualities=[];" +
         "S.address={street:'',city:'Austin',state:'TX',zip:''};S.ddIndex=0;S.ddQuestions=[];" +
         "S.repBallot=null;S.demBallot=null;S.selectedParty='republican';" +
-        "S.guideComplete=false;S.summary=null;S.districts=null;S.expanded={};" +
+        "S.guideComplete=false;S.summary=null;S.districts=null;S.expanded={};S.addressError=null;S.verifyingAddress=false;" +
         "shuffledIssues=null;shuffledSpectrum=null;shuffledQualities=null;shuffledDD={};" +
         "try{localStorage.removeItem('atx_votes_profile');localStorage.removeItem('atx_votes_ballot_republican');" +
         "localStorage.removeItem('atx_votes_ballot_democrat');localStorage.removeItem('atx_votes_selected_party');localStorage.removeItem('atx_votes_has_voted')}catch(e){}" +
@@ -1607,6 +1662,7 @@ var APP_JS = [
     "else if(action==='share-voted'){shareStickerImage()}" +
     "else if(action==='do-print'){window.print()}" +
     "else if(action==='share'){shareGuide()}" +
+    "else if(action==='regen-summary'){regenerateSummary()}" +
   "});",
 
   // Tab bar click handler (tabs live outside #app)
@@ -1619,14 +1675,44 @@ var APP_JS = [
     "if(el.dataset.action==='nav'){location.hash=el.dataset.to}" +
   "});",
 
-  // Form submit for address
+  // Keyboard handler: Enter/Space activates [data-action] elements (accessibility)
+  "document.addEventListener('keydown',function(e){" +
+    "if(e.key==='Enter'||e.key===' '){" +
+      "var el=e.target.closest('[data-action]');if(!el||el.tagName==='BUTTON'||el.tagName==='A'||el.tagName==='INPUT')return;" +
+      "e.preventDefault();el.click()" +
+    "}" +
+  "});",
+
+  // Form submit for address — validate then verify via geocoder
   "document.getElementById('app').addEventListener('submit',function(e){" +
     "e.preventDefault();" +
     "var form=e.target;" +
-    "var st=form.street.value;" +
+    "var st=form.street.value.trim();" +
     "if(st.toLowerCase()==='station'){st='701 Brazos St.';form.city.value='Austin';form.zip.value='78701'}" +
-    "S.address={street:st,city:form.city.value||'Austin',state:'TX',zip:form.zip.value};" +
-    "buildGuide();" +
+    "var zip=form.zip.value.trim();" +
+    // Client-side validation
+    "if(!st){S.addressError=t('Please enter your street address.');render();return}" +
+    "if(!/^\\d{5}$/.test(zip)){S.addressError=t('Please enter a valid 5-digit ZIP code.');render();return}" +
+    "S.address={street:st,city:form.city.value||'Austin',state:'TX',zip:zip};" +
+    "S.addressError=null;S.verifyingAddress=true;render();" +
+    // Verify address via districts API
+    "fetch('/app/api/districts',{method:'POST',headers:{'Content-Type':'application/json'}," +
+      "body:JSON.stringify({street:st,city:form.city.value||'Austin',state:'TX',zip:zip})})" +
+    ".then(function(r){" +
+      "if(r.ok)return r.json();" +
+      "if(r.status===404)throw new Error('not_found');" +
+      "throw new Error('unavailable')" +
+    "})" +
+    ".then(function(d){S.districts=d;S.verifyingAddress=false;buildGuide()})" +
+    ".catch(function(err){" +
+      "S.verifyingAddress=false;" +
+      "if(err.message==='not_found'){" +
+        "S.addressError=t('We couldn\\u2019t find that address. Please check your street and ZIP, or skip to see all races.');render()" +
+      "}else{" +
+        // Census geocoder unavailable — proceed without districts
+        "S.addressError=null;S.districts=null;buildGuide()" +
+      "}" +
+    "});" +
   "});",
 
   // Hash change
@@ -1640,16 +1726,9 @@ var APP_JS = [
 
   "async function doGuide(){" +
     "try{" +
-      // Step 1: Look up districts if address provided
-      "if(S.address&&S.address.street&&S.address.zip){" +
-        "S.loadPhase=1;S.loadMsg='Looking up your districts...';render();" +
-        "try{" +
-          "var dRes=await fetch('/app/api/districts',{method:'POST',headers:{'Content-Type':'application/json'}," +
-            "body:JSON.stringify({street:S.address.street,city:S.address.city||'Austin',state:'TX',zip:S.address.zip})});" +
-          "if(dRes.ok)S.districts=await dRes.json();" +
-        "}catch(e){}" +
-      "}" +
-      // Step 2: Build profile object for API
+      // Districts already resolved before buildGuide — skip to profile
+      "S.loadPhase=1;S.loadMsg='Finding your ballot...';render();" +
+      // Build profile object for API
       "var profile={" +
         "topIssues:S.issues," +
         "politicalSpectrum:S.spectrum||'Moderate'," +
@@ -1663,9 +1742,9 @@ var APP_JS = [
       // Step 3: Generate both ballots in parallel
       "S.loadPhase=2;S.loadMsg='Researching candidates...';render();" +
       "var repP=fetch('/app/api/guide',{method:'POST',headers:{'Content-Type':'application/json'}," +
-        "body:JSON.stringify({party:'republican',profile:profile,districts:S.districts})}).then(function(r){return r.json()});" +
+        "body:JSON.stringify({party:'republican',profile:profile,districts:S.districts,lang:LANG})}).then(function(r){return r.json()});" +
       "var demP=fetch('/app/api/guide',{method:'POST',headers:{'Content-Type':'application/json'}," +
-        "body:JSON.stringify({party:'democrat',profile:profile,districts:S.districts})}).then(function(r){return r.json()});" +
+        "body:JSON.stringify({party:'democrat',profile:profile,districts:S.districts,lang:LANG})}).then(function(r){return r.json()});" +
       // Await in order
       "var repResult=null,demResult=null;" +
       "if(demFirst){" +
@@ -1705,6 +1784,22 @@ var APP_JS = [
     "}catch(err){" +
       "S.error=err.message||'Something went wrong. Please try again.';render();" +
     "}" +
+  "}",
+
+  // ============ REGENERATE SUMMARY ============
+  "function regenerateSummary(){" +
+    "S.regenerating=true;render();" +
+    "var profile={topIssues:S.issues,politicalSpectrum:S.spectrum,candidateQualities:S.qualities,policyViews:S.policyViews};" +
+    "fetch('/app/api/summary',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({profile:profile,lang:LANG})})" +
+    ".then(function(r){return r.json()})" +
+    ".then(function(d){" +
+      "if(d.error)throw new Error(d.error);" +
+      "S.summary=d.summary;S.regenerating=false;save();render()" +
+    "})" +
+    ".catch(function(e){" +
+      "S.regenerating=false;render();" +
+      "alert(t('Could not regenerate summary. Please try again.'))" +
+    "})" +
   "}",
 
   // ============ SHARE ============
@@ -1853,9 +1948,10 @@ var APP_HTML =
   CSS +
   "</style>" +
   "</head><body>" +
-  '<div id="topnav"></div>' +
-  '<div id="app"></div>' +
-  '<div id="tabs"></div>' +
+  '<a class="skip-link" href="#app">Skip to content</a>' +
+  '<div id="topnav" role="navigation" aria-label="Main navigation"></div>' +
+  '<main id="app"></main>' +
+  '<div id="tabs" role="navigation" aria-label="Tab navigation"></div>' +
   "<script>" +
   APP_JS +
   "</script>" +

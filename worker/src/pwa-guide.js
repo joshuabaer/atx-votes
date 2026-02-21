@@ -22,7 +22,7 @@ function json(data, status = 200) {
 
 export async function handlePWA_Guide(request, env) {
   try {
-    const { party, profile, districts } = await request.json();
+    const { party, profile, districts, lang } = await request.json();
 
     if (!party || !["republican", "democrat"].includes(party)) {
       return json({ error: "party required (republican|democrat)" }, 400);
@@ -47,7 +47,7 @@ export async function handlePWA_Guide(request, env) {
 
     // Build prompts
     var ballotDesc = buildCondensedBallotDescription(ballot);
-    var userPrompt = buildUserPrompt(profile, ballotDesc, ballot, party);
+    var userPrompt = buildUserPrompt(profile, ballotDesc, ballot, party, lang);
 
     // Call Claude with model fallback
     var responseText = await callClaude(env, SYSTEM_PROMPT, userPrompt);
@@ -63,6 +63,46 @@ export async function handlePWA_Guide(request, env) {
   } catch (err) {
     console.error("Guide generation error:", err);
     return json({ error: err.message || "Guide generation failed" }, 500);
+  }
+}
+
+// MARK: - Profile Summary Regeneration
+
+const SUMMARY_SYSTEM = "You are a concise political analyst. Return only plain text, no formatting.";
+
+export async function handlePWA_Summary(request, env) {
+  try {
+    const { profile, lang } = await request.json();
+    if (!profile) {
+      return json({ error: "profile required" }, 400);
+    }
+
+    var issues = (profile.topIssues || []).join(", ");
+    var qualities = (profile.candidateQualities || []).join(", ");
+    var stances = Object.keys(profile.policyViews || {})
+      .map(function (k) { return k + ": " + profile.policyViews[k]; })
+      .join("; ");
+
+    var langInstruction = lang === "es"
+      ? "Write your response in Spanish. "
+      : "";
+
+    var userMessage =
+      langInstruction +
+      "Write 2-3 sentences describing this person's politics the way they might describe it to a friend. " +
+      "Be conversational, specific, and insightful \u2014 synthesize who they are as a voter, don't just list positions. " +
+      'NEVER say "I\'m a Democrat" or "I\'m a Republican" or identify with a party label \u2014 focus on their actual views, values, and priorities.\n\n' +
+      "- Political spectrum: " + (profile.politicalSpectrum || "Moderate") + "\n" +
+      "- Top issues: " + issues + "\n" +
+      "- Values in candidates: " + qualities + "\n" +
+      "- Policy stances: " + stances + "\n\n" +
+      "Return ONLY the summary text \u2014 no JSON, no quotes, no labels.";
+
+    var text = await callClaude(env, SUMMARY_SYSTEM, userMessage);
+    return json({ summary: text.trim() });
+  } catch (err) {
+    console.error("Summary generation error:", err);
+    return json({ error: err.message || "Summary generation failed" }, 500);
   }
 }
 
@@ -169,7 +209,7 @@ function buildCondensedBallotDescription(ballot) {
 
 // MARK: - User Prompt
 
-function buildUserPrompt(profile, ballotDesc, ballot, party) {
+function buildUserPrompt(profile, ballotDesc, ballot, party, lang) {
   var raceLines = ballot.races.map(function (r) {
     var names = r.candidates.map(function (c) {
       return c.name;
@@ -189,7 +229,9 @@ function buildUserPrompt(profile, ballotDesc, ballot, party) {
   return (
     "Recommend ONE candidate per race and a stance on each proposition. Be concise.\n\n" +
     "IMPORTANT: For profileSummary, write 2 sentences in first person \u2014 conversational, specific, no generic labels. " +
-    'NEVER say "I\'m a Democrat/Republican" \u2014 focus on values and priorities.\n\n' +
+    'NEVER say "I\'m a Democrat/Republican" \u2014 focus on values and priorities.' +
+    (lang === "es" ? " Write the profileSummary in Spanish." : "") +
+    "\n\n" +
     "VOTER: " +
     partyLabel +
     " primary | Spectrum: " +

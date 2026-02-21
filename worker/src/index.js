@@ -1,6 +1,6 @@
 import { runDailyUpdate } from "./updater.js";
 import { handlePWA, handlePWA_SW, handlePWA_Manifest, handlePWA_Clear } from "./pwa.js";
-import { handlePWA_Guide } from "./pwa-guide.js";
+import { handlePWA_Guide, handlePWA_Summary } from "./pwa-guide.js";
 
 // Travis County commissioner precinct lookup by ZIP code
 // Source: Travis County Clerk precinct maps
@@ -593,6 +593,9 @@ export default {
     // PWA POST routes (no auth — server-side guide gen protects secrets)
     if (url.pathname === "/app/api/guide") {
       return handlePWA_Guide(request, env);
+    }
+    if (url.pathname === "/app/api/summary") {
+      return handlePWA_Summary(request, env);
     }
     if (url.pathname === "/app/api/districts") {
       return handleDistricts(request, env);
