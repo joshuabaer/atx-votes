@@ -290,8 +290,9 @@ var CSS = [
   ".loading p{font-size:15px;color:var(--text2);margin-bottom:24px}",
   ".spinner{width:48px;height:48px;border:4px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 24px}",
   "@keyframes spin{to{transform:rotate(360deg)}}",
-  ".loading-icon{font-size:56px;animation:bounce 1.5s ease-in-out infinite;margin-bottom:16px}",
-  "@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}",
+  ".loading-icon{font-size:56px;margin-bottom:16px}",
+  ".mascot{display:inline-block;font-size:64px;animation:mascotBounce .45s ease-in-out}",
+  "@keyframes mascotBounce{0%{transform:translateY(0) scale(1)}35%{transform:translateY(-18px) scale(1.1)}65%{transform:translateY(-18px) scale(1.1)}100%{transform:translateY(0) scale(1)}}",
   ".loading-msg{animation:fadeIn .4s ease}",
   "@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}",
   ".dots{display:flex;gap:8px;justify-content:center;margin-top:16px}",
@@ -408,6 +409,7 @@ var CSS = [
   // Accessibility: reduce motion
   "@media(prefers-reduced-motion:reduce){" +
     ".loading-icon{animation:none}" +
+    ".mascot{animation:none}" +
     ".loading-msg{animation:none}" +
     ".dot-active{animation:none}" +
     ".spinner{animation:none}" +
@@ -594,6 +596,54 @@ var APP_JS = [
     "'The Texas Legislature should reduce the burden of illegal immigration on taxpayers by ending public services for illegal immigrants.':'La Legislatura de Texas deber\\u00EDa reducir la carga de la inmigraci\\u00F3n ilegal sobre los contribuyentes al terminar los servicios p\\u00FAblicos para inmigrantes ilegales.'," +
     "'The Republican-controlled Texas Legislature should stop awarding leadership positions, including committee chairmanships, to Democrats.':'La Legislatura de Texas controlada por los republicanos deber\\u00EDa dejar de otorgar posiciones de liderazgo, incluyendo presidencias de comit\\u00E9, a los dem\\u00F3cratas.'," +
     "'Texas should prohibit Sharia Law.':'Texas deber\\u00EDa prohibir la ley Sharia.'," +
+    // Proposition ifPasses/ifFails translations (Democrat)
+    "'Signals strong Democratic voter support for Medicaid expansion. Strengthens the case for Democratic candidates to make expansion a central 2026 general election issue. Could pressure moderate Republicans, given that 73% of Texas voters (including 63% of strong Republicans) support expansion in polling.':'Indica un fuerte apoyo de los votantes dem\\u00F3cratas a la expansi\\u00F3n de Medicaid. Fortalece el caso para que los candidatos dem\\u00F3cratas hagan de la expansi\\u00F3n un tema central en las elecciones generales de 2026. Podr\\u00EDa presionar a republicanos moderados, dado que el 73% de los votantes de Texas apoyan la expansi\\u00F3n en encuestas.'," +
+    "'Unlikely to fail among Democratic primary voters. A weak showing would suggest healthcare is not the top motivating issue for Democratic base voters, reducing its prominence as a campaign centerpiece.':'Poco probable que falle entre votantes de la primaria dem\\u00F3crata. Un resultado d\\u00E9bil sugerir\\u00EDa que la salud no es el tema m\\u00E1s motivador para los votantes de base, reduciendo su prominencia como tema central de campa\\u00F1a.'," +
+    "'Signals Democratic voter support for humane immigration reform and pathways to citizenship. Provides a clear contrast with Republican enforcement-first messaging in the 2026 general election. Could shape Democratic candidates\\' immigration platforms statewide.':'Indica apoyo de los votantes dem\\u00F3cratas a una reforma migratoria humanitaria y caminos a la ciudadan\\u00EDa. Proporciona un claro contraste con el mensaje republicano de aplicaci\\u00F3n de la ley en las elecciones generales de 2026.'," +
+    "'Unlikely to fail among Democratic primary voters. A weak showing would suggest the Democratic base is conflicted on immigration messaging, potentially encouraging more moderate or enforcement-inclusive positions.':'Poco probable que falle entre votantes dem\\u00F3cratas. Un resultado d\\u00E9bil sugerir\\u00EDa que la base est\\u00E1 dividida sobre el mensaje migratorio, posiblemente fomentando posiciones m\\u00E1s moderadas.'," +
+    "'Signals overwhelming Democratic voter support for reproductive autonomy. Strengthens the issue as a major motivator for Democratic turnout in the November general election. Could fuel efforts to put a reproductive rights constitutional amendment before Texas voters.':'Indica un apoyo abrumador de los votantes dem\\u00F3cratas a la autonom\\u00EDa reproductiva. Fortalece el tema como un gran motivador para la participaci\\u00F3n dem\\u00F3crata en las elecciones generales de noviembre.'," +
+    "'Extremely unlikely to fail among Democratic primary voters. Any weakness would suggest the party base is divided on the scope of healthcare autonomy, which would be a significant surprise.':'Extremadamente improbable que falle entre votantes dem\\u00F3cratas. Cualquier debilidad sugerir\\u00EDa que la base est\\u00E1 dividida sobre el alcance de la autonom\\u00EDa en salud, lo cual ser\\u00EDa una gran sorpresa.'," +
+    "'Signals strong Democratic voter demand for state action on housing. Provides a mandate for Democratic candidates to make housing affordability a central platform issue. Could pressure the legislature to increase housing funds and strengthen renter protections.':'Indica una fuerte demanda de los votantes dem\\u00F3cratas por acci\\u00F3n estatal en vivienda. Proporciona un mandato para que los candidatos hagan de la vivienda asequible un tema central. Podr\\u00EDa presionar a la legislatura para aumentar fondos de vivienda.'," +
+    "'Unlikely to fail. A weak showing would suggest Democratic voters prioritize other economic issues over housing, reducing its visibility as a campaign issue.':'Poco probable que falle. Un resultado d\\u00E9bil sugerir\\u00EDa que los votantes priorizan otros temas econ\\u00F3micos sobre la vivienda.'," +
+    "'Signals strong Democratic voter support for substantially increased public school funding. Strengthens the argument against school vouchers by emphasizing the underfunding of existing public schools. Could become a key general election contrast with Republicans.':'Indica un fuerte apoyo a un aumento sustancial del financiamiento escolar p\\u00FAblico. Fortalece el argumento contra los vales escolares al enfatizar el bajo financiamiento de las escuelas p\\u00FAblicas existentes.'," +
+    "'Unlikely to fail. A weak result would suggest Democratic voters are ambivalent about the specific target of reaching the national average, though support for schools generally would remain strong.':'Poco probable que falle. Un resultado d\\u00E9bil sugerir\\u00EDa ambivalencia sobre la meta espec\\u00EDfica de alcanzar el promedio nacional, aunque el apoyo a las escuelas seguir\\u00EDa siendo fuerte.'," +
+    "'Signals broad Democratic voter demand for modernized voter registration. Provides ammunition for continued legislative efforts \\u2014 especially given bipartisan support from county election officials. Could be paired with other voting access measures in future sessions.':'Indica una amplia demanda de los votantes dem\\u00F3cratas por modernizar el registro de votantes. Proporciona impulso para esfuerzos legislativos continuos, especialmente dado el apoyo bipartidista de funcionarios electorales del condado.'," +
+    "'Extremely unlikely to fail. Online voter registration is among the least controversial modernization proposals. A failure would be a major surprise.':'Extremadamente improbable que falle. El registro de votantes en l\\u00EDnea es una de las propuestas de modernizaci\\u00F3n menos controversiales. Un fracaso ser\\u00EDa una gran sorpresa.'," +
+    "'Signals Democratic voter demand for stronger environmental protections, particularly as federal standards are rolled back. Provides a mandate for Democratic candidates to campaign on clean air and water. Could influence TCEQ\\u2019s ongoing water quality standards revision.':'Indica demanda de los votantes dem\\u00F3cratas por protecciones ambientales m\\u00E1s fuertes, particularmente mientras se revierten los est\\u00E1ndares federales. Proporciona un mandato para campa\\u00F1as sobre aire y agua limpios.'," +
+    "'Unlikely to fail among Democratic primary voters. A weak showing would suggest the environment is not a top-tier motivating issue for the Democratic base in 2026.':'Poco probable que falle entre votantes dem\\u00F3cratas. Un resultado d\\u00E9bil sugerir\\u00EDa que el medio ambiente no es un tema motivador de primer nivel para la base dem\\u00F3crata en 2026.'," +
+    "'Signals strong Democratic voter support for full legalization and criminal justice reform. Strengthens the issue as a general election differentiator. Could pressure moderate Republicans given that legalization polls above 50% statewide.':'Indica un fuerte apoyo a la legalizaci\\u00F3n total y la reforma de justicia penal. Fortalece el tema como diferenciador en elecciones generales. Podr\\u00EDa presionar a republicanos moderados dado que la legalizaci\\u00F3n supera el 50% en encuestas estatales.'," +
+    "'Unlikely to fail, but a close vote would suggest the Democratic base has reservations about full legalization, particularly the automatic expungement component. Could lead candidates to adopt a more incremental approach (decriminalization first).':'Poco probable que falle, pero una votaci\\u00F3n cerrada sugerir\\u00EDa reservas sobre la legalizaci\\u00F3n total, particularmente la eliminaci\\u00F3n autom\\u00E1tica de antecedentes. Podr\\u00EDa llevar a candidatos a adoptar un enfoque m\\u00E1s gradual.'," +
+    "'Signals strong Democratic voter support for raising public employee wages to competitive levels. Strengthens labor-backed candidates and provides a clear general election message on valuing public servants. Could influence future legislative budget priorities.':'Indica un fuerte apoyo a elevar los salarios de empleados p\\u00FAblicos a niveles competitivos. Fortalece a candidatos respaldados por sindicatos y proporciona un mensaje claro sobre valorar a los servidores p\\u00FAblicos.'," +
+    "'Unlikely to fail. A weak showing would suggest Democratic voters see the recent $4.3 billion investment as adequate, reducing pressure for additional raises.':'Poco probable que falle. Un resultado d\\u00E9bil sugerir\\u00EDa que los votantes consideran la reciente inversi\\u00F3n de $4.3 mil millones como adecuada, reduciendo la presi\\u00F3n por aumentos adicionales.'," +
+    "'Signals strong Democratic voter demand for fair redistricting. Strengthens the case for Democratic candidates to campaign on democracy reform. Could support federal legislation requiring independent commissions. Highlights the 2025 mid-decade redistricting as a general election issue.':'Indica una fuerte demanda por redistribuci\\u00F3n justa de distritos. Fortalece el caso para campa\\u00F1as sobre reforma democr\\u00E1tica. Podr\\u00EDa apoyar legislaci\\u00F3n federal que requiera comisiones independientes.'," +
+    "'Unlikely to fail. A weak showing would suggest Democratic voters do not prioritize process reforms over policy issues, reducing its prominence as a campaign theme.':'Poco probable que falle. Un resultado d\\u00E9bil sugerir\\u00EDa que los votantes no priorizan reformas de proceso sobre temas de pol\\u00EDtica p\\u00FAblica.'," +
+    "'Signals Democratic voter support for progressive federal tax reform. Provides a platform position for Texas Democrats heading into the 2026 midterms. Could influence the federal debate over expiring Trump-era tax cuts.':'Indica apoyo a una reforma tributaria federal progresiva. Proporciona una posici\\u00F3n de plataforma para los dem\\u00F3cratas de Texas de cara a las elecciones intermedias de 2026.'," +
+    "'Would suggest Democratic primary voters are skeptical of tax-the-wealthy messaging or view it as outside the scope of state politics. Could indicate a preference for addressing Texas\\u2019s regressive state tax structure instead.':'Sugerir\\u00EDa que los votantes dem\\u00F3cratas son esc\\u00E9pticos del mensaje de gravar a los ricos o lo ven fuera del \\u00E1mbito de la pol\\u00EDtica estatal. Podr\\u00EDa indicar preferencia por abordar la estructura tributaria regresiva de Texas.'," +
+    "'Signals strong Democratic voter support for public transit investment. Strengthens the case for state transit funding and bolsters local initiatives like Austin\\u2019s Project Connect. Could influence TxDOT\\u2019s multimodal transit plan.':'Indica un fuerte apoyo a la inversi\\u00F3n en transporte p\\u00FAblico. Fortalece el caso para financiamiento estatal de transporte y refuerza iniciativas locales como Project Connect de Austin.'," +
+    "'Unlikely to fail. A weak showing would suggest even Democratic voters prioritize other spending over transit, reducing momentum for state-level transit funding.':'Poco probable que falle. Un resultado d\\u00E9bil sugerir\\u00EDa que incluso los votantes dem\\u00F3cratas priorizan otros gastos sobre el transporte, reduciendo el impulso para financiamiento estatal.'," +
+    "'Signals Democratic voter support for red flag laws focused on domestic violence, directly contradicting the 2025 Anti-Red Flag Act. Provides a sharp general election contrast on gun safety. Could motivate suburban voters, particularly women, who support common-sense gun measures.':'Indica apoyo a leyes de alerta roja enfocadas en violencia dom\\u00E9stica, contradiciendo directamente la Ley Anti-Alerta Roja de 2025. Proporciona un fuerte contraste en seguridad de armas. Podr\\u00EDa motivar a votantes suburbanos, particularmente mujeres.'," +
+    "'Would suggest the Democratic base is divided on gun policy, perhaps due to concerns about government overreach or Second Amendment protections. Could lead candidates to soften gun safety messaging.':'Sugerir\\u00EDa que la base dem\\u00F3crata est\\u00E1 dividida sobre pol\\u00EDtica de armas, quiz\\u00E1s por preocupaciones sobre el exceso gubernamental o las protecciones de la Segunda Enmienda. Podr\\u00EDa llevar a candidatos a suavizar el mensaje sobre seguridad de armas.'," +
+    // Proposition ifPasses/ifFails translations (Republican)
+    "'Signals overwhelming Republican voter support for aggressive property tax elimination. Strengthens Governor Abbott\\u2019s hand to push school property tax elimination in the 2027 legislative session. Could become a GOP platform plank at the June 2026 convention.':'Indica un apoyo abrumador de los votantes republicanos a la eliminaci\\u00F3n agresiva del impuesto a la propiedad. Fortalece la posici\\u00F3n del gobernador Abbott para impulsar la eliminaci\\u00F3n en la sesi\\u00F3n legislativa de 2027.'," +
+    "'Weakens the case for full property tax elimination. Legislators would likely pursue incremental relief (higher homestead exemptions, lower caps) rather than wholesale phase-out.':'Debilita el caso para la eliminaci\\u00F3n total del impuesto a la propiedad. Los legisladores probablemente buscar\\u00EDan alivio gradual (mayores exenciones de hogar, topes m\\u00E1s bajos) en lugar de una eliminaci\\u00F3n total.'," +
+    "'Signals strong voter demand for direct control over local tax increases. Strengthens legislative efforts to tighten the 3.5% revenue cap or require elections for any increase. Could shape 2027 legislation.':'Indica una fuerte demanda de control directo sobre aumentos de impuestos locales. Fortalece los esfuerzos legislativos para endurecer el tope de ingresos del 3.5% o requerir elecciones para cualquier aumento.'," +
+    "'Suggests Republican voters are satisfied with the current 3.5% cap and automatic election trigger from SB 2. Reduces pressure for further restrictions on local government taxing authority.':'Sugiere que los votantes republicanos est\\u00E1n satisfechos con el tope actual del 3.5% y la elecci\\u00F3n autom\\u00E1tica de SB 2. Reduce la presi\\u00F3n por m\\u00E1s restricciones a la autoridad tributaria local.'," +
+    "'Signals Republican voter support for medical freedom legislation. Could lead to bills in the 2027 session prohibiting healthcare providers from denying services based on vaccination status. Becomes a platform priority.':'Indica apoyo de los votantes republicanos a legislaci\\u00F3n de libertad m\\u00E9dica. Podr\\u00EDa llevar a proyectos de ley en la sesi\\u00F3n de 2027 que proh\\u00EDban negar servicios seg\\u00FAn el estado de vacunaci\\u00F3n.'," +
+    "'Unlikely to fail among Republican primary voters. A weak showing would suggest the COVID-era medical freedom movement has lost momentum within the GOP base.':'Poco probable que falle entre votantes republicanos. Un resultado d\\u00E9bil sugerir\\u00EDa que el movimiento de libertad m\\u00E9dica de la era COVID ha perdido impulso dentro de la base republicana.'," +
+    "'Signals strong GOP voter support for incorporating pro-life principles into school curriculum. Could lead to 2027 legislation mandating life-begins-at-fertilization instruction in sex education classes. Reinforces the post-Roe legislative agenda.':'Indica un fuerte apoyo a incorporar principios pro-vida en el curr\\u00EDculo escolar. Podr\\u00EDa llevar a legislaci\\u00F3n en 2027 que obligue la instrucci\\u00F3n de que la vida comienza en la fertilizaci\\u00F3n en clases de educaci\\u00F3n sexual.'," +
+    "'Would suggest even Republican primary voters have reservations about mandating this specific curriculum content. Could indicate nuanced views on abortion policy, as polling shows many Texans hold complex positions on the issue.':'Sugerir\\u00EDa que incluso los votantes republicanos tienen reservas sobre obligar este contenido curricular espec\\u00EDfico. Podr\\u00EDa indicar opiniones matizadas sobre la pol\\u00EDtica de aborto.'," +
+    "'Signals strong voter support for removing all gender, sexuality, and reproductive health services from public schools. Could lead to 2027 legislation banning school-based health clinics that provide these services, building on existing restrictions in SB 12.':'Indica un fuerte apoyo a eliminar todos los servicios de salud de g\\u00E9nero, sexualidad y reproducci\\u00F3n de las escuelas p\\u00FAblicas. Podr\\u00EDa llevar a legislaci\\u00F3n en 2027 que proh\\u00EDba cl\\u00EDnicas escolares que ofrezcan estos servicios.'," +
+    "'Would suggest GOP voters see value in some school-based health services, or that existing restrictions (SB 12, gender-affirming care ban) are sufficient. Reduces pressure for additional legislation.':'Sugerir\\u00EDa que los votantes republicanos ven valor en algunos servicios de salud escolares, o que las restricciones existentes son suficientes. Reduce la presi\\u00F3n por legislaci\\u00F3n adicional.'," +
+    "'Signals overwhelming voter demand for term limits. Adds pressure on the legislature to pass a constitutional amendment, though incumbents historically resist limiting their own tenure. Could become a litmus-test issue in future primaries.':'Indica una demanda abrumadora de l\\u00EDmites de mandato. A\\u00F1ade presi\\u00F3n sobre la legislatura para aprobar una enmienda constitucional, aunque los titulares hist\\u00F3ricamente se resisten a limitar su propio mandato.'," +
+    "'Extremely unlikely to fail. Term limits consistently poll as one of the most popular reform proposals. A failure here would be a major surprise and would effectively kill the issue for years.':'Extremadamente improbable que falle. Los l\\u00EDmites de mandato consistentemente aparecen como una de las propuestas de reforma m\\u00E1s populares. Un fracaso aqu\\u00ED ser\\u00EDa una gran sorpresa.'," +
+    "'Strong signal to the legislature to pass water export restrictions in 2027. Strengthens the case for legislation similar to HB 27 that failed in the Senate. Protects rural water sources from large-scale commercial extraction.':'Fuerte se\\u00F1al a la legislatura para aprobar restricciones de exportaci\\u00F3n de agua en 2027. Fortalece el caso para legislaci\\u00F3n similar a HB 27. Protege las fuentes de agua rurales de la extracci\\u00F3n comercial a gran escala.'," +
+    "'Would suggest Republican voters prioritize free-market water rights over rural water protection. Weakens the legislative push to restrict groundwater exports, emboldening large-scale extraction projects.':'Sugerir\\u00EDa que los votantes republicanos priorizan los derechos de agua de libre mercado sobre la protecci\\u00F3n del agua rural. Debilita el impulso legislativo para restringir exportaciones de agua subterr\\u00E1nea.'," +
+    "'Signals strong GOP voter demand for restricting services to undocumented immigrants. Could push the 2027 legislature to pass bills cutting in-state tuition eligibility, restricting county-funded legal services, or tightening benefits verification. Many proposals would face federal legal challenges.':'Indica una fuerte demanda de restringir servicios a inmigrantes indocumentados. Podr\\u00EDa impulsar a la legislatura de 2027 a aprobar proyectos que recorten la elegibilidad de matr\\u00EDcula estatal y restrinjan servicios legales del condado.'," +
+    "'Unlikely to fail among Republican primary voters. A weak showing would suggest even the GOP base recognizes the complexity of completely ending services, particularly emergency healthcare and K-12 education.':'Poco probable que falle entre votantes republicanos. Un resultado d\\u00E9bil sugerir\\u00EDa que incluso la base reconoce la complejidad de terminar completamente los servicios, particularmente atenci\\u00F3n m\\u00E9dica de emergencia y educaci\\u00F3n K-12.'," +
+    "'Pressures House leadership to end the tradition of bipartisan committee appointments. Could become a litmus test for future speaker races. Signals the GOP base wants fully partisan governance in the legislature.':'Presiona al liderazgo de la C\\u00E1mara para terminar la tradici\\u00F3n de nombramientos bipartidistas de comit\\u00E9s. Podr\\u00EDa convertirse en una prueba decisiva para futuras elecciones de presidente de la C\\u00E1mara.'," +
+    "'Vindicates the bipartisan tradition. Signals that Republican primary voters value pragmatic governance over pure partisanship. Reduces pressure on House leadership to strip Democrats of all committee roles.':'Vindica la tradici\\u00F3n bipartidista. Indica que los votantes republicanos valoran la gobernanza pragm\\u00E1tica sobre el partidismo puro. Reduce la presi\\u00F3n para eliminar a los dem\\u00F3cratas de todos los roles en comit\\u00E9s.'," +
+    "'Signals GOP voter support for explicit anti-Sharia legislation. Could lead to a Texas foreign law ban in 2027, though legal scholars warn it would face immediate constitutional challenges if it singles out Islamic law specifically rather than all foreign legal systems.':'Indica apoyo a legislaci\\u00F3n expl\\u00EDcita anti-Sharia. Podr\\u00EDa llevar a una prohibici\\u00F3n de leyes extranjeras en Texas en 2027, aunque los expertos legales advierten que enfrentar\\u00EDa desaf\\u00EDos constitucionales inmediatos.'," +
+    "'Would suggest Republican voters view the issue as already addressed by existing constitutional protections and recent legislation (HB 4211). Reduces pressure for additional anti-Sharia legislation.':'Sugerir\\u00EDa que los votantes republicanos ven el tema como ya abordado por las protecciones constitucionales existentes y la legislaci\\u00F3n reciente (HB 4211). Reduce la presi\\u00F3n por legislaci\\u00F3n anti-Sharia adicional.'," +
     // Cheat sheet
     "'Your Ballot Cheat Sheet':'Tu gu\\u00EDa r\\u00E1pida de boleta'," +
     "'Primary':'Primaria'," +
@@ -1154,16 +1204,29 @@ var APP_JS = [
     "return h;" +
   "}",
 
-  // Building / Loading
+  // Building / Loading — bouncing mascot animation
+  "var _mascotTimer=null;var _mascotBounce=0;var _mascotAnimal='elephant';",
+  "function startMascotTimer(){" +
+    "if(_mascotTimer)return;" +
+    "_mascotBounce=0;_mascotAnimal='elephant';" +
+    "_mascotTimer=setInterval(function(){" +
+      "_mascotBounce++;" +
+      "if(_mascotBounce>=3){_mascotBounce=0;_mascotAnimal=_mascotAnimal==='elephant'?'donkey':'elephant'}" +
+      "var el=document.getElementById('mascot');" +
+      "if(el){" +
+        "el.textContent=_mascotAnimal==='elephant'?'\u{1F418}':'\u{1FACF}';" +
+        "el.style.animation='none';el.offsetHeight;el.style.animation='mascotBounce .45s ease-in-out'" +
+      "}else{clearInterval(_mascotTimer);_mascotTimer=null}" +
+    "},600)" +
+  "}",
+  "function stopMascotTimer(){if(_mascotTimer){clearInterval(_mascotTimer);_mascotTimer=null}}",
+
   "function renderBuilding(){" +
-    "var icons=['\u{1F5F3}\u{FE0F}','\u{1F4CD}','\u{1F50D}','\u{1F418}','\u{1FACF}','\u2728'];" +
-    "var msgs=['Finding your ballot...','Looking up your districts...','Researching candidates...'," +
-      "'Researching first party...','Researching second party...','Finalizing recommendations...'];" +
     "var pct=Math.min(100,Math.round((S.loadPhase/5)*100));" +
     "var h='<div class=\"loading\">';" +
-    "h+='<div class=\"loading-icon\">'+(icons[S.loadPhase]||'\u{1F5F3}\u{FE0F}')+'</div>';" +
+    "h+='<div class=\"loading-icon\"><span id=\"mascot\" class=\"mascot\">\u{1F418}</span></div>';" +
     "h+='<h2>'+t('Building Your Guide')+'</h2>';" +
-    "h+='<p style=\"min-height:24px\" class=\"loading-msg\" aria-live=\"polite\">'+t(S.loadMsg||msgs[0])+'</p>';" +
+    "h+='<p style=\"min-height:24px\" class=\"loading-msg\" aria-live=\"polite\">'+t(S.loadMsg||'Finding your ballot...')+'</p>';" +
     "h+='<div class=\"progress\" style=\"max-width:240px;margin:20px auto 16px;height:6px\"><div class=\"progress-fill\" style=\"width:'+pct+'%;transition:width .5s ease\"></div></div>';" +
     "if(S.error){h+='<div class=\"error-box\" style=\"margin-top:16px\"><p>'+t(S.error)+'</p></div><button class=\"btn btn-primary mt-md\" data-action=\"retry\">'+t('Try Again')+'</button>'}" +
     "h+='<div class=\"dots\" style=\"margin-top:20px\">';" +
@@ -1172,6 +1235,7 @@ var APP_JS = [
       "h+='<div class=\"'+cls+'\"></div>'" +
     "}" +
     "h+='</div></div>';" +
+    "setTimeout(startMascotTimer,100);" +
     "return h;" +
   "}",
 
@@ -1383,8 +1447,8 @@ var APP_JS = [
     // If Passes / If Fails (always visible, color-coded)
     "if(prop.ifPasses||prop.ifFails){" +
       "h+='<div style=\"margin-top:10px\">';" +
-      "if(prop.ifPasses){h+='<div class=\"prop-outcome pass\"><span style=\"flex-shrink:0\">\u2705</span><div><b>'+t('If it passes:')+'</b> '+esc(prop.ifPasses)+'</div></div>'}" +
-      "if(prop.ifFails){h+='<div class=\"prop-outcome fail\"><span style=\"flex-shrink:0\">\u274C</span><div><b>'+t('If it fails:')+'</b> '+esc(prop.ifFails)+'</div></div>'}" +
+      "if(prop.ifPasses){h+='<div class=\"prop-outcome pass\"><span style=\"flex-shrink:0\">\u2705</span><div><b>'+t('If it passes:')+'</b> '+esc(t(prop.ifPasses))+'</div></div>'}" +
+      "if(prop.ifFails){h+='<div class=\"prop-outcome fail\"><span style=\"flex-shrink:0\">\u274C</span><div><b>'+t('If it fails:')+'</b> '+esc(t(prop.ifFails))+'</div></div>'}" +
       "h+='</div>'" +
     "}" +
     // AI reasoning (always visible)
@@ -1864,12 +1928,12 @@ var APP_JS = [
       "if(S.selectedParty==='republican'&&!S.repBallot)S.selectedParty='democrat';" +
       "if(S.selectedParty==='democrat'&&!S.demBallot)S.selectedParty='republican';" +
       // Save and show
-      "S.guideComplete=true;S.isLoading=false;" +
+      "S.guideComplete=true;S.isLoading=false;stopMascotTimer();" +
       "save();" +
       "await new Promise(function(r){setTimeout(r,500)});" +
       "location.hash='#/ballot';render();" +
     "}catch(err){" +
-      "S.error=err.message||'Something went wrong. Please try again.';render();" +
+      "stopMascotTimer();S.error=err.message||'Something went wrong. Please try again.';render();" +
     "}" +
   "}",
 

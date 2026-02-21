@@ -24,5 +24,4 @@ crons = ["0 12 * * *"]
 
 # Secrets (set via `npx wrangler secret put`):
 #   ANTHROPIC_API_KEY - your Anthropic API key
-#   APP_SECRET - shared bearer token for the iOS app
 #   ADMIN_SECRET - secret for manual trigger endpoint

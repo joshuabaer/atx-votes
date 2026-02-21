@@ -1,6 +1,6 @@
 # ATX Votes
 
-A personalized voting guide app for Austin, Texas. Walks any voter through a quick interview about their values, looks up their specific ballot, researches every candidate, and generates personalized recommendations with a printable cheat sheet.
+A personalized voting guide for Austin, Texas. Walks any voter through a quick interview about their values, looks up their specific ballot, researches every candidate, and generates personalized recommendations with a printable cheat sheet.
 
 ## How It Works
 
@@ -12,80 +12,45 @@ A personalized voting guide app for Austin, Texas. Walks any voter through a qui
 
 ## Architecture
 
-- **SwiftUI** — iOS 17+, iPhone
-- **Claude API** — Powers the voter profile analysis and candidate research/recommendations
-- **Local-first** — Profile stored on-device, address never leaves the phone
-- **No accounts** — No sign-up, no login, no tracking
+A single Cloudflare Worker serves the entire app — landing page, PWA, API routes, and daily election data updates. No build step, no bundler, no framework. Everything is inline JavaScript and CSS.
+
+- **Cloudflare Worker** — serves HTML, handles API routes, runs scheduled updates
+- **Claude API** — powers voter profile analysis and candidate recommendations (server-side, secrets never reach the client)
+- **KV Storage** — caches election ballot data, refreshed daily via cron
+- **Census Geocoder** — looks up congressional/state districts from street address
+- **Local-first** — all voter data stored in `localStorage`, nothing on our servers
+
+## File Structure
+
+```
+worker/src/
+├── index.js        # Router, landing page, static pages, API endpoints
+├── pwa.js          # PWA single-page app (HTML/CSS/JS inline)
+├── pwa-guide.js    # Server-side Claude API calls for guide + summary
+└── updater.js      # Daily cron job to refresh election data in KV
+worker/public/
+└── headshots/      # Candidate headshot images (static assets)
+```
 
 ## Setup
 
-1. Open `AustinVotes.xcodeproj` in Xcode 15+
-2. Add your Claude API key in `ClaudeService.swift` (or configure via environment/Keychain)
-3. Build and run on iPhone or Simulator
-
-Without an API key, the app uses sample data from the March 2026 Republican and Democratic primaries (based on real research) — perfect for development and demo.
-
-## App Structure
-
-```
-AustinVotes/
-├── AustinVotesApp.swift          # App entry point
-├── ContentView.swift             # Root: onboarding flow vs main tab view
-├── Theme.swift                   # Colors, typography, reusable components
-├── Models/
-│   ├── VoterProfile.swift        # User's political values and preferences
-│   ├── Ballot.swift              # Races, candidates, propositions
-│   ├── InterviewQuestion.swift   # Question bank for the interview flow
-│   └── SampleData.swift          # Real sample data for development
-├── Views/
-│   ├── Interview/
-│   │   ├── OnboardingFlowView    # Orchestrates the interview flow
-│   │   ├── IssuesPickerView      # Pick your top 3-5 issues
-│   │   ├── SpectrumPickerView    # Political approach
-│   │   ├── PolicyDeepDiveView    # Follow-up questions on top issues
-│   │   ├── PoliticianPickerView  # Politicians you admire/dislike
-│   │   ├── QualitiesPickerView   # What you value in candidates
-│   │   ├── PrimaryPickerView     # Republican or Democrat primary
-│   │   ├── AddressEntryView      # Home address for ballot lookup
-│   │   └── BuildingGuideView     # Loading screen while guide generates
-│   ├── Ballot/
-│   │   ├── BallotOverviewView    # All races and propositions
-│   │   ├── RaceDetailView        # Deep dive on a single race
-│   │   └── CheatSheetView        # Printable one-page summary
-│   ├── Logistics/
-│   │   └── VotingInfoView        # Dates, ID, locations, resources
-│   └── ProfileView.swift         # Your voter profile summary
-└── Services/
-    ├── VotingGuideStore.swift    # Main app state (ObservableObject)
-    └── ClaudeService.swift       # Claude API integration
+```bash
+cd worker
+npx wrangler dev
 ```
 
-## Screens
+Visit `http://localhost:8787/app` for the PWA, or `http://localhost:8787/` for the landing page.
 
-### Onboarding (first launch)
-- **Welcome** — "Your personalized Austin voting guide in 5 minutes"
-- **Issues** — Grid of tappable issue cards (Economy, Safety, Tech, etc.)
-- **Spectrum** — Single-select political approach
-- **Deep Dive** — Follow-up questions on your top issues
-- **Politicians** — Free-text entry for admired/disliked politicians
-- **Qualities** — What you value in candidates (competence, integrity, etc.)
-- **Primary** — Which party's primary ballot
-- **Address** — Street address for ballot lookup
-- **Building** — Animated loading screen with step-by-step progress
+Requires secrets configured via `npx wrangler secret put`:
+- `ANTHROPIC_API_KEY` — your Anthropic API key
+- `ADMIN_SECRET` — secret for the manual election data trigger endpoint
 
-### Main App (after guide is built)
-- **My Ballot** — Key races with star badges, all contested races, propositions, uncontested races
-- **Cheat Sheet** — Printable summary table with share button
-- **Vote Info** — Countdown, dates, early voting hours, voter ID, what to bring, resources
-- **Profile** — Your voter profile summary, values, policy stances
+## Deploy
 
-## Design
-
-- Austin-inspired color palette (deep blue, capitol gold, cream background)
-- Rounded, friendly typography
-- Card-based layout with gentle shadows
-- Spring animations on selections
-- Progress bar through the interview
+```bash
+cd worker
+npx wrangler deploy
+```
 
 ## Credits
 

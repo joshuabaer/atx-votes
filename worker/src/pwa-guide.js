@@ -244,7 +244,7 @@ function buildUserPrompt(profile, ballotDesc, ballot, party, lang) {
     "stated values, not to party-line positions.\n\n" +
     "IMPORTANT: For profileSummary, write 2 sentences in first person \u2014 conversational, specific, no generic labels. " +
     'NEVER say "I\'m a Democrat/Republican" \u2014 focus on values and priorities.' +
-    (lang === "es" ? " Write the profileSummary in Spanish." : "") +
+    (lang === "es" ? " Write ALL text fields in Spanish (profileSummary, reasoning, strategicNotes, caveats). Keep office names, candidate names, district names, and confidence levels in English." : "") +
     "\n\n" +
     "VOTER: " +
     partyLabel +

@@ -83,22 +83,6 @@ function jsonResponse(data, status = 200) {
   });
 }
 
-async function handleGuide(request, env) {
-  const body = await request.text();
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": env.ANTHROPIC_API_KEY,
-      "anthropic-version": "2023-06-01",
-    },
-    body,
-  });
-
-  const responseBody = await response.text();
-  return jsonResponse(JSON.parse(responseBody), response.status);
-}
-
 function handleLandingPage() {
   const html = `<!DOCTYPE html>
 <html lang="en">
@@ -549,14 +533,6 @@ export default {
       if (url.pathname === "/api/election/manifest") {
         return handleManifest(env);
       }
-      if (url.pathname === "/api/election/ballot") {
-        // Auth required for ballot data
-        const auth = request.headers.get("Authorization");
-        if (!auth || auth !== `Bearer ${env.APP_SECRET}`) {
-          return new Response("Unauthorized", { status: 401 });
-        }
-        return handleBallotFetch(request, env);
-      }
       // PWA routes (no auth)
       if (url.pathname === "/app/clear") {
         return handlePWA_Clear();
@@ -616,20 +592,7 @@ export default {
       return handleTrigger(request, env);
     }
 
-    // Validate app secret for other POST routes
-    const auth = request.headers.get("Authorization");
-    if (!auth || auth !== `Bearer ${env.APP_SECRET}`) {
-      return new Response("Unauthorized", { status: 401 });
-    }
-
-    switch (url.pathname) {
-      case "/api/guide":
-        return handleGuide(request, env);
-      case "/api/districts":
-        return handleDistricts(request, env);
-      default:
-        return new Response("Not found", { status: 404 });
-    }
+    return new Response("Not found", { status: 404 });
   },
 
   async scheduled(event, env, ctx) {

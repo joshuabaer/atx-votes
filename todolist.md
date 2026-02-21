@@ -15,10 +15,12 @@
 Items recently fixed but not yet tested. **Test these before attempting again or marking done.**
 
 ### Bugs
+- [ ] PWA: Proposition explanations not translated — updated Claude prompt to generate all text fields (reasoning, caveats, strategicNotes) in Spanish when `lang=es`. Added 46 Spanish translations for static ifPasses/ifFails data to TR dictionary. Rendering now passes ifPasses/ifFails through `t()`.
 
 ### Improvements
 - [ ] PWA: Remove "Print" from cheat sheet button — renamed ballot page button from "Print Cheat Sheet" to "Cheat Sheet" with clipboard icon. Print button on the cheat sheet page itself still says "Print Cheat Sheet."
 - [ ] PWA: Free-form "Anything else?" field — added phase 5 textarea between Qualities and Address. Optional field stored in `S.freeform`, persisted in localStorage, shown on profile page. Text passed to Claude in both guide and summary prompts as "Additional context." Spanish translations included. Skip button available.
+- [ ] PWA: Bouncing mascot loading animation — replaced single-icon-per-phase with alternating elephant/donkey bounce. Elephant bounces 3 times, then donkey 3 times, repeating on a 600ms timer. Decoupled from progress status text. Timer stops on completion or error. `prefers-reduced-motion` disables animation.
 
 ### Features
 
@@ -29,7 +31,6 @@ Items recently fixed but not yet tested. **Test these before attempting again or
 Items not yet attempted or needing a fresh approach after failed verification.
 
 ### Bugs
-- [ ] PWA: Proposition AI explanations not translated — the "If Passes," "If Fails," and AI reasoning text on proposition cards stays in English when the app is in Spanish mode. These are AI-generated fields from the guide API, so the fix likely needs to happen server-side: pass `lang` to the Claude prompt so it generates proposition reasoning in the requested language.
 
 ### Improvements
 
@@ -38,7 +39,6 @@ Items not yet attempted or needing a fresh approach after failed verification.
 #### Ballot Display
 
 #### Loading Animation
-- [ ] PWA: Bouncing mascot loading animation — replace the current icon-per-phase loading with an alternating elephant/donkey bounce animation. Show the elephant bouncing 3 times, then the donkey 3 times, repeating. Decouple the animation from the loading status text.
 
 #### Interview Flow
 
@@ -50,69 +50,19 @@ Items not yet attempted or needing a fresh approach after failed verification.
 
 ### Features
 
-- [ ] iOS: Light/dark mode support — currently forced to light mode via `.preferredColorScheme(.light)`. Define dark-mode variants for all Theme colors and remove forced light mode.
-- [ ] iOS: Election countdown widget — WidgetKit extension with systemSmall/systemMedium/lock screen families showing days until Election Day and next key date. App Group shared UserDefaults for data bridge.
-- [ ] iOS: More entertaining loading animation — replace simple pulsing icon and status messages with something more engaging during guide build.
+- [ ] Add Google Analytics
 
 ### Testing
 
 - [ ] Interview flow UI tests — walk through all interview phases, verify required field validation (3+ issues, 2+ qualities, address fields), verify back navigation preserves selections.
 - [x] Verify candidate-to-race accuracy — cross-referenced against Ballotpedia, Texas Tribune, Travis County Clerk, and Texas SOS. Fixed: added 3 missing GOP Railroad Commissioner candidates (including Jim Matlock at 20% in polls), removed withdrawn Christopher Hurt from GOP TX-10, added 4 missing Dem HD-49 candidates, added 2 missing Dem SBOE-5 candidates. Updated both JSON files and remote KV. Note: statewide races intentionally exclude minor/perennial candidates as editorial choice.
-- [x] Partisan bias audit — reviewed all 200+ Spanish translations: no bias found. Added explicit NONPARTISAN instruction blocks to all 6 Claude API prompts (PWA guide system prompt, PWA guide user prompt, PWA summary system prompt, PWA summary user prompt, iOS guide system prompt + user prompt, iOS summary system prompt + user prompt). Instructions require factual/issue-based reasoning, prohibit partisan framing and loaded terms, and mandate equal analytical rigor for all candidates.
+- [x] Partisan bias audit — reviewed all 200+ Spanish translations: no bias found. Added explicit NONPARTISAN instruction blocks to all Claude API prompts (guide system/user, summary system/user). Instructions require factual/issue-based reasoning, prohibit partisan framing and loaded terms, and mandate equal analytical rigor for all candidates.
 
 ---
 
 ## Done
 
 Verified working. Collapsed for reference.
-
-<details>
-<summary>iOS Bugs (3 resolved)</summary>
-
-- [x] Onboarding scroll fix — replaced paged TabView with Group+switch in OnboardingFlowView
-- [x] Always shows Republican primary results regardless of party choice — added `Ballot.sampleDemocrat`, switched on `profile.primaryBallot`
-- [x] PolicyDeepDiveView skips silently for unmapped issues — added deep-dive questions for all 12 issues
-
-</details>
-
-<details>
-<summary>iOS Improvements (12 resolved)</summary>
-
-- [x] Complete policy deep-dive questions — all 12 issues covered
-- [x] Real candidate data for March 2026 primary — real data from Travis County Clerk, Ballotpedia, Texas Tribune, KUT
-- [x] Real proposition data — all 10 Republican and 13 Democratic propositions match actual ballot
-- [x] Accuracy disclaimer — DisclaimerBanner on BallotOverviewView, CheatSheetView, RaceDetailView
-- [x] Extract election data into separate JSON files — ElectionDataLoader with raw Decodable types
-- [x] Structured logging — replaced `print()` with `os.Logger` (subsystem `app.atxvotes`) in VotingGuideStore and SampleData
-- [x] Accessibility gaps — added VoiceOver labels/hints to RaceCard, CandidateCard, PropositionCard, share buttons, reminders toggle, section headers
-- [x] Dynamic Type support — switched Theme fonts to semantic text styles, set minimum Dynamic Type size to XXLarge, bumped all inline fixed sizes
-- [x] Service dependency injection — exposed ClaudeService through VotingGuideStore, removed ad-hoc instantiation in ProfileView
-- [x] Error feedback — surface summary regeneration errors in ProfileView, show district lookup failure note in ballot header
-- [x] Safe URL/Date construction — extracted static URL/Date constants in VotingInfoView with safe fallbacks
-- [x] Design review document — created DESIGN_REVIEW.md with 9-section checklist and automated verification commands
-
-</details>
-
-<details>
-<summary>iOS Features (15 resolved)</summary>
-
-- [x] Initial app scaffold — complete interview flow (9 phases), ballot overview, cheat sheet, voting info, profile view, Theme system, sample data, UserDefaults persistence
-- [x] Feedback by email — FeedbackHelper with mailto URL on ProfileView
-- [x] Share the app with others — ShareLink on BuildingGuideView and CheatSheetView toolbar
-- [x] App Store review prompt — SKStoreReviewController after guide completes, once per install
-- [x] Cloudflare Worker backend proxy — server-side API key at atxvotes-api.joshuabaer.workers.dev
-- [x] Accessibility audit — Reduce Motion, VoiceOver labels, decorative image hiding, element grouping, white-on-white text fix
-- [x] Custom domain — registered atxvotes.app, set up DNS, email routing, landing page, API subdomain
-- [x] Address-to-district lookup — Census Geocoder API via Cloudflare Worker, filters ballot to user's districts, falls back to all races
-- [x] Polling location finder — "Open in Maps" button searches vote centers near user's address + VoteTravis.gov link
-- [x] Share voter profile — ShareLink on Profile toolbar, formats as text excluding address for privacy
-- [x] Election Day voting locations link — button in Election Day accordion links to Travis County Clerk site
-- [x] Profile summary generation — standalone Claude API call + refresh button on Profile card to regenerate
-- [x] Push notification reminders — 5 scheduled local notifications from early voting through Election Day with toggle
-- [x] Offline mode — ballot cached to UserDefaults, works without network after initial guide generation
-- [x] Dark mode support — added adaptive colors across all screens via `prefers-color-scheme`
-
-</details>
 
 <details>
 <summary>PWA Bugs (7 resolved)</summary>
