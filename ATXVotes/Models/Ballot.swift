@@ -110,6 +110,48 @@ struct Proposition: Codable, Identifiable {
         case lean = "Lean"
         case genuinelyContested = "Genuinely Contested"
     }
+
+    // Custom decoder so cached ballots from before the enrichment fields existed
+    // still decode successfully (arrays default to [], optionals to nil).
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(UUID.self, forKey: .id)
+        number = try c.decode(Int.self, forKey: .number)
+        title = try c.decode(String.self, forKey: .title)
+        description = try c.decode(String.self, forKey: .description)
+        recommendation = try c.decode(PropRecommendation.self, forKey: .recommendation)
+        reasoning = try c.decode(String.self, forKey: .reasoning)
+        background = try c.decodeIfPresent(String.self, forKey: .background)
+        fiscalImpact = try c.decodeIfPresent(String.self, forKey: .fiscalImpact)
+        supporters = try c.decodeIfPresent([String].self, forKey: .supporters) ?? []
+        opponents = try c.decodeIfPresent([String].self, forKey: .opponents) ?? []
+        ifPasses = try c.decodeIfPresent(String.self, forKey: .ifPasses)
+        ifFails = try c.decodeIfPresent(String.self, forKey: .ifFails)
+        caveats = try c.decodeIfPresent(String.self, forKey: .caveats)
+        confidence = try c.decodeIfPresent(PropConfidence.self, forKey: .confidence)
+    }
+
+    init(id: UUID, number: Int, title: String, description: String,
+         recommendation: PropRecommendation, reasoning: String,
+         background: String? = nil, fiscalImpact: String? = nil,
+         supporters: [String] = [], opponents: [String] = [],
+         ifPasses: String? = nil, ifFails: String? = nil,
+         caveats: String? = nil, confidence: PropConfidence? = nil) {
+        self.id = id
+        self.number = number
+        self.title = title
+        self.description = description
+        self.recommendation = recommendation
+        self.reasoning = reasoning
+        self.background = background
+        self.fiscalImpact = fiscalImpact
+        self.supporters = supporters
+        self.opponents = opponents
+        self.ifPasses = ifPasses
+        self.ifFails = ifFails
+        self.caveats = caveats
+        self.confidence = confidence
+    }
 }
 
 // MARK: - District Filtering
