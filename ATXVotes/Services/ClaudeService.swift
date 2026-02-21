@@ -248,7 +248,7 @@ actor ClaudeService: GuideGenerating {
                 request.addValue("Bearer \(appSecret)", forHTTPHeaderField: "Authorization")
                 request.addValue("application/json", forHTTPHeaderField: "Content-Type")
 
-                let maxTokens = model.contains("haiku") ? 8192 : 12288
+                let maxTokens = model.contains("haiku") ? 4096 : 12288
                 let body: [String: Any] = [
                     "model": model,
                     "max_tokens": maxTokens,
@@ -300,12 +300,22 @@ actor ClaudeService: GuideGenerating {
                 default:
                     // Non-retryable error — try next model if available
                     let bodyStr = String(data: data, encoding: .utf8) ?? "Unknown error"
-                    logger.error("\(model) returned HTTP \(httpResponse.statusCode): \(bodyStr.prefix(200))")
+                    // Extract just the error message from the API response
+                    let apiMessage: String
+                    if let jsonData = bodyStr.data(using: .utf8),
+                       let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
+                       let error = json["error"] as? [String: Any],
+                       let msg = error["message"] as? String {
+                        apiMessage = msg
+                    } else {
+                        apiMessage = String(bodyStr.prefix(200))
+                    }
+                    logger.error("\(model) returned HTTP \(httpResponse.statusCode): \(apiMessage)")
                     if index < modelsToTry.count - 1 {
                         logger.warning("Trying \(modelsToTry[index + 1])...")
                         break
                     }
-                    throw ClaudeError.apiError("HTTP \(httpResponse.statusCode) from \(model)")
+                    throw ClaudeError.apiError("\(model): \(apiMessage)")
                 }
 
                 break // Move to next model after a non-retryable error
