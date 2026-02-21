@@ -192,7 +192,7 @@ class VotingGuideStore: ObservableObject {
             // For undecided voters, randomly pick which party to show first
             demFirstOrder = inferredParty == .democrat || (inferredParty == .undecided && Bool.random())
             if demFirstOrder {
-                await setLoadingPhase("Building Democrat picks...")
+                await setLoadingPhase("Researching Democrats...")
                 do {
                     let (ballot, summary) = try await demTask.value
                     democratBallot = ballot
@@ -202,7 +202,7 @@ class VotingGuideStore: ObservableObject {
                     lastError = error
                 }
 
-                await setLoadingPhase("Building Republican picks...")
+                await setLoadingPhase("Researching Republicans...")
                 do {
                     let (ballot, summary) = try await repTask.value
                     republicanBallot = ballot
@@ -212,7 +212,7 @@ class VotingGuideStore: ObservableObject {
                     lastError = error
                 }
             } else {
-                await setLoadingPhase("Building Republican picks...")
+                await setLoadingPhase("Researching Republicans...")
                 do {
                     let (ballot, summary) = try await repTask.value
                     republicanBallot = ballot
@@ -222,7 +222,7 @@ class VotingGuideStore: ObservableObject {
                     lastError = error
                 }
 
-                await setLoadingPhase("Building Democrat picks...")
+                await setLoadingPhase("Researching Democrats...")
                 do {
                     let (ballot, summary) = try await demTask.value
                     democratBallot = ballot

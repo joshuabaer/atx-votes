@@ -36,10 +36,10 @@ struct BuildingGuideView: View {
     private var steps: [(icon: String, label: String, emoji: String)] {
         let demFirst = store.demFirstOrder
         let firstParty = (icon: "brain.head.profile",
-                          label: demFirst ? "Building Democrat picks" : "Building Republican picks",
+                          label: demFirst ? "Researching Democrats" : "Researching Republicans",
                           emoji: demFirst ? "🫏" : "🐘")
         let secondParty = (icon: "brain.head.profile",
-                           label: demFirst ? "Building Republican picks" : "Building Democrat picks",
+                           label: demFirst ? "Researching Republicans" : "Researching Democrats",
                            emoji: demFirst ? "🐘" : "🫏")
         return [
             ("magnifyingglass", "Finding your ballot", "🔍"),
@@ -148,6 +148,7 @@ struct BuildingGuideView: View {
                             Text(step.label)
                                 .font(Theme.callout)
                                 .foregroundColor(store.guideComplete || index <= currentStep ? Theme.textPrimary : Theme.textSecondary)
+                                .lineLimit(1)
                         }
                     }
                     .animation(.spring(response: 0.3), value: currentStep)

@@ -41,8 +41,9 @@ struct ClaudePropositionRecommendation: Decodable {
 actor ClaudeService: GuideGenerating {
     private let baseURL = "https://api.atxvotes.app/api/guide"
     private let models = [
+        "claude-sonnet-4-6",
         "claude-sonnet-4-20250514",
-        "claude-sonnet-4-5-20241022",
+        "claude-haiku-4-5-20251001",
     ]
     private let appSecret = "atxvotes-2026-primary"
 
@@ -235,8 +236,11 @@ actor ClaudeService: GuideGenerating {
         }
 
         let modelsToTry = fallbackModels ?? self.models
+        var triedModels: [String] = []
 
         for (index, model) in modelsToTry.enumerated() {
+            triedModels.append(model)
+
             // Try up to 2 attempts per model (initial + 1 retry for 529)
             for attempt in 0...1 {
                 var request = URLRequest(url: url, timeoutInterval: 60)
@@ -263,6 +267,9 @@ actor ClaudeService: GuideGenerating {
 
                 switch httpResponse.statusCode {
                 case 200:
+                    if model != modelsToTry.first {
+                        logger.info("Succeeded with fallback model \(model)")
+                    }
                     let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
                     guard let content = json?["content"] as? [[String: Any]],
                           let text = content.first?["text"] as? String else {
@@ -272,16 +279,16 @@ actor ClaudeService: GuideGenerating {
 
                 case 529:
                     if attempt == 0 {
-                        // First 529 on this model — wait and retry
+                        logger.warning("\(model) is overloaded (529), retrying in 2s...")
                         try await Task.sleep(for: .seconds(2))
                         continue
                     }
                     // Second 529 — fall through to try next model
                     if index < modelsToTry.count - 1 {
-                        logger.warning("\(model) returned 529, falling back to \(modelsToTry[index + 1])")
+                        logger.warning("\(model) still overloaded, trying \(modelsToTry[index + 1])...")
                         break
                     }
-                    throw ClaudeError.overloaded
+                    throw ClaudeError.overloaded(triedModels)
 
                 case 401:
                     throw ClaudeError.invalidAPIKey
@@ -290,15 +297,21 @@ actor ClaudeService: GuideGenerating {
                 case 500...599:
                     throw ClaudeError.serverError(httpResponse.statusCode)
                 default:
+                    // Non-retryable error — try next model if available
                     let bodyStr = String(data: data, encoding: .utf8) ?? "Unknown error"
-                    throw ClaudeError.apiError("HTTP \(httpResponse.statusCode): \(bodyStr)")
+                    logger.error("\(model) returned HTTP \(httpResponse.statusCode): \(bodyStr.prefix(200))")
+                    if index < modelsToTry.count - 1 {
+                        logger.warning("Trying \(modelsToTry[index + 1])...")
+                        break
+                    }
+                    throw ClaudeError.apiError("HTTP \(httpResponse.statusCode) from \(model)")
                 }
 
-                break // Move to next model after a non-retryable 529
+                break // Move to next model after a non-retryable error
             }
         }
 
-        throw ClaudeError.overloaded
+        throw ClaudeError.overloaded(triedModels)
     }
 
     // MARK: - Parse Response
@@ -385,17 +398,19 @@ enum ClaudeError: Error, LocalizedError {
     case parseError(String)
     case invalidAPIKey
     case rateLimited
-    case overloaded
+    case overloaded([String])
     case serverError(Int)
 
     var errorDescription: String? {
         switch self {
-        case .apiError(let msg): msg
-        case .parseError(let msg): msg
-        case .invalidAPIKey: "Authentication error. Please update the app."
-        case .rateLimited: "Too many requests. Please wait a moment and try again."
-        case .overloaded: "The AI service is temporarily overloaded. Please try again in a minute."
-        case .serverError(let code): "Server error (\(code)). Please try again later."
+        case .apiError(let msg): return msg
+        case .parseError(let msg): return msg
+        case .invalidAPIKey: return "Authentication error. Please update the app."
+        case .rateLimited: return "Too many requests. Please wait a moment and try again."
+        case .overloaded(let models):
+            let names = models.map { $0.replacingOccurrences(of: "claude-", with: "") }
+            return "All AI models are overloaded (\(names.joined(separator: ", "))). Please try again in a minute."
+        case .serverError(let code): return "Server error (\(code)). Please try again later."
         }
     }
 }
