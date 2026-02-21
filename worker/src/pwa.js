@@ -1307,9 +1307,18 @@ var APP_JS = [
     "if(uncontested.length){" +
       "h+='<div class=\"section-head\">'+t('Uncontested Races')+'</div>';" +
       "for(var i=0;i<uncontested.length;i++){" +
-        "var r=uncontested[i];var name=r.candidates.length?r.candidates[0].name:'TBD';" +
-        "h+='<div class=\"card\"><div style=\"font-size:14px;color:var(--text2)\">'+esc(r.office)+(r.district?' \\u2014 '+esc(r.district):'')+'</div>" +
-          "<div style=\"font-size:16px;font-weight:600;margin-top:2px\">'+esc(name)+'</div></div>'" +
+        "var r=uncontested[i];var c=r.candidates.length?r.candidates[0]:null;var name=c?c.name:'TBD';" +
+        "h+='<div class=\"card\"><div style=\"display:flex;align-items:center;gap:12px\">';" +
+        "if(c){" +
+          "var slug=c.name.toLowerCase().replace(/[^a-z0-9 -]/g,'').replace(/\\s+/g,'-');" +
+          "var initial=c.name.charAt(0).toUpperCase();" +
+          "h+='<div style=\"width:40px;height:40px;border-radius:50%;background:#4A90D9;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;overflow:hidden;flex-shrink:0\">';" +
+          "h+='<img src=\"/headshots/'+slug+'.jpg\" alt=\"\" style=\"width:100%;height:100%;object-fit:cover;border-radius:50%\" onerror=\"if(this.src.indexOf(\\'.jpg\\')>0){this.src=this.src.replace(\\'.jpg\\',\\'.png\\')}else{this.style.display=\\'none\\';this.nextSibling.style.display=\\'\\';}\">';" +
+          "h+='<span style=\"display:none\">'+initial+'</span></div>'" +
+        "}" +
+        "h+='<div><div style=\"font-size:14px;color:var(--text2)\">'+esc(r.office)+(r.district?' \\u2014 '+esc(r.district):'')+'</div>" +
+          "<div style=\"font-size:16px;font-weight:600;margin-top:2px\">'+esc(name)+'</div></div>';" +
+        "h+='</div></div>'" +
       "}" +
     "}" +
     // Footer links
