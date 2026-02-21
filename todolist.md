@@ -34,8 +34,6 @@ Items not yet attempted or needing a fresh approach after failed verification.
 #### Landing Page
 
 #### Ballot Display
-- [ ] PWA: Election info header card — add a header card to the ballot page showing election name, date, and the user's districts (Congressional, State House, State Senate). Show "Showing all races" fallback if no districts. Reference iOS `BallotOverviewView.swift` lines 241-301.
-- [ ] PWA: Candidate cards — avatar and color-coded pros/cons — add avatar circle (first letter), color-coded Strengths (green) / Concerns (red) headers, flow-layout position chips. Reference iOS `RaceDetailView.swift`.
 - [ ] PWA: Proposition cards — side-by-side layout and icons — add side-by-side supporters vs opponents, color-coded If Passes (green check) / If Fails (red X), brain icon for AI reasoning, confidence display. Reference iOS `BallotOverviewView.swift` lines 610-791.
 
 #### Interview Flow
@@ -47,7 +45,6 @@ Items not yet attempted or needing a fresh approach after failed verification.
 - [ ] PWA: Regenerate profile summary — add button to regenerate the profile summary via Claude API. Needs server-side endpoint or reuse of existing guide endpoint.
 
 #### Print
-- [ ] PWA: Cheat sheet party switcher — add ability to switch between Republican and Democrat ballots on the cheat sheet page, similar to the ballot page party switcher.
 
 #### Share
 
@@ -127,7 +124,7 @@ Verified working. Collapsed for reference.
 </details>
 
 <details>
-<summary>PWA Improvements (11 resolved)</summary>
+<summary>PWA Improvements (14 resolved)</summary>
 
 - [x] Service worker cache-first → network-first — old v1 SW served stale HTML. Changed to v2 network-first, added `/app/clear` cache-clearing route, added `Cache-Control: no-cache` header.
 - [x] Tab bar not visible — `position:fixed` tab bar inside `#app` wasn't rendering on some browsers. Moved to flex layout: body is `display:flex;flex-direction:column`, `#app` scrolls (`flex:1;overflow-y:auto`), tab bar is a natural flex child in separate `#tabs` div.
@@ -140,6 +137,9 @@ Verified working. Collapsed for reference.
 - [x] Race cards — candidate count and chevron — shows "N candidates" and a › chevron on every race card to signal tappability.
 - [x] Footer links on all pages — Nonpartisan by Design, Privacy Policy, and contact links now appear on Vote Info and Profile pages in addition to Ballot.
 - [x] Enhanced Voting Info page — 6 expandable accordion sections (Key Dates with strikethrough for past dates, Early Voting hours by date range, Election Day with open primary explanation, Voter ID with checkmarks, What to Bring with phone warning, Resources with 5 links). Plus polling location card and Travis County Elections contact info.
+- [x] Cheat sheet party switcher — added party switcher to cheat sheet page, hidden in print via `@media print`.
+- [x] Election info header card — centered card at top of ballot showing "Texas [Party] Primary", date, and user's district badges (CD/SD/HD) or "Showing all races" fallback.
+- [x] Candidate cards — avatar circle (first letter, rotating colors), color-coded Strengths (green) / Concerns (red) headers, flow-layout position chips replacing bullet lists.
 
 </details>
 

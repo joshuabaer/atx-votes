@@ -237,13 +237,19 @@ var CSS = [
   // Candidate card
   ".cand-card{border:1.5px solid var(--border);border-radius:var(--rs);padding:14px;margin-bottom:10px}",
   ".cand-card.recommended{border-color:var(--ok)}",
+  ".cand-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;flex-shrink:0}",
   ".cand-name{font-size:17px;font-weight:700}",
   ".cand-tags{display:flex;gap:6px;flex-shrink:0;margin-top:2px}",
   ".cand-summary{font-size:14px;color:var(--text2);line-height:1.5;margin-top:8px}",
   ".cand-details{margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}",
   ".cand-section{margin-bottom:10px}",
-  ".cand-section h5{font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}",
+  ".cand-section h5{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}",
+  ".cand-section.pros h5{color:var(--ok)}",
+  ".cand-section.cons h5{color:var(--bad)}",
   ".cand-section li{font-size:14px;line-height:1.5;margin-left:16px;margin-bottom:2px}",
+  ".pos-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}",
+  ".pos-chip{font-size:13px;padding:4px 10px;border-radius:12px;background:rgba(33,89,143,.08);color:var(--blue)}",
+  "@media(prefers-color-scheme:dark){.pos-chip{background:rgba(102,153,217,.12)}}",
 
   // Expand toggle
   ".expand-toggle{font-size:14px;color:var(--blue);cursor:pointer;background:none;border:none;padding:8px 0;font-weight:600;font-family:inherit}",
@@ -357,7 +363,7 @@ var CSS = [
 
   // Print styles
   "@media print{" +
-    "#topnav,#tabs,.cs-actions,.back-btn{display:none!important}" +
+    "#topnav,#tabs,.cs-actions,.back-btn,.party-row{display:none!important}" +
     "html,body{height:auto;display:block}" +
     "#app{max-width:100%;padding:8px;overflow:visible;flex:none}" +
     ".cs-header h2{font-size:18px}" +
@@ -491,7 +497,7 @@ var APP_JS = [
     "repBallot:null,demBallot:null,selectedParty:'republican'," +
     "guideComplete:false,summary:null,districts:null," +
     "isLoading:false,loadPhase:0,loadMsg:'',error:null," +
-    "expanded:{'vi-dates':true,'vi-id':true},disclaimerDismissed:false" +
+    "expanded:{'vi-dates':true,'vi-bring':true},disclaimerDismissed:false" +
     "};",
 
   // Shuffled arrays (set once per question display)
@@ -736,6 +742,21 @@ var APP_JS = [
     "var keyRaces=contested.filter(function(r){return r.isKeyRace});" +
     "var otherContested=contested.filter(function(r){return!r.isKeyRace});" +
     "var h=renderPartySwitcher();" +
+    // Election info header
+    "var partyLabel=S.selectedParty==='democrat'?'Democratic':'Republican';" +
+    "h+='<div class=\"card\" style=\"margin-bottom:16px;text-align:center\">';" +
+    "h+='<div style=\"font-size:18px;font-weight:800\">Texas '+esc(partyLabel)+' Primary</div>';" +
+    "h+='<div style=\"font-size:14px;color:var(--text2);margin-top:2px\">Tuesday, March 3, 2026</div>';" +
+    "if(S.districts&&(S.districts.congressional||S.districts.stateSenate||S.districts.stateHouse)){" +
+      "h+='<div style=\"display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px\">';" +
+      "if(S.districts.congressional)h+='<span class=\"badge badge-blue\">CD-'+esc(S.districts.congressional)+'</span>';" +
+      "if(S.districts.stateSenate)h+='<span class=\"badge badge-blue\">SD-'+esc(S.districts.stateSenate)+'</span>';" +
+      "if(S.districts.stateHouse)h+='<span class=\"badge badge-blue\">HD-'+esc(S.districts.stateHouse)+'</span>';" +
+      "h+='</div>'" +
+    "}else{" +
+      "h+='<div style=\"font-size:13px;color:var(--text2);margin-top:6px\">Showing all races</div>'" +
+    "}" +
+    "h+='</div>';" +
     // Disclaimer (dismissible)
     "if(!S.disclaimerDismissed){" +
       "h+='<div class=\"disclaimer\"><span style=\"font-size:20px\">\u26A0\u{FE0F}</span><div>" +
@@ -842,7 +863,8 @@ var APP_JS = [
     // Legend & footer
     "h+='<div class=\"cs-legend\"><span>\u2B50 = Key race</span><span>\u26A0\uFE0F AI-generated — do your own research</span></div>';" +
     "h+='<div class=\"cs-footer\">Built with ATX Votes &middot; atxvotes.app</div>';" +
-    // Back link (hidden in print)
+    // Party switcher + back link (hidden in print)
+    "h+=renderPartySwitcher();" +
     "h+='<div style=\"text-align:center;margin-top:8px\" class=\"cs-actions\"><button class=\"btn btn-secondary\" data-action=\"nav\" data-to=\"#/ballot\">&larr; Back to Ballot</button></div>';" +
     "return h;" +
   "}",
@@ -942,7 +964,13 @@ var APP_JS = [
       "var c=candidates[i];" +
       "var eid='cand-'+c.id;" +
       "var isOpen=S.expanded[eid];" +
+      "var colors=['#4A90D9','#D95B43','#5B8C5A','#8E6BBF','#D4A843','#C75B8F','#5BBFC7','#7B8D6F','#D97B43','#6B8FBF'];" +
+      "var avatarColor=colors[i%colors.length];" +
+      "var initial=c.name.charAt(0).toUpperCase();" +
       "h+='<div class=\"cand-card'+(c.isRecommended?' recommended':'')+'\">';" +
+      "h+='<div style=\"display:flex;gap:12px;align-items:flex-start\">';" +
+      "h+='<div class=\"cand-avatar\" style=\"background:'+avatarColor+'\">'+initial+'</div>';" +
+      "h+='<div style=\"flex:1;min-width:0\">';" +
       "h+='<div style=\"display:flex;justify-content:space-between;align-items:flex-start\">';" +
       "h+='<div class=\"cand-name\">'+esc(c.name)+'</div>';" +
       "h+='<div class=\"cand-tags\">';" +
@@ -950,12 +978,13 @@ var APP_JS = [
       "if(c.isRecommended)h+='<span class=\"badge badge-ok\">Recommended</span>';" +
       "h+='</div></div>';" +
       "h+='<div class=\"cand-summary\">'+esc(c.summary)+'</div>';" +
+      "h+='</div></div>';" +
       "if(isOpen){" +
         "h+='<div class=\"cand-details\">';" +
-        "if(c.keyPositions&&c.keyPositions.length){h+='<div class=\"cand-section\"><h5>Key Positions</h5><ul>';for(var j=0;j<c.keyPositions.length;j++)h+='<li>'+esc(c.keyPositions[j])+'</li>';h+='</ul></div>'}" +
+        "if(c.keyPositions&&c.keyPositions.length){h+='<div class=\"cand-section\"><h5>Key Positions</h5><div class=\"pos-chips\">';for(var j=0;j<c.keyPositions.length;j++)h+='<span class=\"pos-chip\">'+esc(c.keyPositions[j])+'</span>';h+='</div></div>'}" +
+        "if(c.pros&&c.pros.length){h+='<div class=\"cand-section pros\"><h5>\u2705 Strengths</h5><ul>';for(var j=0;j<c.pros.length;j++)h+='<li>'+esc(c.pros[j])+'</li>';h+='</ul></div>'}" +
+        "if(c.cons&&c.cons.length){h+='<div class=\"cand-section cons\"><h5>\u26A0\u{FE0F} Concerns</h5><ul>';for(var j=0;j<c.cons.length;j++)h+='<li>'+esc(c.cons[j])+'</li>';h+='</ul></div>'}" +
         "if(c.endorsements&&c.endorsements.length){h+='<div class=\"cand-section\"><h5>Endorsements</h5><ul>';for(var j=0;j<c.endorsements.length;j++)h+='<li>'+esc(c.endorsements[j])+'</li>';h+='</ul></div>'}" +
-        "if(c.pros&&c.pros.length){h+='<div class=\"cand-section\"><h5>Pros</h5><ul>';for(var j=0;j<c.pros.length;j++)h+='<li>'+esc(c.pros[j])+'</li>';h+='</ul></div>'}" +
-        "if(c.cons&&c.cons.length){h+='<div class=\"cand-section\"><h5>Cons</h5><ul>';for(var j=0;j<c.cons.length;j++)h+='<li>'+esc(c.cons[j])+'</li>';h+='</ul></div>'}" +
         "if(c.fundraising){h+='<div class=\"cand-section\"><h5>Fundraising</h5><p>'+esc(c.fundraising)+'</p></div>'}" +
         "if(c.polling){h+='<div class=\"cand-section\"><h5>Polling</h5><p>'+esc(c.polling)+'</p></div>'}" +
         "h+='</div>'" +
