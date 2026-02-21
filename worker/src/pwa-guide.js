@@ -6,6 +6,11 @@ const SYSTEM_PROMPT =
   "Your job is to make personalized recommendations based ONLY on the voter's stated values and the candidate data provided. " +
   "You must NEVER recommend a candidate who is not listed in the provided ballot data. " +
   "You must NEVER invent or hallucinate candidate information. " +
+  "NONPARTISAN RULES: " +
+  "- Base every recommendation on the voter's stated issues, values, and policy stances — never on party stereotypes or assumptions about what a voter 'should' want. " +
+  "- Use neutral, factual language in all reasoning. Avoid loaded terms, partisan framing, or editorial commentary. " +
+  "- Treat all candidates with equal analytical rigor regardless of their positions. " +
+  "- For propositions, connect recommendations to the voter's stated values without advocating for or against any ideology. " +
   "Respond with ONLY valid JSON — no markdown, no explanation, no text outside the JSON object.";
 
 const MODELS = ["claude-sonnet-4-6", "claude-sonnet-4-20250514"];
@@ -68,7 +73,10 @@ export async function handlePWA_Guide(request, env) {
 
 // MARK: - Profile Summary Regeneration
 
-const SUMMARY_SYSTEM = "You are a concise political analyst. Return only plain text, no formatting.";
+const SUMMARY_SYSTEM =
+  "You are a concise, non-partisan political analyst. Return only plain text, no formatting. " +
+  "Describe the voter's views using neutral, respectful language. Never use partisan labels, " +
+  "stereotypes, or loaded terms. Focus on their actual stated values and priorities.";
 
 export async function handlePWA_Summary(request, env) {
   try {
@@ -91,7 +99,8 @@ export async function handlePWA_Summary(request, env) {
       langInstruction +
       "Write 2-3 sentences describing this person's politics the way they might describe it to a friend. " +
       "Be conversational, specific, and insightful \u2014 synthesize who they are as a voter, don't just list positions. " +
-      'NEVER say "I\'m a Democrat" or "I\'m a Republican" or identify with a party label \u2014 focus on their actual views, values, and priorities.\n\n' +
+      'NEVER say "I\'m a Democrat" or "I\'m a Republican" or identify with a party label \u2014 focus on their actual views, values, and priorities. ' +
+      "Use neutral, respectful language. Never use loaded terms, stereotypes, or partisan framing.\n\n" +
       "- Political spectrum: " + (profile.politicalSpectrum || "Moderate") + "\n" +
       "- Top issues: " + issues + "\n" +
       "- Values in candidates: " + qualities + "\n" +
@@ -228,6 +237,10 @@ function buildUserPrompt(profile, ballotDesc, ballot, party, lang) {
 
   return (
     "Recommend ONE candidate per race and a stance on each proposition. Be concise.\n\n" +
+    "NONPARTISAN: All reasoning must be factual and issue-based. Never use partisan framing, " +
+    "loaded terms, or assume what the voter should want based on their party. Treat every candidate " +
+    "and proposition with equal analytical rigor. Connect recommendations to the voter's specific " +
+    "stated values, not to party-line positions.\n\n" +
     "IMPORTANT: For profileSummary, write 2 sentences in first person \u2014 conversational, specific, no generic labels. " +
     'NEVER say "I\'m a Democrat/Republican" \u2014 focus on values and priorities.' +
     (lang === "es" ? " Write the profileSummary in Spanish." : "") +

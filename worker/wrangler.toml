@@ -9,6 +9,10 @@ routes = [
   { pattern = "www.atxvotes.app/*", zone_name = "atxvotes.app" },
 ]
 
+# Static assets (headshot images served at /headshots/*)
+[assets]
+directory = "./public"
+
 # KV namespace for cached election data
 [[kv_namespaces]]
 binding = "ELECTION_DATA"

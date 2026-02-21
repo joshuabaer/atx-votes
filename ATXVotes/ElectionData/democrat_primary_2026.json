@@ -23,10 +23,23 @@
           "isRecommended": true,
           "summary": "U.S. Representative from Dallas. Rose to national prominence on the House Oversight Committee. Known for sharp, viral exchanges with Republican colleagues. Considered the frontrunner.",
           "background": "U.S. Representative (TX-30) since 2023. Attorney and former state representative. Member of House Oversight Committee.",
-          "keyPositions": ["Voting rights", "Criminal justice reform", "Healthcare access", "Economic equity"],
+          "keyPositions": [
+            "Voting rights",
+            "Criminal justice reform",
+            "Healthcare access",
+            "Economic equity"
+          ],
           "endorsements": [],
-          "pros": ["National profile and momentum", "Strong fundraising", "Proven communicator", "Federal legislative experience"],
-          "cons": ["Relatively new to Congress (one term)", "Dallas-based — less Austin connection"],
+          "pros": [
+            "National profile and momentum",
+            "Strong fundraising",
+            "Proven communicator",
+            "Federal legislative experience"
+          ],
+          "cons": [
+            "Relatively new to Congress (one term)",
+            "Dallas-based — less Austin connection"
+          ],
           "fundraising": "Strong — leading Democratic fundraising",
           "polling": "Frontrunner"
         },
@@ -37,10 +50,24 @@
           "isRecommended": false,
           "summary": "State Representative from Round Rock (HD-50). Former teacher. Known for bipartisan education legislation. Giving up his House seat to run.",
           "background": "Texas State Representative since 2019. Former public school teacher and education nonprofit worker. Georgetown University graduate.",
-          "keyPositions": ["Public education funding", "Teacher pay", "Bipartisan governance", "Youth engagement"],
+          "keyPositions": [
+            "Public education funding",
+            "Teacher pay",
+            "Bipartisan governance",
+            "Youth engagement"
+          ],
           "endorsements": [],
-          "pros": ["Austin-area candidate — local connection", "Bipartisan track record in the Legislature", "Education expertise", "Younger generation voice"],
-          "cons": ["State-level experience only", "Giving up safe House seat", "Lower name recognition statewide than Crockett"],
+          "pros": [
+            "Austin-area candidate — local connection",
+            "Bipartisan track record in the Legislature",
+            "Education expertise",
+            "Younger generation voice"
+          ],
+          "cons": [
+            "State-level experience only",
+            "Giving up safe House seat",
+            "Lower name recognition statewide than Crockett"
+          ],
           "fundraising": null,
           "polling": "Second place"
         },
@@ -51,10 +78,20 @@
           "isRecommended": false,
           "summary": "Perennial candidate and businessman who emigrated from Egypt. Has run for office multiple times across Texas and Minnesota with minimal electoral support.",
           "background": "Emigrated from Egypt in 1984. B.A. from Friends University (1989). Law degree from Presidents College School of Law (2001). Businessman, real estate and mortgage broker, owner of Alexandria Realty and Mortgage. Former professional soccer player, coach, referee, and team owner.",
-          "keyPositions": ["Making Texas affordable and safe", "No deportation without due process"],
+          "keyPositions": [
+            "Making Texas affordable and safe",
+            "No deportation without due process"
+          ],
           "endorsements": [],
-          "pros": ["Immigrant success story", "Diverse professional background"],
-          "cons": ["Polling at 2%", "Perennial candidate — ran for U.S. Senate in both Texas and Minnesota, Harris County Judge, and TX State Senate across multiple cycles", "Minimal campaign infrastructure and fundraising"],
+          "pros": [
+            "Immigrant success story",
+            "Diverse professional background"
+          ],
+          "cons": [
+            "Polling at 2%",
+            "Perennial candidate — ran for U.S. Senate in both Texas and Minnesota, Harris County Judge, and TX State Senate across multiple cycles",
+            "Minimal campaign infrastructure and fundraising"
+          ],
           "fundraising": "Minimal",
           "polling": "2%"
         }
@@ -80,10 +117,24 @@
           "isRecommended": true,
           "summary": "State Representative from Austin. Giving up her House seat to run for Governor. Known for education policy and progressive advocacy in the Legislature.",
           "background": "Texas State Representative. Former Austin ISD school board trustee. Attorney. Austin-based.",
-          "keyPositions": ["Public education", "Reproductive rights", "Affordable housing", "Grid reliability"],
+          "keyPositions": [
+            "Public education",
+            "Reproductive rights",
+            "Affordable housing",
+            "Grid reliability"
+          ],
           "endorsements": [],
-          "pros": ["Austin-area candidate", "Education policy expertise", "Legislative experience", "Progressive credentials"],
-          "cons": ["State-level experience only", "Statewide name recognition challenge", "Crowded 9-candidate field"],
+          "pros": [
+            "Austin-area candidate",
+            "Education policy expertise",
+            "Legislative experience",
+            "Progressive credentials"
+          ],
+          "cons": [
+            "State-level experience only",
+            "Statewide name recognition challenge",
+            "Crowded 9-candidate field"
+          ],
           "fundraising": null,
           "polling": "Among top tier"
         },
@@ -94,10 +145,22 @@
           "isRecommended": false,
           "summary": "Former U.S. Representative from Houston. Previously ran for Governor in 2006. Most experienced candidate in terms of federal office.",
           "background": "Former U.S. Representative (2003-2005). Houston City Council member. Attorney. Ran for Governor in 2006 (lost to Rick Perry).",
-          "keyPositions": ["Moderate Democratic governance", "Infrastructure", "Ethics reform"],
+          "keyPositions": [
+            "Moderate Democratic governance",
+            "Infrastructure",
+            "Ethics reform"
+          ],
           "endorsements": [],
-          "pros": ["Federal experience", "Previous statewide campaign experience", "Moderate positioning"],
-          "cons": ["Lost 2006 Governor's race", "Out of office for two decades", "May lack fresh energy"],
+          "pros": [
+            "Federal experience",
+            "Previous statewide campaign experience",
+            "Moderate positioning"
+          ],
+          "cons": [
+            "Lost 2006 Governor's race",
+            "Out of office for two decades",
+            "May lack fresh energy"
+          ],
           "fundraising": null,
           "polling": "Among top tier"
         },
@@ -108,10 +171,21 @@
           "isRecommended": false,
           "summary": "Businessman and son of former Governor Mark White. Ran for Governor in 2018, finished second in the Democratic primary.",
           "background": "Businessman. Son of former Texas Governor Mark White. Ran in the 2018 Democratic gubernatorial primary.",
-          "keyPositions": ["Business-friendly Democratic governance", "Education (family legacy)", "Moderate approach"],
+          "keyPositions": [
+            "Business-friendly Democratic governance",
+            "Education (family legacy)",
+            "Moderate approach"
+          ],
           "endorsements": [],
-          "pros": ["Name recognition from father's legacy", "Business background", "Previous campaign experience"],
-          "cons": ["Lost 2018 primary to Lupe Valdez", "No elected office experience"],
+          "pros": [
+            "Name recognition from father's legacy",
+            "Business background",
+            "Previous campaign experience"
+          ],
+          "cons": [
+            "Lost 2018 primary to Lupe Valdez",
+            "No elected office experience"
+          ],
           "fundraising": null,
           "polling": null
         }
@@ -137,10 +211,21 @@
           "isRecommended": true,
           "summary": "State Representative from Austin (HD-47). Giving up her House seat to run. Real estate background with focus on housing affordability.",
           "background": "Texas State Representative. Former real estate agent. Austin-based.",
-          "keyPositions": ["Housing affordability", "Property tax reform", "Public education"],
+          "keyPositions": [
+            "Housing affordability",
+            "Property tax reform",
+            "Public education"
+          ],
           "endorsements": [],
-          "pros": ["Austin-area candidate", "Real estate/housing expertise", "Legislative experience"],
-          "cons": ["Statewide name recognition challenge", "Giving up safe House seat"],
+          "pros": [
+            "Austin-area candidate",
+            "Real estate/housing expertise",
+            "Legislative experience"
+          ],
+          "cons": [
+            "Statewide name recognition challenge",
+            "Giving up safe House seat"
+          ],
           "fundraising": "$159,000 cash on hand",
           "polling": null
         },
@@ -151,10 +236,25 @@
           "isRecommended": false,
           "summary": "Legal and compliance professional running her first campaign. Contracts & Privacy Manager for a software company. Mother of two.",
           "background": "B.A. in Philosophy with Political Science minor from University of Houston (2017). Associate degree in Paralegal Studies from San Antonio College (2014). Contracts & Privacy Manager for a Columbus, OH-based software company. Negotiates multi-million dollar agreements with government agencies and Fortune 500 firms. Born in Honolulu, Hawaii. First-time candidate.",
-          "keyPositions": ["Cannabis legalization", "Medicaid expansion", "High-speed rail funding", "Environmental protections", "Repeal school voucher program"],
+          "keyPositions": [
+            "Cannabis legalization",
+            "Medicaid expansion",
+            "High-speed rail funding",
+            "Environmental protections",
+            "Repeal school voucher program"
+          ],
           "endorsements": [],
-          "pros": ["Fresh outsider perspective", "Legal and compliance expertise", "Ambitious policy platform"],
-          "cons": ["First-time candidate", "Only $330 cash on hand — lowest funded in race", "No elected office or government experience", "Based out of state for work"],
+          "pros": [
+            "Fresh outsider perspective",
+            "Legal and compliance expertise",
+            "Ambitious policy platform"
+          ],
+          "cons": [
+            "First-time candidate",
+            "Only $330 cash on hand — lowest funded in race",
+            "No elected office or government experience",
+            "Based out of state for work"
+          ],
           "fundraising": "$330 cash on hand",
           "polling": null
         },
@@ -165,10 +265,32 @@
           "isRecommended": false,
           "summary": "Steelworkers union leader emerging as a dark horse candidate. Assistant Director of United Steelworkers District 13. Houston-based labor organizer with a focus on wages and affordability.",
           "background": "Assistant Director of United Steelworkers union District 13. Former oil and gas refinery area operator in Texas. Blue-collar worker turned labor leader who has fought for higher pay, better benefits, and safer conditions. Houston-based.",
-          "keyPositions": ["Lowering costs for families", "Raising wages and rebuilding the middle class", "Fully funding public schools and raising teacher pay", "Protecting rural Texas communities", "Government accountability to working families"],
-          "endorsements": ["Texas AFL-CIO", "Houston LGBTQ+ Political Caucus", "Houston Progressive Caucus", "Stonewall Democrats of Dallas", "Stonewall Democrats of San Antonio", "Bay Area Democratic Movement"],
-          "pros": ["Strong labor endorsements including Texas AFL-CIO", "Authentic blue-collar background", "Message focused on wages and affordability resonates", "Donor support from state Democratic Party network"],
-          "cons": ["No elected office experience", "Lower name recognition than Goodwin", "Houston-based — less Austin connection"],
+          "keyPositions": [
+            "Lowering costs for families",
+            "Raising wages and rebuilding the middle class",
+            "Fully funding public schools and raising teacher pay",
+            "Protecting rural Texas communities",
+            "Government accountability to working families"
+          ],
+          "endorsements": [
+            "Texas AFL-CIO",
+            "Houston LGBTQ+ Political Caucus",
+            "Houston Progressive Caucus",
+            "Stonewall Democrats of Dallas",
+            "Stonewall Democrats of San Antonio",
+            "Bay Area Democratic Movement"
+          ],
+          "pros": [
+            "Strong labor endorsements including Texas AFL-CIO",
+            "Authentic blue-collar background",
+            "Message focused on wages and affordability resonates",
+            "Donor support from state Democratic Party network"
+          ],
+          "cons": [
+            "No elected office experience",
+            "Lower name recognition than Goodwin",
+            "Houston-based — less Austin connection"
+          ],
           "fundraising": "$46,000 cash on hand",
           "polling": null
         }
@@ -194,10 +316,23 @@
           "isRecommended": false,
           "summary": "Former Galveston mayor and attorney. Ran for AG in 2022. Grandson of Watergate special prosecutor Leon Jaworski.",
           "background": "Former Mayor of Galveston. Attorney. Grandson of Watergate special prosecutor Leon Jaworski. Ran for AG in the 2022 Democratic primary runoff (lost to Rochelle Garza).",
-          "keyPositions": ["Rule of law", "Consumer protection", "Environmental enforcement", "Government accountability"],
+          "keyPositions": [
+            "Rule of law",
+            "Consumer protection",
+            "Environmental enforcement",
+            "Government accountability"
+          ],
           "endorsements": [],
-          "pros": ["Legal family pedigree (Watergate prosecutor's grandson)", "Executive experience as mayor", "Previous AG campaign — knows the race"],
-          "cons": ["Lost 2022 primary runoff to Rochelle Garza", "Galveston-based — less Austin connection", "Polling third at 22%"],
+          "pros": [
+            "Legal family pedigree (Watergate prosecutor's grandson)",
+            "Executive experience as mayor",
+            "Previous AG campaign — knows the race"
+          ],
+          "cons": [
+            "Lost 2022 primary runoff to Rochelle Garza",
+            "Galveston-based — less Austin connection",
+            "Polling third at 22%"
+          ],
           "fundraising": null,
           "polling": "22% (third place)"
         },
@@ -208,10 +343,38 @@
           "isRecommended": true,
           "summary": "State Senator from Dallas (District 16). Flipped a red seat in 2018. Most endorsed and best-funded candidate. Business litigator who has passed 135 bills including Medicaid expansion legislation.",
           "background": "Texas State Senator (District 16) since 2019 — first Democrat to win the North Dallas district in three decades. B.S. in Physics from University of Arizona. J.D. from University of Texas at Austin. Business litigator and mediator at Thompson Coburn LLP. Composed musical scores for Dragon Ball Z. Won reelection in 2022 (61.9%) and 2024 (unopposed). Passed 135 bills.",
-          "keyPositions": ["Stop MAGA federal overreach through AG litigation", "Consumer protection and antitrust", "Root out political corruption", "Reproductive rights", "Cooperative public safety approach", "Border security without unconstitutional tactics"],
-          "endorsements": ["Dallas Morning News", "Houston Chronicle", "Austin Chronicle", "Fort Worth Star-Telegram", "State Senators Royce West, Sarah Eckhardt, Boris Miles, Jose Menendez", "Dallas DA John Creuzot", "Houston LGBTQ+ Political Caucus", "Texas AFL-CIO", "Asian Texans for Justice", "Stonewall Democrats of Dallas"],
-          "pros": ["Leads in polling at 25%", "Strongest fundraising ($650K+ cash on hand)", "Most endorsements including 4 major newspapers", "Proven winner in swing district — flipped red seat", "Passed 135 bills including Medicaid expansion"],
-          "cons": ["Business litigator, not a prosecutor — no criminal law experience", "Will give up Senate seat, creating open race in District 16", "Some may prefer outsider over sitting politician"],
+          "keyPositions": [
+            "Stop MAGA federal overreach through AG litigation",
+            "Consumer protection and antitrust",
+            "Root out political corruption",
+            "Reproductive rights",
+            "Cooperative public safety approach",
+            "Border security without unconstitutional tactics"
+          ],
+          "endorsements": [
+            "Dallas Morning News",
+            "Houston Chronicle",
+            "Austin Chronicle",
+            "Fort Worth Star-Telegram",
+            "State Senators Royce West, Sarah Eckhardt, Boris Miles, Jose Menendez",
+            "Dallas DA John Creuzot",
+            "Houston LGBTQ+ Political Caucus",
+            "Texas AFL-CIO",
+            "Asian Texans for Justice",
+            "Stonewall Democrats of Dallas"
+          ],
+          "pros": [
+            "Leads in polling at 25%",
+            "Strongest fundraising ($650K+ cash on hand)",
+            "Most endorsements including 4 major newspapers",
+            "Proven winner in swing district — flipped red seat",
+            "Passed 135 bills including Medicaid expansion"
+          ],
+          "cons": [
+            "Business litigator, not a prosecutor — no criminal law experience",
+            "Will give up Senate seat, creating open race in District 16",
+            "Some may prefer outsider over sitting politician"
+          ],
           "fundraising": "$650,000+ cash on hand — leads all candidates",
           "polling": "25% (leads, with 40% undecided)"
         },
@@ -222,10 +385,33 @@
           "isRecommended": false,
           "summary": "Dallas attorney with an extraordinary service resume: Army officer, FBI Special Agent, and federal prosecutor. First-time candidate who wants to depoliticize the AG office.",
           "background": "B.S. in Accounting from Morehouse College. M.P.A. from Harvard Kennedy School. J.D. from Washington University in St. Louis. LL.M. in Taxation from Washington University. CPA. U.S. Army officer — commanded tank platoons in 1st Infantry Division, earned Airborne designation, deployed to Iraq as JAG officer. FBI Special Agent for nearly a decade — SWAT team, drug trafficking, major fraud. Assistant U.S. Attorney handling tax evasion and violent crime. Investigator for Congressional Commission on Wartime Contracting (uncovered $30B in waste). Currently private practice litigator at Gray Reed in Dallas. Shot at age 16 while apprehending a purse thief.",
-          "keyPositions": ["Restore professionalism and accountability to AG office", "Consumer protection and antitrust against big tech", "Expand voting access", "Cooperative approach with local DAs", "Depoliticize the office"],
-          "endorsements": ["San Antonio Express-News", "Austin American-Statesman", "VoteVets", "State Reps Gene Wu (House Dem Caucus Chair), Ann Johnson, Ron Reynolds", "U.S. Reps Julie Johnson and Marc Veasey"],
-          "pros": ["Deepest law enforcement resume (Army, FBI, federal prosecutor)", "No political baggage — first-time candidate with service narrative", "CPA + multiple law degrees — uniquely qualified on financial crimes", "Compelling personal story", "Two major newspaper endorsements"],
-          "cons": ["Weakest fundraising at $137K (vs Johnson's $650K+)", "Lowest polling at 13%", "No elected office experience", "Lower name recognition than opponents"],
+          "keyPositions": [
+            "Restore professionalism and accountability to AG office",
+            "Consumer protection and antitrust against big tech",
+            "Expand voting access",
+            "Cooperative approach with local DAs",
+            "Depoliticize the office"
+          ],
+          "endorsements": [
+            "San Antonio Express-News",
+            "Austin American-Statesman",
+            "VoteVets",
+            "State Reps Gene Wu (House Dem Caucus Chair), Ann Johnson, Ron Reynolds",
+            "U.S. Reps Julie Johnson and Marc Veasey"
+          ],
+          "pros": [
+            "Deepest law enforcement resume (Army, FBI, federal prosecutor)",
+            "No political baggage — first-time candidate with service narrative",
+            "CPA + multiple law degrees — uniquely qualified on financial crimes",
+            "Compelling personal story",
+            "Two major newspaper endorsements"
+          ],
+          "cons": [
+            "Weakest fundraising at $137K (vs Johnson's $650K+)",
+            "Lowest polling at 13%",
+            "No elected office experience",
+            "Lower name recognition than opponents"
+          ],
           "fundraising": "$137,000 raised, ~$28,000 cash on hand",
           "polling": "13%"
         }
@@ -251,10 +437,22 @@
           "isRecommended": true,
           "summary": "State Senator from Austin. Former Travis County Judge (top county executive). Deep fiscal and government management experience.",
           "background": "Texas State Senator. Former Travis County Judge (2015-2020). Former Travis County Commissioner. Attorney. Austin-based.",
-          "keyPositions": ["Fiscal transparency", "Government efficiency", "Environmental protection", "Local government support"],
+          "keyPositions": [
+            "Fiscal transparency",
+            "Government efficiency",
+            "Environmental protection",
+            "Local government support"
+          ],
           "endorsements": [],
-          "pros": ["Austin-area candidate", "Executive experience as County Judge", "Deep fiscal knowledge", "Legislative experience"],
-          "cons": ["Giving up Senate seat"],
+          "pros": [
+            "Austin-area candidate",
+            "Executive experience as County Judge",
+            "Deep fiscal knowledge",
+            "Legislative experience"
+          ],
+          "cons": [
+            "Giving up Senate seat"
+          ],
           "fundraising": "Leading fundraiser in Democratic Comptroller primary",
           "polling": "Frontrunner"
         },
@@ -265,10 +463,29 @@
           "isRecommended": false,
           "summary": "U.S. Army veteran and Houston ISD trustee with a background in trucking, software engineering, and ministry. Published author on personal finance.",
           "background": "Houston ISD Trustee (District II) since 2024. U.S. Army veteran (Airborne Ranger, ~7-10 years service). B.A. in History from Howard University (2016). Truck driver, software engineer, small business owner (trucking), nonprofit founder, and minister in Houston's Sunnyside neighborhood. Author of a personal finance book. Father of three. From northeast Houston.",
-          "keyPositions": ["Fiscal transparency with plain-language public dashboard", "School voucher oversight and auditing", "Restore HUB program for minority/women/veteran-owned businesses", "Taxpayer protection with grace periods before penalties", "Small business support", "Fossil fuel tax exemption accountability"],
-          "endorsements": ["Lone Star Left"],
-          "pros": ["Unique combination of military service, business, and elected office", "Published author on personal finance — demonstrates subject-matter knowledge", "Strong personal narrative — working-class Houston, Army Ranger, minister", "Passionate about education finance during voucher debates"],
-          "cons": ["Limited fundraising and name recognition vs. Eckhardt", "History degree — lacks formal finance/accounting credentials", "School board is low-profile for a statewide race", "No major newspaper endorsements"],
+          "keyPositions": [
+            "Fiscal transparency with plain-language public dashboard",
+            "School voucher oversight and auditing",
+            "Restore HUB program for minority/women/veteran-owned businesses",
+            "Taxpayer protection with grace periods before penalties",
+            "Small business support",
+            "Fossil fuel tax exemption accountability"
+          ],
+          "endorsements": [
+            "Lone Star Left"
+          ],
+          "pros": [
+            "Unique combination of military service, business, and elected office",
+            "Published author on personal finance — demonstrates subject-matter knowledge",
+            "Strong personal narrative — working-class Houston, Army Ranger, minister",
+            "Passionate about education finance during voucher debates"
+          ],
+          "cons": [
+            "Limited fundraising and name recognition vs. Eckhardt",
+            "History degree — lacks formal finance/accounting credentials",
+            "School board is low-profile for a statewide race",
+            "No major newspaper endorsements"
+          ],
           "fundraising": "Limited — significantly less than Eckhardt",
           "polling": null
         },
@@ -279,10 +496,26 @@
           "isRecommended": false,
           "summary": "Finance professional with 40 years of investment management experience. Son of immigrants. Previously ran for Texas Land Commissioner in 2022.",
           "background": "B.S. in Finance from University of Texas at Austin (1985). Advanced Management Program at INSEAD (France, 1999). 40 years in finance and investment management across Texas, London, and New York. Chair of a Texas State Democratic Committee. Harris County Precinct Chair. Grew up in Houston, son of immigrants. Ran for Texas Land Commissioner in 2022 (received 20.2% — did not advance past primary).",
-          "keyPositions": ["Full transparency with plain-language financial reports", "Audit $1B in school voucher spending", "Audit $20B in water infrastructure spending", "Broadband expansion", "Grow small business employment share from 44% to 60%"],
+          "keyPositions": [
+            "Full transparency with plain-language financial reports",
+            "Audit $1B in school voucher spending",
+            "Audit $20B in water infrastructure spending",
+            "Broadband expansion",
+            "Grow small business employment share from 44% to 60%"
+          ],
           "endorsements": [],
-          "pros": ["Strongest formal finance credentials — 40 years professional experience, UT finance degree, INSEAD training", "Deep Democratic Party infrastructure experience", "Previous statewide campaign — received nearly 200K votes in 2022", "Specific, numbers-driven policy proposals"],
-          "cons": ["Lost 2022 Land Commissioner primary", "Low fundraising relative to Eckhardt", "No endorsements from major organizations or newspapers", "No elected office experience"],
+          "pros": [
+            "Strongest formal finance credentials — 40 years professional experience, UT finance degree, INSEAD training",
+            "Deep Democratic Party infrastructure experience",
+            "Previous statewide campaign — received nearly 200K votes in 2022",
+            "Specific, numbers-driven policy proposals"
+          ],
+          "cons": [
+            "Lost 2022 Land Commissioner primary",
+            "Low fundraising relative to Eckhardt",
+            "No endorsements from major organizations or newspapers",
+            "No elected office experience"
+          ],
           "fundraising": "Limited — raised $105K in 2022 campaign",
           "polling": null
         }
@@ -308,10 +541,27 @@
           "isRecommended": true,
           "summary": "First-term incumbent, former Austin City Council member and labor organizer. Progressive champion in a safe D+26 seat. Member of the Congressional Progressive Caucus.",
           "background": "U.S. Representative since 2023. Former Austin City Council member (District 4). Labor organizer. Member of the Congressional Progressive Caucus.",
-          "keyPositions": ["Workers' rights", "Medicare for All", "Housing affordability", "Immigration reform"],
-          "endorsements": ["Congressional Progressive Caucus", "AFL-CIO", "Austin Chronicle"],
-          "pros": ["Strong constituent services", "Visible and accessible in district", "Effective coalition-builder", "Safe seat — can focus on policy"],
-          "cons": ["Very progressive — some moderates feel unrepresented", "Only one term of experience"],
+          "keyPositions": [
+            "Workers' rights",
+            "Medicare for All",
+            "Housing affordability",
+            "Immigration reform"
+          ],
+          "endorsements": [
+            "Congressional Progressive Caucus",
+            "AFL-CIO",
+            "Austin Chronicle"
+          ],
+          "pros": [
+            "Strong constituent services",
+            "Visible and accessible in district",
+            "Effective coalition-builder",
+            "Safe seat — can focus on policy"
+          ],
+          "cons": [
+            "Very progressive — some moderates feel unrepresented",
+            "Only one term of experience"
+          ],
           "fundraising": "Well-funded as incumbent",
           "polling": "Heavy favorite"
         },
@@ -322,10 +572,27 @@
           "isRecommended": false,
           "summary": "Epidemiologist turned tech worker. Ran HIV clinics, oversaw food pantries, and served on the Texas COVID-19 task force. Latina daughter of Mexican immigrants and mother of two.",
           "background": "Epidemiologist who ran HIV clinics and oversaw community food pantries. Served on the Texas COVID-19 task force reporting to the Governor's office. Transitioned to the technology sector. Latina, daughter of Mexican immigrants. Mother of two. Campaign focuses on AI governance, healthcare, and working families.",
-          "keyPositions": ["AI governance for child safety and worker protections", "Reproductive rights and federal protections", "Expanding mental health access", "Universal background checks", "Border economy through fair commerce", "Environmental equity"],
+          "keyPositions": [
+            "AI governance for child safety and worker protections",
+            "Reproductive rights and federal protections",
+            "Expanding mental health access",
+            "Universal background checks",
+            "Border economy through fair commerce",
+            "Environmental equity"
+          ],
           "endorsements": [],
-          "pros": ["Unique background bridging public health, epidemiology, and technology", "COVID task force experience demonstrates crisis management", "Authentic personal story as immigrant's daughter", "Forward-looking AI policy focus"],
-          "cons": ["Challenging a well-known popular incumbent", "No significant endorsements found", "No reported FEC contributions — extremely limited fundraising", "Very low media profile"],
+          "pros": [
+            "Unique background bridging public health, epidemiology, and technology",
+            "COVID task force experience demonstrates crisis management",
+            "Authentic personal story as immigrant's daughter",
+            "Forward-looking AI policy focus"
+          ],
+          "cons": [
+            "Challenging a well-known popular incumbent",
+            "No significant endorsements found",
+            "No reported FEC contributions — extremely limited fundraising",
+            "Very low media profile"
+          ],
           "fundraising": "Minimal — no FEC-reported contributions",
           "polling": null
         }
@@ -351,10 +618,28 @@
           "isRecommended": true,
           "summary": "Incumbent Commissioner. Environmental advocate with focus on water quality, flooding, and transportation. Seeking re-election.",
           "background": "Travis County Commissioner since 2015. Environmental advocate. Former journalist.",
-          "keyPositions": ["Environmental protection", "Flood mitigation", "Transportation", "Responsible growth"],
-          "endorsements": ["Stonewall Democrats", "Austin Chronicle", "20+ organizational endorsements"],
-          "pros": ["Incumbent experience", "Deep knowledge of county operations", "Environmental leadership", "Extensive endorsement list"],
-          "cons": ["Some feel county needs fresh energy", "Long tenure", "2020 Tesla tax deal vote is a point of contention"],
+          "keyPositions": [
+            "Environmental protection",
+            "Flood mitigation",
+            "Transportation",
+            "Responsible growth"
+          ],
+          "endorsements": [
+            "Stonewall Democrats",
+            "Austin Chronicle",
+            "20+ organizational endorsements"
+          ],
+          "pros": [
+            "Incumbent experience",
+            "Deep knowledge of county operations",
+            "Environmental leadership",
+            "Extensive endorsement list"
+          ],
+          "cons": [
+            "Some feel county needs fresh energy",
+            "Long tenure",
+            "2020 Tesla tax deal vote is a point of contention"
+          ],
           "fundraising": null,
           "polling": "Favored as incumbent"
         },
@@ -365,10 +650,25 @@
           "isRecommended": false,
           "summary": "Government consultant with a PhD in Public Affairs. 12+ years with firms like Deloitte and Accenture focused on government modernization. Active in HIV/AIDS advocacy.",
           "background": "PhD in Public Affairs, MPA, and BA in Political Science — all from Florida International University. Originally from Miami. 12+ years as a consultant with Deloitte, Accenture, Public Consulting Group, and Weaver on government modernization. Built large-scale contact centers serving 1M+ people. Managed a $19M county COVID resilience grant for small businesses. PhD research on social vulnerability and disaster mitigation policy. President of Friends of the David Powell Clinic (HIV services). Led cycling team raising $300K+ for Hill Country Ride for AIDS.",
-          "keyPositions": ["Health & human services — prevention-focused health initiatives", "Affordable housing using new 2025 legislative tools", "Governance innovation — proposes Travis County Quality of Life and Human Rights Commissions", "Collaborative, design-thinking approach to county government"],
+          "keyPositions": [
+            "Health & human services — prevention-focused health initiatives",
+            "Affordable housing using new 2025 legislative tools",
+            "Governance innovation — proposes Travis County Quality of Life and Human Rights Commissions",
+            "Collaborative, design-thinking approach to county government"
+          ],
           "endorsements": [],
-          "pros": ["Strongest academic credentials in the race (PhD, MPA)", "Extensive consulting experience managing government programs at scale", "Deep community involvement in public health advocacy", "Evidence-based, technocratic approach"],
-          "cons": ["Originally from Miami — may face outsider perception", "Campaign website light on specific policy proposals", "No major organizational endorsements", "Lower media profile than Marzullo"],
+          "pros": [
+            "Strongest academic credentials in the race (PhD, MPA)",
+            "Extensive consulting experience managing government programs at scale",
+            "Deep community involvement in public health advocacy",
+            "Evidence-based, technocratic approach"
+          ],
+          "cons": [
+            "Originally from Miami — may face outsider perception",
+            "Campaign website light on specific policy proposals",
+            "No major organizational endorsements",
+            "Lower media profile than Marzullo"
+          ],
           "fundraising": null,
           "polling": null
         },
@@ -379,10 +679,29 @@
           "isRecommended": false,
           "summary": "Civil rights attorney with 16 years reforming Texas's legal system. Gates Cambridge Scholar. Policy Director at Austin Community Law Center. Serves on City of Austin water and sustainability commissions.",
           "background": "Master's in Criminology and J.D. from University of Pennsylvania (full-tuition scholarship). Law degree from Cambridge University (Gates Cambridge Scholar). Policy Director and Senior Counsel at Austin Community Law Center. Former Executive Director of Texas Defender Service — built bipartisan coalitions to stop executions. Founded her own legal and policy consultancy advising the Innocence Project and Vera Institute. Serves on City of Austin Water and Wastewater Commission and Joint Committee on Sustainability.",
-          "keyPositions": ["Affordable housing and cost-of-living relief", "Corporate accountability — critical of Tesla tax deal, wants moratorium on corporate tax breaks", "Public transit — push to dismiss Paxton's lawsuit tying up Project Connect", "Criminal justice reform and restorative justice", "Workers' rights in county contracts", "Environmental justice with solar investment"],
-          "endorsements": ["Texas Progressive Caucus"],
-          "pros": ["Strongest legal and policy credentials among challengers", "Track record of legislative accomplishments (restored 700K+ driver's licenses, bail reform)", "Most media coverage of challengers", "Detailed, actionable policy platform", "Currently serving on city commissions"],
-          "cons": ["Facing incumbent with 20+ endorsements", "Legal/policy background may be perceived as advocacy-oriented vs. administrative", "Less institutional support than incumbent"],
+          "keyPositions": [
+            "Affordable housing and cost-of-living relief",
+            "Corporate accountability — critical of Tesla tax deal, wants moratorium on corporate tax breaks",
+            "Public transit — push to dismiss Paxton's lawsuit tying up Project Connect",
+            "Criminal justice reform and restorative justice",
+            "Workers' rights in county contracts",
+            "Environmental justice with solar investment"
+          ],
+          "endorsements": [
+            "Texas Progressive Caucus"
+          ],
+          "pros": [
+            "Strongest legal and policy credentials among challengers",
+            "Track record of legislative accomplishments (restored 700K+ driver's licenses, bail reform)",
+            "Most media coverage of challengers",
+            "Detailed, actionable policy platform",
+            "Currently serving on city commissions"
+          ],
+          "cons": [
+            "Facing incumbent with 20+ endorsements",
+            "Legal/policy background may be perceived as advocacy-oriented vs. administrative",
+            "Less institutional support than incumbent"
+          ],
           "fundraising": null,
           "polling": null
         },
@@ -393,10 +712,31 @@
           "isRecommended": false,
           "summary": "High school student, democratic socialist, and community organizer. Founded Students United for fairer workdays and special education support. The youngest candidate in the race.",
           "background": "Current McCallum High School student (previously attended LASA). Chair of LASA Young Democratic Socialists of America chapter. Founded Students United, organizing for fairer workdays, special education support, and mental health resources. Organized with Hack Club to improve nonprofit worker conditions — transitioned workers from contractor to full employment, secured wage increases.",
-          "keyPositions": ["Build thousands of permanently affordable social housing units", "Expand Central Health toward universal healthcare", "Eliminate ambulance transport fees", "Require labor peace agreements for all companies receiving county investment", "Indefinite moratorium on jail construction", "Invest in transit, bike lanes, and sidewalks"],
-          "endorsements": ["Student Victory Fund", "Green Party US", "Jewish Voice for Peace", "Austin Students for a Democratic Society"],
-          "pros": ["Genuinely grassroots, youth-driven campaign with no corporate PAC money", "Most uncompromising progressive platform", "Real organizing experience with concrete worker wins despite young age"],
-          "cons": ["Current high school student — youngest and least experienced by far", "No professional or government experience", "Ambitious platform may exceed county commissioner authority", "Green Party endorsement may raise questions about Democratic commitment"],
+          "keyPositions": [
+            "Build thousands of permanently affordable social housing units",
+            "Expand Central Health toward universal healthcare",
+            "Eliminate ambulance transport fees",
+            "Require labor peace agreements for all companies receiving county investment",
+            "Indefinite moratorium on jail construction",
+            "Invest in transit, bike lanes, and sidewalks"
+          ],
+          "endorsements": [
+            "Student Victory Fund",
+            "Green Party US",
+            "Jewish Voice for Peace",
+            "Austin Students for a Democratic Society"
+          ],
+          "pros": [
+            "Genuinely grassroots, youth-driven campaign with no corporate PAC money",
+            "Most uncompromising progressive platform",
+            "Real organizing experience with concrete worker wins despite young age"
+          ],
+          "cons": [
+            "Current high school student — youngest and least experienced by far",
+            "No professional or government experience",
+            "Ambitious platform may exceed county commissioner authority",
+            "Green Party endorsement may raise questions about Democratic commitment"
+          ],
           "fundraising": "Small-dollar only — no corporate PAC money",
           "polling": null
         }
@@ -422,10 +762,35 @@
           "isRecommended": false,
           "summary": "Austin native and Del Valle community organizer running for the third time. Nearly won in 2022, losing by only 248 votes. Founded the Del Valle Community Coalition. Current Del Valle ISD board trustee.",
           "background": "Austin native from Del Valle. Wife and working mother of three. Career in project management. Founded the Del Valle Community Coalition in 2010 (nonprofit for food and healthcare access). Del Valle ISD Board of Trustees (District 7) since 2011, currently Vice President. Played critical role in advocating for Del Valle Health and Wellness Center. County partnered with her nonprofit on COVID relief and vaccine outreach. Ran for this seat in 2018 (lost badly) and 2022 (lost by only 248 votes).",
-          "keyPositions": ["Equitable infrastructure investment — roads, utilities, water access", "Affordable housing and supporting working families", "Expanding Central Health services in the precinct", "Addressing historic neglect of Precinct 4"],
-          "endorsements": ["Run for Something", "Ground Game Texas", "Austin City Council Members Natasha Harper-Madison and Vanessa Fuentes", "Pflugerville Mayor Victor Gonzales", "Education Austin", "Black Austin Democrats", "Austin Environmental Democrats", "University Democrats", "Texas Democrats with Disabilities"],
-          "pros": ["Deep community roots — 15 years organizing in the precinct", "Nearly won in 2022 (248 votes)", "Founded nonprofit that tangibly delivered services", "Strong grassroots progressive endorsements", "School board governance experience"],
-          "cons": ["Has run and lost twice", "No county government administrative experience", "Fewer labor/institutional endorsements than Morales"],
+          "keyPositions": [
+            "Equitable infrastructure investment — roads, utilities, water access",
+            "Affordable housing and supporting working families",
+            "Expanding Central Health services in the precinct",
+            "Addressing historic neglect of Precinct 4"
+          ],
+          "endorsements": [
+            "Run for Something",
+            "Ground Game Texas",
+            "Austin City Council Members Natasha Harper-Madison and Vanessa Fuentes",
+            "Pflugerville Mayor Victor Gonzales",
+            "Education Austin",
+            "Black Austin Democrats",
+            "Austin Environmental Democrats",
+            "University Democrats",
+            "Texas Democrats with Disabilities"
+          ],
+          "pros": [
+            "Deep community roots — 15 years organizing in the precinct",
+            "Nearly won in 2022 (248 votes)",
+            "Founded nonprofit that tangibly delivered services",
+            "Strong grassroots progressive endorsements",
+            "School board governance experience"
+          ],
+          "cons": [
+            "Has run and lost twice",
+            "No county government administrative experience",
+            "Fewer labor/institutional endorsements than Morales"
+          ],
           "fundraising": null,
           "polling": null
         },
@@ -436,10 +801,26 @@
           "isRecommended": false,
           "summary": "Longtime community organizer with 30+ years experience. Visually impaired, retired on disability. Former AISD board trustee. Led Austin Interfaith for decades. Former chief of staff for Precinct 4 Commissioner Marcos De Leon.",
           "background": "Grew up in public housing in southeast Austin. Visually impaired, retired on disability in 1995. 30+ years of community organizing. Served on Austin Interfaith board 30+ years. LULAC District 12 director. Former chief of staff (1991-1994) for Travis County Commissioner Marcos De Leon. Elected to AISD Board of Trustees (District 2) in 2020 with 60.5%. Community representative in Travis County Public Defender's Office. Texas Anti-Poverty Project organizer.",
-          "keyPositions": ["Water quality improvement in Austin Colony", "No more tax increases", "No ICE cooperation", "Keeping Precinct 4 affordable", "Climate change policies", "Creating cabinet of diverse community advisors"],
+          "keyPositions": [
+            "Water quality improvement in Austin Colony",
+            "No more tax increases",
+            "No ICE cooperation",
+            "Keeping Precinct 4 affordable",
+            "Climate change policies",
+            "Creating cabinet of diverse community advisors"
+          ],
           "endorsements": [],
-          "pros": ["30+ years of community organizing through Austin Interfaith", "Prior experience working in Precinct 4 Commissioner's office", "Won AISD board race convincingly at 60.5%", "Anti-poverty and social justice focus matches precinct needs"],
-          "cons": ["Fewest visible endorsements for 2026", "\"No more tax increases\" could limit needed infrastructure investment", "Less name recognition in this race than Ledesma-Woody and Morales"],
+          "pros": [
+            "30+ years of community organizing through Austin Interfaith",
+            "Prior experience working in Precinct 4 Commissioner's office",
+            "Won AISD board race convincingly at 60.5%",
+            "Anti-poverty and social justice focus matches precinct needs"
+          ],
+          "cons": [
+            "Fewest visible endorsements for 2026",
+            "\"No more tax increases\" could limit needed infrastructure investment",
+            "Less name recognition in this race than Ledesma-Woody and Morales"
+          ],
           "fundraising": null,
           "polling": null
         },
@@ -450,10 +831,45 @@
           "isRecommended": true,
           "summary": "Former Travis County Precinct 4 Constable with 27 years of public service. Led the county's Mobile Vaccine Collaborative (380K+ vaccines). Austin City Council renamed Dove Springs Recreation Center in his honor. By far the most endorsed candidate.",
           "background": "Lifelong Austin resident from Dove Springs. Became a father at 16, worked as a garbage collector, then pursued law enforcement. Graduated Huston-Tillotson University summa cum laude. Certified Master Texas Peace Officer. Travis County Precinct 4 Constable (2016-2024). Led county Mobile Vaccine Collaborative — administered 380,000+ vaccines. Austin City Council renamed Dove Springs Recreation Center in his honor (2019). Distributes ~5,000 backpacks annually. Annual Thanksgiving meals for ~6,000 families. Three-time Presidential Community Service Award recipient.",
-          "keyPositions": ["Road repairs and transportation infrastructure", "Expanding healthcare and mental health access", "Fully funding a diversion center", "Preventing family displacement through affordable housing", "Legal aid to prevent displacement", "Budget transparency and community engagement"],
-          "endorsements": ["Austin Chronicle", "U.S. Reps Greg Casar and Lloyd Doggett", "State Reps Sheryl Cole and Vikki Goodwin", "AFL-CIO Central Labor Council", "AFSCME Local 1624", "CWA Local 6132", "IAFF (Firefighters)", "IBEW Local 520", "Austin EMS Association", "Austin Young Democrats", "Black Austin Democrats", "Stonewall Democrats", "Tejano Democrats", "Capitol Area Progressive Democrats", "Liberal Austin Democrats", "Austin Board of Realtors", "30+ total endorsements"],
-          "pros": ["By far the most endorsements — Congress members, labor unions, nearly every Democratic club", "Extraordinary community service record with multiple presidential awards", "Deep institutional knowledge from serving as constable", "Proven large-scale initiative management (380K+ vaccines)", "Compelling personal story (teen father to college graduate summa cum laude)"],
-          "cons": ["Law enforcement background may not appeal to all progressive voters", "Moving from constable to commissioner is a significant role shift", "Has not faced competitive elections recently"],
+          "keyPositions": [
+            "Road repairs and transportation infrastructure",
+            "Expanding healthcare and mental health access",
+            "Fully funding a diversion center",
+            "Preventing family displacement through affordable housing",
+            "Legal aid to prevent displacement",
+            "Budget transparency and community engagement"
+          ],
+          "endorsements": [
+            "Austin Chronicle",
+            "U.S. Reps Greg Casar and Lloyd Doggett",
+            "State Reps Sheryl Cole and Vikki Goodwin",
+            "AFL-CIO Central Labor Council",
+            "AFSCME Local 1624",
+            "CWA Local 6132",
+            "IAFF (Firefighters)",
+            "IBEW Local 520",
+            "Austin EMS Association",
+            "Austin Young Democrats",
+            "Black Austin Democrats",
+            "Stonewall Democrats",
+            "Tejano Democrats",
+            "Capitol Area Progressive Democrats",
+            "Liberal Austin Democrats",
+            "Austin Board of Realtors",
+            "30+ total endorsements"
+          ],
+          "pros": [
+            "By far the most endorsements — Congress members, labor unions, nearly every Democratic club",
+            "Extraordinary community service record with multiple presidential awards",
+            "Deep institutional knowledge from serving as constable",
+            "Proven large-scale initiative management (380K+ vaccines)",
+            "Compelling personal story (teen father to college graduate summa cum laude)"
+          ],
+          "cons": [
+            "Law enforcement background may not appeal to all progressive voters",
+            "Moving from constable to commissioner is a significant role shift",
+            "Has not faced competitive elections recently"
+          ],
           "fundraising": "Strong endorsement infrastructure suggests solid fundraising",
           "polling": null
         },
@@ -464,10 +880,28 @@
           "isRecommended": false,
           "summary": "Longtime East Austin community activist. Retired from City of Austin and Travis County. Former chief of staff for Precinct 4 Commissioner Marcos De Leon (1991-1994). Johnston High School graduate.",
           "background": "Born and raised in Austin near Ortega Elementary and Zavala Elementary. AISD graduate of Johnston High School (1972). Attended Austin Community College. Retired from City of Austin and Travis County. Former chief of staff for Precinct 4 Commissioner Marcos De Leon (1991-1994). Involved with Austin Brown Berets and El Concilio. Active in LULAC Austin and East Austin Lions Club. Austin coordinator for National Voter Registration Day. Ran for Austin City Council District 3 in 2022 (received 5.1%).",
-          "keyPositions": ["Keeping Precinct 4 affordable", "No more tax increases", "No ICE cooperation", "Funding mental health and addiction services for uninsured and homeless", "Auditing county contracts for cost-effectiveness", "Equitable resource allocation"],
+          "keyPositions": [
+            "Keeping Precinct 4 affordable",
+            "No more tax increases",
+            "No ICE cooperation",
+            "Funding mental health and addiction services for uninsured and homeless",
+            "Auditing county contracts for cost-effectiveness",
+            "Equitable resource allocation"
+          ],
           "endorsements": [],
-          "pros": ["Deep East Austin roots and longtime community activist", "Direct experience in Precinct 4 Commissioner's office (1991-1994)", "Genuine personal motivation for public service", "Historical knowledge of the precinct"],
-          "cons": ["5.1% in 2022 City Council race — weak electoral showing", "No visible endorsements", "\"No more tax increases\" could limit needed investment", "Precinct 4 staff experience is from 30+ years ago", "Least organized campaign of the four candidates"],
+          "pros": [
+            "Deep East Austin roots and longtime community activist",
+            "Direct experience in Precinct 4 Commissioner's office (1991-1994)",
+            "Genuine personal motivation for public service",
+            "Historical knowledge of the precinct"
+          ],
+          "cons": [
+            "5.1% in 2022 City Council race — weak electoral showing",
+            "No visible endorsements",
+            "\"No more tax increases\" could limit needed investment",
+            "Precinct 4 staff experience is from 30+ years ago",
+            "Least organized campaign of the four candidates"
+          ],
           "fundraising": null,
           "polling": null
         }
@@ -493,10 +927,25 @@
           "isRecommended": true,
           "summary": "Former Austin City Council member (District 9) and former Mayor Pro Tem. Extensive local government experience. Well-known in Austin politics.",
           "background": "Former Austin City Council member. Former Mayor Pro Tem. Adjunct professor. Deep roots in Austin civic life.",
-          "keyPositions": ["Housing affordability", "Homelessness policy", "Transportation", "Local governance"],
-          "endorsements": ["Austin Chronicle (co-endorsed with Garibay)"],
-          "pros": ["Most government experience in the field", "Well-known in Austin politics", "Deep policy knowledge", "Among top fundraisers"],
-          "cons": ["City council tenure was sometimes polarizing", "Some see her as an insider"],
+          "keyPositions": [
+            "Housing affordability",
+            "Homelessness policy",
+            "Transportation",
+            "Local governance"
+          ],
+          "endorsements": [
+            "Austin Chronicle (co-endorsed with Garibay)"
+          ],
+          "pros": [
+            "Most government experience in the field",
+            "Well-known in Austin politics",
+            "Deep policy knowledge",
+            "Among top fundraisers"
+          ],
+          "cons": [
+            "City council tenure was sometimes polarizing",
+            "Some see her as an insider"
+          ],
           "fundraising": "Among top fundraisers in 8-candidate field",
           "polling": null
         },
@@ -507,10 +956,27 @@
           "isRecommended": false,
           "summary": "Native Austinite, actor/comedian, and 20-year Democratic grassroots organizer. Radio personality (KLBJ-FM, ESPN Austin). Received a Texas House resolution from Rep. Hinojosa honoring his precinct chair work.",
           "background": "Born and raised in Austin. Actor and comedian with credits on Apple TV ('Brothers'), 'Iron Claw' film, HBO, and The CW's 'Walker.' Trained at The Second City (Chicago). Radio personality at KLBJ-FM (Dudley and Bob Show), ESPN Austin, KMAC. 20+ years of Democratic organizing: precinct chair in Travis County, worked on both Obama campaigns. Austin High School graduate. Received Texas House resolution from Rep. Hinojosa.",
-          "keyPositions": ["Public education funding — comes from family of teachers", "Restrict new data center development to conserve water and lower utility bills", "Lower costs for gas, groceries, healthcare, housing", "Pledges 10 constituent calls per week and monthly roundtable meetings"],
-          "endorsements": ["Travis County Democratic Party (#1 choice for HD-49)"],
-          "pros": ["Deep Austin roots and 20+ years grassroots Democratic experience", "Strong communicator with media skills", "Working-class perspective on affordability", "Specific policy proposals (data center water legislation)"],
-          "cons": ["No legislative or government experience", "Lower name recognition than Tovo", "Less fundraising than frontrunners", "Not endorsed by Austin Chronicle or Texas AFL-CIO"],
+          "keyPositions": [
+            "Public education funding — comes from family of teachers",
+            "Restrict new data center development to conserve water and lower utility bills",
+            "Lower costs for gas, groceries, healthcare, housing",
+            "Pledges 10 constituent calls per week and monthly roundtable meetings"
+          ],
+          "endorsements": [
+            "Travis County Democratic Party (#1 choice for HD-49)"
+          ],
+          "pros": [
+            "Deep Austin roots and 20+ years grassroots Democratic experience",
+            "Strong communicator with media skills",
+            "Working-class perspective on affordability",
+            "Specific policy proposals (data center water legislation)"
+          ],
+          "cons": [
+            "No legislative or government experience",
+            "Lower name recognition than Tovo",
+            "Less fundraising than frontrunners",
+            "Not endorsed by Austin Chronicle or Texas AFL-CIO"
+          ],
           "fundraising": "Lower-tier in 8-candidate field",
           "polling": null
         },
@@ -521,9 +987,22 @@
           "isRecommended": false,
           "summary": "Former Austin ISD board trustee and education advocate. Strong labor and education organizing background. Co-endorsed by Austin Chronicle alongside Tovo.",
           "background": "Former Austin ISD board trustee. Education and labor advocate.",
-          "keyPositions": ["Public education", "Workers' rights", "Immigration"],
-          "endorsements": ["Austin Chronicle (co-endorsed with Tovo)", "Texas AFL-CIO"],
-          "pros": ["Education policy experience", "Labor and community organizing background", "Co-endorsed by Austin Chronicle", "Texas AFL-CIO endorsement", "Among top fundraisers"],
+          "keyPositions": [
+            "Public education",
+            "Workers' rights",
+            "Immigration"
+          ],
+          "endorsements": [
+            "Austin Chronicle (co-endorsed with Tovo)",
+            "Texas AFL-CIO"
+          ],
+          "pros": [
+            "Education policy experience",
+            "Labor and community organizing background",
+            "Co-endorsed by Austin Chronicle",
+            "Texas AFL-CIO endorsement",
+            "Among top fundraisers"
+          ],
           "cons": [],
           "fundraising": "Among top fundraisers in 8-candidate field",
           "polling": null
@@ -535,12 +1014,151 @@
           "isRecommended": false,
           "summary": "20-year nurse practitioner with a doctorate. Peace Corps volunteer (Ghana). Breast cancer survivor. Directs a nonprofit helping uninsured women with breast cancer. Former HUD and White House staffer.",
           "background": "5th generation Texan from North Dallas, moved to Austin for college in the 1990s. B.A. in Government from UT Austin (2000). Worked at HUD and in the White House. Became an RN in 2006, M.S. in Nursing from UT Austin (2008). Served in Peace Corps in Ghana (2 years). ICU nurse in Chicago. Doctorate of Nursing Practice from Rush University (2015). 20-year nurse practitioner. Directs nonprofit assisting uninsured women with breast cancer. Breast cancer survivor (diagnosed 2020). Serves on anti-eviction nonprofit board.",
-          "keyPositions": ["Healthcare expansion and Medicaid access", "Increased teacher pay and school funding", "Affordable living", "LGBTQ+ protections", "Workers' right to organize"],
+          "keyPositions": [
+            "Healthcare expansion and Medicaid access",
+            "Increased teacher pay and school funding",
+            "Affordable living",
+            "LGBTQ+ protections",
+            "Workers' right to organize"
+          ],
           "endorsements": [],
-          "pros": ["Deeply credentialed in healthcare — 20 years with doctorate", "Lived experience as breast cancer survivor", "Diverse life experience: White House, HUD, Peace Corps, ICU nursing", "Direct understanding of uninsured patients' needs"],
-          "cons": ["Described as 'energy agnostic' supporting oil/gas — may be too moderate for this progressive district", "No prior elected office or legislative experience", "Relatively newer to Austin (returned ~2015)", "No major endorsements"],
+          "pros": [
+            "Deeply credentialed in healthcare — 20 years with doctorate",
+            "Lived experience as breast cancer survivor",
+            "Diverse life experience: White House, HUD, Peace Corps, ICU nursing",
+            "Direct understanding of uninsured patients' needs"
+          ],
+          "cons": [
+            "Described as 'energy agnostic' supporting oil/gas — may be too moderate for this progressive district",
+            "No prior elected office or legislative experience",
+            "Relatively newer to Austin (returned ~2015)",
+            "No major endorsements"
+          ],
           "fundraising": "$31,000 cash on hand (end of 2025)",
           "polling": null
+        },
+        {
+          "name": "Robin Jennifer Lerner",
+          "party": "Democrat",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "Former U.S. diplomat and Obama administration official with 25 years of experience in government, law, and higher education. Running her first campaign for elected office. Currently President and CEO of the Texas International Education Consortium.",
+          "background": "Deputy Assistant Secretary of State under Obama (oversaw J-1 Visa Exchange Visitor Program). Senior Advisor for Global Women's Issues. Senior Counsel on U.S. Senate Foreign Relations Committee. Career State Department officer with posts in Cairo and Baghdad. ACLU of Mississippi staff attorney. Election supervisor for Bosnia's first democratic elections (1997). Board member of Ann Richards School Foundation. B.G.S., University of Michigan; J.D., NYU School of Law.",
+          "keyPositions": [
+            "Fully fund public schools, oppose vouchers, defend academic freedom",
+            "Climate resilience through universities, solar farms, urban shade solutions",
+            "Make Austin a hub of innovation and upward mobility",
+            "Defend reproductive healthcare access",
+            "Address housing affordability"
+          ],
+          "endorsements": [],
+          "pros": [
+            "Extraordinary depth of international, federal, and legal experience",
+            "Direct experience in diplomacy, human rights law, and higher education leadership",
+            "Strong on education policy with specific, actionable proposals"
+          ],
+          "cons": [
+            "First-time candidate with no prior elected office",
+            "Described as 'liberal-institutionalist' rather than movement-progressive",
+            "No major organizational endorsements"
+          ],
+          "fundraising": "Lower tier fundraising.",
+          "polling": "No public polling data available for individual HD-49 candidates."
+        },
+        {
+          "name": "Gigs Hodges",
+          "party": "Democrat",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "Educator-turned-organizer and former legislative director running openly as a Democratic Socialist. Served as Legislative Director for State Rep. Aicha Davis, helping pass 13 bills into law. The only DSA-aligned candidate in the race.",
+          "background": "Legislative Director for State Rep. Aicha Davis (D-Dallas). Participated in the Archer Fellowship Program on Capitol Hill. Thru-hiked the Appalachian Trail in 2018. Associate Degree from Austin Community College (2020); B.A. from University of Texas at Austin (2022).",
+          "keyPositions": [
+            "Expand housing supply, protect renters, decommodify housing",
+            "Fully fund public schools, raise teacher pay",
+            "Expand Medicaid, invest in mental health care",
+            "Raise wages and support working Texans",
+            "Climate justice through clean energy investment"
+          ],
+          "endorsements": [
+            "State Rep. Ana-Maria Rodriguez Ramos (Chair, Texas Legislative Progressive Caucus)",
+            "Lone Star Left"
+          ],
+          "pros": [
+            "Strong progressive platform aligned with HD-49's educated, progressive voter base",
+            "Genuine legislative experience as a staffer who passed 13 bills",
+            "Fills a clear ideological lane as the only Democratic Socialist"
+          ],
+          "cons": [
+            "Relatively young career — graduated from UT in 2022",
+            "'Democratic Socialist' label may be a liability in broader coalition-building",
+            "Limited fundraising compared to frontrunners"
+          ],
+          "fundraising": "Lower tier fundraising.",
+          "polling": "No public polling data available for individual HD-49 candidates."
+        },
+        {
+          "name": "Josh Reyna",
+          "party": "Democrat",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "Sixth-generation Texan, Austin attorney, and Chief of Staff/General Counsel in the Texas Senate with 16+ years at the Capitol. Leads the field in cash on hand at $128,933. Claims the most legislative experience of any candidate.",
+          "background": "Chief of Staff and General Counsel for State Sen. Cesar Blanco (D-El Paso). 16 years of legislative experience starting as a Capitol intern in 2009. Helped write and pass legislation including the largest increase in public school funding in recent Texas history, SNAP expansion, and gun safety legislation after El Paso Walmart shooting. B.A. in Accounting (magna cum laude) from St. Edward's University; J.D. from UT School of Law.",
+          "keyPositions": [
+            "Property tax relief for homeowners and renters, expand housing supply",
+            "Fully fund schools, eliminate STAAR testing, raise teacher pay, overturn vouchers",
+            "Expand Medicaid, lower prescription drug costs, protect reproductive healthcare",
+            "Protect immigrant communities and Dreamers, expand voting rights",
+            "More state dollars to public transit, expand regional rail"
+          ],
+          "endorsements": [
+            "Run for Something",
+            "AURA (Austin Affordability Organization)",
+            "West Campus Democrats",
+            "Texas Realtors PAC (TREPAC)",
+            "100% rating from Planned Parenthood Texas Votes"
+          ],
+          "pros": [
+            "Deepest Capitol experience of any candidate (16 years)",
+            "Most cash on hand in the race ($128,933)",
+            "Concrete legislative achievements (school funding, SNAP expansion, gun safety)"
+          ],
+          "cons": [
+            "Worked for a conservative Democrat from El Paso — questions about authentic progressivism",
+            "Texas Realtors PAC endorsement may raise questions with progressive voters",
+            "Not originally from the district (grew up in Rio Grande Valley)"
+          ],
+          "fundraising": "$128,933 cash on hand — highest in the HD-49 race.",
+          "polling": "No public polling data available for individual HD-49 candidates."
+        },
+        {
+          "name": "Shenghao \"Daniel\" Wang",
+          "party": "Democrat",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "Austin native, MIT math graduate, Harvard-trained attorney, and Travis Central Appraisal District board member. Works as an electricity regulation lawyer. Defeated Republican Travis County Party Chair Matt Mackowiak in the 2024 TCAD election. Age 31.",
+          "background": "Travis Central Appraisal District Board of Directors member (defeated Republican Party Chair Matt Mackowiak in 2024). Full-time electricity regulation lawyer at Eversheds Sutherland. Served on Travis County Democratic Party advisory council. Austin native, graduated from AISD public schools (LASA). B.S. in Mathematics from MIT; J.D. from Harvard Law School (2020).",
+          "keyPositions": [
+            "'Build more stuff' — pro-density, pro-supply approach to housing",
+            "Medicaid expansion as top priority",
+            "Fully fund public schools, protect from voucher programs",
+            "Fix the electric grid (professional expertise in energy regulation)",
+            "Fight Republican extremism"
+          ],
+          "endorsements": [
+            "Austin Chinese Americans Network (ACAN)"
+          ],
+          "pros": [
+            "Already won a competitive election (defeated Republican Matt Mackowiak for TCAD board)",
+            "Professional expertise in energy/grid regulation directly relevant to Texas policy",
+            "Austin native with deep local roots (AISD product, LASA graduate)"
+          ],
+          "cons": [
+            "Limited endorsements compared to other candidates",
+            "TCAD board is a relatively low-profile elected office",
+            "At 31, relatively young career"
+          ],
+          "fundraising": "Lower tier fundraising.",
+          "polling": "No public polling data available for individual HD-49 candidates."
         }
       ],
       "recommendation": {
@@ -564,9 +1182,20 @@
           "isRecommended": true,
           "summary": "Long-serving incumbent. Registered nurse turned legislator. Known for healthcare and education advocacy in the Texas House.",
           "background": "Texas State Representative since 2006. Registered nurse. Serves on Appropriations and Public Education committees.",
-          "keyPositions": ["Healthcare access", "Public education funding", "Women's health", "Budget oversight"],
-          "endorsements": ["Texas State Teachers Association"],
-          "pros": ["Deep legislative experience", "Healthcare expertise as an RN", "Strong committee positions"],
+          "keyPositions": [
+            "Healthcare access",
+            "Public education funding",
+            "Women's health",
+            "Budget oversight"
+          ],
+          "endorsements": [
+            "Texas State Teachers Association"
+          ],
+          "pros": [
+            "Deep legislative experience",
+            "Healthcare expertise as an RN",
+            "Strong committee positions"
+          ],
           "cons": [],
           "fundraising": null,
           "polling": "Unopposed in primary"
@@ -587,10 +1216,27 @@
           "isRecommended": true,
           "summary": "25-year Texas educator — teacher, school counselor, nonprofit executive, and community advocate across Central Texas school districts. Former union member with progressive advocacy experience in conservative communities.",
           "background": "25+ years as teacher, school counselor, nonprofit executive director, and community advocate in Central Texas ISDs. Associate degree in Communication and Visual Arts from Kilgore College. B.A. in Communication and Special Education from Stephen F. Austin State University. Former union member. Progressive advocacy experience in conservative communities.",
-          "keyPositions": ["Curriculum standards based on educator expertise, not partisan politics", "Fight to reduce teacher paperwork and improve retention", "Oppose book bans and attacks on DEI", "Charter school oversight — equal academic standards and fiscal transparency", "Protect accurate history and age-appropriate health education", "Oppose vouchers and privatization"],
-          "endorsements": ["Austin Chronicle"],
-          "pros": ["Most direct K-12 classroom and administrative experience (25 years in Texas ISDs)", "Austin Chronicle endorsement", "Union background aligns with teacher advocacy", "Experience advocating for progressive education in conservative communities"],
-          "cons": ["Lower academic/research profile than Sampson", "Less prominent endorsement list than Bazan's elected official endorsements"],
+          "keyPositions": [
+            "Curriculum standards based on educator expertise, not partisan politics",
+            "Fight to reduce teacher paperwork and improve retention",
+            "Oppose book bans and attacks on DEI",
+            "Charter school oversight — equal academic standards and fiscal transparency",
+            "Protect accurate history and age-appropriate health education",
+            "Oppose vouchers and privatization"
+          ],
+          "endorsements": [
+            "Austin Chronicle"
+          ],
+          "pros": [
+            "Most direct K-12 classroom and administrative experience (25 years in Texas ISDs)",
+            "Austin Chronicle endorsement",
+            "Union background aligns with teacher advocacy",
+            "Experience advocating for progressive education in conservative communities"
+          ],
+          "cons": [
+            "Lower academic/research profile than Sampson",
+            "Less prominent endorsement list than Bazan's elected official endorsements"
+          ],
           "fundraising": null,
           "polling": null
         },
@@ -601,10 +1247,25 @@
           "isRecommended": false,
           "summary": "UT Austin associate professor of STEM Education with a PhD in Curriculum and Instruction. Former classroom science teacher. Deepest academic credentials of any candidate.",
           "background": "Associate Professor of STEM Education at UT Austin. Chief Innovation Officer for Argument-Driven Inquiry. B.S. in Biology from University of Washington (1997). M.Ed. from Seattle University (1999). Ph.D. in Curriculum and Instruction from Arizona State University (2007). Former classroom science teacher.",
-          "keyPositions": ["Curriculum based on educational research, not politics", "Anti-virtual schooling — incompatible with child development", "Adequate public school funding", "Assessment reform — reduce high-stakes testing", "Teacher autonomy and empowerment"],
+          "keyPositions": [
+            "Curriculum based on educational research, not politics",
+            "Anti-virtual schooling — incompatible with child development",
+            "Adequate public school funding",
+            "Assessment reform — reduce high-stakes testing",
+            "Teacher autonomy and empowerment"
+          ],
           "endorsements": [],
-          "pros": ["Deepest academic and research credentials — PhD and UT Austin professor", "Direct expertise in curriculum design, which is SBOE's core function", "Strong on evidence-based education policy", "Former K-12 classroom teacher plus academic research"],
-          "cons": ["Academic background may seem theoretical vs. Bush's 25 years in Texas ISDs", "Not endorsed by Austin Chronicle", "Limited visible endorsements or organizational support"],
+          "pros": [
+            "Deepest academic and research credentials — PhD and UT Austin professor",
+            "Direct expertise in curriculum design, which is SBOE's core function",
+            "Strong on evidence-based education policy",
+            "Former K-12 classroom teacher plus academic research"
+          ],
+          "cons": [
+            "Academic background may seem theoretical vs. Bush's 25 years in Texas ISDs",
+            "Not endorsed by Austin Chronicle",
+            "Limited visible endorsements or organizational support"
+          ],
           "fundraising": null,
           "polling": null
         },
@@ -615,10 +1276,26 @@
           "isRecommended": false,
           "summary": "Current Austin ISD bilingual special education teacher and parent support specialist. Master's in Public Affairs from UT Austin's LBJ School (2025).",
           "background": "B.B.A. in Business Administration from UT Austin (2015). M.P.Aff. in Public Affairs from UT Austin LBJ School (2025). Current Austin ISD bilingual special education teacher and parent support specialist. Former political canvasser.",
-          "keyPositions": ["Multilingual and bilingual education programs", "Special education resources and accessibility", "Community input in policy decisions", "Assessment reform", "Funding equity for underserved communities"],
+          "keyPositions": [
+            "Multilingual and bilingual education programs",
+            "Special education resources and accessibility",
+            "Community input in policy decisions",
+            "Assessment reform",
+            "Funding equity for underserved communities"
+          ],
           "endorsements": [],
-          "pros": ["Active classroom teacher — brings current, firsthand experience", "Strong focus on bilingual and special education — underrepresented perspectives on SBOE", "Public policy education (LBJ School) bridges classroom and policy", "Younger generation of educators"],
-          "cons": ["No traditional campaign website — relies on social media", "Narrower issue focus than other candidates", "Relatively newer career", "No major endorsements"],
+          "pros": [
+            "Active classroom teacher — brings current, firsthand experience",
+            "Strong focus on bilingual and special education — underrepresented perspectives on SBOE",
+            "Public policy education (LBJ School) bridges classroom and policy",
+            "Younger generation of educators"
+          ],
+          "cons": [
+            "No traditional campaign website — relies on social media",
+            "Narrower issue focus than other candidates",
+            "Relatively newer career",
+            "No major endorsements"
+          ],
           "fundraising": null,
           "polling": null
         },
@@ -629,12 +1306,94 @@
           "isRecommended": false,
           "summary": "Nonprofit leader, former educator, and 5th generation Texan. Most endorsed candidate in the SBOE race with support from multiple elected officials. Mom of two, first-generation college graduate, Austin ISD product.",
           "background": "Mom of two (ages 7 and 10). 5th generation Texan. Austin ISD public school product. First-generation college graduate. B.A. in English from St. Edward's University (2002). M.A. in Creative Writing from University of Leeds, England (2005). Former teacher at St. Edward's. Career spanning education, healthcare, law, and nonprofit sectors. Worked with LifeWorks addressing youth homelessness and literacy.",
-          "keyPositions": ["Historically accurate curriculum — not revised for political or religious agendas", "Stop Christian nationalist influence in curriculum", "Oppose vouchers and charter expansion", "Educator-led standards focused on critical thinking", "Reduce unnecessary testing", "Address chronic underfunding"],
-          "endorsements": ["State Rep. Sheryl Cole (HD-46)", "Travis County Tax Assessor Celia Israel", "Travis County Sheriff Sally Hernandez", "Capital Area Progressive Democrats", "Austin Tejano Democrats", "Austin Environmental Democrats", "Former Austin City Council Member Ann Kitchen"],
-          "pros": ["By far the most endorsements including multiple elected officials", "Strong personal connection to public education (AISD product, parent of two)", "Broad professional background across education, nonprofit, healthcare", "Clear, forceful messaging against privatization and Christian nationalism"],
-          "cons": ["Less direct K-12 classroom experience than Bush (25 years) or Longoria", "Teaching was at university level, not K-12", "Not endorsed by Austin Chronicle", "Creative writing/nonprofit background less tied to SBOE's curriculum-setting function"],
+          "keyPositions": [
+            "Historically accurate curriculum — not revised for political or religious agendas",
+            "Stop Christian nationalist influence in curriculum",
+            "Oppose vouchers and charter expansion",
+            "Educator-led standards focused on critical thinking",
+            "Reduce unnecessary testing",
+            "Address chronic underfunding"
+          ],
+          "endorsements": [
+            "State Rep. Sheryl Cole (HD-46)",
+            "Travis County Tax Assessor Celia Israel",
+            "Travis County Sheriff Sally Hernandez",
+            "Capital Area Progressive Democrats",
+            "Austin Tejano Democrats",
+            "Austin Environmental Democrats",
+            "Former Austin City Council Member Ann Kitchen"
+          ],
+          "pros": [
+            "By far the most endorsements including multiple elected officials",
+            "Strong personal connection to public education (AISD product, parent of two)",
+            "Broad professional background across education, nonprofit, healthcare",
+            "Clear, forceful messaging against privatization and Christian nationalism"
+          ],
+          "cons": [
+            "Less direct K-12 classroom experience than Bush (25 years) or Longoria",
+            "Teaching was at university level, not K-12",
+            "Not endorsed by Austin Chronicle",
+            "Creative writing/nonprofit background less tied to SBOE's curriculum-setting function"
+          ],
           "fundraising": null,
           "polling": null
+        },
+        {
+          "name": "Abigail Gray",
+          "party": "Democrat",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "Career public school educator and curriculum expert with 7+ years in elementary classrooms. Currently a civic education coordinator at UT Austin's Annette Strauss Institute. Served as an instructional materials reviewer for the 2024 SBOE curriculum adoption cycle.",
+          "background": "Third-grade teacher at Chandler Elementary (2020-2023) and Griffin Elementary (2018-2019). B.S. in EC-6 Education from LeTourneau University (2017); M.Ed. in Curriculum and Instruction Design from UT Tyler (2023); currently pursuing graduate studies at LBJ School of Public Affairs, UT Austin. Civic education outreach coordinator at Strauss Institute (Speak Up Speak Out program). Reports on SBOE education policy through social media and podcasting.",
+          "keyPositions": [
+            "Evidence-based instructional materials free from ideological bias",
+            "Expert-driven academic standards backed by data and research, not ideology",
+            "SBOE transparency — real-time reporting on the Board's activity to the public",
+            "Civic education standards that teach discourse and tolerance",
+            "Address systemic inequities affecting students and educators"
+          ],
+          "endorsements": [],
+          "pros": [
+            "Direct SBOE experience as an instructional materials reviewer for the 2024 adoption cycle",
+            "Unique transparency platform through education policy reporting and podcasting",
+            "Strong curriculum credentials (M.Ed. in Curriculum Design + LBJ School policy studies)"
+          ],
+          "cons": [
+            "Relatively early career (7 years of classroom experience)",
+            "Currently a university staff/grad student, not a practicing classroom teacher",
+            "No major organizational endorsements"
+          ],
+          "fundraising": "No fundraising data publicly available.",
+          "polling": "No public polling data available."
+        },
+        {
+          "name": "Kevin Jackson",
+          "party": "Democrat",
+          "isIncumbent": false,
+          "isRecommended": false,
+          "summary": "Career public school educator who has taught at elementary, middle, and high school levels across Bexar, Travis, and Williamson Counties. Currently an educational diagnostician in Del Valle ISD. Active in Black Austin Democrats and Travis County Democratic Party.",
+          "background": "Educational diagnostician (including dyslexia evaluation) at Del Valle ISD. Previously taught in Judson ISD (Bexar County), Austin ISD, and Round Rock ISD. Board member of Black Austin Democrats; precinct chair for Travis County Democratic Party. Associate degree from Austin Community College (2004); B.A. in Government from UT Austin (2009); M.P.A. from UT San Antonio (2019); M.Ed. in Special Education and Educational Diagnostics from UNT (2023). Father of two.",
+          "keyPositions": [
+            "Clear, rigorous curriculum standards written by educators and experts, not political appointees",
+            "Oppose politicized or ideologically driven instructional materials",
+            "Rigorous charter school oversight — new approvals must be rare and held to highest standards",
+            "Inclusive ethnic studies reflecting Black, Latino, Asian, Indigenous, and immigrant communities",
+            "Evidence-based reading and math instruction",
+            "Permanent School Fund transparency"
+          ],
+          "endorsements": [],
+          "pros": [
+            "Breadth of classroom experience across multiple levels and districts (elementary through high school)",
+            "Special education and diagnostics expertise in one of Central Texas's highest-need districts",
+            "Strong Democratic Party infrastructure and community ties"
+          ],
+          "cons": [
+            "No major organizational endorsements found",
+            "Not highlighted by Austin Chronicle in their endorsement analysis",
+            "Less curriculum design/academic research background than some competitors"
+          ],
+          "fundraising": "No fundraising data publicly available.",
+          "polling": "No public polling data available."
         }
       ],
       "recommendation": {
@@ -655,8 +1414,21 @@
       "reasoning": "Texas has the highest uninsured rate in the nation. Medicaid expansion would cover over a million Texans using available federal funding.",
       "background": "Texas has the nation's highest uninsured rate and has not expanded Medicaid under the Affordable Care Act, leaving it as one of only 10 states that have declined expansion. Over 950,000 working-age adults fall into a 'coverage gap' — earning too much for current Medicaid but too little for marketplace subsidies. Forty other states have already expanded Medicaid. Texas currently forgoes an estimated $5-6 billion in annual federal funding by refusing expansion.",
       "fiscalImpact": "Non-binding advisory. If enacted, Texas would receive approximately $6 billion annually in federal funding with a 90/10 federal-state match. Over ten years, the economic ripple effect is projected at $100 billion. The state's share would cost roughly $600 million per year, but could be partially offset by reductions in the $5.5 billion Texas currently spends annually on uncompensated hospital care.",
-      "supporters": ["Cover Texas Now (coalition of 188+ organizations)", "Every Texan (policy organization)", "Texas Hospital Association", "Episcopal Health Foundation", "Texas Medical Association", "AARP Texas"],
-      "opponents": ["Gov. Greg Abbott", "Lt. Gov. Dan Patrick", "Texas Public Policy Foundation", "Heritage Foundation", "Some fiscal conservatives who argue expansion would 'bust' the state budget"],
+      "supporters": [
+        "Cover Texas Now (coalition of 188+ organizations)",
+        "Every Texan (policy organization)",
+        "Texas Hospital Association",
+        "Episcopal Health Foundation",
+        "Texas Medical Association",
+        "AARP Texas"
+      ],
+      "opponents": [
+        "Gov. Greg Abbott",
+        "Lt. Gov. Dan Patrick",
+        "Texas Public Policy Foundation",
+        "Heritage Foundation",
+        "Some fiscal conservatives who argue expansion would 'bust' the state budget"
+      ],
       "ifPasses": "Signals strong Democratic voter support for Medicaid expansion. Strengthens the case for Democratic candidates to make expansion a central 2026 general election issue. Could pressure moderate Republicans, given that 73% of Texas voters (including 63% of strong Republicans) support expansion in polling.",
       "ifFails": "Unlikely to fail among Democratic primary voters. A weak showing would suggest healthcare is not the top motivating issue for Democratic base voters, reducing its prominence as a campaign centerpiece."
     },
@@ -668,8 +1440,21 @@
       "reasoning": "Depends on your immigration priorities. Both humanitarian and practical arguments exist.",
       "background": "Texas is at the center of the national immigration debate. Reports have documented inhumane conditions at detention facilities such as Fort Bliss. The state's Operation Lone Star border initiative has cost over $11 billion since 2021. In 2025, the Trump administration's DOJ dropped its challenge to Texas's SB 4, which would have allowed state law enforcement to arrest and deport migrants. ICE enforcement operations in Texas have intensified, prompting school walkouts and community protests across the state.",
       "fiscalImpact": "Non-binding advisory. Immigration policy is primarily set at the federal level. Texas currently spends billions on border enforcement through Operation Lone Star. Comprehensive immigration reform at the federal level could generate economic growth — immigrants contribute significantly to Texas's $2 trillion economy.",
-      "supporters": ["ACLU of Texas", "Las Americas Immigrant Advocacy Center", "American Immigration Council", "Catholic Bishops of Texas", "Texas business groups (who rely on immigrant labor)", "Presente.org"],
-      "opponents": ["Gov. Greg Abbott", "Republican Party of Texas", "Heritage Foundation", "Federation for American Immigration Reform (FAIR)", "Texas border security advocacy groups"],
+      "supporters": [
+        "ACLU of Texas",
+        "Las Americas Immigrant Advocacy Center",
+        "American Immigration Council",
+        "Catholic Bishops of Texas",
+        "Texas business groups (who rely on immigrant labor)",
+        "Presente.org"
+      ],
+      "opponents": [
+        "Gov. Greg Abbott",
+        "Republican Party of Texas",
+        "Heritage Foundation",
+        "Federation for American Immigration Reform (FAIR)",
+        "Texas border security advocacy groups"
+      ],
       "ifPasses": "Signals Democratic voter support for humane immigration reform and pathways to citizenship. Provides a clear contrast with Republican enforcement-first messaging in the 2026 general election. Could shape Democratic candidates' immigration platforms statewide.",
       "ifFails": "Unlikely to fail among Democratic primary voters. A weak showing would suggest the Democratic base is conflicted on immigration messaging, potentially encouraging more moderate or enforcement-inclusive positions."
     },
@@ -681,8 +1466,24 @@
       "reasoning": "Core Democratic platform issue. Aligns with bodily autonomy and personal healthcare decision-making.",
       "background": "Texas enforces some of the nation's strictest abortion restrictions, banning nearly all abortions except when the mother's life is at imminent risk. The state also prohibits gender-affirming care for minors. Since the 2022 Dobbs decision overturning Roe v. Wade, Texas has prosecuted providers and some localities have attempted to restrict residents from traveling out of state for abortion care. A major Texas Supreme Court challenge to the ban was pending as of early 2026. Insurance barriers also limit access to contraception and fertility treatments.",
       "fiscalImpact": "Non-binding advisory. Reproductive healthcare restrictions have economic consequences — Texas has seen increases in maternal mortality, unplanned pregnancies, and emergency room visits for pregnancy complications. The state funnels millions to crisis pregnancy centers with limited oversight.",
-      "supporters": ["Avow Texas", "Planned Parenthood Texas Votes", "ACLU of Texas", "Lilith Fund", "Fund Texas Choice", "Texas Freedom Network", "Jane's Due Process", "Frontera Fund", "Every Body Texas"],
-      "opponents": ["Texas Right to Life", "Texas Alliance for Life", "Gov. Greg Abbott", "Texas Values", "Texas Eagle Forum"],
+      "supporters": [
+        "Avow Texas",
+        "Planned Parenthood Texas Votes",
+        "ACLU of Texas",
+        "Lilith Fund",
+        "Fund Texas Choice",
+        "Texas Freedom Network",
+        "Jane's Due Process",
+        "Frontera Fund",
+        "Every Body Texas"
+      ],
+      "opponents": [
+        "Texas Right to Life",
+        "Texas Alliance for Life",
+        "Gov. Greg Abbott",
+        "Texas Values",
+        "Texas Eagle Forum"
+      ],
       "ifPasses": "Signals overwhelming Democratic voter support for reproductive autonomy. Strengthens the issue as a major motivator for Democratic turnout in the November general election. Could fuel efforts to put a reproductive rights constitutional amendment before Texas voters.",
       "ifFails": "Extremely unlikely to fail among Democratic primary voters. Any weakness would suggest the party base is divided on the scope of healthcare autonomy, which would be a significant surprise."
     },
@@ -694,8 +1495,20 @@
       "reasoning": "Housing costs are a top concern across Texas, especially in Austin.",
       "background": "Texas median home prices jumped roughly 40% between 2019 and 2023, while mortgage rates hit 23-year highs. The state needs an estimated 320,000 more homes than it currently has, according to housing policy organization Up For Growth. Despite leading the nation in new housing construction, Texas's rapid population growth has outpaced supply. The Texas Comptroller has called housing affordability a 'looming economic threat.' The 2025 Legislature pursued zoning reforms to allow more residential development, but housing advocates say much more is needed.",
       "fiscalImpact": "Non-binding advisory. Addressing the housing crisis would require significant state investment in affordable housing programs, down-payment assistance, and regulatory changes. The economic cost of inaction is also substantial — the Comptroller warns that housing unaffordability threatens the state's economic competitiveness and ability to attract workers.",
-      "supporters": ["Texas Housers (statewide housing advocacy)", "Up For Growth", "Texas Low Income Housing Information Service", "Habitat for Humanity Texas", "Local housing authorities", "Austin City Council"],
-      "opponents": ["Some property rights advocates who oppose new regulations", "NIMBY groups opposing density increases", "Developers who oppose affordability mandates", "Some fiscal conservatives who oppose state spending on housing programs"],
+      "supporters": [
+        "Texas Housers (statewide housing advocacy)",
+        "Up For Growth",
+        "Texas Low Income Housing Information Service",
+        "Habitat for Humanity Texas",
+        "Local housing authorities",
+        "Austin City Council"
+      ],
+      "opponents": [
+        "Some property rights advocates who oppose new regulations",
+        "NIMBY groups opposing density increases",
+        "Developers who oppose affordability mandates",
+        "Some fiscal conservatives who oppose state spending on housing programs"
+      ],
       "ifPasses": "Signals strong Democratic voter demand for state action on housing. Provides a mandate for Democratic candidates to make housing affordability a central platform issue. Could pressure the legislature to increase housing funds and strengthen renter protections.",
       "ifFails": "Unlikely to fail. A weak showing would suggest Democratic voters prioritize other economic issues over housing, reducing its visibility as a campaign issue."
     },
@@ -707,8 +1520,19 @@
       "reasoning": "Texas ranks near the bottom in per-pupil education spending despite a growing economy.",
       "background": "Texas ranks 42nd nationally in per-student funding at approximately $13,189 per pupil — about $4,000 to $5,664 below the national average depending on the measure used. Per-pupil funding remained essentially flat from 2019 through 2024 despite significant inflation. The 2025 Legislature passed HB 2, an $8.5 billion school funding bill that included teacher pay raises, but education advocates say Texas would need roughly $19.6 billion in new funding just to restore 2019 purchasing power. Meanwhile, the state launched a controversial school voucher program that critics say diverts scarce public education funds to private schools.",
       "fiscalImpact": "Non-binding advisory. Reaching the national per-pupil average would require billions in additional annual spending — estimates range from $5 billion to $8.5 billion depending on the baseline. The 2025 Legislature invested $8.5 billion but advocates at Raise Your Hand Texas say it still falls short.",
-      "supporters": ["Texas State Teachers Association (TSTA)", "Texas AFT", "Texas Association of School Administrators", "Raise Your Hand Texas", "Texas Association of School Boards", "Education Austin"],
-      "opponents": ["Some fiscal conservatives who oppose higher state spending", "School voucher proponents who prioritize school choice over increased per-pupil funding", "Texas Public Policy Foundation (favors market-based education reforms)"],
+      "supporters": [
+        "Texas State Teachers Association (TSTA)",
+        "Texas AFT",
+        "Texas Association of School Administrators",
+        "Raise Your Hand Texas",
+        "Texas Association of School Boards",
+        "Education Austin"
+      ],
+      "opponents": [
+        "Some fiscal conservatives who oppose higher state spending",
+        "School voucher proponents who prioritize school choice over increased per-pupil funding",
+        "Texas Public Policy Foundation (favors market-based education reforms)"
+      ],
       "ifPasses": "Signals strong Democratic voter support for substantially increased public school funding. Strengthens the argument against school vouchers by emphasizing the underfunding of existing public schools. Could become a key general election contrast with Republicans.",
       "ifFails": "Unlikely to fail. A weak result would suggest Democratic voters are ambivalent about the specific target of reaching the national average, though support for schools generally would remain strong."
     },
@@ -720,8 +1544,19 @@
       "reasoning": "42 other states already do this. Modernizes voter access without compromising security.",
       "background": "Texas is one of only eight states without universal online voter registration. Voters must submit paper forms by mail or in person — a process plagued by lost applications, handwriting errors, and processing delays. A bipartisan bill in 2015 had 76 House co-authors (a majority) but was never brought to a vote. A similar bill received a public hearing in 2025 but missed its deadline to become law. The Texas Association of County Election Officials, comprising both Republican and Democratic officials, has endorsed online registration, noting it would improve the accuracy of voter records.",
       "fiscalImpact": "Non-binding advisory. Implementation would require an initial investment in a secure online registration system, but would reduce ongoing costs associated with processing paper forms, fixing errors, and mailing materials. Other states report long-term cost savings after implementing online registration.",
-      "supporters": ["League of Women Voters of Texas", "Texas Association of County Election Officials (bipartisan)", "ACLU of Texas", "Common Cause Texas", "MOVE Texas (youth voter engagement)", "Texas Civil Rights Project"],
-      "opponents": ["Some Republican legislators who have blocked bills from reaching a vote", "Groups concerned about cybersecurity risks (though 42 states have successfully implemented secure systems)", "Texas Secretary of State's office has been slow to adopt"],
+      "supporters": [
+        "League of Women Voters of Texas",
+        "Texas Association of County Election Officials (bipartisan)",
+        "ACLU of Texas",
+        "Common Cause Texas",
+        "MOVE Texas (youth voter engagement)",
+        "Texas Civil Rights Project"
+      ],
+      "opponents": [
+        "Some Republican legislators who have blocked bills from reaching a vote",
+        "Groups concerned about cybersecurity risks (though 42 states have successfully implemented secure systems)",
+        "Texas Secretary of State's office has been slow to adopt"
+      ],
       "ifPasses": "Signals broad Democratic voter demand for modernized voter registration. Provides ammunition for continued legislative efforts — especially given bipartisan support from county election officials. Could be paired with other voting access measures in future sessions.",
       "ifFails": "Extremely unlikely to fail. Online voter registration is among the least controversial modernization proposals. A failure would be a major surprise."
     },
@@ -733,8 +1568,21 @@
       "reasoning": "Austin and Texas face growing environmental challenges including air quality, water scarcity, and urban heat.",
       "background": "Texas hosts eight of the nation's top 50 greenhouse gas emitters and faces growing pollution challenges from its massive petrochemical, oil, and gas industries. The Trump administration's rollback of federal EPA protections has raised concerns that Texas, which has historically shown little interest in exceeding federal environmental standards, will see increased pollution. The Texas Commission on Environmental Quality (TCEQ) is currently revising surface water quality standards. Texas voters overwhelmingly approved a $20 billion water infrastructure bond in November 2025, showing broad bipartisan support for environmental investment.",
       "fiscalImpact": "Non-binding advisory. Stricter enforcement would require additional TCEQ funding and staffing. However, environmental degradation carries its own economic costs — pollution-related healthcare expenses, water treatment costs, and climate-related disaster damage run into billions annually for Texas.",
-      "supporters": ["Sierra Club Lone Star Chapter", "Environment Texas", "Texas Campaign for the Environment", "Environmental Defense Fund", "Texas Living Waters Project", "Clean Air Task Force"],
-      "opponents": ["Texas Oil and Gas Association", "Texas Chemical Council", "Some business groups who oppose additional regulation", "Texas Public Policy Foundation (argues market-based solutions are preferable)", "Some Republican legislators who view regulation as anti-business"],
+      "supporters": [
+        "Sierra Club Lone Star Chapter",
+        "Environment Texas",
+        "Texas Campaign for the Environment",
+        "Environmental Defense Fund",
+        "Texas Living Waters Project",
+        "Clean Air Task Force"
+      ],
+      "opponents": [
+        "Texas Oil and Gas Association",
+        "Texas Chemical Council",
+        "Some business groups who oppose additional regulation",
+        "Texas Public Policy Foundation (argues market-based solutions are preferable)",
+        "Some Republican legislators who view regulation as anti-business"
+      ],
       "ifPasses": "Signals Democratic voter demand for stronger environmental protections, particularly as federal standards are rolled back. Provides a mandate for Democratic candidates to campaign on clean air and water. Could influence TCEQ's ongoing water quality standards revision.",
       "ifFails": "Unlikely to fail among Democratic primary voters. A weak showing would suggest the environment is not a top-tier motivating issue for the Democratic base in 2026."
     },
@@ -746,8 +1594,22 @@
       "reasoning": "Combines drug policy reform with criminal justice reform. Depends on your personal stance.",
       "background": "Recreational marijuana remains illegal in Texas despite growing public support — a 2025 poll found 53% of Texans oppose hemp product bans, and broader legalization polls even higher. Texas arrested over 26,000 people for cannabis possession in 2024 alone. The state's hemp industry already generates an estimated $8-10 billion annually and employs over 50,000 Texans. Lt. Gov. Dan Patrick has pushed to ban hemp-derived THC products, but Governor Abbott vetoed the ban bill (SB 3) after an outcry from veterans and other advocates. Multiple legalization bills (HB 1208, SB 335) were filed in 2025 but received no hearings.",
       "fiscalImpact": "Non-binding advisory. If enacted, cannabis legalization could generate over $1 billion in annual tax revenue within a few years, based on projected $2.7 billion in annual sales. A regulated market could also create 20,000-40,000 direct jobs. Expungement provisions would reduce incarceration costs but require administrative processing resources.",
-      "supporters": ["Marijuana Policy Project", "Texas Cannabis Policy Center", "Foundation for an Informed Texas", "NORML Texas", "Veterans advocacy groups", "Criminal justice reform organizations", "ACLU of Texas"],
-      "opponents": ["Lt. Gov. Dan Patrick", "Texas Alliance for Life", "Some law enforcement organizations", "Anti-drug advocacy groups", "Smart Approaches to Marijuana (SAM)"],
+      "supporters": [
+        "Marijuana Policy Project",
+        "Texas Cannabis Policy Center",
+        "Foundation for an Informed Texas",
+        "NORML Texas",
+        "Veterans advocacy groups",
+        "Criminal justice reform organizations",
+        "ACLU of Texas"
+      ],
+      "opponents": [
+        "Lt. Gov. Dan Patrick",
+        "Texas Alliance for Life",
+        "Some law enforcement organizations",
+        "Anti-drug advocacy groups",
+        "Smart Approaches to Marijuana (SAM)"
+      ],
       "ifPasses": "Signals strong Democratic voter support for full legalization and criminal justice reform. Strengthens the issue as a general election differentiator. Could pressure moderate Republicans given that legalization polls above 50% statewide.",
       "ifFails": "Unlikely to fail, but a close vote would suggest the Democratic base has reservations about full legalization, particularly the automatic expungement component. Could lead candidates to adopt a more incremental approach (decriminalization first)."
     },
@@ -759,8 +1621,19 @@
       "reasoning": "Texas state employees and teachers are paid below national averages, contributing to recruitment and retention challenges.",
       "background": "Texas ranks 31st nationally in average teacher salary at $62,463, with 77% of teachers reporting their pay is insufficient. Texas's 135,000 state employees received two 5% pay raises in 2024-2025, but advocacy groups say these do not keep pace with inflation. The Texas Public Employees Association (TPEA) is requesting a minimum $10,000/year raise for every state employee to restore their standard of living. The 2025 Legislature passed a $4.3 billion teacher pay raise bill — the largest single investment in teachers in the nation — but educators say it still does not close the gap with national averages.",
       "fiscalImpact": "Non-binding advisory. Raising all state employee and teacher salaries to national averages with cost-of-living adjustments would cost billions annually. The 2025 teacher pay raise alone cost $4.3 billion. Proponents argue higher wages improve recruitment, retention, and the quality of public services, reducing costly turnover.",
-      "supporters": ["Texas State Teachers Association (TSTA)", "Texas AFT", "Texas Public Employees Association (TPEA)", "Texas State Employees Union (CWA Local 6186)", "Texas AFL-CIO", "Education Austin"],
-      "opponents": ["Fiscal conservatives who oppose increased state spending", "Texas Public Policy Foundation (favors targeted raises over across-the-board increases)", "Some legislators who argue the 2025 pay raise was sufficient"],
+      "supporters": [
+        "Texas State Teachers Association (TSTA)",
+        "Texas AFT",
+        "Texas Public Employees Association (TPEA)",
+        "Texas State Employees Union (CWA Local 6186)",
+        "Texas AFL-CIO",
+        "Education Austin"
+      ],
+      "opponents": [
+        "Fiscal conservatives who oppose increased state spending",
+        "Texas Public Policy Foundation (favors targeted raises over across-the-board increases)",
+        "Some legislators who argue the 2025 pay raise was sufficient"
+      ],
       "ifPasses": "Signals strong Democratic voter support for raising public employee wages to competitive levels. Strengthens labor-backed candidates and provides a clear general election message on valuing public servants. Could influence future legislative budget priorities.",
       "ifFails": "Unlikely to fail. A weak showing would suggest Democratic voters see the recent $4.3 billion investment as adequate, reducing pressure for additional raises."
     },
@@ -772,8 +1645,20 @@
       "reasoning": "Fair maps are foundational to representative democracy. Texas has a long history of redistricting controversies.",
       "background": "Texas conducted a controversial mid-decade redistricting in 2025, with the Republican-controlled Legislature redrawing congressional maps to shore up GOP seats. The U.S. Supreme Court allowed the new maps to stand for the 2026 midterms. Nationally, 51% of Americans say an independent commission should draw districts, while only 19% say the legislature should. Texas does not allow citizens to vote directly on redistricting reforms — any changes must come from the Legislature. The Redistricting Reform Act of 2025 was introduced at the federal level to ban mid-decade redistricting and require independent commissions.",
       "fiscalImpact": "Non-binding advisory. Creating a nonpartisan redistricting commission would have modest administrative costs. However, the current system generates significant legal costs — Texas has spent millions defending redistricting maps in court over multiple cycles.",
-      "supporters": ["Common Cause Texas", "League of Women Voters of Texas", "Texas Civil Rights Project", "NAACP Texas", "MALDEF", "Fair Maps Texas", "Two-thirds of American voters in polling"],
-      "opponents": ["Republican legislative leadership (who control current redistricting)", "Some incumbents in both parties who benefit from current maps", "Texas Attorney General's office (has defended current maps in court)"],
+      "supporters": [
+        "Common Cause Texas",
+        "League of Women Voters of Texas",
+        "Texas Civil Rights Project",
+        "NAACP Texas",
+        "MALDEF",
+        "Fair Maps Texas",
+        "Two-thirds of American voters in polling"
+      ],
+      "opponents": [
+        "Republican legislative leadership (who control current redistricting)",
+        "Some incumbents in both parties who benefit from current maps",
+        "Texas Attorney General's office (has defended current maps in court)"
+      ],
       "ifPasses": "Signals strong Democratic voter demand for fair redistricting. Strengthens the case for Democratic candidates to campaign on democracy reform. Could support federal legislation requiring independent commissions. Highlights the 2025 mid-decade redistricting as a general election issue.",
       "ifFails": "Unlikely to fail. A weak showing would suggest Democratic voters do not prioritize process reforms over policy issues, reducing its prominence as a campaign theme."
     },
@@ -785,8 +1670,20 @@
       "reasoning": "Depends on your views on federal tax policy and progressivity.",
       "background": "Texas has no state income tax, but its heavy reliance on sales and property taxes creates one of the most regressive tax systems in the country — the Institute on Taxation and Economic Policy (ITEP) ranks Texas 7th most regressive. Lower-income Texans pay a higher percentage of their income in taxes than the wealthy. This proposition addresses federal tax policy, calling for the wealthiest individuals to bear more of the burden while providing relief to working-class earners. The 2017 Trump tax cuts disproportionately benefited high earners and are set for partial expiration.",
       "fiscalImpact": "Non-binding advisory. This is a federal tax policy question that the Texas Legislature cannot directly enact. Changes to federal income tax rates would require Congressional action. Proponents of progressive taxation argue it would generate significant federal revenue while providing working-class relief; opponents argue it would reduce economic growth and investment.",
-      "supporters": ["Every Texan (Texas policy organization)", "Americans for Tax Fairness", "Center on Budget and Policy Priorities", "Progressive labor unions", "Texas AFL-CIO"],
-      "opponents": ["Americans for Prosperity", "Tax Foundation (argues U.S. system is already highly progressive)", "Business Roundtable", "Heritage Foundation", "Some economists who argue higher marginal rates reduce investment"],
+      "supporters": [
+        "Every Texan (Texas policy organization)",
+        "Americans for Tax Fairness",
+        "Center on Budget and Policy Priorities",
+        "Progressive labor unions",
+        "Texas AFL-CIO"
+      ],
+      "opponents": [
+        "Americans for Prosperity",
+        "Tax Foundation (argues U.S. system is already highly progressive)",
+        "Business Roundtable",
+        "Heritage Foundation",
+        "Some economists who argue higher marginal rates reduce investment"
+      ],
       "ifPasses": "Signals Democratic voter support for progressive federal tax reform. Provides a platform position for Texas Democrats heading into the 2026 midterms. Could influence the federal debate over expiring Trump-era tax cuts.",
       "ifFails": "Would suggest Democratic primary voters are skeptical of tax-the-wealthy messaging or view it as outside the scope of state politics. Could indicate a preference for addressing Texas's regressive state tax structure instead."
     },
@@ -798,8 +1695,22 @@
       "reasoning": "Transportation is a top Austin concern. Expanded transit reduces congestion and improves access.",
       "background": "Texas's rapid population growth has intensified traffic congestion, but the state's investment in public transit lags far behind peer states. A TxDOT survey found 1 in 3 Texans see a need to expand public transit in both rural and urban areas. The state spends nothing on public transit in major urban areas — agencies like DART and CapMetro rely on local sales tax revenue. Younger Texans want more transit options, while older rural Texans increasingly need them as car ownership costs rise. TxDOT's draft Statewide Multimodal Transit Plan acknowledges the gap. Meanwhile, Austin's Project Connect faces legal challenges from AG Paxton's office.",
       "fiscalImpact": "Non-binding advisory. Expanding transit statewide would require significant investment — Governor Abbott announced a $146 billion transportation plan, but most goes to highways. Dedicated state transit funding would require new revenue sources or budget reallocation. Proponents argue transit investment generates economic returns through reduced congestion, improved workforce access, and lower household transportation costs.",
-      "supporters": ["Transit advocacy organizations", "Texas AFL-CIO", "AARP Texas", "Environmental groups", "CapMetro (Austin)", "DART (Dallas)", "Disability rights organizations", "Urban planning groups"],
-      "opponents": ["Some fiscal conservatives who oppose new state spending", "Highway-focused transportation advocates", "Oil and gas interests concerned about reduced driving", "Some suburban/rural voters who prioritize road investment over transit"],
+      "supporters": [
+        "Transit advocacy organizations",
+        "Texas AFL-CIO",
+        "AARP Texas",
+        "Environmental groups",
+        "CapMetro (Austin)",
+        "DART (Dallas)",
+        "Disability rights organizations",
+        "Urban planning groups"
+      ],
+      "opponents": [
+        "Some fiscal conservatives who oppose new state spending",
+        "Highway-focused transportation advocates",
+        "Oil and gas interests concerned about reduced driving",
+        "Some suburban/rural voters who prioritize road investment over transit"
+      ],
       "ifPasses": "Signals strong Democratic voter support for public transit investment. Strengthens the case for state transit funding and bolsters local initiatives like Austin's Project Connect. Could influence TxDOT's multimodal transit plan.",
       "ifFails": "Unlikely to fail. A weak showing would suggest even Democratic voters prioritize other spending over transit, reducing momentum for state-level transit funding."
     },
@@ -811,8 +1722,21 @@
       "reasoning": "Gun policy is deeply personal. Balances public safety with Second Amendment concerns.",
       "background": "One in three Texans experience domestic violence, and guns are the most common weapon used in domestic violence homicides. In June 2025, Governor Abbott signed SB 1362, an 'Anti-Red Flag Act' that bans the enactment or enforcement of Extreme Risk Protection Orders (ERPOs) in Texas — moving in the opposite direction from this proposition. A multistate study found that one suicide was averted for every 17 ERPOs issued. Twenty-one states and D.C. currently have red flag laws. The proposition specifically targets the intersection of domestic violence and firearms, calling for ERPOs when there is documented domestic abuse history.",
       "fiscalImpact": "Non-binding advisory. Implementation would require judicial infrastructure for ERPO hearings and a firearms tracking system. Studies from other states show ERPOs are cost-effective compared to the economic toll of gun violence — the average gun homicide costs society an estimated $1.4 million in medical, criminal justice, and lost productivity costs.",
-      "supporters": ["Texas Gun Sense", "Moms Demand Action Texas", "Everytown for Gun Safety", "Texas Council on Family Violence", "National Domestic Violence Hotline (headquartered in Austin)", "American Medical Association"],
-      "opponents": ["National Rifle Association (NRA)", "Gun Owners of America", "Texas State Rifle Association", "Gov. Greg Abbott (signed the Anti-Red Flag Act)", "Some civil liberties advocates concerned about due process in ERPO proceedings"],
+      "supporters": [
+        "Texas Gun Sense",
+        "Moms Demand Action Texas",
+        "Everytown for Gun Safety",
+        "Texas Council on Family Violence",
+        "National Domestic Violence Hotline (headquartered in Austin)",
+        "American Medical Association"
+      ],
+      "opponents": [
+        "National Rifle Association (NRA)",
+        "Gun Owners of America",
+        "Texas State Rifle Association",
+        "Gov. Greg Abbott (signed the Anti-Red Flag Act)",
+        "Some civil liberties advocates concerned about due process in ERPO proceedings"
+      ],
       "ifPasses": "Signals Democratic voter support for red flag laws focused on domestic violence, directly contradicting the 2025 Anti-Red Flag Act. Provides a sharp general election contrast on gun safety. Could motivate suburban voters, particularly women, who support common-sense gun measures.",
       "ifFails": "Would suggest the Democratic base is divided on gun policy, perhaps due to concerns about government overreach or Second Amendment protections. Could lead candidates to soften gun safety messaging."
     }

@@ -34,10 +34,12 @@ Items not yet attempted or needing a fresh approach after failed verification.
 #### Landing Page
 
 #### Ballot Display
-- [ ] PWA: Proposition Spanish translations — when in Spanish mode, show Spanish translations below the English proposition title and description text. 13 Democrat + 10 Republican propositions to translate.
-- [ ] PWA: Candidate photos — display candidate headshot photos on their cards instead of letter-initial avatars. Photos stored as SVGs in `worker/headshots/`.
+
+#### Loading Animation
+- [ ] PWA: Bouncing mascot loading animation — replace the current icon-per-phase loading with an alternating elephant/donkey bounce animation. Show the elephant bouncing 3 times, then the donkey 3 times, repeating. Decouple the animation from the loading status text.
 
 #### Interview Flow
+- [ ] PWA: Free-form "Anything else?" field — add a final free-form text input ("Anything else we should know about you?") at the end of the interview, before address entry. Include the response in the voter profile sent to the guide generation API so Claude can factor it into recommendations.
 
 #### Pages
 
@@ -54,6 +56,8 @@ Items not yet attempted or needing a fresh approach after failed verification.
 ### Testing
 
 - [ ] Interview flow UI tests — walk through all interview phases, verify required field validation (3+ issues, 2+ qualities, address fields), verify back navigation preserves selections.
+- [x] Verify candidate-to-race accuracy — cross-referenced against Ballotpedia, Texas Tribune, Travis County Clerk, and Texas SOS. Fixed: added 3 missing GOP Railroad Commissioner candidates (including Jim Matlock at 20% in polls), removed withdrawn Christopher Hurt from GOP TX-10, added 4 missing Dem HD-49 candidates, added 2 missing Dem SBOE-5 candidates. Updated both JSON files and remote KV. Note: statewide races intentionally exclude minor/perennial candidates as editorial choice.
+- [x] Partisan bias audit — reviewed all 200+ Spanish translations: no bias found. Added explicit NONPARTISAN instruction blocks to all 6 Claude API prompts (PWA guide system prompt, PWA guide user prompt, PWA summary system prompt, PWA summary user prompt, iOS guide system prompt + user prompt, iOS summary system prompt + user prompt). Instructions require factual/issue-based reasoning, prohibit partisan framing and loaded terms, and mandate equal analytical rigor for all candidates.
 
 ---
 
@@ -110,7 +114,7 @@ Verified working. Collapsed for reference.
 </details>
 
 <details>
-<summary>PWA Bugs (6 resolved)</summary>
+<summary>PWA Bugs (7 resolved)</summary>
 
 - [x] Proposition badges not translated — added `t()` wrapping on prop badges and cheat sheet, added Spanish translations for "Lean Yes" → "A favor", "Lean No" → "En contra", "Your Call" → "Tu decisión", plus confidence labels.
 - [x] Profile summary not translated — pass `lang` parameter from client to `/app/api/summary` and `/app/api/guide` endpoints. Server adds "Write in Spanish" instruction to Claude prompt when `lang=es`.
@@ -118,11 +122,12 @@ Verified working. Collapsed for reference.
 - [x] Spanish nav tab labels wrapping — shortened translations ("Mi boleta" → "Boleta", "Info de votación" → "Info"), added `white-space:nowrap` to `.tab` CSS.
 - [x] White screen on first deploy — `APP_HTML` was defined before `CSS` and `APP_JS` variables. With `var` hoisting, they were `undefined` at assignment time. Fixed by moving `APP_HTML` to end of pwa.js.
 - [x] "Station" Easter egg — fixed by explicitly setting city field to "Austin" in addition to street and zip when station shortcut is detected.
+- [x] Race card navigation always goes to senate race — races don't have `id` fields, so `undefined === undefined` matched first race every time. Changed `renderRaceCard` to match by `office + district` instead.
 
 </details>
 
 <details>
-<summary>PWA Improvements (19 resolved)</summary>
+<summary>PWA Improvements (22 resolved)</summary>
 
 - [x] Service worker cache-first → network-first — old v1 SW served stale HTML. Changed to v2 network-first, added `/app/clear` cache-clearing route, added `Cache-Control: no-cache` header.
 - [x] Tab bar not visible — `position:fixed` tab bar inside `#app` wasn't rendering on some browsers. Moved to flex layout: body is `display:flex;flex-direction:column`, `#app` scrolls (`flex:1;overflow-y:auto`), tab bar is a natural flex child in separate `#tabs` div.
@@ -143,6 +148,9 @@ Verified working. Collapsed for reference.
 - [x] Qualities picker icons — 8 inline SVG icons matching iOS SF Symbols (bar chart, shield, standing figure, briefcase, lightbulb, arrows, flag, people group) displayed in quality chips during interview and on profile page.
 - [x] Address verification — client-side validation (street required, 5-digit ZIP), pre-verifies address via Census Geocoder before guide generation. Shows error on form if address not found with option to fix or skip. Spinner loading state during verification. Spanish translations included.
 - [x] Candidate descriptions full-width — moved summary text below the avatar+name header row so it spans the full card width instead of being indented by the avatar column.
+- [x] Candidate photos — headshots served via Cloudflare static assets at `/headshots/`. 62 real photos (JPG/PNG) with initial-letter fallback for 3 placeholder candidates. `onerror` cascade tries `.jpg` then `.png` then letter initial. Avatar bumped to 48px with `overflow:hidden` for circular crop.
+- [x] Proposition Spanish translations — 23 proposition titles and descriptions (13 Democrat + 10 Republican) translated to Spanish. Shown below English text in italic when language is set to Spanish, using `prop-trans` CSS class.
+- [x] Ballot race card headshots — small 30px candidate headshot row on each race card in the ballot overview. Recommended candidate highlighted with blue border. Same `.jpg → .png → initial` fallback cascade.
 
 </details>
 

@@ -240,7 +240,7 @@ var CSS = [
   // Candidate card
   ".cand-card{border:1.5px solid var(--border);border-radius:var(--rs);padding:14px;margin-bottom:10px}",
   ".cand-card.recommended{border-color:var(--ok)}",
-  ".cand-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;flex-shrink:0}",
+  ".cand-avatar{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden}",
   ".cand-name{font-size:17px;font-weight:700}",
   ".cand-tags{display:flex;gap:6px;flex-shrink:0;margin-top:2px}",
   ".cand-summary{font-size:14px;color:var(--text2);line-height:1.5;margin-top:8px}",
@@ -261,6 +261,7 @@ var CSS = [
   ".prop-header{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}",
   ".prop-title{font-size:16px;font-weight:700}",
   ".prop-desc{font-size:14px;color:var(--text2);line-height:1.5;margin-top:6px}",
+  ".prop-trans{font-size:13px;color:var(--text2);line-height:1.5;margin-top:4px;font-style:italic}",
   ".prop-details{margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}",
   ".prop-section{margin-bottom:10px}",
   ".prop-section h5{font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}",
@@ -428,7 +429,7 @@ var CSS = [
 
 var APP_JS = [
   // ============ VERSION CHECK ============
-  "var APP_VERSION=23;",
+  "var APP_VERSION=25;",
 
   // ============ i18n ============
   "var LANG=localStorage.getItem('atx_votes_lang')||((navigator.language||'').slice(0,2)==='es'?'es':'en');",
@@ -523,8 +524,6 @@ var APP_JS = [
     "'Lean Yes':'A favor'," +
     "'Lean No':'En contra'," +
     "'Your Call':'Tu decisi\\u00F3n'," +
-    "'Clear Call':'Clara'," +
-    "'Genuinely Contested':'Realmente disputada'," +
     "'Clear Call':'Decisi\\u00F3n clara'," +
     "'Best Available':'Mejor opci\\u00F3n disponible'," +
     "'Symbolic Race':'Contienda simb\\u00F3lica'," +
@@ -538,6 +537,56 @@ var APP_JS = [
     "'Supporters':'Partidarios'," +
     "'Opponents':'Opositores'," +
     "'Caveats':'Advertencias'," +
+    // Proposition titles (Democrat)
+    "'Expand Medicaid':'Expandir Medicaid'," +
+    "'Humane immigration reform':'Reforma migratoria humanitaria'," +
+    "'Reproductive rights':'Derechos reproductivos'," +
+    "'Housing affordability':'Vivienda asequible'," +
+    "'Public school funding':'Financiamiento de escuelas p\\u00FAblicas'," +
+    "'Online voter registration':'Registro de votantes en l\\u00EDnea'," +
+    "'Environmental standards':'Est\\u00E1ndares ambientales'," +
+    "'Cannabis legalization':'Legalizaci\\u00F3n del cannabis'," +
+    "'Raise state employee wages':'Aumento de salarios de empleados estatales'," +
+    "'Redistricting reform':'Reforma de redistribuci\\u00F3n de distritos'," +
+    "'Fair taxation':'Tributaci\\u00F3n justa'," +
+    "'Expand public transit':'Expandir transporte p\\u00FAblico'," +
+    "'Red flag gun safety laws':'Leyes de alerta de seguridad de armas'," +
+    // Proposition titles (Republican)
+    "'Phase out property taxes':'Eliminar gradualmente impuestos a la propiedad'," +
+    "'Voter approval for local tax hikes':'Aprobaci\\u00F3n de votantes para aumentos de impuestos locales'," +
+    "'Healthcare & vaccination status':'Atenci\\u00F3n m\\u00E9dica y estado de vacunaci\\u00F3n'," +
+    "'Life at fertilization in schools':'Vida desde la fertilizaci\\u00F3n en escuelas'," +
+    "'Ban school health clinics':'Prohibir cl\\u00EDnicas de salud en escuelas'," +
+    "'Term limits':'L\\u00EDmites de mandato'," +
+    "'Protect Texas water':'Proteger el agua de Texas'," +
+    "'End services for undocumented immigrants':'Terminar servicios para inmigrantes indocumentados'," +
+    "'No Democratic committee chairs':'Sin presidentes de comit\\u00E9 dem\\u00F3cratas'," +
+    "'Prohibit Sharia Law':'Prohibir la ley Sharia'," +
+    // Proposition descriptions (Democrat)
+    "'Texas should expand Medicaid to ensure access to affordable healthcare for all residents.':'Texas deber\\u00EDa expandir Medicaid para asegurar acceso a atenci\\u00F3n m\\u00E9dica asequible para todos los residentes.'," +
+    "'Texas should adopt humane and dignified immigration policies and clear pathways to citizenship.':'Texas deber\\u00EDa adoptar pol\\u00EDticas migratorias humanas y dignas con caminos claros a la ciudadan\\u00EDa.'," +
+    "'Texans should have the right to make their own healthcare decisions, including reproductive rights, with removal of insurance barriers to treatment.':'Los texanos deber\\u00EDan tener el derecho a tomar sus propias decisiones de salud, incluyendo derechos reproductivos, eliminando barreras de seguro para el tratamiento.'," +
+    "'The state should use funding and regulation to address the housing crisis in urban and rural communities.':'El estado deber\\u00EDa usar financiamiento y regulaci\\u00F3n para abordar la crisis de vivienda en comunidades urbanas y rurales.'," +
+    "'Texas should equalize per-pupil spending to the national average. Texas currently ranks 42nd.':'Texas deber\\u00EDa igualar el gasto por alumno al promedio nacional. Texas actualmente ocupa el puesto 42.'," +
+    "'Texas should implement secure online voter registration, already used by 42 other states.':'Texas deber\\u00EDa implementar el registro seguro de votantes en l\\u00EDnea, ya utilizado por otros 42 estados.'," +
+    "'Texas should enforce stricter environmental standards for air, water, and biodiversity.':'Texas deber\\u00EDa aplicar est\\u00E1ndares ambientales m\\u00E1s estrictos para aire, agua y biodiversidad.'," +
+    "'Texas should legalize adult cannabis use and automatically expunge past cannabis-related convictions.':'Texas deber\\u00EDa legalizar el uso de cannabis para adultos y borrar autom\\u00E1ticamente condenas previas relacionadas con cannabis.'," +
+    "'State and school employee salaries should be raised to national averages with biennial cost-of-living adjustments.':'Los salarios de empleados estatales y escolares deber\\u00EDan aumentarse al promedio nacional con ajustes bienales por costo de vida.'," +
+    "'Texas should ban racially motivated and mid-decade redistricting.':'Texas deber\\u00EDa prohibir la redistribuci\\u00F3n de distritos motivada racialmente y a mitad de d\\u00E9cada.'," +
+    "'The federal tax burden should shift to the wealthiest individuals with working-class income tax relief.':'La carga tributaria federal deber\\u00EDa trasladarse a los individuos m\\u00E1s ricos con alivio de impuestos sobre la renta para la clase trabajadora.'," +
+    "'Texas should expand accessible transit in rural and urban areas.':'Texas deber\\u00EDa expandir el transporte accesible en \\u00E1reas rurales y urbanas.'," +
+    "'Texas should enact Extreme Risk Protection Orders to prevent individuals with a history of domestic abuse from purchasing firearms.':'Texas deber\\u00EDa promulgar \\u00D3rdenes de Protecci\\u00F3n por Riesgo Extremo para prevenir que personas con historial de abuso dom\\u00E9stico compren armas de fuego.'," +
+    // Proposition descriptions (Republican)
+    "'Texas property taxes should be assessed at the purchase price and phased out entirely over the next six years through spending reductions.':'Los impuestos a la propiedad de Texas deber\\u00EDan evaluarse al precio de compra y eliminarse por completo en los pr\\u00F3ximos seis a\\u00F1os mediante reducciones de gasto.'," +
+    "'Texas should require any local government budget that raises property taxes to be approved by voters at a November general election.':'Texas deber\\u00EDa requerir que cualquier presupuesto de gobierno local que aumente impuestos a la propiedad sea aprobado por los votantes en una elecci\\u00F3n general de noviembre.'," +
+    "'Texas should prohibit denial of healthcare or any medical service based solely on the patient\\'s vaccination status.':'Texas deber\\u00EDa prohibir la denegaci\\u00F3n de atenci\\u00F3n m\\u00E9dica basada \\u00FAnicamente en el estado de vacunaci\\u00F3n del paciente.'," +
+    "'Texas should require its public schools to teach that life begins at fertilization.':'Texas deber\\u00EDa requerir que sus escuelas p\\u00FAblicas ense\\u00F1en que la vida comienza en la fertilizaci\\u00F3n.'," +
+    "'Texas should ban gender, sexuality, and reproductive clinics and services in K-12 schools.':'Texas deber\\u00EDa prohibir cl\\u00EDnicas y servicios de g\\u00E9nero, sexualidad y reproducci\\u00F3n en escuelas K-12.'," +
+    "'Texas should enact term limits on all elected officials.':'Texas deber\\u00EDa establecer l\\u00EDmites de mandato para todos los funcionarios electos.'," +
+    "'Texas should ban the large-scale export, or sale, of our groundwater and surface water to any single private or public entity.':'Texas deber\\u00EDa prohibir la exportaci\\u00F3n o venta a gran escala de nuestras aguas subterr\\u00E1neas y superficiales a cualquier entidad privada o p\\u00FAblica individual.'," +
+    "'The Texas Legislature should reduce the burden of illegal immigration on taxpayers by ending public services for illegal immigrants.':'La Legislatura de Texas deber\\u00EDa reducir la carga de la inmigraci\\u00F3n ilegal sobre los contribuyentes al terminar los servicios p\\u00FAblicos para inmigrantes ilegales.'," +
+    "'The Republican-controlled Texas Legislature should stop awarding leadership positions, including committee chairmanships, to Democrats.':'La Legislatura de Texas controlada por los republicanos deber\\u00EDa dejar de otorgar posiciones de liderazgo, incluyendo presidencias de comit\\u00E9, a los dem\\u00F3cratas.'," +
+    "'Texas should prohibit Sharia Law.':'Texas deber\\u00EDa prohibir la ley Sharia.'," +
     // Cheat sheet
     "'Your Ballot Cheat Sheet':'Tu gu\\u00EDa r\\u00E1pida de boleta'," +
     "'Primary':'Primaria'," +
@@ -1264,7 +1313,7 @@ var APP_JS = [
   "}",
 
   "function renderRaceCard(race,allRaces){" +
-    "var idx=-1;for(var i=0;i<allRaces.length;i++){if(allRaces[i].id===race.id){idx=i;break}}" +
+    "var idx=-1;for(var i=0;i<allRaces.length;i++){if(allRaces[i].office===race.office&&allRaces[i].district===race.district){idx=i;break}}" +
     "var label=race.office+(race.district?' \\u2014 '+race.district:'')+(race.recommendation?' \\u2014 Recommended: '+race.recommendation.candidateName:'');" +
     "var h='<div class=\"card card-touch\" data-action=\"nav\" data-to=\"#/race/'+idx+'\" role=\"link\" aria-label=\"'+esc(label)+'\" tabindex=\"0\">';" +
     "h+='<div style=\"display:flex;justify-content:space-between;align-items:flex-start\">';" +
@@ -1275,6 +1324,19 @@ var APP_JS = [
       "h+='<div style=\"font-size:13px;color:var(--text2);margin-top:2px;line-height:1.4\">'+esc(race.recommendation.reasoning)+'</div>'" +
     "}" +
     "h+='<div style=\"font-size:13px;color:var(--text2);margin-top:4px\">'+race.candidates.length+' '+(race.candidates.length!==1?t('candidates'):t('candidate'))+'</div>';" +
+    "var colors=['#4A90D9','#D95B43','#5B8C5A','#8E6BBF','#D4A843','#C75B8F','#5BBFC7','#7B8D6F','#D97B43','#6B8FBF'];" +
+    "h+='<div style=\"display:flex;gap:4px;margin-top:6px\">';" +
+    "for(var j=0;j<race.candidates.length;j++){" +
+      "var c=race.candidates[j];" +
+      "var slug=c.name.toLowerCase().replace(/[^a-z0-9 -]/g,'').replace(/\\s+/g,'-');" +
+      "var initial=c.name.charAt(0).toUpperCase();" +
+      "var ac=colors[j%colors.length];" +
+      "var bdr=c.isRecommended?'2px solid var(--blue)':'2px solid transparent';" +
+      "h+='<div style=\"width:30px;height:30px;border-radius:50%;background:'+ac+';display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;overflow:hidden;border:'+bdr+';flex-shrink:0\">';" +
+      "h+='<img src=\"/headshots/'+slug+'.jpg\" alt=\"\" style=\"width:100%;height:100%;object-fit:cover;border-radius:50%\" onerror=\"if(this.src.indexOf(\\'.jpg\\')>0){this.src=this.src.replace(\\'.jpg\\',\\'.png\\')}else{this.style.display=\\'none\\';this.nextSibling.style.display=\\'\\';}\">';" +
+      "h+='<span style=\"display:none\">'+initial+'</span></div>'" +
+    "}" +
+    "h+='</div>';" +
     "h+='</div>';" +
     "h+='<div style=\"display:flex;align-items:center;gap:8px;flex-shrink:0\">';" +
     "if(race.recommendation){h+=confBadge(race.recommendation.confidence)}" +
@@ -1299,7 +1361,9 @@ var APP_JS = [
     "var h='<div class=\"card\">';" +
     "h+='<div class=\"prop-header\"><div class=\"prop-title\">Prop '+prop.number+': '+esc(prop.title)+'</div>';" +
     "h+='<span class=\"badge '+recClass+'\">'+t(prop.recommendation)+'</span></div>';" +
+    "if(LANG==='es'){var tt=t(prop.title);if(tt!==prop.title)h+='<div class=\"prop-trans\">'+esc(tt)+'</div>'}" +
     "h+='<div class=\"prop-desc\">'+esc(prop.description)+'</div>';" +
+    "if(LANG==='es'){var td=t(prop.description);if(td!==prop.description)h+='<div class=\"prop-trans\">'+esc(td)+'</div>'}" +
     // If Passes / If Fails (always visible, color-coded)
     "if(prop.ifPasses||prop.ifFails){" +
       "h+='<div style=\"margin-top:10px\">';" +
@@ -1368,9 +1432,12 @@ var APP_JS = [
       "var colors=['#4A90D9','#D95B43','#5B8C5A','#8E6BBF','#D4A843','#C75B8F','#5BBFC7','#7B8D6F','#D97B43','#6B8FBF'];" +
       "var avatarColor=colors[i%colors.length];" +
       "var initial=c.name.charAt(0).toUpperCase();" +
+      "var slug=c.name.toLowerCase().replace(/[^a-z0-9 -]/g,'').replace(/\\s+/g,'-');" +
       "h+='<div class=\"cand-card'+(c.isRecommended?' recommended':'')+'\">';" +
       "h+='<div style=\"display:flex;gap:12px;align-items:center\">';" +
-      "h+='<div class=\"cand-avatar\" style=\"background:'+avatarColor+'\">'+initial+'</div>';" +
+      "h+='<div class=\"cand-avatar\" style=\"background:'+avatarColor+'\">';" +
+      "h+='<img src=\"/headshots/'+slug+'.jpg\" alt=\"\" style=\"width:100%;height:100%;object-fit:cover;border-radius:50%\" onerror=\"if(this.src.indexOf(\\'.jpg\\')>0){this.src=this.src.replace(\\'.jpg\\',\\'.png\\')}else{this.style.display=\\'none\\';this.nextSibling.style.display=\\'\\';}\">';" +
+      "h+='<span style=\"display:none\">'+initial+'</span></div>';" +
       "h+='<div style=\"flex:1;min-width:0\">';" +
       "h+='<div style=\"display:flex;justify-content:space-between;align-items:flex-start\">';" +
       "h+='<div class=\"cand-name\">'+esc(c.name)+'</div>';" +
