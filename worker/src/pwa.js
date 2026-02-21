@@ -741,7 +741,7 @@ var APP_JS = [
     // Issues
     "'Economy & Cost of Living':'Econom\\u00EDa y costo de vida'," +
     "'Housing':'Vivienda'," +
-    "'Community Safety':'Seguridad comunitaria'," +
+    "'Public Safety':'Seguridad p\\u00FAblica'," +
     "'Education':'Educaci\\u00F3n'," +
     "'Healthcare':'Salud'," +
     "'Environment & Climate':'Medio ambiente y clima'," +
@@ -880,7 +880,7 @@ var APP_JS = [
   "var ISSUES=[" +
     '{v:"Economy & Cost of Living",icon:"\u{1F4B0}"},' +
     '{v:"Housing",icon:"\u{1F3E0}"},' +
-    '{v:"Community Safety",icon:"\u{1F6E1}\u{FE0F}"},' +
+    '{v:"Public Safety",icon:"\u{1F6E1}\u{FE0F}"},' +
     '{v:"Education",icon:"\u{1F393}"},' +
     '{v:"Healthcare",icon:"\u2764\u{FE0F}"},' +
     '{v:"Environment & Climate",icon:"\u{1F33F}"},' +
@@ -921,7 +921,7 @@ var APP_JS = [
       '{l:"Protect neighborhoods",d:"Preserve character, limit density changes"},' +
       "{l:\"It\\u2019s complicated\",d:\"Case by case \\u2014 depends on the neighborhood\"}" +
     "]}," +
-    '"Community Safety":{q:"On public safety, what\\u2019s your approach?",opts:[' +
+    '"Public Safety":{q:"On public safety, what\\u2019s your approach?",opts:[' +
       '{l:"Fully fund police",d:"Hire more officers, strong prosecution"},' +
       '{l:"Reform + fund",d:"Fund police but invest in alternatives too"},' +
       '{l:"Redirect funding",d:"Move money toward prevention and social services"},' +
