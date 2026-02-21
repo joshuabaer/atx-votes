@@ -49,7 +49,7 @@ actor ClaudeService: GuideGenerating {
     // MARK: - Generate Personalized Voting Guide
 
     func generateVotingGuide(profile: VoterProfile, districts: Ballot.Districts? = nil) async throws -> (Ballot, String) {
-        var baseBallot = loadBaseBallot(for: profile.primaryBallot)
+        var baseBallot = await loadBaseBallot(for: profile.primaryBallot)
 
         if let districts {
             baseBallot = baseBallot.filtered(to: districts)
@@ -94,7 +94,11 @@ actor ClaudeService: GuideGenerating {
 
     // MARK: - Load Base Ballot
 
-    private func loadBaseBallot(for primary: PrimaryBallot) -> Ballot {
+    private func loadBaseBallot(for primary: PrimaryBallot) async -> Ballot {
+        // Try remote-updated data first, fall back to bundled
+        if let remote = await ElectionDataService.shared.loadCachedBallot(for: primary) {
+            return remote
+        }
         switch primary {
         case .democrat:
             return Ballot.sampleDemocrat

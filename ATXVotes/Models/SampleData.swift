@@ -13,12 +13,15 @@ enum ElectionDataLoader {
               let data = try? Data(contentsOf: url) else {
             return nil
         }
+        return loadBallot(from: data)
+    }
 
+    static func loadBallot(from data: Data) -> Ballot? {
         do {
             let raw = try JSONDecoder().decode(RawBallot.self, from: data)
             return raw.toBallot()
         } catch {
-            logger.error("Failed to decode \(filename).json — \(error.localizedDescription)")
+            logger.error("Failed to decode ballot JSON — \(error.localizedDescription)")
             return nil
         }
     }
@@ -26,7 +29,7 @@ enum ElectionDataLoader {
 
 // MARK: - JSON-friendly models (no UUIDs, simple strings for enums/dates)
 
-private struct RawBallot: Decodable {
+struct RawBallot: Decodable {
     let electionName: String
     let electionDate: String        // "2026-03-03"
     let party: String               // "republican" or "democrat"
@@ -63,7 +66,7 @@ private struct RawBallot: Decodable {
     }
 }
 
-private struct RawDistricts: Decodable {
+struct RawDistricts: Decodable {
     let congressional: String?
     let stateSenate: String?
     let stateHouse: String?
@@ -71,7 +74,7 @@ private struct RawDistricts: Decodable {
     let schoolBoard: String?
 }
 
-private struct RawRace: Decodable {
+struct RawRace: Decodable {
     let office: String
     let district: String?
     let isContested: Bool
@@ -92,7 +95,7 @@ private struct RawRace: Decodable {
     }
 }
 
-private struct RawCandidate: Decodable {
+struct RawCandidate: Decodable {
     let name: String
     let party: String?
     let isIncumbent: Bool
@@ -125,7 +128,7 @@ private struct RawCandidate: Decodable {
     }
 }
 
-private struct RawRecommendation: Decodable {
+struct RawRecommendation: Decodable {
     let candidateName: String
     let reasoning: String
     let strategicNotes: String?
@@ -144,7 +147,7 @@ private struct RawRecommendation: Decodable {
     }
 }
 
-private struct RawProposition: Decodable {
+struct RawProposition: Decodable {
     let number: Int
     let title: String
     let description: String

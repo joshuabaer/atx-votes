@@ -9,6 +9,16 @@ routes = [
   { pattern = "www.atxvotes.app/*", zone_name = "atxvotes.app" },
 ]
 
+# KV namespace for cached election data
+[[kv_namespaces]]
+binding = "ELECTION_DATA"
+id = "1b02b19492f243c8b503d99d0ff11761"
+
+# Daily update cron: 12:00 UTC = 6:00 AM CT
+[triggers]
+crons = ["0 12 * * *"]
+
 # Secrets (set via `npx wrangler secret put`):
 #   ANTHROPIC_API_KEY - your Anthropic API key
 #   APP_SECRET - shared bearer token for the iOS app
+#   ADMIN_SECRET - secret for manual trigger endpoint

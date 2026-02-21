@@ -33,6 +33,9 @@ Pods/
 .LSOverride
 ._*
 
+# Cloudflare Wrangler
+worker/.wrangler/
+
 # Misc
 *.swp
 *~

@@ -1,3 +1,5 @@
+import { runDailyUpdate } from "./updater.js";
+
 // Travis County commissioner precinct lookup by ZIP code
 // Source: Travis County Clerk precinct maps
 const ZIP_TO_PRECINCT = {
@@ -381,6 +383,62 @@ function handlePrivacyPolicy() {
   });
 }
 
+// MARK: - Election Data Endpoints
+
+async function handleManifest(env) {
+  const raw = await env.ELECTION_DATA.get("manifest");
+  if (!raw) {
+    return jsonResponse({ republican: null, democrat: null }, 200, {
+      "Cache-Control": "public, max-age=300",
+    });
+  }
+  return jsonResponse(JSON.parse(raw), 200, {
+    "Cache-Control": "public, max-age=300",
+  });
+}
+
+async function handleBallotFetch(request, env) {
+  const url = new URL(request.url);
+  const party = url.searchParams.get("party");
+  if (!party || !["republican", "democrat"].includes(party)) {
+    return jsonResponse({ error: "party parameter required (republican|democrat)" }, 400);
+  }
+
+  const key = `ballot:${party}_primary_2026`;
+  const raw = await env.ELECTION_DATA.get(key);
+  if (!raw) {
+    return jsonResponse({ error: "No ballot data available" }, 404);
+  }
+
+  const etag = `"${await hashString(raw)}"`;
+  const ifNoneMatch = request.headers.get("If-None-Match");
+  if (ifNoneMatch === etag) {
+    return new Response(null, { status: 304 });
+  }
+
+  return new Response(raw, {
+    status: 200,
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "public, max-age=3600",
+      ETag: etag,
+    },
+  });
+}
+
+async function handleTrigger(request, env) {
+  const body = await request.json().catch(() => ({}));
+  const parties = body.parties || undefined;
+  const result = await runDailyUpdate(env, { parties });
+  return jsonResponse(result);
+}
+
+async function hashString(str) {
+  const data = new TextEncoder().encode(str);
+  const hash = await crypto.subtle.digest("SHA-256", data);
+  return [...new Uint8Array(hash)].map((b) => b.toString(16).padStart(2, "0")).join("").slice(0, 16);
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -393,6 +451,17 @@ export default {
       if (url.pathname === "/support") {
         return handleSupport();
       }
+      if (url.pathname === "/api/election/manifest") {
+        return handleManifest(env);
+      }
+      if (url.pathname === "/api/election/ballot") {
+        // Auth required for ballot data
+        const auth = request.headers.get("Authorization");
+        if (!auth || auth !== `Bearer ${env.APP_SECRET}`) {
+          return new Response("Unauthorized", { status: 401 });
+        }
+        return handleBallotFetch(request, env);
+      }
       return handleLandingPage();
     }
 
@@ -400,7 +469,16 @@ export default {
       return new Response("Not found", { status: 404 });
     }
 
-    // Validate app secret
+    // POST: /api/election/trigger uses ADMIN_SECRET
+    if (url.pathname === "/api/election/trigger") {
+      const auth = request.headers.get("Authorization");
+      if (!auth || auth !== `Bearer ${env.ADMIN_SECRET}`) {
+        return new Response("Unauthorized", { status: 401 });
+      }
+      return handleTrigger(request, env);
+    }
+
+    // Validate app secret for other POST routes
     const auth = request.headers.get("Authorization");
     if (!auth || auth !== `Bearer ${env.APP_SECRET}`) {
       return new Response("Unauthorized", { status: 401 });
@@ -414,5 +492,9 @@ export default {
       default:
         return new Response("Not found", { status: 404 });
     }
+  },
+
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(runDailyUpdate(env));
   },
 };

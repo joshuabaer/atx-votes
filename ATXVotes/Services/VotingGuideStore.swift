@@ -348,6 +348,8 @@ class VotingGuideStore: ObservableObject {
 
         if republicanBallot != nil || democratBallot != nil {
             guideComplete = true
+            // Check for remotely-updated election data in the background
+            Task { await self.refreshElectionDataIfNeeded() }
         }
 
         // Load selected party
@@ -403,6 +405,60 @@ class VotingGuideStore: ObservableObject {
             cloudStore.removeObject(forKey: key)
         }
         cloudStore.synchronize()
+    }
+
+    // MARK: - Remote Election Data Refresh
+
+    /// Checks for remotely-updated election data and merges factual changes
+    /// (endorsements, polling, etc.) without overwriting personalized recommendations.
+    private func refreshElectionDataIfNeeded() async {
+        let (remoteRep, remoteDem) = await ElectionDataService.shared.checkForUpdates()
+
+        if let remoteRep, var currentRep = republicanBallot {
+            mergeFactualUpdates(from: remoteRep, into: &currentRep)
+            republicanBallot = currentRep
+            logger.info("Merged remote Republican ballot updates")
+        }
+
+        if let remoteDem, var currentDem = democratBallot {
+            mergeFactualUpdates(from: remoteDem, into: &currentDem)
+            democratBallot = currentDem
+            logger.info("Merged remote Democrat ballot updates")
+        }
+
+        if remoteRep != nil || remoteDem != nil {
+            saveProfile()
+        }
+    }
+
+    /// Merges factual candidate data from a remote ballot into the user's personalized ballot.
+    /// Updates: endorsements, polling, fundraising, background, pros, cons, keyPositions, summary.
+    /// Preserves: isRecommended, recommendation, reasoning, confidence (personalized fields).
+    private func mergeFactualUpdates(from remote: Ballot, into current: inout Ballot) {
+        for (raceIndex, currentRace) in current.races.enumerated() {
+            guard let remoteRace = remote.races.first(where: {
+                $0.office == currentRace.office && $0.district == currentRace.district
+            }) else { continue }
+
+            for (candIndex, currentCand) in currentRace.candidates.enumerated() {
+                guard let remoteCand = remoteRace.candidates.first(where: {
+                    $0.name == currentCand.name
+                }) else { continue }
+
+                // Update factual fields only
+                current.races[raceIndex].candidates[candIndex].endorsements = remoteCand.endorsements
+                current.races[raceIndex].candidates[candIndex].polling = remoteCand.polling
+                current.races[raceIndex].candidates[candIndex].fundraising = remoteCand.fundraising
+                current.races[raceIndex].candidates[candIndex].background = remoteCand.background
+                current.races[raceIndex].candidates[candIndex].pros = remoteCand.pros
+                current.races[raceIndex].candidates[candIndex].cons = remoteCand.cons
+                current.races[raceIndex].candidates[candIndex].keyPositions = remoteCand.keyPositions
+                current.races[raceIndex].candidates[candIndex].summary = remoteCand.summary
+                // Preserve: isRecommended (personalized)
+            }
+            // Preserve: recommendation (personalized)
+        }
+        // Propositions are never modified by remote updates
     }
 
     // MARK: - iCloud Sync
