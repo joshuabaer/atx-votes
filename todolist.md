@@ -19,6 +19,16 @@
 - [x] Apply tone to AI personal summary on profile page — summary is regenerated with current tone when user hits "Reprocess Guide"
 - [x] Put "Texas Votes (Cowboy)" in the title of the link for txvotes.app/cowboy and "(Swedish Chef)" for /chef
 - [ ] Candidate profile page — a page for each candidate where they can verify all information and background we have about them in one place
+- [ ] AI audit — figure out the best way to have ChatGPT, Gemini, and Grok audit the detailed content and methodologies of this app
+- [ ] Data coverage dashboard — a web page showing what data/districts/counties/candidates are missing (county_info, county ballots, headshots, tone variants, endorsements, polling, fundraising)
+- [x] Fix district resolution — Census geocoder + filterBallotToDistricts() already work; fixed by populating county ballot data and moving Travis races out of statewide
+- [x] Move Travis County races out of statewide ballot — Commissioner Pct 2/4 moved to `ballot:county:48453:democrat_primary_2026`
+- [ ] Seed county ballots for top 20 counties by population — covers ~75% of TX voters with local races
+- [ ] Seed county_info for remaining 202 counties — voting logistics (hours, locations, contact) for rural/smaller counties
+- [ ] Fill missing headshots — 9 candidates completely missing, 2 have SVG only (need .jpg/.png)
+- [ ] Fill sparse candidate data — endorsements (43% missing), Democrat polling (55% missing), Democrat fundraising (35% missing)
+- [ ] Pre-generate candidate tone variants — summary/strengths/concerns for all 73 statewide candidates across 7 tones (in progress)
+- [ ] LLM choice — let users choose which LLM and model to use for generating their ballot (Claude, GPT, Gemini, Grok)
 - [x] Race card description text doesn't use full card width on desktop — text column is narrower than the card, wasting space next to the "Good Match" badge
 - [x] Integrate Polymarket predictions — show prediction market odds alongside race recommendations
 - [x] Geolocate button to auto-fill address — use browser geolocation to fill in street, city, and ZIP; hardcode state to TX

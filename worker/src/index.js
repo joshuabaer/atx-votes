@@ -822,6 +822,232 @@ Return ONLY valid JSON, no markdown fences, no explanation.`;
   return jsonResponse({ success: true, party, candidate: candidateName, tone, fieldsUpdated: updated });
 }
 
+// MARK: - Admin Coverage Dashboard
+
+// All 254 Texas county FIPS codes (48001 to 48507, odd numbers only)
+const TX_FIPS = [];
+for (let i = 1; i <= 507; i += 2) TX_FIPS.push(`48${String(i).padStart(3, "0")}`);
+
+async function handleAdminCoverage(env) {
+  const parties = ["republican", "democrat"];
+  const ballots = {};
+
+  // Load statewide ballots
+  for (const party of parties) {
+    let raw = await env.ELECTION_DATA.get(`ballot:statewide:${party}_primary_2026`);
+    if (!raw) raw = await env.ELECTION_DATA.get(`ballot:${party}_primary_2026`);
+    ballots[party] = raw ? JSON.parse(raw) : null;
+  }
+
+  // --- Section 1: Statewide Ballot Summary ---
+  let summaryRows = "";
+  for (const party of parties) {
+    const b = ballots[party];
+    if (!b) {
+      summaryRows += `<tr><td>${party}</td><td colspan="3" style="color:var(--text2)">No data</td></tr>`;
+      continue;
+    }
+    const raceCount = (b.races || []).length;
+    const candidateCount = (b.races || []).reduce((s, r) => s + (r.candidates || []).length, 0);
+    const propCount = (b.propositions || []).length;
+    summaryRows += `<tr><td style="text-transform:capitalize;font-weight:600">${party}</td><td>${raceCount}</td><td>${candidateCount}</td><td>${propCount}</td></tr>`;
+  }
+
+  // --- Section 2: Candidate Data Completeness ---
+  const candFields = ["summary", "background", "keyPositions", "endorsements", "pros", "cons", "fundraising", "polling", "headshot"];
+  let candRows = "";
+  for (const party of parties) {
+    const b = ballots[party];
+    if (!b) continue;
+    for (const race of (b.races || [])) {
+      for (const c of (race.candidates || [])) {
+        let cells = `<td style="text-transform:capitalize">${party}</td><td>${race.office}</td><td>${c.name}</td>`;
+        for (const f of candFields) {
+          const val = c[f];
+          const has = val !== undefined && val !== null && val !== "" && !(Array.isArray(val) && val.length === 0);
+          cells += `<td class="${has ? "cov-yes" : "cov-no"}">${has ? "Y" : "-"}</td>`;
+        }
+        candRows += `<tr>${cells}</tr>`;
+      }
+    }
+  }
+
+  // --- Section 3: Tone Variant Coverage ---
+  let toneRows = "";
+  for (const party of parties) {
+    const b = ballots[party];
+    if (!b) continue;
+    for (const race of (b.races || [])) {
+      for (const c of (race.candidates || [])) {
+        const summaryType = typeof c.summary === "object" && !Array.isArray(c.summary) ? "tones" : "plain";
+        const prosType = Array.isArray(c.pros) && c.pros.length > 0 && typeof c.pros[0] === "object" && !Array.isArray(c.pros[0]) ? "tones" : "plain";
+        const consType = Array.isArray(c.cons) && c.cons.length > 0 && typeof c.cons[0] === "object" && !Array.isArray(c.cons[0]) ? "tones" : "plain";
+
+        const toneCell = (type, keys) => {
+          if (type === "tones") return `<td class="cov-yes">Tones ${keys || ""}</td>`;
+          return `<td class="cov-no">Plain</td>`;
+        };
+
+        const summaryKeys = summaryType === "tones" ? Object.keys(c.summary).sort().join(",") : "";
+        const prosKeys = prosType === "tones" ? Object.keys(c.pros[0]).sort().join(",") : "";
+        const consKeys = consType === "tones" ? Object.keys(c.cons[0]).sort().join(",") : "";
+
+        toneRows += `<tr><td style="text-transform:capitalize">${party}</td><td>${c.name}</td>${toneCell(summaryType, summaryKeys)}${toneCell(prosType, prosKeys)}${toneCell(consType, consKeys)}</tr>`;
+      }
+    }
+  }
+
+  // --- Section 4: Proposition Tone Coverage ---
+  const propFields = ["description", "ifPasses", "ifFails", "background", "fiscalImpact"];
+  let propRows = "";
+  for (const party of parties) {
+    const b = ballots[party];
+    if (!b) continue;
+    for (const p of (b.propositions || [])) {
+      let cells = `<td style="text-transform:capitalize">${party}</td><td>Prop ${p.number}: ${p.title || ""}</td>`;
+      for (const f of propFields) {
+        const val = p[f];
+        if (val === undefined || val === null) {
+          cells += `<td class="cov-no">Missing</td>`;
+        } else if (typeof val === "object" && !Array.isArray(val)) {
+          const keys = Object.keys(val).sort();
+          const hasFull = keys.length === 7;
+          cells += `<td class="${hasFull ? "cov-yes" : "cov-partial"}">Tones ${keys.join(",")}</td>`;
+        } else {
+          cells += `<td class="cov-partial">Plain</td>`;
+        }
+      }
+      propRows += `<tr>${cells}</tr>`;
+    }
+  }
+
+  // --- Section 5 & 6: County Info & Ballot Coverage ---
+  // Batch KV reads in groups of 50 for performance
+  const BATCH = 50;
+  const countyInfoResults = {};
+  const countyBallotResults = {};
+
+  for (let i = 0; i < TX_FIPS.length; i += BATCH) {
+    const batch = TX_FIPS.slice(i, i + BATCH);
+    const reads = batch.flatMap(fips => [
+      env.ELECTION_DATA.get(`county_info:${fips}`).then(v => ({ type: "info", fips, has: !!v })),
+      env.ELECTION_DATA.get(`ballot:county:${fips}:republican_primary_2026`).then(v => ({ type: "rep", fips, has: !!v })),
+      env.ELECTION_DATA.get(`ballot:county:${fips}:democrat_primary_2026`).then(v => ({ type: "dem", fips, has: !!v })),
+    ]);
+    const results = await Promise.all(reads);
+    for (const r of results) {
+      if (r.type === "info") countyInfoResults[r.fips] = r.has;
+      else if (r.type === "rep") {
+        if (!countyBallotResults[r.fips]) countyBallotResults[r.fips] = {};
+        countyBallotResults[r.fips].republican = r.has;
+      } else {
+        if (!countyBallotResults[r.fips]) countyBallotResults[r.fips] = {};
+        countyBallotResults[r.fips].democrat = r.has;
+      }
+    }
+  }
+
+  const infoPresent = Object.values(countyInfoResults).filter(Boolean).length;
+  const infoMissing = TX_FIPS.length - infoPresent;
+  const repPresent = Object.values(countyBallotResults).filter(v => v.republican).length;
+  const demPresent = Object.values(countyBallotResults).filter(v => v.democrat).length;
+
+  // Build county detail rows (only show counties with at least some data, or first 20 missing)
+  let countyDetailRows = "";
+  const missingInfoFips = TX_FIPS.filter(f => !countyInfoResults[f]);
+  const presentInfoFips = TX_FIPS.filter(f => countyInfoResults[f]);
+  const allCountyFips = [...presentInfoFips, ...missingInfoFips];
+  for (const fips of allCountyFips) {
+    const hasInfo = countyInfoResults[fips];
+    const hasRep = countyBallotResults[fips]?.republican || false;
+    const hasDem = countyBallotResults[fips]?.democrat || false;
+    countyDetailRows += `<tr><td>${fips}</td><td class="${hasInfo ? "cov-yes" : "cov-no"}">${hasInfo ? "Y" : "-"}</td><td class="${hasRep ? "cov-yes" : "cov-no"}">${hasRep ? "Y" : "-"}</td><td class="${hasDem ? "cov-yes" : "cov-no"}">${hasDem ? "Y" : "-"}</td></tr>`;
+  }
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Data Coverage — Texas Votes Admin</title>
+  ${PAGE_CSS}
+  <style>
+    .container{max-width:1100px}
+    table{width:100%;border-collapse:collapse;margin-bottom:2rem;font-size:0.9rem}
+    th,td{padding:6px 10px;border:1px solid var(--border);text-align:left}
+    th{background:var(--blue);color:#fff;font-weight:600;font-size:0.85rem;position:sticky;top:0}
+    .cov-yes{background:rgba(34,197,94,.15);color:#16a34a;text-align:center;font-weight:600}
+    .cov-no{background:rgba(239,68,68,.12);color:#dc2626;text-align:center}
+    .cov-partial{background:rgba(234,179,8,.15);color:#b45309;text-align:center}
+    .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:2rem}
+    .stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:1rem;text-align:center}
+    .stat-card .num{font-size:2rem;font-weight:800;color:var(--blue)}
+    .stat-card .label{font-size:0.85rem;color:var(--text2)}
+    .scroll-table{max-height:500px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--rs);margin-bottom:2rem}
+    .scroll-table table{margin-bottom:0}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Data Coverage Dashboard</h1>
+    <p class="subtitle">Texas Votes election data completeness at a glance.</p>
+
+    <h2>Statewide Ballot Summary</h2>
+    <table>
+      <tr><th>Party</th><th>Races</th><th>Candidates</th><th>Propositions</th></tr>
+      ${summaryRows}
+    </table>
+
+    <h2>County Coverage Summary</h2>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="num">${infoPresent}</div><div class="label">Counties with Info</div></div>
+      <div class="stat-card"><div class="num">${infoMissing}</div><div class="label">Counties Missing Info</div></div>
+      <div class="stat-card"><div class="num">${repPresent}</div><div class="label">Republican Ballots</div></div>
+      <div class="stat-card"><div class="num">${demPresent}</div><div class="label">Democrat Ballots</div></div>
+    </div>
+
+    <h2>Candidate Data Completeness</h2>
+    <div class="scroll-table">
+    <table>
+      <tr><th>Party</th><th>Race</th><th>Candidate</th>${candFields.map(f => `<th>${f}</th>`).join("")}</tr>
+      ${candRows}
+    </table>
+    </div>
+
+    <h2>Tone Variant Coverage (Candidates)</h2>
+    <div class="scroll-table">
+    <table>
+      <tr><th>Party</th><th>Candidate</th><th>Summary</th><th>Pros</th><th>Cons</th></tr>
+      ${toneRows}
+    </table>
+    </div>
+
+    <h2>Proposition Tone Coverage</h2>
+    <div class="scroll-table">
+    <table>
+      <tr><th>Party</th><th>Proposition</th>${propFields.map(f => `<th>${f}</th>`).join("")}</tr>
+      ${propRows}
+    </table>
+    </div>
+
+    <h2>County Detail (All 254 Counties)</h2>
+    <div class="scroll-table">
+    <table>
+      <tr><th>FIPS</th><th>County Info</th><th>GOP Ballot</th><th>Dem Ballot</th></tr>
+      ${countyDetailRows}
+    </table>
+    </div>
+
+    <p class="page-footer"><a href="/">Texas Votes</a></p>
+  </div>
+</body>
+</html>`;
+
+  return new Response(html, {
+    headers: { "Content-Type": "text/html;charset=utf-8" },
+  });
+}
+
 async function hashString(str) {
   const data = new TextEncoder().encode(str);
   const hash = await crypto.subtle.digest("SHA-256", data);
@@ -906,6 +1132,14 @@ export default {
       }
       if (url.pathname === "/app/api/polymarket") {
         return handlePolymarket(env);
+      }
+      // Admin coverage dashboard (GET with Bearer auth)
+      if (url.pathname === "/admin/coverage") {
+        const auth = request.headers.get("Authorization");
+        if (!auth || auth !== `Bearer ${env.ADMIN_SECRET}`) {
+          return new Response("Unauthorized", { status: 401 });
+        }
+        return handleAdminCoverage(env);
       }
       return handleLandingPage();
     }
