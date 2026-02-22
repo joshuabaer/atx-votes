@@ -465,8 +465,8 @@ var APP_JS = [
     "'Build My Guide':'Crear mi gu\\u00EDa'," +
     // Interview
     "'What issues matter most to you?':'\\u00BFQu\\u00E9 temas te importan m\\u00E1s?'," +
-    "'Pick your top 3-5. We\\u2019ll dig deeper on these.':'Elige los 3 a 5 m\\u00E1s importantes. Profundizaremos en estos.'," +
-    "'of 3-5 selected':'de 3-5 seleccionados'," +
+    "'Pick your top 3-7. We\\u2019ll dig deeper on these.':'Elige los 3 a 7 m\\u00E1s importantes. Profundizaremos en estos.'," +
+    "'of 3-7 selected':'de 3-7 seleccionados'," +
     "'Continue':'Continuar'," +
     "'Back':'Atr\\u00E1s'," +
     "'How would you describe your political approach?':'\\u00BFC\\u00F3mo describir\\u00EDas tu enfoque pol\\u00EDtico?'," +
@@ -1238,7 +1238,7 @@ var APP_JS = [
   // Issues
   "function renderIssues(){" +
     "if(!shuffledIssues)shuffledIssues=shuffle(ISSUES);" +
-    "var h='<div class=\"phase-header\"><h2>'+t('What issues matter most to you?')+'</h2><p>'+t('Pick your top 3-5. We\\u2019ll dig deeper on these.')+'</p></div>';" +
+    "var h='<div class=\"phase-header\"><h2>'+t('What issues matter most to you?')+'</h2><p>'+t('Pick your top 3-7. We\\u2019ll dig deeper on these.')+'</p></div>';" +
     "h+='<div class=\"chip-grid\">';" +
     "for(var i=0;i<shuffledIssues.length;i++){" +
       "var issue=shuffledIssues[i];" +
@@ -1247,7 +1247,7 @@ var APP_JS = [
     "}" +
     "h+='</div>';" +
     "var n=S.issues.length;" +
-    "h+='<p class=\"text-center mt-md\" style=\"font-size:14px;color:var(--text2)\">'+n+' '+t('of 3-5 selected')+'</p>';" +
+    "h+='<p class=\"text-center mt-md\" style=\"font-size:14px;color:var(--text2)\">'+n+' '+t('of 3-7 selected')+'</p>';" +
     "h+='<button class=\"btn btn-primary mt-md\" data-action=\"next\"'+(n<3?' disabled':'')+'>'+t('Continue')+'</button>';" +
     "return h;" +
   "}",
@@ -1961,7 +1961,7 @@ var APP_JS = [
     "}" +
     "else if(action==='toggle-issue'){" +
       "var v=el.dataset.value;var idx=S.issues.indexOf(v);" +
-      "if(idx!==-1)S.issues.splice(idx,1);else if(S.issues.length<5)S.issues.push(v);" +
+      "if(idx!==-1)S.issues.splice(idx,1);else if(S.issues.length<7)S.issues.push(v);" +
       "render()" +
     "}" +
     "else if(action==='select-spectrum'){S.spectrum=el.dataset.value;render()}" +

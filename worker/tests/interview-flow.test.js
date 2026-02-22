@@ -147,18 +147,20 @@ describe("Phase 1: Issues", () => {
     expect(btn.disabled).toBe(false);
   });
 
-  it("enforces max 5 issues", () => {
+  it("enforces max 7 issues", () => {
     clickAction("toggle-issue", "Housing");
     clickAction("toggle-issue", "Healthcare");
     clickAction("toggle-issue", "Education");
     clickAction("toggle-issue", "Transportation");
     clickAction("toggle-issue", "Immigration");
-    expect(S().issues).toHaveLength(5);
-
-    // 6th issue should be rejected
     clickAction("toggle-issue", "Taxes");
-    expect(S().issues).toHaveLength(5);
-    expect(S().issues).not.toContain("Taxes");
+    clickAction("toggle-issue", "Civil Rights");
+    expect(S().issues).toHaveLength(7);
+
+    // 8th issue should be rejected
+    clickAction("toggle-issue", "Gun Policy");
+    expect(S().issues).toHaveLength(7);
+    expect(S().issues).not.toContain("Gun Policy");
   });
 
   it("toggling an issue off deselects it", () => {
