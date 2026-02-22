@@ -11,7 +11,8 @@
 - [x] Broaden deep dives for rural Texas — Housing (property rights/taxes vs density), Transportation (rural roads vs light rail), Immigration (remove Austin city-council framing)
 - [x] Add candidate qualities: Faith & Values, Business Experience
 - [x] Fix progress bar animation — dots jump back and forth between 4th and 5th position, line moves awkwardly during the loading screen
-- [ ] Reading level slider on profile — adjusts language complexity across the app on a scale from "high school" to "political science professor"
+- [x] Reading level slider on profile — adjusts language complexity across the app on a scale from "high school" to "political science professor"
+- [ ] Wider content area on desktop — currently displays phone-width on computer screens
 - [x] Integrate Polymarket predictions — show prediction market odds alongside race recommendations
 - [x] Geolocate button to auto-fill address — use browser geolocation to fill in street, city, and ZIP; hardcode state to TX
 - [x] Balance loading screen timing — "Researching Republicans" and "Researching Democrats" should show for roughly equal time; currently the first one displays much longer and looks uneven

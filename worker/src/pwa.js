@@ -705,6 +705,18 @@ var APP_JS = [
     "'High School':'Preparatoria'," +
     "'Professor':'Profesor'," +
     "'Reprocess Guide':'Reprocesar gu\\u00EDa'," +
+    "'Talk to me like...':'H\\u00E1blame como...'," +
+    "'How should we explain things?':'\\u00BFC\\u00F3mo deber\\u00EDamos explicarte las cosas?'," +
+    "'Keep it simple':'Hazlo simple'," +
+    "'Simple, everyday language \\u2014 like a high school class':'Lenguaje simple y cotidiano \\u2014 como en una clase de preparatoria'," +
+    "'Talk like a friend':'H\\u00E1blame como amigo'," +
+    "'Casual and conversational':'Casual y conversacional'," +
+    "'Just the facts':'Solo los hechos'," +
+    "'Clear and balanced \\u2014 standard news level':'Claro y equilibrado \\u2014 nivel de noticias est\\u00E1ndar'," +
+    "'I follow politics':'Sigo la pol\\u00EDtica'," +
+    "'More depth, nuance, and political terminology':'M\\u00E1s profundidad, matices y terminolog\\u00EDa pol\\u00EDtica'," +
+    "'Full professor mode':'Modo profesor'," +
+    "'Expert-level analysis with policy frameworks':'An\\u00E1lisis a nivel experto con marcos de pol\\u00EDtica p\\u00FAblica'," +
     "'This will erase your profile and recommendations.':'Esto borrar\\u00E1 tu perfil y recomendaciones.'," +
     "'Start over? This will erase your profile and recommendations.':'\\u00BFEmpezar de nuevo? Esto borrar\\u00E1 tu perfil y recomendaciones.'," +
     // Vote Info
@@ -1213,17 +1225,18 @@ var APP_JS = [
   // ============ INTERVIEW VIEWS ============
   "function renderInterview(){" +
     "if(S.phase===0)return renderWelcome();" +
-    "if(S.phase===7)return renderBuilding();" +
-    "var step=S.phase;var total=6;" +
-    "if(S.phase===3){step=3};" +
+    "if(S.phase===8)return renderBuilding();" +
+    "var step=S.phase;var total=7;" +
+    "if(S.phase===4){step=4};" +
     "var pbar='<div class=\"progress\"><div class=\"progress-fill\" style=\"width:'+(step/total*100)+'%\"></div></div>';" +
     "var back='<button class=\"back-btn\" data-action=\"back\">&larr; Back</button>';" +
-    "if(S.phase===1)return pbar+renderIssues();" +
-    "if(S.phase===2)return pbar+back+renderSpectrum();" +
-    "if(S.phase===3)return pbar+back+renderDeepDive();" +
-    "if(S.phase===4)return pbar+back+renderQualities();" +
-    "if(S.phase===5)return pbar+back+renderFreeform();" +
-    "if(S.phase===6)return pbar+back+renderAddress();" +
+    "if(S.phase===1)return pbar+renderTone();" +
+    "if(S.phase===2)return pbar+back+renderIssues();" +
+    "if(S.phase===3)return pbar+back+renderSpectrum();" +
+    "if(S.phase===4)return pbar+back+renderDeepDive();" +
+    "if(S.phase===5)return pbar+back+renderQualities();" +
+    "if(S.phase===6)return pbar+back+renderFreeform();" +
+    "if(S.phase===7)return pbar+back+renderAddress();" +
     "return'';" +
   "}",
 
@@ -1248,6 +1261,29 @@ var APP_JS = [
     "<div style=\"text-align:center;margin-top:16px\">" +
       "<button data-action=\"set-lang\" data-value=\"'+(LANG==='es'?'en':'es')+'\" style=\"font-size:14px;color:var(--text2);background:none;border:none;cursor:pointer;font-family:inherit\">'+(LANG==='es'?'Switch to English':'Cambiar a Espa\\u00F1ol')+'</button>" +
     "</div>';" +
+  "}",
+
+  // Tone / Reading Level
+  "var TONE_OPTS=[" +
+    "{v:1,l:'Keep it simple',d:'Simple, everyday language \\u2014 like a high school class'}," +
+    "{v:2,l:'Talk like a friend',d:'Casual and conversational'}," +
+    "{v:3,l:'Just the facts',d:'Clear and balanced \\u2014 standard news level'}," +
+    "{v:4,l:'I follow politics',d:'More depth, nuance, and political terminology'}," +
+    "{v:5,l:'Full professor mode',d:'Expert-level analysis with policy frameworks'}" +
+  "];",
+  "function renderTone(){" +
+    "var h='<div class=\"phase-header\"><h2>'+t('Talk to me like...')+'</h2><p>'+t('How should we explain things?')+'</p></div>';" +
+    "h+='<div class=\"radio-list\">';" +
+    "for(var i=0;i<TONE_OPTS.length;i++){" +
+      "var o=TONE_OPTS[i];var on=S.readingLevel===o.v;" +
+      "h+='<div class=\"radio'+(on?' radio-on':'')+'\" data-action=\"select-tone\" data-value=\"'+o.v+'\" role=\"option\" aria-selected=\"'+on+'\" tabindex=\"0\">';" +
+      "h+='<div class=\"radio-label\">'+t(o.l)+'</div>';" +
+      "h+='<div class=\"radio-desc\">'+t(o.d)+'</div>';" +
+      "h+='</div>'" +
+    "}" +
+    "h+='</div>';" +
+    "h+='<button class=\"btn btn-primary mt-md\" data-action=\"next\"'+(S.readingLevel?'':' disabled')+'>'+t('Continue')+'</button>';" +
+    "return h;" +
   "}",
 
   // Issues
@@ -1979,16 +2015,16 @@ var APP_JS = [
     "var action=el.dataset.action;" +
     "if(action==='start'){S.phase=1;render()}" +
     "else if(action==='back'){" +
-      "if(S.phase===3&&S.ddIndex>0){S.ddIndex--;render()}" +
-      "else if(S.phase===4&&S.ddQuestions.length>0){S.phase=3;S.ddIndex=S.ddQuestions.length-1;render()}" +
+      "if(S.phase===4&&S.ddIndex>0){S.ddIndex--;render()}" +
+      "else if(S.phase===5&&S.ddQuestions.length>0){S.phase=4;S.ddIndex=S.ddQuestions.length-1;render()}" +
       "else{S.phase=Math.max(0,S.phase-1);render()}" +
     "}" +
     "else if(action==='next'){" +
-      "if(S.phase===1){" +
+      "if(S.phase===2){" +
         "S.ddQuestions=[];S.ddIndex=0;" +
         "for(var i=0;i<S.issues.length;i++){if(DEEP_DIVES[S.issues[i]])S.ddQuestions.push(DEEP_DIVES[S.issues[i]])}" +
       "}" +
-      "if(S.phase===5){var ta=document.getElementById('freeform-input');S.freeform=ta?ta.value.trim():S.freeform}" +
+      "if(S.phase===6){var ta=document.getElementById('freeform-input');S.freeform=ta?ta.value.trim():S.freeform}" +
       "S.phase++;render()" +
     "}" +
     "else if(action==='toggle-issue'){" +
@@ -1996,6 +2032,7 @@ var APP_JS = [
       "if(idx!==-1)S.issues.splice(idx,1);else if(S.issues.length<7)S.issues.push(v);" +
       "render()" +
     "}" +
+    "else if(action==='select-tone'){S.readingLevel=parseInt(el.dataset.value)||3;render()}" +
     "else if(action==='select-spectrum'){S.spectrum=el.dataset.value;render()}" +
     "else if(action==='select-dd'){" +
       "var dd=S.ddQuestions[S.ddIndex];" +
@@ -2003,7 +2040,7 @@ var APP_JS = [
     "}" +
     "else if(action==='next-dd'){" +
       "if(S.ddIndex<S.ddQuestions.length-1){S.ddIndex++;render()}" +
-      "else{S.phase=4;render()}" +
+      "else{S.phase=5;render()}" +
     "}" +
     "else if(action==='toggle-quality'){" +
       "var v=el.dataset.value;var idx=S.qualities.indexOf(v);" +
@@ -2020,7 +2057,7 @@ var APP_JS = [
     "else if(action==='nav'){location.hash=el.dataset.to}" +
     "else if(action==='reset'){" +
       "if(confirm(t('Start over? This will erase your profile and recommendations.'))){" +
-        "S.phase=0;S.issues=[];S.spectrum=null;S.policyViews={};S.qualities=[];S.freeform='';" +
+        "S.phase=0;S.issues=[];S.spectrum=null;S.policyViews={};S.qualities=[];S.freeform='';S.readingLevel=3;" +
         "S.address={street:'',city:'',state:'TX',zip:''};S.ddIndex=0;S.ddQuestions=[];S.countyInfo=null;" +
         "S.repBallot=null;S.demBallot=null;S.selectedParty='republican';" +
         "S.guideComplete=false;S.summary=null;S.districts=null;S.expanded={};S.addressError=null;S.verifyingAddress=false;" +
@@ -2106,7 +2143,7 @@ var APP_JS = [
 
   // ============ BUILD GUIDE ============
   "function buildGuide(){" +
-    "S.phase=7;S.error=null;S.loadPhase=0;S.loadMsg='Finding your ballot...';S.isLoading=true;render();" +
+    "S.phase=8;S.error=null;S.loadPhase=0;S.loadMsg='Finding your ballot...';S.isLoading=true;render();" +
     "doGuide();" +
   "}",
 
@@ -2173,7 +2210,7 @@ var APP_JS = [
 
   // ============ REPROCESS GUIDE ============
   "function reprocessGuide(){" +
-    "S.phase=7;S.error=null;S.loadPhase=0;S.loadMsg='Finding your ballot...';S.isLoading=true;render();" +
+    "S.phase=8;S.error=null;S.loadPhase=0;S.loadMsg='Finding your ballot...';S.isLoading=true;render();" +
     "doGuide();" +
   "}",
 
