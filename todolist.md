@@ -29,17 +29,19 @@
 - [ ] Fill sparse candidate data — endorsements (43% missing), Democrat polling (55% missing), Democrat fundraising (35% missing)
 - [x] Pre-generate candidate tone variants — summary/strengths/concerns for all 73 statewide candidates across 7 tones
 - [ ] LLM choice — let users choose which LLM and model to use for generating their ballot (Claude, GPT, Gemini, Grok)
-- [ ] Fireworks animation after "I Voted" — celebratory fireworks/confetti when the user taps the "I Voted" button
+- [x] Fireworks animation after "I Voted" — celebratory fireworks/confetti when the user taps the "I Voted" button
 - [ ] Make the app more patriotic visually — red/white/blue theme touches, stars, flag-inspired design elements
 - [ ] Make the app more viral — built-in sharing prompts, social hooks, referral mechanics
 - [ ] Volunteer opportunities near you — add a "Volunteer" section on the Vote Info page showing nearby volunteer opportunities
 - [ ] Post-voting share prompt — after voting, ask the user to share the app with 3 people who could use encouragement to vote
-- [ ] Fix back button on /cowboy and /chef — after entering via a vanity URL, the browser back button doesn't work properly; it should clear data and take you back to /cowboy (or /chef)
-- [ ] Always show a back button in the interview flow — e.g., the tone picker screen has no way to go back to the previous step
+- [x] Fix back button on /cowboy and /chef — after entering via a vanity URL, the browser back button doesn't work properly; it should clear data and take you back to /cowboy (or /chef)
+- [x] Always show a back button in the interview flow — e.g., the tone picker screen has no way to go back to the previous step
 - [ ] Open source code — create an open source page on the website that links to the repo and includes links to 3 different AI code reviews to demonstrate fairness and impartiality
-- [ ] Remove Polymarket stats — remove prediction market odds from the app
+- [x] Remove Polymarket stats — remove prediction market odds from the app
 - [ ] Create new txvotes repo in GitHub — fresh copy of the code without all the dev history
 - [ ] Put Texas flag on the home page — add Texas flag graphic to the landing/welcome page
+- [ ] Fix formatting on static pages (iPhone 17 Pro) — landing page and nonpartisan page have margins too wide, text is squeezed into a narrow column with excessive padding; "Build My Voting Guide" button and badge text wrap awkwardly
+- [ ] Change issues and candidate trait selection to "sort by priority" — instead of "select your top 3-5", let users drag/sort issues by importance
 - [x] Race card description text doesn't use full card width on desktop — text column is narrower than the card, wasting space next to the "Good Match" badge
 - [x] Integrate Polymarket predictions — show prediction market odds alongside race recommendations
 - [x] Geolocate button to auto-fill address — use browser geolocation to fill in street, city, and ZIP; hardcode state to TX

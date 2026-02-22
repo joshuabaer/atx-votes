@@ -9,10 +9,11 @@ const PAGE_CSS = `<meta name="theme-color" content="rgb(33,89,143)" media="(pref
 :root{--blue:rgb(33,89,143);--bg:#faf8f0;--card:#fff;--text:rgb(31,31,36);--text2:rgb(115,115,128);--border:rgba(128,128,128,.15);--shadow:rgba(0,0,0,.06);--r:16px;--rs:10px}
 @media(prefers-color-scheme:dark){:root{--blue:rgb(102,153,217);--bg:rgb(28,28,31);--card:rgb(43,43,46);--text:rgb(237,237,240);--text2:rgb(153,153,166);--border:rgba(255,255,255,.15);--shadow:rgba(0,0,0,.3)}}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);padding:2rem;line-height:1.7;-webkit-font-smoothing:antialiased}
-.container,.card{background:var(--card);border-radius:var(--r);padding:3rem 2.5rem;box-shadow:0 2px 8px var(--shadow)}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);padding:1rem;line-height:1.7;-webkit-font-smoothing:antialiased}
+.container,.card{background:var(--card);border-radius:var(--r);padding:2rem 1.5rem;box-shadow:0 2px 8px var(--shadow)}
 .container{max-width:640px;margin:0 auto}
 .card{max-width:480px;text-align:center}
+@media(min-width:600px){body{padding:2rem}.container,.card{padding:3rem 2.5rem}}
 h1{font-size:2rem;font-weight:800;color:var(--blue);margin-bottom:0.5rem;letter-spacing:-0.5px}
 h2{font-size:1.15rem;font-weight:700;color:var(--text);margin-top:1.5rem;margin-bottom:0.5rem}
 p{font-size:1rem;color:var(--text);margin-bottom:0.75rem}
@@ -218,7 +219,14 @@ function handleLandingPage() {
 </head>
 <body style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center">
   <div class="card">
-    <div class="icon">🗳️</div>
+    <svg width="120" height="80" viewBox="0 0 120 80" style="margin-bottom:12px">
+      <rect width="120" height="80" rx="4" fill="#002868"/>
+      <rect y="40" width="120" height="40" rx="0" fill="#BF0A30"/>
+      <rect x="0" y="40" width="120" height="40" fill="#BF0A30"/>
+      <rect x="0" y="0" width="120" height="40" fill="#fff"/>
+      <rect x="0" y="0" width="40" height="80" fill="#002868"/>
+      <polygon points="20,20 23.1,28.5 32,28.5 25,34 27.4,42.5 20,37.5 12.6,42.5 15,34 8,28.5 16.9,28.5" fill="#fff"/>
+    </svg>
     <h1>Texas Votes</h1>
     <p class="subtitle" data-t="Your personalized voting guide for Texas elections.">Your personalized voting guide for Texas elections.</p>
     <div class="badge" data-t="Texas Primary — March 3, 2026">Texas Primary — March 3, 2026</div>

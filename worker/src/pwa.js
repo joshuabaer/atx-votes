@@ -762,6 +762,13 @@ var APP_JS = [
     "'Note:':'Nota:'," +
     "'You may NOT use your phone in the voting booth. Print your cheat sheet before you go!':'NO puedes usar tu tel\\u00E9fono en la casilla de votaci\\u00F3n. \\u00A1Imprime tu gu\\u00EDa antes de ir!'," +
     "'Resources':'Recursos'," +
+    "'Volunteer Opportunities':'Oportunidades de voluntariado'," +
+    "'Be an Election Worker':'S\\u00E9 trabajador electoral'," +
+    "'County Elections Office':'Oficina de elecciones del condado'," +
+    "'League of Women Voters TX':'Liga de Mujeres Votantes TX'," +
+    "'Rock the Vote':'Rock the Vote'," +
+    "'Texas Civil Rights Project':'Proyecto de Derechos Civiles de Texas'," +
+    "'Help your neighbors vote! Poll workers, voter registration drives, and ride-to-polls programs need volunteers.':'\\u00A1Ayuda a tus vecinos a votar! Se necesitan voluntarios para trabajar en casillas, registrar votantes y llevar gente a votar.'," +
     "'County Elections':'Elecciones del condado'," +
     "'Find your polling location for Election Day.':'Encuentra tu lugar de votaci\\u00F3n para el d\\u00EDa de elecciones.'," +
     "'Vote at any Vote Center in your county.':'Vota en cualquier centro de votaci\\u00F3n en tu condado.'," +
@@ -2001,6 +2008,22 @@ var APP_JS = [
     "resBody+='<div class=\"vi-link\"><a href=\"https://vote411.org\" target=\"_blank\">VOTE411 \\u2014 Personalized ballot &rarr;</a></div>';" +
     "resBody+='<div class=\"vi-link\"><a href=\"https://votetexas.gov\" target=\"_blank\">VoteTexas.gov \\u2014 State info &rarr;</a></div>';" +
     "h+=accSection('vi-res','\u{1F517}',t('Resources'),resBody);" +
+
+    // Volunteer Opportunities accordion — location-specific + statewide
+    "var volBody='';" +
+    "if(ci&&ci.countyName){" +
+      "volBody+='<div class=\"vi-link\"><a href=\"https://www.votetexas.gov/be-an-election-worker/\" target=\"_blank\">'+t('Be an Election Worker')+' \\u2014 '+esc(ci.countyName)+' County &rarr;</a></div>'" +
+    "}else{" +
+      "volBody+='<div class=\"vi-link\"><a href=\"https://www.votetexas.gov/be-an-election-worker/\" target=\"_blank\">'+t('Be an Election Worker')+' &rarr;</a></div>'" +
+    "}" +
+    "if(ci&&ci.electionsWebsite){" +
+      "volBody+='<div class=\"vi-link\"><a href=\"'+esc(ci.electionsWebsite)+'\" target=\"_blank\">'+esc(ci.countyName)+' '+t('County Elections Office')+' &rarr;</a></div>'" +
+    "}" +
+    "volBody+='<div class=\"vi-link\"><a href=\"https://lwvtexas.org/volunteer\" target=\"_blank\">'+t('League of Women Voters TX')+' &rarr;</a></div>';" +
+    "volBody+='<div class=\"vi-link\"><a href=\"https://www.rockthevote.org/get-involved/\" target=\"_blank\">'+t('Rock the Vote')+' &rarr;</a></div>';" +
+    "volBody+='<div class=\"vi-link\"><a href=\"https://texascivilrightsproject.org/\" target=\"_blank\">'+t('Texas Civil Rights Project')+' &rarr;</a></div>';" +
+    "volBody+='<p style=\"font-size:13px;color:var(--text2);margin-top:8px\">'+t('Help your neighbors vote! Poll workers, voter registration drives, and ride-to-polls programs need volunteers.')+'</p>';" +
+    "h+=accSection('vi-vol','\u{1F91D}',t('Volunteer Opportunities'),volBody);" +
 
     // Contact card — dynamic from county info
     "h+='<div class=\"card\" style=\"margin-top:16px\">';" +
