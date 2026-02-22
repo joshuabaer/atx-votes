@@ -554,6 +554,97 @@ async function handleTrigger(request, env) {
   return jsonResponse(result);
 }
 
+const TONE_LABELS = {
+  1: "high school / simplest",
+  2: "casual / friendly",
+  3: "standard / news level",
+  4: "detailed / political",
+  5: "expert / professor",
+  6: "Swedish Chef from the Muppets (bork bork bork!)",
+  7: "Texas cowboy (y'all, reckon, fixin' to, partner)",
+};
+
+async function handleGenerateTones(request, env) {
+  const body = await request.json().catch(() => ({}));
+  const parties = body.parties || ["republican", "democrat"];
+  const tones = body.tones || [1, 2, 3, 4, 5, 6, 7];
+  const fields = ["description", "ifPasses", "ifFails", "background", "fiscalImpact"];
+  const results = {};
+
+  for (const party of parties) {
+    const key = `ballot:statewide:${party}_primary_2026`;
+    const raw = await env.ELECTION_DATA.get(key);
+    if (!raw) { results[party] = { error: "no ballot data" }; continue; }
+
+    const ballot = JSON.parse(raw);
+    if (!ballot.propositions || !ballot.propositions.length) {
+      results[party] = { error: "no propositions" }; continue;
+    }
+
+    let updated = 0;
+    for (const prop of ballot.propositions) {
+      // For each text field, generate tone versions
+      for (const field of fields) {
+        const original = typeof prop[field] === "string" ? prop[field] : (prop[field] && prop[field]["3"]) || null;
+        if (!original) continue;
+
+        const toneVersions = typeof prop[field] === "object" && !Array.isArray(prop[field]) ? { ...prop[field] } : {};
+
+        // Generate missing tones
+        const missing = tones.filter(t => !toneVersions[String(t)]);
+        if (missing.length === 0) continue;
+
+        // Store original as tone 3 if not set
+        if (!toneVersions["3"]) toneVersions["3"] = original;
+
+        for (const tone of missing) {
+          if (tone === 3) { toneVersions["3"] = original; continue; }
+          try {
+            const result = await callClaudeForTone(env, original, field, prop.number, prop.title, tone);
+            toneVersions[String(tone)] = result;
+          } catch (err) {
+            toneVersions[String(tone)] = original; // fallback to original on error
+          }
+          // Rate limit delay
+          await new Promise(r => setTimeout(r, 1000));
+        }
+
+        prop[field] = toneVersions;
+        updated++;
+      }
+    }
+
+    // Save back to KV
+    await env.ELECTION_DATA.put(key, JSON.stringify(ballot));
+    results[party] = { success: true, fieldsUpdated: updated, propositions: ballot.propositions.length };
+  }
+
+  return jsonResponse(results);
+}
+
+async function callClaudeForTone(env, text, fieldName, propNumber, propTitle, tone) {
+  const toneDesc = TONE_LABELS[tone] || "standard";
+  const prompt = `Rewrite the following proposition text in a ${toneDesc} tone. Keep the same factual content and meaning, just adjust the language style and complexity.\n\nProposition ${propNumber}: ${propTitle}\nField: ${fieldName}\nOriginal text: "${text}"\n\nReturn ONLY the rewritten text, nothing else. No quotes, no explanation.`;
+
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": env.ANTHROPIC_API_KEY,
+      "anthropic-version": "2023-06-01",
+    },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 512,
+      messages: [{ role: "user", content: prompt }],
+    }),
+  });
+
+  if (!res.ok) throw new Error(`API error ${res.status}`);
+  const data = await res.json();
+  return data.content[0].text.trim();
+}
+
 async function hashString(str) {
   const data = new TextEncoder().encode(str);
   const hash = await crypto.subtle.digest("SHA-256", data);
@@ -677,6 +768,15 @@ export default {
       }
       const result = await seedFullCounty(body.countyFips, body.countyName, env);
       return jsonResponse(result);
+    }
+
+    // POST: /api/election/generate-tones — pre-generate proposition text at all 7 tone levels
+    if (url.pathname === "/api/election/generate-tones") {
+      const auth = request.headers.get("Authorization");
+      if (!auth || auth !== `Bearer ${env.ADMIN_SECRET}`) {
+        return new Response("Unauthorized", { status: 401 });
+      }
+      return handleGenerateTones(request, env);
     }
 
     return new Response("Not found", { status: 404 });

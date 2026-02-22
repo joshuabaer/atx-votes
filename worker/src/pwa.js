@@ -1275,7 +1275,10 @@ var APP_JS = [
   "var chefTaps=0;",
   "function renderTone(){" +
     "var opts=TONE_OPTS.slice();" +
-    "if(chefTaps>=5||S.readingLevel===6)opts.push({v:6,l:'Bork bork bork!',d:'The Swedish Chef from the Muppets explains your ballot'});" +
+    "if(chefTaps>=5||S.readingLevel>=6){" +
+      "opts.push({v:6,l:'Bork bork bork!',d:'The Swedish Chef from the Muppets explains your ballot'});" +
+      "opts.push({v:7,l:'Howdy, partner',d:'A Texas cowboy explains your ballot, y\\u2019all'})" +
+    "}" +
     "var h='<div class=\"phase-header\"><h2 data-action=\"chef-tap\">'+t('Talk to me like...')+'</h2><p>'+t('How should we explain things?')+'</p></div>';" +
     "h+='<div class=\"radio-list\">';" +
     "for(var i=0;i<opts.length;i++){" +
@@ -1642,6 +1645,9 @@ var APP_JS = [
     "return '<span class=\"badge '+cls+'\">'+t(c)+'</span>'" +
   "}",
 
+  // Pick tone-appropriate version of a prop field (object with tone keys or plain string)
+  "function tp(v){if(!v)return v;if(typeof v==='object'&&!Array.isArray(v)){return v[S.readingLevel]||v['3']||v['1']||Object.values(v)[0]}return v}",
+
   "function renderPropCard(prop){" +
     "var eid='prop-'+prop.number;" +
     "var isOpen=S.expanded[eid];" +
@@ -1652,21 +1658,25 @@ var APP_JS = [
     "h+='<div class=\"prop-header\"><div class=\"prop-title\">Prop '+prop.number+': '+esc(prop.title)+'</div>';" +
     "h+='<span class=\"badge '+recClass+'\">'+t(prop.recommendation)+'</span></div>';" +
     "if(LANG==='es'){var tt=t(prop.title);if(tt!==prop.title)h+='<div class=\"prop-trans\">'+esc(tt)+'</div>'}" +
-    "h+='<div class=\"prop-desc\">'+esc(prop.description)+'</div>';" +
+    "var pdesc=tp(prop.description)||prop.description;" +
+    "h+='<div class=\"prop-desc\">'+esc(pdesc)+'</div>';" +
     "if(LANG==='es'){var td=t(prop.description);if(td!==prop.description)h+='<div class=\"prop-trans\">'+esc(td)+'</div>'}" +
     // If Passes / If Fails (always visible, color-coded)
-    "if(prop.ifPasses||prop.ifFails){" +
+    "var pPass=tp(prop.ifPasses)||prop.ifPasses;var pFail=tp(prop.ifFails)||prop.ifFails;" +
+    "if(pPass||pFail){" +
       "h+='<div style=\"margin-top:10px\">';" +
-      "if(prop.ifPasses){h+='<div class=\"prop-outcome pass\"><span style=\"flex-shrink:0\">\u2705</span><div><b>'+t('If it passes:')+'</b> '+esc(t(prop.ifPasses))+'</div></div>'}" +
-      "if(prop.ifFails){h+='<div class=\"prop-outcome fail\"><span style=\"flex-shrink:0\">\u274C</span><div><b>'+t('If it fails:')+'</b> '+esc(t(prop.ifFails))+'</div></div>'}" +
+      "if(pPass){h+='<div class=\"prop-outcome pass\"><span style=\"flex-shrink:0\">\u2705</span><div><b>'+t('If it passes:')+'</b> '+esc(LANG==='es'?t(prop.ifPasses):pPass)+'</div></div>'}" +
+      "if(pFail){h+='<div class=\"prop-outcome fail\"><span style=\"flex-shrink:0\">\u274C</span><div><b>'+t('If it fails:')+'</b> '+esc(LANG==='es'?t(prop.ifFails):pFail)+'</div></div>'}" +
       "h+='</div>'" +
     "}" +
     // AI reasoning (always visible)
-    "if(prop.reasoning){h+='<div class=\"prop-reasoning\"><span style=\"flex-shrink:0\">\u{1F9E0}</span><div>'+esc(prop.reasoning)+'</div></div>'}" +
+    "var pReason=tp(prop.reasoning)||prop.reasoning;" +
+    "if(pReason){h+='<div class=\"prop-reasoning\"><span style=\"flex-shrink:0\">\u{1F9E0}</span><div>'+esc(pReason)+'</div></div>'}" +
     "if(isOpen){" +
       "h+='<div class=\"prop-details\">';" +
-      "if(prop.background){h+='<div class=\"prop-section\"><h5>'+t('Background')+'</h5><p>'+esc(prop.background)+'</p></div>'}" +
-      "if(prop.fiscalImpact){h+='<div class=\"prop-section\"><h5>\u{1F4B0} '+t('Fiscal Impact')+'</h5><p>'+esc(prop.fiscalImpact)+'</p></div>'}" +
+      "var pBg=tp(prop.background)||prop.background;var pFi=tp(prop.fiscalImpact)||prop.fiscalImpact;" +
+      "if(pBg){h+='<div class=\"prop-section\"><h5>'+t('Background')+'</h5><p>'+esc(pBg)+'</p></div>'}" +
+      "if(pFi){h+='<div class=\"prop-section\"><h5>\u{1F4B0} '+t('Fiscal Impact')+'</h5><p>'+esc(pFi)+'</p></div>'}" +
       // Side-by-side supporters vs opponents
       "if((prop.supporters&&prop.supporters.length)||(prop.opponents&&prop.opponents.length)){" +
         "h+='<div class=\"prop-cols\">';" +
@@ -1682,7 +1692,8 @@ var APP_JS = [
         "}" +
         "h+='</div>'" +
       "}" +
-      "if(prop.caveats){h+='<div class=\"prop-section\"><h5>\u26A0\u{FE0F} '+t('Caveats')+'</h5><p>'+esc(prop.caveats)+'</p></div>'}" +
+      "var pCav=tp(prop.caveats)||prop.caveats;" +
+      "if(pCav){h+='<div class=\"prop-section\"><h5>\u26A0\u{FE0F} '+t('Caveats')+'</h5><p>'+esc(pCav)+'</p></div>'}" +
       "h+='</div>'" +
     "}" +
     "h+='<button class=\"expand-toggle\" data-action=\"toggle-expand\" data-id=\"'+eid+'\" aria-expanded=\"'+!!isOpen+'\">'+(isOpen?t('Show Less'):t('Learn More'))+'</button>';" +
@@ -1808,7 +1819,7 @@ var APP_JS = [
     // Reading level slider
     "h+='<div class=\"card\" style=\"margin-top:16px\">';" +
     "h+='<div style=\"font-size:15px;font-weight:600;margin-bottom:12px\">\u{1F4D6} '+t('Reading Level')+'</div>';" +
-    "var rlLabels=[t('Simple'),t('Casual'),t('Standard'),t('Detailed'),t('Expert'),'Bork!'];" +
+    "var rlLabels=[t('Simple'),t('Casual'),t('Standard'),t('Detailed'),t('Expert'),'Bork!','Howdy!'];" +
     "var rlVal=S.readingLevel>5?5:S.readingLevel;" +
     "h+='<input type=\"range\" min=\"1\" max=\"5\" value=\"'+rlVal+'\" data-action=\"set-reading-level\" style=\"width:100%;accent-color:var(--blue)\">';" +
     "h+='<div style=\"display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-top:4px\">';" +
