@@ -620,14 +620,14 @@ Return ONLY this JSON:
 
     <div class="audit-card">
       <h3>ChatGPT (OpenAI) Review</h3>
-      <span class="audit-score audit-pending">Pending</span>
-      <p style="margin-top:0.5rem;font-size:0.9rem;color:var(--text2)">Audit submitted. Results will be published here when complete.</p>
+      <span class="audit-score">6 / 10</span>
+      <p style="margin-top:0.5rem;font-size:0.9rem;color:var(--text2)">Solid foundation, but needs stronger evidence trails and bias testing. Highest-priority gap: no per-claim source citations.</p>
     </div>
 
     <div class="audit-card">
       <h3>Gemini (Google) Review</h3>
-      <span class="audit-score audit-pending">Pending</span>
-      <p style="margin-top:0.5rem;font-size:0.9rem;color:var(--text2)">Audit submitted. Results will be published here when complete.</p>
+      <span class="audit-score">8.6 / 10</span>
+      <p style="margin-top:0.5rem;font-size:0.9rem;color:var(--text2)">A gold-standard model for nonpartisan AI voting tools. Technically rigorous with strong data validation and exceptional transparency.</p>
     </div>
 
     <div class="audit-card">
@@ -1270,19 +1270,16 @@ function handleOpenSource() {
     <div class="review-cards">
       <div class="review-card">
         <h3>ChatGPT Code Review</h3>
-        <!-- TODO: Replace with actual quote and link after review is published -->
-        <p class="quote">Review pending — full analysis of bias, security, and code quality.</p>
+        <p class="quote">"Well-intentioned methodology, but needs stronger evidence trails + bias testing before treating it as a serious voting guide." — 6/10</p>
         <a href="/audit">Read the full review &rarr;</a>
       </div>
       <div class="review-card">
         <h3>Gemini Code Review</h3>
-        <!-- TODO: Replace with actual quote and link after review is published -->
-        <p class="quote">Review pending — full analysis of bias, security, and code quality.</p>
+        <p class="quote">"A gold-standard model for nonpartisan AI voting tools. Technically rigorous with exceptional transparency." — 8.6/10</p>
         <a href="/audit">Read the full review &rarr;</a>
       </div>
       <div class="review-card">
         <h3>Grok Code Review</h3>
-        <!-- TODO: Replace with actual quote and link after review is published -->
         <p class="quote">Review pending — full analysis of bias, security, and code quality.</p>
         <a href="/audit">Read the full review &rarr;</a>
       </div>
