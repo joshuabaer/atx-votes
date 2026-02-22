@@ -164,8 +164,8 @@ describe("buildUserPrompt", () => {
       "democrat",
       "en"
     );
-    expect(prompt).toContain("Healthcare, Climate");
-    expect(prompt).toContain("Integrity, Experience");
+    expect(prompt).toContain("1. Healthcare, 2. Climate");
+    expect(prompt).toContain("1. Integrity, 2. Experience");
     expect(prompt).toContain("immigration: Path to citizenship");
     expect(prompt).toContain("Progressive");
   });

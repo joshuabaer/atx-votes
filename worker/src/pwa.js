@@ -19,7 +19,7 @@ export function handlePWA_SW() {
   });
 }
 
-export function handlePWA_Clear(redirectUrl = '/app', title = 'Texas Votes') {
+export function handlePWA_Clear(redirectUrl = '/', title = 'Texas Votes') {
   var html = '<!DOCTYPE html><html><head><meta charset="utf-8">' +
     '<meta name="viewport" content="width=device-width,initial-scale=1">' +
     '<title>' + title + '</title>' +
@@ -114,13 +114,58 @@ var MANIFEST = JSON.stringify({
         "data:image/svg+xml," +
         encodeURIComponent(
           '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">' +
-            '<rect width="512" height="512" rx="96" fill="#21598e"/>' +
-            '<text x="256" y="380" font-size="280" font-weight="900" text-anchor="middle" fill="white" font-family="system-ui">V</text>' +
+            '<defs><clipPath id="s"><path d="M56 48h400c10 0 16 6 16 16v256c0 108-200 148-216 156C240 468 40 428 40 320V64c0-10 6-16 16-16Z"/></clipPath></defs>' +
+            '<g clip-path="url(#s)"><rect x="40" y="48" width="432" height="440" fill="#21598F"/>' +
+            '<rect x="210" y="48" width="270" height="86" fill="#FFF"/>' +
+            '<rect x="210" y="134" width="270" height="86" fill="#BF2626"/>' +
+            '<rect x="210" y="220" width="270" height="86" fill="#FFF"/>' +
+            '<rect x="210" y="306" width="270" height="86" fill="#BF2626"/>' +
+            '<rect x="210" y="392" width="270" height="86" fill="#FFF"/></g>' +
+            '<path d="M125 166 L140 209 L186 210 L150 238 L163 282 L125 256 L87 282 L100 238 L64 210 L110 209Z" fill="#FFF"/>' +
             "</svg>"
         ),
       sizes: "512x512",
       type: "image/svg+xml",
       purpose: "any",
+    },
+    {
+      src:
+        "data:image/svg+xml," +
+        encodeURIComponent(
+          '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">' +
+            '<defs><clipPath id="s"><path d="M21 18h150c4 0 6 2 6 6v96c0 40-75 56-81 59-6-3-81-19-81-59V24c0-4 2-6 6-6Z"/></clipPath></defs>' +
+            '<g clip-path="url(#s)"><rect x="15" y="18" width="162" height="165" fill="#21598F"/>' +
+            '<rect x="79" y="18" width="102" height="33" fill="#FFF"/>' +
+            '<rect x="79" y="51" width="102" height="33" fill="#BF2626"/>' +
+            '<rect x="79" y="84" width="102" height="33" fill="#FFF"/>' +
+            '<rect x="79" y="117" width="102" height="33" fill="#BF2626"/>' +
+            '<rect x="79" y="150" width="102" height="33" fill="#FFF"/></g>' +
+            '<path d="M47 62 L53 78 L70 78 L56 89 L61 105 L47 96 L33 105 L38 89 L24 78 L41 78Z" fill="#FFF"/>' +
+            "</svg>"
+        ),
+      sizes: "192x192",
+      type: "image/svg+xml",
+      purpose: "any",
+    },
+    {
+      src:
+        "data:image/svg+xml," +
+        encodeURIComponent(
+          '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">' +
+            '<rect width="512" height="512" fill="#21598F"/>' +
+            '<defs><clipPath id="m"><path d="M107 99h298c7 0 12 5 12 12v191c0 81-149 111-161 117-12-6-161-36-161-117V111c0-7 5-12 12-12Z"/></clipPath></defs>' +
+            '<g clip-path="url(#m)"><rect x="95" y="99" width="322" height="328" fill="#21598F"/>' +
+            '<rect x="258" y="99" width="163" height="65" fill="#FFF"/>' +
+            '<rect x="258" y="164" width="163" height="65" fill="#BF2626"/>' +
+            '<rect x="258" y="229" width="163" height="65" fill="#FFF"/>' +
+            '<rect x="258" y="294" width="163" height="65" fill="#BF2626"/>' +
+            '<rect x="258" y="359" width="163" height="65" fill="#FFF"/></g>' +
+            '<path d="M176 205 L187 243 L228 244 L195 265 L205 303 L176 283 L147 303 L157 265 L124 244 L165 243Z" fill="#FFF"/>' +
+            "</svg>"
+        ),
+      sizes: "512x512",
+      type: "image/svg+xml",
+      purpose: "maskable",
     },
   ],
 });
@@ -130,7 +175,7 @@ var MANIFEST = JSON.stringify({
 var CSS = [
   "*{margin:0;padding:0;box-sizing:border-box}",
   ":root{" +
-    "--blue:rgb(33,89,143);--gold:rgb(217,166,33);--bg:#faf8f0;--card:#fff;" +
+    "--blue:rgb(33,89,143);--red:rgb(191,38,38);--gold:rgb(217,166,33);--bg:#faf8f0;--card:#fff;" +
     "--text:rgb(31,31,36);--text2:rgb(115,115,128);" +
     "--ok:rgb(51,166,82);--warn:rgb(230,140,26);--bad:rgb(209,51,51);" +
     "--rep:rgb(217,38,38);--dem:rgb(38,77,191);" +
@@ -139,14 +184,14 @@ var CSS = [
     "--r:16px;--rs:10px;--ps:8px;--pm:16px;--pl:24px" +
     "}",
   "@media(prefers-color-scheme:dark){:root{" +
-    "--blue:rgb(102,153,217);--gold:rgb(242,191,64);--bg:rgb(28,28,31);--card:rgb(43,43,46);" +
+    "--blue:rgb(102,153,217);--red:rgb(235,88,88);--gold:rgb(242,191,64);--bg:rgb(28,28,31);--card:rgb(43,43,46);" +
     "--text:rgb(237,237,240);--text2:rgb(153,153,166);" +
     "--ok:rgb(77,199,107);--warn:rgb(255,166,51);--bad:rgb(255,89,89);" +
     "--rep:rgb(255,77,77);--dem:rgb(89,128,242);" +
     "--border:rgba(255,255,255,.15);--border2:rgba(255,255,255,.2);" +
     "--fill3:rgba(255,255,255,.08);--shadow:rgba(0,0,0,.3)" +
     "}}",
-  "body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}",
+  "body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;border-top:3px solid var(--red)}",
   "#app{max-width:480px;margin:0 auto;padding:var(--pm)}",
   "@media(min-width:600px){#app{max-width:680px}}",
   ".card{background:var(--card);border-radius:var(--r);padding:var(--pm);box-shadow:0 2px 8px var(--shadow);margin-bottom:12px;overflow:hidden;word-break:break-word}",
@@ -168,6 +213,22 @@ var CSS = [
   ".chip svg{flex-shrink:0}",
   ".chip-grid{display:flex;flex-wrap:wrap;gap:10px}",
 
+  // Sortable priority list
+  ".sort-list{list-style:none;padding:0;margin:0}",
+  ".sort-item{display:flex;align-items:center;gap:8px;padding:10px 12px;margin-bottom:4px;border-radius:var(--rs);border:1.5px solid var(--border2);background:var(--fill3);font-size:15px;user-select:none;touch-action:pan-y;position:relative;transition:transform .15s ease,box-shadow .15s ease}",
+  ".sort-item.dragging{box-shadow:0 4px 16px rgba(0,0,0,.18);z-index:10;opacity:.95;transition:none;touch-action:none}",
+  ".sort-item .rank{min-width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}",
+  ".sort-item .rank-low{background:var(--border2);color:var(--text2)}",
+  ".sort-item .drag-handle{cursor:grab;padding:4px;color:var(--text2);flex-shrink:0;font-size:18px;line-height:1;touch-action:none}",
+  ".sort-item .sort-label{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}",
+  ".sort-item .sort-arrows{margin-left:auto;display:flex;gap:2px;flex-shrink:0}",
+  ".sort-item .sort-arrows button{width:36px;height:36px;border:none;background:none;color:var(--text2);font-size:16px;cursor:pointer;border-radius:6px;display:flex;align-items:center;justify-content:center;padding:0}",
+  ".sort-item .sort-arrows button:active{background:var(--border)}",
+  ".sort-item .sort-arrows button:disabled{opacity:.25;cursor:default}",
+  ".sort-divider{text-align:center;font-size:12px;color:var(--text2);padding:6px 0;margin:4px 0;border-top:1.5px dashed var(--border2);letter-spacing:.3px}",
+  ".sort-item-low{opacity:.55}",
+  "@media(prefers-color-scheme:dark){.sort-item .rank-low{background:var(--fill3);color:var(--text2)}}",
+
   // Radio options
   ".radio{padding:14px 16px;border-radius:var(--rs);border:1.5px solid var(--border2);background:var(--fill3);cursor:pointer;transition:all .15s;margin-bottom:10px}",
   ".radio-on{border-color:var(--blue);background:rgba(33,89,143,.1)}",
@@ -177,7 +238,7 @@ var CSS = [
 
   // Progress bar
   ".progress{height:4px;background:var(--border);border-radius:2px;margin-bottom:20px;overflow:hidden}",
-  ".progress-fill{height:100%;background:var(--blue);border-radius:2px;transition:width .3s}",
+  ".progress-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--blue));border-radius:2px;transition:width .3s}",
 
   // Header
   ".phase-header{margin-bottom:var(--pl)}",
@@ -198,7 +259,7 @@ var CSS = [
     ".topnav-brand{font-size:18px;font-weight:800;color:var(--blue);margin-right:auto;padding:12px 0;letter-spacing:-.3px}" +
     ".topnav-link{display:flex;align-items:center;gap:6px;padding:12px 16px;font-size:14px;font-weight:600;color:var(--text2);text-decoration:none;cursor:pointer;border:none;background:none;font-family:inherit;transition:color .15s;border-bottom:2px solid transparent;margin-bottom:-1px}" +
     ".topnav-link:hover{color:var(--blue)}" +
-    ".topnav-link.on{color:var(--blue);border-bottom-color:var(--blue)}" +
+    ".topnav-link.on{color:var(--blue);border-bottom-color:var(--red)}" +
     ".topnav-link svg{width:18px;height:18px}" +
     "#tabs{display:none}" +
   "}",
@@ -287,12 +348,13 @@ var CSS = [
   // Section headers
   ".section-head{font-size:18px;font-weight:800;margin:24px 0 12px;display:flex;align-items:center;gap:8px}",
   ".section-head:first-child{margin-top:0}",
+  ".section-head::before{content:'\\2605';color:var(--red);font-size:14px}",
 
   // Loading
   ".loading{text-align:center;padding:60px 20px}",
   ".loading h2{font-size:22px;font-weight:800;margin-bottom:8px}",
   ".loading p{font-size:15px;color:var(--text2);margin-bottom:24px}",
-  ".spinner{width:48px;height:48px;border:4px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 24px}",
+  ".spinner{width:48px;height:48px;border:4px solid var(--border);border-top-color:var(--blue);border-bottom-color:var(--red);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 24px}",
   "@keyframes spin{to{transform:rotate(360deg)}}",
   ".loading-icon{font-size:56px;margin-bottom:16px}",
   ".tug-arena{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:16px}",
@@ -311,6 +373,16 @@ var CSS = [
   "@keyframes pulse{50%{transform:scale(1.3)}}",
   "@keyframes confettiFall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}",
   ".confetti-piece{position:fixed;top:-10px;width:10px;height:10px;z-index:9999;animation:confettiFall 3s ease-in forwards;pointer-events:none}",
+  ".share-prompt-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:10000;display:flex;align-items:center;justify-content:center;padding:24px;animation:fadeIn .3s ease}",
+  ".share-prompt-card{background:var(--card);border-radius:16px;padding:28px 24px;max-width:340px;width:100%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.2)}",
+  ".share-prompt-card h3{font-size:22px;margin:0 0 8px}",
+  ".share-prompt-card p{font-size:15px;color:var(--text2);margin:0 0 20px;line-height:1.5}",
+  ".share-prompt-dismiss{background:none;border:none;font-size:14px;color:var(--text2);cursor:pointer;margin-top:12px;padding:8px}",
+  ".share-cta{background:linear-gradient(135deg,rgba(33,89,143,.08),rgba(191,38,38,.08));border:2px dashed var(--border2);border-radius:var(--r);padding:20px;text-align:center;margin-bottom:16px}",
+  ".share-cta-icon{font-size:32px;margin-bottom:8px}",
+  ".share-cta-title{font-size:18px;font-weight:800;margin-bottom:6px}",
+  ".share-cta-body{font-size:14px;color:var(--text2);line-height:1.5;margin-bottom:14px}",
+  ".share-cta-btn{display:inline-block;width:auto;padding:12px 28px;font-size:16px}",
 
   // Form
   ".form-group{margin-bottom:16px}",
@@ -353,7 +425,8 @@ var CSS = [
   // Welcome
   ".hero{text-align:center;padding:40px 0 20px}",
   ".hero-icon{font-size:64px;margin-bottom:12px}",
-  ".hero h1{font-size:28px;font-weight:900;color:var(--blue);letter-spacing:-.5px}",
+  ".hero h1{font-size:28px;font-weight:900;color:var(--blue);letter-spacing:-.5px;position:relative;display:inline-block;padding-bottom:10px}",
+  ".hero h1::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:40px;height:3px;background:var(--red);border-radius:2px}",
   ".hero p{font-size:16px;color:var(--text2);margin-top:8px;line-height:1.5}",
   ".features{margin:24px 0;text-align:left}",
   ".features div{padding:8px 0;font-size:15px;display:flex;align-items:center;gap:10px}",
@@ -365,7 +438,7 @@ var CSS = [
   ".profile-summary{font-size:16px;line-height:1.6;font-style:italic;color:var(--text2);margin-bottom:20px}",
 
   // I Voted sticker (oval, matching iOS)
-  ".voted-sticker{width:220px;height:165px;border-radius:50%;border:1.5px solid rgba(0,0,0,.15);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 16px;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.12);padding:12px;gap:2px}",
+  ".voted-sticker{width:220px;height:165px;border-radius:50%;border:3px solid #0D2738;outline:3px solid #CC1919;outline-offset:2px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 16px;background:#fff;box-shadow:0 4px 12px rgba(0,0,0,.15);padding:12px;gap:2px}",
   ".voted-text{font-size:42px;font-weight:700;font-style:italic;font-family:Georgia,'Times New Roman',serif;color:#0D2738;line-height:1}",
   ".voted-early{font-size:24px;font-weight:700;font-style:italic;font-family:Georgia,'Times New Roman',serif;color:#CC1919;line-height:1}",
 
@@ -431,7 +504,7 @@ var CSS = [
     ".dot-active{animation:none}" +
     ".spinner{animation:none}" +
     ".card-touch{transition:none}" +
-    ".chip,.radio,.btn,.tab,.topnav-link,.party-btn,.acc-chev,.progress-fill{transition:none}" +
+    ".chip,.radio,.btn,.tab,.topnav-link,.party-btn,.acc-chev,.progress-fill,.sort-item{transition:none}" +
   "}",
 
   // Accessibility: focus visible
@@ -455,9 +528,26 @@ var APP_JS = [
   "var _lastLangSwitch=0;",
   "function setLang(l){" +
     "var now=Date.now();if(now-_lastLangSwitch<500)return;_lastLangSwitch=now;" +
-    "LANG=l;localStorage.setItem('tx_votes_lang',l);shuffledIssues=null;shuffledSpectrum=null;shuffledQualities=null;shuffledDD={};render();" +
+    "LANG=l;localStorage.setItem('tx_votes_lang',l);shuffledSpectrum=null;shuffledDD={};render();" +
     "if(S.summary&&S.guideComplete){regenerateSummary()}" +
   "}",
+
+  // ============ ANALYTICS ============
+  // Fire-and-forget event tracking — never throws, respects DNT
+  "var _trkSent={};",
+  "function trk(e,p){" +
+    "try{" +
+      "if(navigator.doNotTrack==='1')return;" +
+      "var key=e+JSON.stringify(p||{});" +
+      "var now=Date.now();" +
+      "if(_trkSent[key]&&now-_trkSent[key]<1000)return;" +
+      "_trkSent[key]=now;" +
+      "var body=JSON.stringify({event:e,props:Object.assign({lang:LANG},p||{})});" +
+      "if(navigator.sendBeacon){navigator.sendBeacon('/app/api/ev',body)}" +
+      "else{fetch('/app/api/ev',{method:'POST',body:body,keepalive:true}).catch(function(){})}" +
+    "}catch(x){}" +
+  "}",
+
   "var TR={" +
     // Welcome & General
     "'Your personalized voting guide for Texas elections.':'Tu gu\\u00EDa personalizada de votaci\\u00F3n para las elecciones de Texas.'," +
@@ -472,6 +562,12 @@ var APP_JS = [
     "'What issues matter most to you?':'\\u00BFQu\\u00E9 temas te importan m\\u00E1s?'," +
     "'Pick your top 3-7. We\\u2019ll dig deeper on these.':'Elige los 3 a 7 m\\u00E1s importantes. Profundizaremos en estos.'," +
     "'of 3-7 selected':'de 3-7 seleccionados'," +
+    "'Rank your issues by priority':'Ordena los temas por prioridad'," +
+    "'Drag to reorder or use arrows. #1 = most important.':'Arrastra para reordenar o usa las flechas. #1 = m\\u00E1s importante.'," +
+    "'your top priorities are above this line':'tus principales prioridades est\\u00E1n arriba de esta l\\u00EDnea'," +
+    "'Rank the qualities you value in a candidate':'Ordena las cualidades que valoras en un candidato'," +
+    "'Top Issues (ranked)':'Temas principales (por prioridad)'," +
+    "'Candidate Qualities (ranked)':'Cualidades del candidato (por prioridad)'," +
     "'Continue':'Continuar'," +
     "'Back':'Atr\\u00E1s'," +
     "'How would you describe your political approach?':'\\u00BFC\\u00F3mo describir\\u00EDas tu enfoque pol\\u00EDtico?'," +
@@ -523,6 +619,11 @@ var APP_JS = [
     "'Cheat Sheet':'Gu\\u00EDa r\\u00E1pida'," +
     "'Print Cheat Sheet':'Imprimir gu\\u00EDa r\\u00E1pida'," +
     "'Share':'Compartir'," +
+    "'Share this race':'Compartir esta contienda'," +
+    "'Know someone who needs help deciding?':'\\u00BFConoces a alguien que necesita ayuda para decidir?'," +
+    "'The Texas primary is March 3. Share Texas Votes so your friends and family can get a personalized voting guide too.':'La primaria de Texas es el 3 de marzo. Comparte Texas Votes para que tus amigos y familia tambi\\u00E9n obtengan una gu\\u00EDa personalizada.'," +
+    "'Share Texas Votes':'Compartir Texas Votes'," +
+    "'Spread the word':'Pasa la voz'," +
     "'Key Races':'Contiendas clave'," +
     "'Other Contested Races':'Otras contiendas competidas'," +
     "'Propositions':'Proposiciones'," +
@@ -731,6 +832,10 @@ var APP_JS = [
     "'Early!':'\\u00A1Anticipadamente!'," +
     "'You voted! Thank you for participating in democracy.':'\\u00A1Ya votaste! Gracias por participar en la democracia.'," +
     "'Actually, I didn\\u2019t vote yet.':'En realidad, a\\u00FAn no he votado.'," +
+    "'You did it!':'\\u00A1Lo lograste!'," +
+    "'Now help 3 friends do the same. Share Texas Votes with someone who needs help deciding.':'Ahora ayuda a 3 amigos a hacer lo mismo. Comparte Texas Votes con alguien que necesite ayuda para decidir.'," +
+    "'Share Texas Votes':'Compartir Texas Votes'," +
+    "'Maybe later':'Quiz\\u00E1s despu\\u00E9s'," +
     "'Find Your Polling Location':'Encuentra tu lugar de votaci\\u00F3n'," +
     "'Your county uses Vote Centers \\u2014 you can vote at any location.':'Tu condado usa centros de votaci\\u00F3n \\u2014 puedes votar en cualquier ubicaci\\u00F3n.'," +
     "'Find Locations':'Encontrar ubicaciones'," +
@@ -1130,12 +1235,77 @@ var APP_JS = [
     "};",
 
   // Shuffled arrays (set once per question display)
-  "var shuffledIssues=null,shuffledSpectrum=null,shuffledQualities=null,shuffledDD={};",
+  "var shuffledSpectrum=null,shuffledDD={};",
 
   // ============ UTILS ============
   "function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;')}",
 
   "function shuffle(a){var b=a.slice();for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=b[i];b[i]=b[j];b[j]=t}return b}",
+
+  // Drag-to-reorder engine for sortable priority lists
+  "function initSortable(containerId,stateKey){" +
+    "var container=document.getElementById(containerId);" +
+    "if(!container)return;" +
+    "var dragEl=null,startY=0,startIdx=0,itemH=0,items=[];" +
+    "function getY(e){return e.touches?e.touches[0].clientY:e.clientY}" +
+    "function getEndY(e){return e.changedTouches?e.changedTouches[0].clientY:e.clientY}" +
+    "function onStart(e){" +
+      "var handle=e.target.closest('.drag-handle');" +
+      "if(!handle)return;" +
+      "e.preventDefault();" +
+      "dragEl=handle.closest('.sort-item');" +
+      "if(!dragEl)return;" +
+      "items=Array.from(container.querySelectorAll('.sort-item'));" +
+      "startIdx=items.indexOf(dragEl);" +
+      "itemH=dragEl.offsetHeight+4;" +
+      "startY=getY(e);" +
+      "dragEl.classList.add('dragging');" +
+      "document.body.style.overflow='hidden';" +
+      "document.addEventListener('mousemove',onMove);" +
+      "document.addEventListener('touchmove',onMove,{passive:false});" +
+      "document.addEventListener('mouseup',onEnd);" +
+      "document.addEventListener('touchend',onEnd);" +
+      "if(navigator.vibrate)navigator.vibrate(10);" +
+    "}" +
+    "function onMove(e){" +
+      "if(!dragEl)return;" +
+      "e.preventDefault();" +
+      "var y=getY(e);" +
+      "var dy=y-startY;" +
+      "dragEl.style.transform='translateY('+dy+'px)';" +
+      "var cur=startIdx+Math.round(dy/itemH);" +
+      "cur=Math.max(0,Math.min(items.length-1,cur));" +
+      "items.forEach(function(item,i){" +
+        "if(item===dragEl)return;" +
+        "if(i>=Math.min(startIdx,cur)&&i<=Math.max(startIdx,cur)){" +
+          "var shift=(cur>startIdx)?-itemH:itemH;" +
+          "item.style.transform='translateY('+shift+'px)'" +
+        "}else{item.style.transform=''}" +
+      "})" +
+    "}" +
+    "function onEnd(e){" +
+      "if(!dragEl)return;" +
+      "var y=getEndY(e);" +
+      "var dy=y-startY;" +
+      "var newIdx=startIdx+Math.round(dy/itemH);" +
+      "newIdx=Math.max(0,Math.min(items.length-1,newIdx));" +
+      "var arr=S[stateKey];" +
+      "var moved=arr.splice(startIdx,1)[0];" +
+      "arr.splice(newIdx,0,moved);" +
+      "dragEl.classList.remove('dragging');" +
+      "dragEl.style.transform='';" +
+      "items.forEach(function(item){item.style.transform=''});" +
+      "document.body.style.overflow='';" +
+      "document.removeEventListener('mousemove',onMove);" +
+      "document.removeEventListener('touchmove',onMove);" +
+      "document.removeEventListener('mouseup',onEnd);" +
+      "document.removeEventListener('touchend',onEnd);" +
+      "dragEl=null;" +
+      "render()" +
+    "}" +
+    "container.addEventListener('mousedown',onStart);" +
+    "container.addEventListener('touchstart',onStart,{passive:false})" +
+  "}",
 
   "function sortOrder(r){var o=r.office;" +
     "if(o.indexOf('U.S. Senator')!==-1)return 0;" +
@@ -1182,6 +1352,8 @@ var APP_JS = [
     "var p=localStorage.getItem('tx_votes_profile');" +
     "if(p){p=JSON.parse(p);S.issues=p.topIssues||[];S.spectrum=p.politicalSpectrum||null;" +
     "S.policyViews=p.policyViews||{};S.qualities=p.candidateQualities||[];S.freeform=p.freeform||'';" +
+    "var allIV=ISSUES.map(function(x){return x.v});if(S.issues.length>0&&S.issues.length<allIV.length){S.issues=S.issues.concat(allIV.filter(function(v){return S.issues.indexOf(v)===-1}))}" +
+    "if(S.qualities.length>0&&S.qualities.length<QUALITIES.length){S.qualities=S.qualities.concat(QUALITIES.filter(function(v){return S.qualities.indexOf(v)===-1}))}" +
     "S.address=p.address||{street:'',city:'',state:'TX',zip:''};" +
     "S.summary=p.summaryText||null;S.districts=p.districts||null;" +
     "S.readingLevel=p.readingLevel||1}" +
@@ -1199,18 +1371,26 @@ var APP_JS = [
   // ============ RENDER ============
   "function topNav(active){" +
     "return '<div class=\"topnav-inner\">" +
-      "<span class=\"topnav-brand\">Texas Votes</span>" +
+      "<a href=\"/\" class=\"topnav-brand\" style=\"text-decoration:none;color:var(--blue)\">'+ICON_STAR+'Texas Votes</a>" +
       "<a class=\"topnav-link'+(active==='#/ballot'?' on':'')+'\" data-action=\"nav\" data-to=\"#/ballot\">'+ICON_BALLOT+t('My Ballot')+'</a>" +
       "<a class=\"topnav-link'+(active==='#/info'?' on':'')+'\" data-action=\"nav\" data-to=\"#/info\">'+ICON_INFO+t('Vote Info')+'</a>" +
       "<a class=\"topnav-link'+(active==='#/profile'?' on':'')+'\" data-action=\"nav\" data-to=\"#/profile\">'+ICON_PROFILE+t('Profile')+'</a>" +
     "</div>';" +
   "}",
+  "var _lastPage='';",
   "function render(){" +
     "var app=document.getElementById('app');" +
     "var tabs=document.getElementById('tabs');" +
     "var tnav=document.getElementById('topnav');" +
-    "if(!S.guideComplete){app.innerHTML=renderInterview();tabs.innerHTML='';tnav.innerHTML='';return}" +
+    "if(!S.guideComplete){app.innerHTML=renderInterview();tabs.innerHTML='';tnav.innerHTML='';" +
+      "if(S.phase===2)initSortable('sort-issues','issues');" +
+      "if(S.phase===5)initSortable('sort-qualities','qualities');" +
+    "return}" +
     "var h=location.hash||'#/ballot';" +
+    "if(h!==_lastPage){_lastPage=h;trk('page_view',{d1:h});" +
+      "if(h.indexOf('#/race/')===0){var _ri=parseInt(h.split('/')[2]);var _races=(S.selectedParty==='democrat'?S.demBallot:S.repBallot);_races=_races&&_races.races||[];trk('race_view',{d1:(_races[_ri]&&_races[_ri].office)||'',d2:(_races[_ri]&&_races[_ri].district)||''})}" +
+      "else if(h==='#/cheatsheet'){trk('cheatsheet_view')}" +
+    "}" +
     "if(h.indexOf('#/race/')===0){app.innerHTML=renderRaceDetail(parseInt(h.split('/')[2]));tabs.innerHTML=tabBar('#/ballot');tnav.innerHTML=topNav('#/ballot')}" +
     "else if(h==='#/cheatsheet'){app.innerHTML=renderCheatSheet();tabs.innerHTML='';tnav.innerHTML=topNav('#/ballot')}" +
     "else if(h==='#/profile'){app.innerHTML=renderProfile();tabs.innerHTML=tabBar('#/profile');tnav.innerHTML=topNav('#/profile')}" +
@@ -1219,6 +1399,8 @@ var APP_JS = [
   "}",
 
   // ============ TAB BAR ============
+  // Texas lone star icon for branding
+  "var ICON_STAR='<svg width=\"20\" height=\"22\" viewBox=\"0 0 20 22\" style=\"vertical-align:-3px;margin-right:4px\"><defs><clipPath id=\"ns\"><path d=\"M2 1h16c.6 0 1 .4 1 1v10c0 5-7 7.5-9 8.5C8 19.5 1 17 1 12V2c0-.6.4-1 1-1Z\"/></clipPath></defs><g clip-path=\"url(#ns)\"><rect x=\"1\" y=\"1\" width=\"18\" height=\"20\" fill=\"var(--blue)\"/><rect x=\"9\" y=\"1\" width=\"11\" height=\"4\" fill=\"#FFF\"/><rect x=\"9\" y=\"5\" width=\"11\" height=\"4\" fill=\"var(--red)\"/><rect x=\"9\" y=\"9\" width=\"11\" height=\"4\" fill=\"#FFF\"/><rect x=\"9\" y=\"13\" width=\"11\" height=\"4\" fill=\"var(--red)\"/><rect x=\"9\" y=\"17\" width=\"11\" height=\"4\" fill=\"#FFF\"/></g><path d=\"M5 8 L5.8 10.2 L8.2 10.2 L6.2 11.6 L7 13.8 L5 12.4 L3 13.8 L3.8 11.6 L1.8 10.2 L4.2 10.2Z\" fill=\"#FFF\"/></svg>';",
   // SVG icons matching iOS SF Symbols: checkmark.seal.fill, info.circle.fill, person.circle.fill
   "var ICON_BALLOT='<svg width=\"28\" height=\"28\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M12 1C9.8 1 7.9 2.3 7.2 4.2L3.6 6.3C2.6 6.9 2 8 2 9.2V14.8C2 16 2.6 17.1 3.6 17.7L10.4 21.6C11.4 22.2 12.6 22.2 13.6 21.6L20.4 17.7C21.4 17.1 22 16 22 14.8V9.2C22 8 21.4 6.9 20.4 6.3L16.8 4.2C16.1 2.3 14.2 1 12 1ZM16.3 9.3L11 14.6L7.7 11.3C7.3 10.9 7.3 10.3 7.7 9.9C8.1 9.5 8.7 9.5 9.1 9.9L11 11.8L14.9 7.9C15.3 7.5 15.9 7.5 16.3 7.9C16.7 8.3 16.7 8.9 16.3 9.3Z\"/></svg>';",
   "var ICON_INFO='<svg width=\"28\" height=\"28\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 17H11V11H13V17ZM13 9H11V7H13V9Z\"/></svg>';",
@@ -1252,7 +1434,7 @@ var APP_JS = [
   // Welcome
   "function renderWelcome(){" +
     "return '<div class=\"hero\">" +
-      "<div class=\"hero-icon\">\u{1F5F3}\u{FE0F}</div>" +
+      "<div class=\"hero-icon\"><svg width=\"64\" height=\"72\" viewBox=\"0 0 512 576\"><defs><clipPath id=\"hs\"><path d=\"M56 48h400c10 0 16 6 16 16v256c0 108-200 148-216 156C240 468 40 428 40 320V64c0-10 6-16 16-16Z\"/></clipPath></defs><g clip-path=\"url(#hs)\"><rect x=\"40\" y=\"48\" width=\"432\" height=\"440\" fill=\"var(--blue)\"/><rect x=\"210\" y=\"48\" width=\"270\" height=\"86\" fill=\"#FFF\"/><rect x=\"210\" y=\"134\" width=\"270\" height=\"86\" fill=\"var(--red)\"/><rect x=\"210\" y=\"220\" width=\"270\" height=\"86\" fill=\"#FFF\"/><rect x=\"210\" y=\"306\" width=\"270\" height=\"86\" fill=\"var(--red)\"/><rect x=\"210\" y=\"392\" width=\"270\" height=\"86\" fill=\"#FFF\"/></g><path d=\"M125 166 L140 209 L186 210 L150 238 L163 282 L125 256 L87 282 L100 238 L64 210 L110 209Z\" fill=\"#FFF\"/></svg></div>" +
       "<h1>Texas Votes</h1>" +
       "<p>'+t('Your personalized voting guide for Texas elections.')+'</p>" +
     "</div>" +
@@ -1299,20 +1481,31 @@ var APP_JS = [
     "return h;" +
   "}",
 
-  // Issues
+  // Issues (sortable priority list)
   "function renderIssues(){" +
-    "if(!shuffledIssues)shuffledIssues=shuffle(ISSUES);" +
-    "var h='<div class=\"phase-header\"><h2>'+t('What issues matter most to you?')+'</h2><p>'+t('Pick your top 3-7. We\\u2019ll dig deeper on these.')+'</p></div>';" +
-    "h+='<div class=\"chip-grid\">';" +
-    "for(var i=0;i<shuffledIssues.length;i++){" +
-      "var issue=shuffledIssues[i];" +
-      "var on=S.issues.indexOf(issue.v)!==-1;" +
-      "h+='<div class=\"chip'+(on?' chip-on':'')+'\" data-action=\"toggle-issue\" data-value=\"'+esc(issue.v)+'\" role=\"option\" aria-selected=\"'+on+'\" tabindex=\"0\">'+issue.icon+' '+t(issue.v)+'</div>'" +
+    "if(S.issues.length<ISSUES.length){" +
+      "var existing=S.issues.slice();" +
+      "var rest=shuffle(ISSUES.filter(function(x){return existing.indexOf(x.v)===-1})).map(function(x){return x.v});" +
+      "S.issues=existing.concat(rest)" +
+    "}" +
+    "var h='<div class=\"phase-header\"><h2>'+t('Rank your issues by priority')+'</h2><p>'+t('Drag to reorder or use arrows. #1 = most important.')+'</p></div>';" +
+    "h+='<div id=\"sort-issues\" class=\"sort-list\">';" +
+    "for(var i=0;i<S.issues.length;i++){" +
+      "var issue=ISSUES.find(function(x){return x.v===S.issues[i]});" +
+      "var icon=issue?issue.icon:'';" +
+      "var isLow=i>=5;" +
+      "if(i===5)h+='<div class=\"sort-divider\">&mdash; '+t('your top priorities are above this line')+' &mdash;</div>';" +
+      "h+='<div class=\"sort-item'+(isLow?' sort-item-low':'')+'\" data-index=\"'+i+'\" role=\"listitem\" aria-label=\"'+(i+1)+'. '+esc(S.issues[i])+'\">'+" +
+        "'<span class=\"drag-handle\" aria-hidden=\"true\">&#9776;</span>'+" +
+        "'<span class=\"rank'+(isLow?' rank-low':'')+'\">'+(i+1)+'</span>'+" +
+        "'<span class=\"sort-label\">'+icon+' '+t(S.issues[i])+'</span>'+" +
+        "'<span class=\"sort-arrows\">'+" +
+        "'<button data-action=\"sort-up\" data-key=\"issues\" data-idx=\"'+i+'\" aria-label=\"Move up\"'+(i===0?' disabled':'')+'>&blacktriangle;</button>'+" +
+        "'<button data-action=\"sort-down\" data-key=\"issues\" data-idx=\"'+i+'\" aria-label=\"Move down\"'+(i===S.issues.length-1?' disabled':'')+'>&blacktriangledown;</button>'+" +
+        "'</span></div>'" +
     "}" +
     "h+='</div>';" +
-    "var n=S.issues.length;" +
-    "h+='<p class=\"text-center mt-md\" style=\"font-size:14px;color:var(--text2)\">'+n+' '+t('of 3-7 selected')+'</p>';" +
-    "h+='<button class=\"btn btn-primary mt-md\" data-action=\"next\"'+(n<3?' disabled':'')+'>'+t('Continue')+'</button>';" +
+    "h+='<button class=\"btn btn-primary mt-md\" data-action=\"next\">'+t('Continue')+'</button>';" +
     "return h;" +
   "}",
 
@@ -1346,20 +1539,31 @@ var APP_JS = [
     "return h;" +
   "}",
 
-  // Qualities
+  // Qualities (sortable priority list)
   "function renderQualities(){" +
-    "if(!shuffledQualities)shuffledQualities=shuffle(QUALITIES);" +
-    "var h='<div class=\"phase-header\"><h2>'+t('What do you value most in a candidate?')+'</h2><p>'+t('Pick 2-3 that matter most.')+'</p></div>';" +
-    "h+='<div class=\"chip-grid\">';" +
-    "for(var i=0;i<shuffledQualities.length;i++){" +
-      "var q=shuffledQualities[i];" +
-      "var on=S.qualities.indexOf(q)!==-1;" +
-      "h+='<div class=\"chip'+(on?' chip-on':'')+'\" data-action=\"toggle-quality\" data-value=\"'+esc(q)+'\" role=\"option\" aria-selected=\"'+on+'\" tabindex=\"0\">'+(QUAL_ICONS[q]||'')+' '+t(q)+'</div>'" +
+    "if(S.qualities.length<QUALITIES.length){" +
+      "var existing=S.qualities.slice();" +
+      "var rest=shuffle(QUALITIES.filter(function(x){return existing.indexOf(x)===-1}));" +
+      "S.qualities=existing.concat(rest)" +
+    "}" +
+    "var h='<div class=\"phase-header\"><h2>'+t('Rank the qualities you value in a candidate')+'</h2><p>'+t('Drag to reorder or use arrows. #1 = most important.')+'</p></div>';" +
+    "h+='<div id=\"sort-qualities\" class=\"sort-list\">';" +
+    "for(var i=0;i<S.qualities.length;i++){" +
+      "var q=S.qualities[i];" +
+      "var icon=QUAL_ICONS[q]||'';" +
+      "var isLow=i>=3;" +
+      "if(i===3)h+='<div class=\"sort-divider\">&mdash; '+t('your top priorities are above this line')+' &mdash;</div>';" +
+      "h+='<div class=\"sort-item'+(isLow?' sort-item-low':'')+'\" data-index=\"'+i+'\" role=\"listitem\" aria-label=\"'+(i+1)+'. '+esc(q)+'\">'+" +
+        "'<span class=\"drag-handle\" aria-hidden=\"true\">&#9776;</span>'+" +
+        "'<span class=\"rank'+(isLow?' rank-low':'')+'\">'+(i+1)+'</span>'+" +
+        "'<span class=\"sort-label\">'+icon+' '+t(q)+'</span>'+" +
+        "'<span class=\"sort-arrows\">'+" +
+        "'<button data-action=\"sort-up\" data-key=\"qualities\" data-idx=\"'+i+'\" aria-label=\"Move up\"'+(i===0?' disabled':'')+'>&blacktriangle;</button>'+" +
+        "'<button data-action=\"sort-down\" data-key=\"qualities\" data-idx=\"'+i+'\" aria-label=\"Move down\"'+(i===S.qualities.length-1?' disabled':'')+'>&blacktriangledown;</button>'+" +
+        "'</span></div>'" +
     "}" +
     "h+='</div>';" +
-    "var n=S.qualities.length;" +
-    "h+='<p class=\"text-center mt-md\" style=\"font-size:14px;color:var(--text2)\">'+n+' '+t('of 2-3 selected')+'</p>';" +
-    "h+='<button class=\"btn btn-primary mt-md\" data-action=\"next\"'+(n<2?' disabled':'')+'>'+t('Continue')+'</button>';" +
+    "h+='<button class=\"btn btn-primary mt-md\" data-action=\"next\">'+t('Continue')+'</button>';" +
     "return h;" +
   "}",
 
@@ -1472,7 +1676,7 @@ var APP_JS = [
     // Election info header
     "var partyLabel=S.selectedParty==='democrat'?t('Democratic'):t('Republican');" +
     "h+='<div class=\"card\" style=\"margin-bottom:16px;text-align:center\">';" +
-    "h+='<div style=\"font-size:18px;font-weight:800\">Texas '+esc(partyLabel)+' '+t('Primary')+'</div>';" +
+    "h+='<div style=\"font-size:18px;font-weight:800\"><span style=\"color:var(--red)\">&starf;</span> Texas '+esc(partyLabel)+' '+t('Primary')+'</div>';" +
     "h+='<div style=\"font-size:14px;color:var(--text2);margin-top:2px\">'+t('Tuesday, March 3, 2026')+'</div>';" +
     "if(S.districts&&(S.districts.congressional||S.districts.stateSenate||S.districts.stateHouse)){" +
       "h+='<div style=\"display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px\">';" +
@@ -1495,6 +1699,13 @@ var APP_JS = [
     "h+='<div class=\"actions\">';" +
     "h+='<button class=\"btn btn-secondary\" data-action=\"nav\" data-to=\"#/cheatsheet\">\u{1F4CB} '+t('Cheat Sheet')+'</button>';" +
     "h+='<button class=\"btn btn-secondary\" data-action=\"share\">\u{1F4E4} '+t('Share')+'</button>';" +
+    "h+='</div>';" +
+    // Share CTA card
+    "h+='<div class=\"share-cta\">';" +
+    "h+='<div class=\"share-cta-icon\">\u{1F4E3}</div>';" +
+    "h+='<div class=\"share-cta-title\">'+t('Spread the word')+'</div>';" +
+    "h+='<div class=\"share-cta-body\">'+t('Know someone who needs help deciding?')+' '+t('The Texas primary is March 3. Share Texas Votes so your friends and family can get a personalized voting guide too.')+'</div>';" +
+    "h+='<button class=\"btn btn-primary share-cta-btn\" data-action=\"share-app\">\u{1F4E4} '+t('Share Texas Votes')+'</button>';" +
     "h+='</div>';" +
     // Key races
     "if(keyRaces.length){" +
@@ -1534,7 +1745,7 @@ var APP_JS = [
     "h+='<a href=\"/nonpartisan\" target=\"_blank\" style=\"color:var(--text2)\">'+t('Nonpartisan by Design')+'</a>';" +
     "h+=' &middot; ';" +
     "h+='<a href=\"/privacy\" target=\"_blank\" style=\"color:var(--text2)\">'+t('Privacy Policy')+'</a>';" +
-    "h+='<br><span style=\"margin-top:6px;display:inline-block\">Built in Texas &middot; <a href=\"mailto:howdy@txvotes.app\" style=\"color:var(--text2)\">howdy@txvotes.app</a> &middot; v'+APP_VERSION+'</span>';" +
+    "h+='<br><span style=\"margin-top:6px;display:inline-block\"><span style=\"color:var(--red)\">&starf;</span> Built in Texas &middot; <a href=\"mailto:howdy@txvotes.app\" style=\"color:var(--text2)\">howdy@txvotes.app</a> &middot; v'+APP_VERSION+'</span>';" +
     "h+='</div>';" +
     "return h;" +
   "}",
@@ -1552,7 +1763,7 @@ var APP_JS = [
     "var partyCls=S.selectedParty==='democrat'?'cs-party-dem':'cs-party-rep';" +
     // Header
     "var h='<div class=\"cs-header\">';" +
-    "h+='<h2>'+t('Your Ballot Cheat Sheet')+'</h2>';" +
+    "h+='<h2><span style=\"color:var(--red)\">&starf;</span> '+t('Your Ballot Cheat Sheet')+'</h2>';" +
     "if(addr&&addr.street){h+='<div class=\"cs-meta\">'+esc(addr.street)+(addr.city?', '+esc(addr.city):'')+' '+esc(addr.zip||'')+'</div>'}" +
     "h+='<span class=\"cs-party '+partyCls+'\">'+esc(partyName)+' '+t('Primary')+'</span>';" +
     "h+='<div class=\"cs-meta\">'+t('March 3, 2026')+'</div>';" +
@@ -1598,7 +1809,7 @@ var APP_JS = [
     "}" +
     // Legend & footer
     "h+='<div class=\"cs-legend\"><span>\u2B50 '+t('= Key race')+'</span><span>\u26A0\uFE0F '+t('AI-generated \\u2014 do your own research')+'</span></div>';" +
-    "h+='<div class=\"cs-footer\">'+t('Built with Texas Votes')+' &middot; txvotes.app</div>';" +
+    "h+='<div class=\"cs-footer\"><span style=\"color:var(--red)\">&starf;</span> '+t('Built with Texas Votes')+' &middot; txvotes.app</div>';" +
     // Party switcher + back link (hidden in print)
     "h+=renderPartySwitcher();" +
     "h+='<div style=\"text-align:center;margin-top:8px\" class=\"cs-actions\"><button class=\"btn btn-secondary\" data-action=\"nav\" data-to=\"#/ballot\">&larr; '+t('Back to Ballot')+'</button></div>';" +
@@ -1774,6 +1985,10 @@ var APP_JS = [
       "h+='<button class=\"expand-toggle\" data-action=\"toggle-expand\" data-id=\"'+eid+'\" aria-expanded=\"'+!!isOpen+'\">'+(isOpen?t('Show Less'):t('Show Details'))+'</button>';" +
       "h+='</div>'" +
     "}" +
+    // Share this race button
+    "h+='<div style=\"margin-top:20px\">';" +
+    "h+='<button class=\"btn btn-secondary\" data-action=\"share-race\" data-idx=\"'+idx+'\">\u{1F4E4} '+t('Share this race')+'</button>';" +
+    "h+='</div>';" +
     "return h;" +
   "}",
 
@@ -1788,13 +2003,14 @@ var APP_JS = [
       "h+='</div>'" +
     "}" +
     "h+='<div class=\"card\">';" +
-    // Issues
-    "h+='<div class=\"profile-section\"><h3>'+t('Top Issues')+'</h3><div class=\"chip-grid\">';" +
-    "for(var i=0;i<S.issues.length;i++){" +
+    // Issues (ranked)
+    "h+='<div class=\"profile-section\"><h3>'+t('Top Issues (ranked)')+'</h3>';" +
+    "h+='<ol style=\"margin:0;padding-left:24px\">';" +
+    "for(var i=0;i<Math.min(S.issues.length,7);i++){" +
       "var issue=ISSUES.find(function(x){return x.v===S.issues[i]});" +
-      "h+='<span class=\"chip chip-on\">'+(issue?issue.icon+' ':'')+t(S.issues[i])+'</span>'" +
+      "h+='<li style=\"font-size:15px;margin-bottom:4px'+(i>=5?';opacity:.5':'')+'\">'+(issue?issue.icon+' ':'')+t(S.issues[i])+'</li>'" +
     "}" +
-    "h+='</div></div>';" +
+    "h+='</ol></div>';" +
     // Spectrum
     "if(S.spectrum){h+='<div class=\"profile-section\"><h3>'+t('Political Approach')+'</h3><p style=\"font-size:16px\">'+t(S.spectrum)+'</p></div>'}" +
     // Policy views
@@ -1804,11 +2020,14 @@ var APP_JS = [
       "for(var i=0;i<pvKeys.length;i++){h+='<div style=\"margin-bottom:6px\"><span style=\"font-size:13px;color:var(--text2)\">'+t(pvKeys[i])+'</span><br><span style=\"font-size:15px;font-weight:600\">'+t(S.policyViews[pvKeys[i]])+'</span></div>'}" +
       "h+='</div>'" +
     "}" +
-    // Qualities
+    // Qualities (ranked)
     "if(S.qualities.length){" +
-      "h+='<div class=\"profile-section\"><h3>'+t('Candidate Qualities')+'</h3><div class=\"chip-grid\">';" +
-      "for(var i=0;i<S.qualities.length;i++)h+='<span class=\"chip chip-on\">'+(QUAL_ICONS[S.qualities[i]]||'')+' '+t(S.qualities[i])+'</span>';" +
-      "h+='</div></div>'" +
+      "h+='<div class=\"profile-section\"><h3>'+t('Candidate Qualities (ranked)')+'</h3>';" +
+      "h+='<ol style=\"margin:0;padding-left:24px\">';" +
+      "for(var i=0;i<Math.min(S.qualities.length,5);i++){" +
+        "h+='<li style=\"font-size:15px;margin-bottom:4px'+(i>=3?';opacity:.5':'')+'\">'+(QUAL_ICONS[S.qualities[i]]||'')+' '+t(S.qualities[i])+'</li>'" +
+      "}" +
+      "h+='</ol></div>'" +
     "}" +
     // Freeform
     "if(S.freeform){h+='<div class=\"profile-section\"><h3>'+t('Additional Context')+'</h3><p style=\"font-size:15px;line-height:1.5\">'+esc(S.freeform)+'</p></div>'}" +
@@ -1872,7 +2091,7 @@ var APP_JS = [
     "var election=new Date(2026,2,3);" + // March 3, 2026
     "var now=new Date();" +
     "var diff=Math.ceil((election-now)/(1000*60*60*24));" +
-    "var h='<h2 style=\"font-size:22px;font-weight:800;margin-bottom:16px\">'+t('Voting Info')+'</h2>';" +
+    "var h='<h2 style=\"font-size:22px;font-weight:800;margin-bottom:16px\"><span style=\"color:var(--red)\">&starf;</span> '+t('Voting Info')+'</h2>';" +
     // Countdown card
     "h+='<div class=\"card\" style=\"text-align:center;margin-bottom:16px\">';" +
     "var isEarly=diff>0;" +
@@ -2048,7 +2267,7 @@ var APP_JS = [
     "h+='<a href=\"/nonpartisan\" target=\"_blank\" style=\"color:var(--text2)\">'+t('Nonpartisan by Design')+'</a>';" +
     "h+=' &middot; ';" +
     "h+='<a href=\"/privacy\" target=\"_blank\" style=\"color:var(--text2)\">'+t('Privacy Policy')+'</a>';" +
-    "h+='<br><span style=\"margin-top:6px;display:inline-block\">Built in Texas &middot; <a href=\"mailto:howdy@txvotes.app\" style=\"color:var(--text2)\">howdy@txvotes.app</a></span>';" +
+    "h+='<br><span style=\"margin-top:6px;display:inline-block\"><span style=\"color:var(--red)\">&starf;</span> Built in Texas &middot; <a href=\"mailto:howdy@txvotes.app\" style=\"color:var(--text2)\">howdy@txvotes.app</a></span>';" +
     "h+='</div>';" +
     "return h;" +
   "}",
@@ -2057,7 +2276,7 @@ var APP_JS = [
   "document.getElementById('app').addEventListener('click',function(e){" +
     "var el=e.target.closest('[data-action]');if(!el)return;e.preventDefault();" +
     "var action=el.dataset.action;" +
-    "if(action==='start'){S.phase=1;render()}" +
+    "if(action==='start'){S.phase=1;S._iStart=Date.now();trk('interview_start');render()}" +
     "else if(action==='back'){" +
       "if(S.phase===4&&S.ddIndex>0){S.ddIndex--;render()}" +
       "else if(S.phase===5&&S.ddQuestions.length>0){S.phase=4;S.ddIndex=S.ddQuestions.length-1;render()}" +
@@ -2066,18 +2285,21 @@ var APP_JS = [
     "else if(action==='next'){" +
       "if(S.phase===2){" +
         "S.ddQuestions=[];S.ddIndex=0;" +
-        "for(var i=0;i<S.issues.length;i++){if(DEEP_DIVES[S.issues[i]])S.ddQuestions.push(DEEP_DIVES[S.issues[i]])}" +
+        "var topN=S.issues.slice(0,5);for(var i=0;i<topN.length;i++){if(DEEP_DIVES[topN[i]])S.ddQuestions.push(DEEP_DIVES[topN[i]])}" +
       "}" +
       "if(S.phase===6){var ta=document.getElementById('freeform-input');S.freeform=ta?ta.value.trim():S.freeform}" +
-      "S.phase++;render()" +
+      "S.phase++;trk('interview_phase',{d1:'phase_'+S.phase});render()" +
     "}" +
-    "else if(action==='toggle-issue'){" +
-      "var v=el.dataset.value;var idx=S.issues.indexOf(v);" +
-      "if(idx!==-1)S.issues.splice(idx,1);else if(S.issues.length<7)S.issues.push(v);" +
-      "render()" +
+    "else if(action==='sort-up'){" +
+      "var key=el.dataset.key;var idx=parseInt(el.dataset.idx);" +
+      "if(idx>0){var tmp=S[key][idx-1];S[key][idx-1]=S[key][idx];S[key][idx]=tmp;render()}" +
+    "}" +
+    "else if(action==='sort-down'){" +
+      "var key=el.dataset.key;var idx=parseInt(el.dataset.idx);" +
+      "if(idx<S[key].length-1){var tmp=S[key][idx+1];S[key][idx+1]=S[key][idx];S[key][idx]=tmp;render()}" +
     "}" +
     "else if(action==='chef-tap'){chefTaps++;if(chefTaps===5)render()}" +
-    "else if(action==='select-tone'){S.readingLevel=parseInt(el.dataset.value)||1;render()}" +
+    "else if(action==='select-tone'){S.readingLevel=parseInt(el.dataset.value)||1;trk('tone_select',{d1:''+S.readingLevel,v:S.readingLevel});render()}" +
     "else if(action==='select-spectrum'){S.spectrum=el.dataset.value;render()}" +
     "else if(action==='select-dd'){" +
       "var dd=S.ddQuestions[S.ddIndex];" +
@@ -2087,15 +2309,10 @@ var APP_JS = [
       "if(S.ddIndex<S.ddQuestions.length-1){S.ddIndex++;render()}" +
       "else{S.phase=5;render()}" +
     "}" +
-    "else if(action==='toggle-quality'){" +
-      "var v=el.dataset.value;var idx=S.qualities.indexOf(v);" +
-      "if(idx!==-1)S.qualities.splice(idx,1);else if(S.qualities.length<3)S.qualities.push(v);" +
-      "render()" +
-    "}" +
     "else if(action==='skip-address'){S.address={street:'',city:'',state:'TX',zip:''};buildGuide()}" +
     "else if(action==='geolocate'){geolocate()}" +
     "else if(action==='retry'){buildGuide()}" +
-    "else if(action==='set-party'){S.selectedParty=el.dataset.value;save();render()}" +
+    "else if(action==='set-party'){S.selectedParty=el.dataset.value;trk('party_switch',{d1:el.dataset.value});save();render()}" +
     "else if(action==='toggle-expand'){" +
       "var id=el.dataset.id;S.expanded[id]=!S.expanded[id];render()" +
     "}" +
@@ -2106,21 +2323,23 @@ var APP_JS = [
         "S.address={street:'',city:'',state:'TX',zip:''};S.ddIndex=0;S.ddQuestions=[];S.countyInfo=null;" +
         "S.repBallot=null;S.demBallot=null;S.selectedParty='republican';" +
         "S.guideComplete=false;S.summary=null;S.districts=null;S.expanded={};S.addressError=null;S.verifyingAddress=false;" +
-        "shuffledIssues=null;shuffledSpectrum=null;shuffledQualities=null;shuffledDD={};" +
+        "shuffledSpectrum=null;shuffledDD={};" +
         "try{localStorage.removeItem('tx_votes_profile');localStorage.removeItem('tx_votes_ballot_republican');" +
-        "localStorage.removeItem('tx_votes_ballot_democrat');localStorage.removeItem('tx_votes_selected_party');localStorage.removeItem('tx_votes_has_voted');" +
+        "localStorage.removeItem('tx_votes_ballot_democrat');localStorage.removeItem('tx_votes_selected_party');localStorage.removeItem('tx_votes_has_voted');localStorage.removeItem('tx_votes_sharePromptSeen');" +
         "localStorage.removeItem('atx_votes_profile');localStorage.removeItem('atx_votes_ballot_republican');" +
         "localStorage.removeItem('atx_votes_ballot_democrat');localStorage.removeItem('atx_votes_selected_party');localStorage.removeItem('atx_votes_has_voted')}catch(e){}" +
         "location.hash='#/';render()" +
       "}" +
     "}" +
     "else if(action==='dismiss-disclaimer'){S.disclaimerDismissed=true;render()}" +
-    "else if(action==='set-lang'){setLang(el.dataset.value)}" +
-    "else if(action==='mark-voted'){S.hasVoted=true;save();render();launchConfetti()}" +
+    "else if(action==='set-lang'){trk('lang_toggle',{d1:el.dataset.value});setLang(el.dataset.value)}" +
+    "else if(action==='mark-voted'){S.hasVoted=true;trk('i_voted');save();render();launchConfetti();setTimeout(showSharePrompt,1500)}" +
     "else if(action==='unvote'){S.hasVoted=false;save();render()}" +
-    "else if(action==='share-voted'){shareStickerImage()}" +
-    "else if(action==='do-print'){window.print()}" +
+    "else if(action==='share-voted'){trk('share_voted');shareStickerImage()}" +
+    "else if(action==='do-print'){trk('cheatsheet_print');window.print()}" +
     "else if(action==='share'){shareGuide()}" +
+    "else if(action==='share-app'){trk('share_app');shareApp()}" +
+    "else if(action==='share-race'){trk('share_race',{d1:el.dataset.idx});shareRace(parseInt(el.dataset.idx))}" +
     "else if(action==='regen-summary'){regenerateSummary()}" +
     "else if(action==='reprocess-guide'){reprocessGuide()}" +
   "});",
@@ -2207,6 +2426,8 @@ var APP_JS = [
     "return t(key)" +
   "}",
   "function buildGuide(){" +
+    "trk('interview_complete',{d1:''+S.readingLevel,d2:S.spectrum,ms:Date.now()-(S._iStart||Date.now())});" +
+    "trk('guide_start');" +
     "S.phase=8;S.error=null;S.loadPhase=0;S.loadMsg=lm('Finding your ballot...');S.isLoading=true;render();" +
     "doGuide();" +
   "}",
@@ -2263,10 +2484,12 @@ var APP_JS = [
       "if(S.selectedParty==='democrat'&&!S.demBallot)S.selectedParty='republican';" +
       // Save and show
       "S.guideComplete=true;S.isLoading=false;stopMascotTimer();" +
+      "trk('guide_complete',{ms:Date.now()-(S._iStart||Date.now())});" +
       "save();" +
       "await new Promise(function(r){setTimeout(r,500)});" +
       "location.hash='#/ballot';render();" +
     "}catch(err){" +
+      "trk('guide_error',{d1:(err.message||'unknown').slice(0,128)});" +
       "stopMascotTimer();S.error=err.message||'Something went wrong. Please try again.';render();" +
     "}" +
   "}",
@@ -2317,6 +2540,35 @@ var APP_JS = [
     "}" +
   "}",
 
+  // ============ SHARE APP ============
+  "function shareApp(){" +
+    "var text='The Texas primary is March 3. Get your free personalized voting guide at txvotes.app';" +
+    "if(navigator.share){" +
+      "navigator.share({title:'Texas Votes',text:text,url:'https://txvotes.app'}).catch(function(){})" +
+    "}else{" +
+      "navigator.clipboard.writeText(text).then(function(){alert('Copied to clipboard!')}).catch(function(){alert(text)})" +
+    "}" +
+  "}",
+
+  // ============ SHARE RACE ============
+  "function shareRace(idx){" +
+    "var b=getBallot();if(!b)return;" +
+    "var races=b.races.slice().sort(function(a,b){return sortOrder(a)-sortOrder(b)});" +
+    "var race=races[idx];if(!race)return;" +
+    "var lines=[race.office+(race.district?' \\u2014 '+race.district:'')];" +
+    "if(race.recommendation){" +
+      "lines.push('My pick: '+race.recommendation.candidateName);" +
+      "if(race.recommendation.reasoning)lines.push(race.recommendation.reasoning)" +
+    "}" +
+    "lines.push('');lines.push('Build your own voting guide at txvotes.app');" +
+    "var text=lines.join('\\n');" +
+    "if(navigator.share){" +
+      "navigator.share({title:'Texas Votes \\u2014 '+race.office,text:text}).catch(function(){})" +
+    "}else{" +
+      "navigator.clipboard.writeText(text).then(function(){alert('Copied to clipboard!')}).catch(function(){alert(text)})" +
+    "}" +
+  "}",
+
   // ============ SHARE STICKER ============
   "function shareStickerImage(){" +
     "var W=440,H=330;" +
@@ -2325,7 +2577,10 @@ var APP_JS = [
     // White oval background
     "ctx.save();ctx.beginPath();ctx.ellipse(W/2,H/2,W/2-4,H/2-4,0,0,Math.PI*2);ctx.closePath();" +
     "ctx.fillStyle='#fff';ctx.fill();" +
-    "ctx.strokeStyle='rgba(0,0,0,.15)';ctx.lineWidth=3;ctx.stroke();ctx.clip();" +
+    "ctx.strokeStyle='#0D2738';ctx.lineWidth=4;ctx.stroke();" +
+    "ctx.beginPath();ctx.ellipse(W/2,H/2,W/2-1,H/2-1,0,0,Math.PI*2);ctx.closePath();" +
+    "ctx.strokeStyle='#CC1919';ctx.lineWidth=3;ctx.stroke();" +
+    "ctx.beginPath();ctx.ellipse(W/2,H/2,W/2-4,H/2-4,0,0,Math.PI*2);ctx.closePath();ctx.clip();" +
     // Flag — 13 stripes
     "var fw=140,fh=84,fx=(W-fw)/2,fy=24;" +
     "var sH=fh/13;" +
@@ -2384,6 +2639,33 @@ var APP_JS = [
       "document.body.appendChild(el);" +
       "setTimeout(function(){el.remove()},5000)" +
     "}" +
+  "}",
+
+  // ============ SHARE PROMPT (post-vote) ============
+  "function showSharePrompt(){" +
+    "if(localStorage.getItem('tx_votes_sharePromptSeen'))return;" +
+    "localStorage.setItem('tx_votes_sharePromptSeen','1');" +
+    "var d=document.createElement('div');" +
+    "d.id='share-prompt-overlay';" +
+    "d.className='share-prompt-overlay';" +
+    "d.innerHTML='<div class=\"share-prompt-card\">" +
+      "<h3>\\u{1F389} '+t('You did it!')+'</h3>" +
+      "<p>'+t('Now help 3 friends do the same. Share Texas Votes with someone who needs help deciding.')+'</p>" +
+      "<button class=\"btn btn-primary\" data-action=\"share-app-prompt\" style=\"width:100%\">\\u{1F4E4} '+t('Share Texas Votes')+'</button>" +
+      "<button class=\"share-prompt-dismiss\" data-action=\"dismiss-share-prompt\">'+t('Maybe later')+'</button>" +
+    "</div>';" +
+    "document.body.appendChild(d);" +
+    "d.addEventListener('click',function(e){" +
+      "var btn=e.target.closest('[data-action]');" +
+      "if(btn&&btn.dataset.action==='share-app-prompt'){" +
+        "var shareText='I just voted in the Texas Primary! Build your own personalized voting guide at https://txvotes.app';" +
+        "if(navigator.share){navigator.share({title:'Texas Votes',text:shareText}).catch(function(){})}" +
+        "else{navigator.clipboard.writeText(shareText).then(function(){alert('Copied to clipboard!')}).catch(function(){alert(shareText)})}" +
+        "d.remove()" +
+      "}else if((btn&&btn.dataset.action==='dismiss-share-prompt')||e.target===d){" +
+        "d.remove()" +
+      "}" +
+    "})" +
   "}",
 
   // ============ BACKGROUND REFRESH ============
@@ -2447,6 +2729,13 @@ var APP_JS = [
       "navigator.serviceWorker.register('/app/sw.js').catch(function(){});" +
     "})" +
   "}",
+
+  // Track interview abandonment when page is hidden mid-interview
+  "document.addEventListener('visibilitychange',function(){" +
+    "if(document.visibilityState==='hidden'&&S.phase>0&&S.phase<8&&!S.guideComplete){" +
+      "navigator.sendBeacon('/app/api/ev',JSON.stringify({event:'interview_abandon',props:{lang:LANG,d1:'phase_'+S.phase,ms:Date.now()-(S._iStart||Date.now())}}))" +
+    "}" +
+  "});",
 ].join("\n");
 
 // MARK: - App HTML (must be after CSS and APP_JS)
@@ -2457,6 +2746,8 @@ var APP_HTML =
   '<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">' +
   "<title>Texas Votes</title>" +
   '<link rel="manifest" href="/app/manifest.json">' +
+  '<link rel="icon" href="/favicon.svg" type="image/svg+xml">' +
+  '<link rel="apple-touch-icon" href="/apple-touch-icon.svg">' +
   '<meta name="theme-color" content="#21598e">' +
   '<meta name="apple-mobile-web-app-capable" content="yes">' +
   '<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">' +

@@ -36,7 +36,7 @@ npx wrangler secret put ADMIN_SECRET -c wrangler.txvotes.toml
 - **worker/src/pwa-guide.js** — Claude API integration for personalized voting guide generation
 - **worker/src/county-seeder.js** — Data population pipeline for county races/info via Claude + web_search
 - **worker/src/updater.js** — Daily updater cron (runs on atxvotes-api only)
-- **worker/tests/interview-flow.test.js** — 64 interview flow UI tests (happy-dom + vitest)
+- **worker/tests/interview-flow.test.js** — 71 interview flow UI tests (happy-dom + vitest)
 
 ## Testing
 
@@ -44,7 +44,7 @@ npx wrangler secret put ADMIN_SECRET -c wrangler.txvotes.toml
 cd worker && npx vitest run
 ```
 
-101 tests total: 64 interview flow + 37 pwa-guide.
+108 tests total: 71 interview flow + 37 pwa-guide.
 
 ## Key Patterns
 

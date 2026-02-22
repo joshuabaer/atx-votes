@@ -108,8 +108,12 @@ export async function handlePWA_Summary(request, env) {
       return json({ error: "profile required" }, 400);
     }
 
-    var issues = (profile.topIssues || []).join(", ");
-    var qualities = (profile.candidateQualities || []).join(", ");
+    var topIssues = (profile.topIssues || []).slice(0, 7);
+    var otherIssues = (profile.topIssues || []).slice(7);
+    var issues = topIssues.map(function(item, i) { return (i + 1) + ". " + item; }).join(", ");
+    if (otherIssues.length) issues += " (also: " + otherIssues.join(", ") + ")";
+    var topQuals = (profile.candidateQualities || []).slice(0, 5);
+    var qualities = topQuals.map(function(item, i) { return (i + 1) + ". " + item; }).join(", ");
     var stances = Object.keys(profile.policyViews || {})
       .map(function (k) { return k + ": " + profile.policyViews[k]; })
       .join("; ");
@@ -266,8 +270,12 @@ function buildUserPrompt(profile, ballotDesc, ballot, party, lang, readingLevel)
   });
 
   var partyLabel = party.charAt(0).toUpperCase() + party.slice(1);
-  var issues = (profile.topIssues || []).join(", ");
-  var qualities = (profile.candidateQualities || []).join(", ");
+  var topIssues = (profile.topIssues || []).slice(0, 7);
+  var otherIssues = (profile.topIssues || []).slice(7);
+  var issues = topIssues.map(function(item, i) { return (i + 1) + ". " + item; }).join(", ");
+  if (otherIssues.length) issues += " (also: " + otherIssues.join(", ") + ")";
+  var topQuals = (profile.candidateQualities || []).slice(0, 5);
+  var qualities = topQuals.map(function(item, i) { return (i + 1) + ". " + item; }).join(", ");
   var stances = Object.keys(profile.policyViews || {})
     .map(function (k) {
       return k + ": " + profile.policyViews[k];

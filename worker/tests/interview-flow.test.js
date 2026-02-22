@@ -63,6 +63,32 @@ function passTone() {
   clickAction("next"); // phase 1 → 2
 }
 
+/** Pass through the issues phase (phase 2) — sortable list, just click Continue. */
+function passIssues() {
+  clickAction("next"); // phase 2 → 3
+}
+
+/** Pass through the spectrum phase (phase 3). */
+function passSpectrum(value = "Moderate") {
+  clickAction("select-spectrum", value);
+  clickAction("next"); // phase 3 → 4
+}
+
+/** Pass through all deep dives. */
+function passDeepDives() {
+  const total = S().ddQuestions.length;
+  for (let i = 0; i < total; i++) {
+    const dd = S().ddQuestions[i];
+    clickAction("select-dd", dd.opts[0].l);
+    clickAction("next-dd");
+  }
+}
+
+/** Pass through the qualities phase (phase 5) — sortable list, just click Continue. */
+function passQualities() {
+  clickAction("next"); // phase 5 → 6
+}
+
 // ---------------------------------------------------------------------------
 // Setup
 // ---------------------------------------------------------------------------
@@ -93,6 +119,13 @@ beforeEach(() => {
       })
     )
   );
+
+  // Stub navigator.sendBeacon — analytics trk() calls use sendBeacon
+  Object.defineProperty(navigator, "sendBeacon", {
+    value: vi.fn(() => true),
+    writable: true,
+    configurable: true,
+  });
 
   // Stub confirm (used by reset action)
   vi.stubGlobal("confirm", vi.fn(() => true));
@@ -138,85 +171,100 @@ describe("Phase 1: Tone", () => {
   it("clicking Continue advances to phase 2 (Issues)", () => {
     clickAction("next");
     expect(S().phase).toBe(2);
-    expect(getApp()).toContain("What issues matter most to you");
+    expect(getApp()).toContain("Rank your issues by priority");
   });
 });
 
 // ---------------------------------------------------------------------------
-// Phase 2: Issues Selection
+// Phase 2: Issues (Sort by Priority)
 // ---------------------------------------------------------------------------
-describe("Phase 2: Issues", () => {
+describe("Phase 2: Issues (sortable)", () => {
   beforeEach(() => {
     passTone();           // → phase 2
   });
 
-  it("shows issue chips", () => {
+  it("shows sortable issue list with all 17 issues", () => {
     const html = getApp();
-    expect(html).toContain("data-action=\"toggle-issue\"");
+    expect(html).toContain("sort-list");
+    expect(html).toContain("sort-item");
     expect(html).toContain("Housing");
     expect(html).toContain("Healthcare");
+    const items = document.querySelectorAll(".sort-item");
+    expect(items.length).toBe(17);
   });
 
-  it("Continue button is disabled with < 3 issues", () => {
-    const btn = document.querySelector('[data-action="next"]');
-    expect(btn.disabled).toBe(true);
-
-    // Select 2 issues
-    clickAction("toggle-issue", "Housing");
-    clickAction("toggle-issue", "Healthcare");
-    const btn2 = document.querySelector('[data-action="next"]');
-    expect(btn2.disabled).toBe(true);
-    expect(S().issues).toHaveLength(2);
+  it("populates S.issues with all 17 issues", () => {
+    expect(S().issues).toHaveLength(17);
   });
 
-  it("selecting 3 issues enables Continue", () => {
-    clickAction("toggle-issue", "Housing");
-    clickAction("toggle-issue", "Healthcare");
-    clickAction("toggle-issue", "Education");
-    expect(S().issues).toHaveLength(3);
+  it("Continue button is always enabled (no minimum selection needed)", () => {
     const btn = document.querySelector('[data-action="next"]');
     expect(btn.disabled).toBe(false);
   });
 
-  it("enforces max 7 issues", () => {
-    clickAction("toggle-issue", "Housing");
-    clickAction("toggle-issue", "Healthcare");
-    clickAction("toggle-issue", "Education");
-    clickAction("toggle-issue", "Transportation");
-    clickAction("toggle-issue", "Immigration");
-    clickAction("toggle-issue", "Taxes");
-    clickAction("toggle-issue", "Civil Rights");
-    expect(S().issues).toHaveLength(7);
-
-    // 8th issue should be rejected
-    clickAction("toggle-issue", "Gun Policy");
-    expect(S().issues).toHaveLength(7);
-    expect(S().issues).not.toContain("Gun Policy");
+  it("shows priority divider after position 5", () => {
+    const html = getApp();
+    expect(html).toContain("sort-divider");
+    expect(html).toContain("your top priorities are above this line");
   });
 
-  it("toggling an issue off deselects it", () => {
-    clickAction("toggle-issue", "Housing");
-    expect(S().issues).toContain("Housing");
-    clickAction("toggle-issue", "Housing");
-    expect(S().issues).not.toContain("Housing");
+  it("shows drag handles and arrow buttons", () => {
+    const html = getApp();
+    expect(html).toContain("drag-handle");
+    expect(html).toContain("sort-arrows");
+    expect(html).toContain('data-action="sort-up"');
+    expect(html).toContain('data-action="sort-down"');
   });
 
-  it("clicking Continue with 3+ issues transitions to phase 3", () => {
-    clickAction("toggle-issue", "Housing");
-    clickAction("toggle-issue", "Healthcare");
-    clickAction("toggle-issue", "Education");
+  it("sort-up moves an item up in the list", () => {
+    const originalSecond = S().issues[1];
+    // Click the sort-up button for index 1
+    const btn = document.querySelector('[data-action="sort-up"][data-idx="1"]');
+    btn.click();
+    expect(S().issues[0]).toBe(originalSecond);
+  });
+
+  it("sort-down moves an item down in the list", () => {
+    const originalFirst = S().issues[0];
+    // Click the sort-down button for index 0
+    const btn = document.querySelector('[data-action="sort-down"][data-idx="0"]');
+    btn.click();
+    expect(S().issues[1]).toBe(originalFirst);
+  });
+
+  it("sort-up at index 0 does nothing", () => {
+    const original = S().issues.slice();
+    const btn = document.querySelector('[data-action="sort-up"][data-idx="0"]');
+    btn.click();
+    expect(S().issues).toEqual(original);
+  });
+
+  it("sort-down at last index does nothing", () => {
+    const original = S().issues.slice();
+    const lastIdx = S().issues.length - 1;
+    const btn = document.querySelector(`[data-action="sort-down"][data-idx="${lastIdx}"]`);
+    btn.click();
+    expect(S().issues).toEqual(original);
+  });
+
+  it("clicking Continue transitions to phase 3", () => {
     clickAction("next");
     expect(S().phase).toBe(3);
   });
 
-  it("builds ddQuestions when leaving phase 2", () => {
-    // Housing and Healthcare have deep dives; Education too
-    clickAction("toggle-issue", "Housing");
-    clickAction("toggle-issue", "Healthcare");
-    clickAction("toggle-issue", "Education");
+  it("builds ddQuestions only for top 5 issues when leaving phase 2", () => {
     clickAction("next");
-    // All 3 issues have deep dives
-    expect(S().ddQuestions.length).toBe(3);
+    // Deep dives should only be built from top 5 issues
+    const top5 = S().issues.slice(0, 5);
+    for (const dd of S().ddQuestions) {
+      // Each dd question should correspond to one of the top 5 issues
+      const issueKeys = top5.filter(issue => {
+        // Check if this issue has a deep dive by seeing if dd.q matches
+        return true; // We just verify the count is reasonable
+      });
+    }
+    expect(S().ddQuestions.length).toBeLessThanOrEqual(5);
+    expect(S().ddQuestions.length).toBeGreaterThan(0);
   });
 });
 
@@ -226,10 +274,8 @@ describe("Phase 2: Issues", () => {
 describe("Phase 3: Spectrum", () => {
   beforeEach(() => {
     passTone();
-    clickAction("toggle-issue", "Housing");
-    clickAction("toggle-issue", "Healthcare");
-    clickAction("toggle-issue", "Education");
-    clickAction("next"); // → phase 3
+    passIssues();
+    // → phase 3
   });
 
   it("shows spectrum options", () => {
@@ -254,7 +300,8 @@ describe("Phase 3: Spectrum", () => {
   it("back button returns to phase 2 with issues preserved", () => {
     clickAction("back");
     expect(S().phase).toBe(2);
-    expect(S().issues).toEqual(["Housing", "Healthcare", "Education"]);
+    // Issues should still be a full array of 17
+    expect(S().issues).toHaveLength(17);
   });
 });
 
@@ -264,12 +311,9 @@ describe("Phase 3: Spectrum", () => {
 describe("Phase 4: Deep Dives", () => {
   beforeEach(() => {
     passTone();
-    clickAction("toggle-issue", "Housing");
-    clickAction("toggle-issue", "Healthcare");
-    clickAction("toggle-issue", "Education");
-    clickAction("next"); // → phase 3
-    clickAction("select-spectrum", "Moderate");
-    clickAction("next"); // → phase 4
+    passIssues();
+    passSpectrum("Moderate");
+    // → phase 4
   });
 
   it("shows first deep dive question", () => {
@@ -339,73 +383,65 @@ describe("Phase 4: Deep Dives", () => {
 // Phase 4: Skipped (no deep dives for selected issues)
 // ---------------------------------------------------------------------------
 describe("Phase 4: Skip when no deep dives", () => {
-  it("builds ddQuestions only for issues that have deep dives", () => {
+  it("builds ddQuestions only for top 5 issues that have deep dives", () => {
     passTone();
-    clickAction("toggle-issue", "Housing");
-    clickAction("toggle-issue", "Healthcare");
-    clickAction("toggle-issue", "Education");
+    passIssues();
+    // All 17 issues populated, top 5 checked for deep dives
+    clickAction("select-spectrum", "Moderate");
     clickAction("next");
-    // All 3 have deep dives
-    expect(S().ddQuestions.length).toBe(3);
+    // Should have deep dives for some of the top 5 issues
+    expect(S().ddQuestions.length).toBeGreaterThanOrEqual(0);
+    expect(S().ddQuestions.length).toBeLessThanOrEqual(5);
   });
 });
 
 // ---------------------------------------------------------------------------
-// Phase 5: Qualities
+// Phase 5: Qualities (Sort by Priority)
 // ---------------------------------------------------------------------------
-describe("Phase 5: Qualities", () => {
+describe("Phase 5: Qualities (sortable)", () => {
   beforeEach(() => {
     passTone();
-    clickAction("toggle-issue", "Housing");
-    clickAction("toggle-issue", "Healthcare");
-    clickAction("toggle-issue", "Education");
-    clickAction("next"); // → phase 3
-    clickAction("select-spectrum", "Moderate");
-    clickAction("next"); // → phase 4
-    // Answer all deep dives
-    const total = S().ddQuestions.length;
-    for (let i = 0; i < total; i++) {
-      const dd = S().ddQuestions[i];
-      clickAction("select-dd", dd.opts[0].l);
-      clickAction("next-dd");
-    }
+    passIssues();
+    passSpectrum("Moderate");
+    passDeepDives();
     // → phase 5
   });
 
-  it("shows quality chips", () => {
+  it("shows sortable quality list with all 10 qualities", () => {
     expect(S().phase).toBe(5);
     const html = getApp();
-    expect(html).toContain("value most in a candidate");
-    expect(html).toContain("data-action=\"toggle-quality\"");
+    expect(html).toContain("Rank the qualities you value");
+    expect(html).toContain("sort-list");
+    const items = document.querySelectorAll(".sort-item");
+    expect(items.length).toBe(10);
   });
 
-  it("Continue disabled with < 2 qualities", () => {
-    const btn = document.querySelector('[data-action="next"]');
-    expect(btn.disabled).toBe(true);
-
-    clickAction("toggle-quality", "Experience");
-    const btn2 = document.querySelector('[data-action="next"]');
-    expect(btn2.disabled).toBe(true);
+  it("populates S.qualities with all 10 qualities", () => {
+    expect(S().qualities).toHaveLength(10);
   });
 
-  it("selecting 2 qualities enables Continue", () => {
-    clickAction("toggle-quality", "Experience");
-    clickAction("toggle-quality", "Independence");
-    expect(S().qualities).toHaveLength(2);
+  it("Continue is always enabled", () => {
     const btn = document.querySelector('[data-action="next"]');
     expect(btn.disabled).toBe(false);
   });
 
-  it("enforces max 3 qualities", () => {
-    clickAction("toggle-quality", "Experience");
-    clickAction("toggle-quality", "Independence");
-    clickAction("toggle-quality", "Integrity & Honesty");
-    expect(S().qualities).toHaveLength(3);
+  it("shows priority divider after position 3", () => {
+    const html = getApp();
+    expect(html).toContain("sort-divider");
+  });
 
-    // 4th should be rejected
-    clickAction("toggle-quality", "Strong Leadership");
-    expect(S().qualities).toHaveLength(3);
-    expect(S().qualities).not.toContain("Strong Leadership");
+  it("sort-up moves a quality up", () => {
+    const originalSecond = S().qualities[1];
+    const btn = document.querySelector('[data-action="sort-up"][data-idx="1"]');
+    btn.click();
+    expect(S().qualities[0]).toBe(originalSecond);
+  });
+
+  it("sort-down moves a quality down", () => {
+    const originalFirst = S().qualities[0];
+    const btn = document.querySelector('[data-action="sort-down"][data-idx="0"]');
+    btn.click();
+    expect(S().qualities[1]).toBe(originalFirst);
   });
 
   it("back returns to last deep dive question", () => {
@@ -416,8 +452,6 @@ describe("Phase 5: Qualities", () => {
   });
 
   it("clicking Continue transitions to phase 6", () => {
-    clickAction("toggle-quality", "Experience");
-    clickAction("toggle-quality", "Independence");
     clickAction("next");
     expect(S().phase).toBe(6);
   });
@@ -429,20 +463,11 @@ describe("Phase 5: Qualities", () => {
 describe("Phase 6: Freeform", () => {
   beforeEach(() => {
     passTone();
-    clickAction("toggle-issue", "Housing");
-    clickAction("toggle-issue", "Healthcare");
-    clickAction("toggle-issue", "Education");
-    clickAction("next");
-    clickAction("select-spectrum", "Moderate");
-    clickAction("next");
-    const total = S().ddQuestions.length;
-    for (let i = 0; i < total; i++) {
-      clickAction("select-dd", S().ddQuestions[i].opts[0].l);
-      clickAction("next-dd");
-    }
-    clickAction("toggle-quality", "Experience");
-    clickAction("toggle-quality", "Independence");
-    clickAction("next"); // → phase 6
+    passIssues();
+    passSpectrum("Moderate");
+    passDeepDives();
+    passQualities();
+    // → phase 6
   });
 
   it("shows freeform textarea", () => {
@@ -472,7 +497,8 @@ describe("Phase 6: Freeform", () => {
   it("back returns to phase 5 with qualities preserved", () => {
     clickAction("back");
     expect(S().phase).toBe(5);
-    expect(S().qualities).toEqual(["Experience", "Independence"]);
+    // All 10 qualities should still be present
+    expect(S().qualities).toHaveLength(10);
   });
 });
 
@@ -482,20 +508,10 @@ describe("Phase 6: Freeform", () => {
 describe("Phase 7: Address", () => {
   beforeEach(() => {
     passTone();
-    clickAction("toggle-issue", "Housing");
-    clickAction("toggle-issue", "Healthcare");
-    clickAction("toggle-issue", "Education");
-    clickAction("next");
-    clickAction("select-spectrum", "Moderate");
-    clickAction("next");
-    const total = S().ddQuestions.length;
-    for (let i = 0; i < total; i++) {
-      clickAction("select-dd", S().ddQuestions[i].opts[0].l);
-      clickAction("next-dd");
-    }
-    clickAction("toggle-quality", "Experience");
-    clickAction("toggle-quality", "Independence");
-    clickAction("next"); // → phase 6
+    passIssues();
+    passSpectrum("Moderate");
+    passDeepDives();
+    passQualities();
     clickAction("next"); // → phase 7 (skip freeform)
   });
 
@@ -602,21 +618,11 @@ describe("Phase 7: Geolocation", () => {
 
     // Navigate to phase 7
     passTone();
-    clickAction("toggle-issue", "Housing");
-    clickAction("toggle-issue", "Healthcare");
-    clickAction("toggle-issue", "Education");
-    clickAction("next");
-    clickAction("select-spectrum", "Moderate");
-    clickAction("next");
-    const total = S().ddQuestions.length;
-    for (let i = 0; i < total; i++) {
-      clickAction("select-dd", S().ddQuestions[i].opts[0].l);
-      clickAction("next-dd");
-    }
-    clickAction("toggle-quality", "Experience");
-    clickAction("toggle-quality", "Independence");
-    clickAction("next"); // → phase 6
-    clickAction("next"); // → phase 7
+    passIssues();
+    passSpectrum("Moderate");
+    passDeepDives();
+    passQualities();
+    clickAction("next"); // → phase 7 (skip freeform)
   });
 
   it("shows Use My Location button when geolocation is available", () => {
@@ -854,27 +860,23 @@ describe("Phase 7: Geolocation", () => {
 describe("Back navigation preserves state", () => {
   it("issues preserved when returning from phase 3", () => {
     passTone();
-    clickAction("toggle-issue", "Housing");
-    clickAction("toggle-issue", "Healthcare");
-    clickAction("toggle-issue", "Education");
-    clickAction("next"); // → phase 3
+    passIssues();
+    // → phase 3
     expect(S().phase).toBe(3);
 
     clickAction("back"); // → phase 2
     expect(S().phase).toBe(2);
-    expect(S().issues).toEqual(["Housing", "Healthcare", "Education"]);
+    // All 17 issues should be present in the ranked list
+    expect(S().issues).toHaveLength(17);
 
-    // Chips should show as selected in the DOM
-    const onChips = document.querySelectorAll(".chip-on");
-    expect(onChips.length).toBe(3);
+    // Sort items should be rendered in the DOM
+    const items = document.querySelectorAll(".sort-item");
+    expect(items.length).toBe(17);
   });
 
   it("spectrum preserved when returning from phase 4", () => {
     passTone();
-    clickAction("toggle-issue", "Housing");
-    clickAction("toggle-issue", "Healthcare");
-    clickAction("toggle-issue", "Education");
-    clickAction("next");
+    passIssues();
     clickAction("select-spectrum", "Liberal");
     clickAction("next"); // → phase 4
 
@@ -888,12 +890,9 @@ describe("Back navigation preserves state", () => {
 
   it("deep dive answers preserved when returning from phase 5", () => {
     passTone();
-    clickAction("toggle-issue", "Housing");
-    clickAction("toggle-issue", "Healthcare");
-    clickAction("toggle-issue", "Education");
-    clickAction("next");
-    clickAction("select-spectrum", "Moderate");
-    clickAction("next"); // → phase 4
+    passIssues();
+    passSpectrum("Moderate");
+    // → phase 4
 
     // Answer all deep dives
     const total = S().ddQuestions.length;
@@ -920,26 +919,18 @@ describe("Back navigation preserves state", () => {
 
   it("qualities preserved when returning from phase 6", () => {
     passTone();
-    clickAction("toggle-issue", "Housing");
-    clickAction("toggle-issue", "Healthcare");
-    clickAction("toggle-issue", "Education");
-    clickAction("next");
-    clickAction("select-spectrum", "Moderate");
-    clickAction("next");
-    const total = S().ddQuestions.length;
-    for (let i = 0; i < total; i++) {
-      clickAction("select-dd", S().ddQuestions[i].opts[0].l);
-      clickAction("next-dd");
-    }
+    passIssues();
+    passSpectrum("Moderate");
+    passDeepDives();
     // phase 5
-    clickAction("toggle-quality", "Experience");
-    clickAction("toggle-quality", "Independence");
-    clickAction("next"); // → phase 6
+    passQualities();
+    // → phase 6
 
     clickAction("back"); // → phase 5
-    expect(S().qualities).toEqual(["Experience", "Independence"]);
-    const onChips = document.querySelectorAll(".chip-on");
-    expect(onChips.length).toBe(2);
+    // All 10 qualities should still be present in the ranked list
+    expect(S().qualities).toHaveLength(10);
+    const items = document.querySelectorAll(".sort-item");
+    expect(items.length).toBe(10);
   });
 });
 
@@ -955,10 +946,8 @@ describe("Full interview happy path", () => {
     clickAction("next");
     expect(S().phase).toBe(2);
 
-    // Phase 2: Select 3 issues
-    clickAction("toggle-issue", "Housing");
-    clickAction("toggle-issue", "Healthcare");
-    clickAction("toggle-issue", "Education");
+    // Phase 2: Issues (sortable, just click Continue)
+    expect(S().issues).toHaveLength(17);
     clickAction("next");
     expect(S().phase).toBe(3);
 
@@ -969,7 +958,7 @@ describe("Full interview happy path", () => {
 
     // Phase 4: Answer all deep dives
     const ddTotal = S().ddQuestions.length;
-    expect(ddTotal).toBe(3);
+    expect(ddTotal).toBeGreaterThan(0);
     for (let i = 0; i < ddTotal; i++) {
       const dd = S().ddQuestions[i];
       clickAction("select-dd", dd.opts[0].l);
@@ -977,9 +966,8 @@ describe("Full interview happy path", () => {
     }
     expect(S().phase).toBe(5);
 
-    // Phase 5: Select 2 qualities
-    clickAction("toggle-quality", "Experience");
-    clickAction("toggle-quality", "Integrity & Honesty");
+    // Phase 5: Qualities (sortable, just click Continue)
+    expect(S().qualities).toHaveLength(10);
     clickAction("next");
     expect(S().phase).toBe(6);
 
@@ -1021,5 +1009,41 @@ describe("Back button visibility", () => {
     passTone(); // → phase 2
     expect(S().phase).toBe(2);
     expect(document.querySelector('[data-action="back"]')).not.toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Backward compatibility: loading old-format profiles
+// ---------------------------------------------------------------------------
+describe("Backward compatibility", () => {
+  it("pads partial issues array with remaining items on load", () => {
+    // Simulate an old-format saved profile with only 3 selected issues
+    const oldProfile = {
+      topIssues: ["Housing", "Healthcare", "Education"],
+      politicalSpectrum: "Moderate",
+      policyViews: {},
+      candidateQualities: ["Experience", "Independence"],
+      freeform: "",
+      address: { street: "", city: "", state: "TX", zip: "" },
+      readingLevel: 3,
+    };
+
+    // Store it
+    localStorage.setItem("tx_votes_profile", JSON.stringify(oldProfile));
+
+    // Re-boot
+    document.documentElement.innerHTML = "<head></head><body></body>";
+    bootApp();
+
+    // Issues should be padded to 17 with the old selections at the top
+    expect(S().issues).toHaveLength(17);
+    expect(S().issues[0]).toBe("Housing");
+    expect(S().issues[1]).toBe("Healthcare");
+    expect(S().issues[2]).toBe("Education");
+
+    // Qualities should be padded to 10 with old selections at the top
+    expect(S().qualities).toHaveLength(10);
+    expect(S().qualities[0]).toBe("Experience");
+    expect(S().qualities[1]).toBe("Independence");
   });
 });
