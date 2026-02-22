@@ -42,6 +42,9 @@
 - [ ] Put Texas flag on the home page — add Texas flag graphic to the landing/welcome page
 - [ ] Fix formatting on static pages (iPhone 17 Pro) — landing page and nonpartisan page have margins too wide, text is squeezed into a narrow column with excessive padding; "Build My Voting Guide" button and badge text wrap awkwardly
 - [ ] Change issues and candidate trait selection to "sort by priority" — instead of "select your top 3-5", let users drag/sort issues by importance
+- [ ] Register related domain names — research and register city/region domains like dallasvotes.app, houstonvotes.app, sanantonio votes.app, etc. for future expansion
+- [ ] Analytics event tracking — track key pages, actions, and flows in Web Analytics (interview completion rate, guide generation, "I Voted" clicks, share actions, cheat sheet prints)
+- [ ] Update privacy policy — remove "app" references, update language to reflect txvotes.app rebrand and current data practices
 - [x] Race card description text doesn't use full card width on desktop — text column is narrower than the card, wasting space next to the "Good Match" badge
 - [x] Integrate Polymarket predictions — show prediction market odds alongside race recommendations
 - [x] Geolocate button to auto-fill address — use browser geolocation to fill in street, city, and ZIP; hardcode state to TX
