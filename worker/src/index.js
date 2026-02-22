@@ -16,6 +16,40 @@ const ZIP_TO_PRECINCT = {
   "78758": "2", "78759": "2",
 };
 
+// Shared CSS for static pages — matches app design tokens from pwa.js
+const PAGE_CSS = `<meta name="theme-color" content="rgb(33,89,143)" media="(prefers-color-scheme:light)"><meta name="theme-color" content="rgb(28,28,31)" media="(prefers-color-scheme:dark)">
+<style>
+:root{--blue:rgb(33,89,143);--bg:#faf8f0;--card:#fff;--text:rgb(31,31,36);--text2:rgb(115,115,128);--border:rgba(128,128,128,.15);--shadow:rgba(0,0,0,.06);--r:16px;--rs:10px}
+@media(prefers-color-scheme:dark){:root{--blue:rgb(102,153,217);--bg:rgb(28,28,31);--card:rgb(43,43,46);--text:rgb(237,237,240);--text2:rgb(153,153,166);--border:rgba(255,255,255,.15);--shadow:rgba(0,0,0,.3)}}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);padding:2rem;line-height:1.7;-webkit-font-smoothing:antialiased}
+.container,.card{background:var(--card);border-radius:var(--r);padding:3rem 2.5rem;box-shadow:0 2px 8px var(--shadow)}
+.container{max-width:640px;margin:0 auto}
+.card{max-width:480px;text-align:center}
+h1{font-size:2rem;font-weight:800;color:var(--blue);margin-bottom:0.5rem;letter-spacing:-0.5px}
+h2{font-size:1.15rem;font-weight:700;color:var(--text);margin-top:1.5rem;margin-bottom:0.5rem}
+p{font-size:1rem;color:var(--text);margin-bottom:0.75rem}
+a{color:var(--blue)}
+ul{padding-left:1.5rem;margin-bottom:0.75rem}
+li{font-size:1rem;color:var(--text);margin-bottom:0.75rem}
+.subtitle{font-size:1.05rem;color:var(--text2);margin-bottom:1.5rem;line-height:1.6}
+.badge{display:inline-block;background:rgba(33,89,143,.1);color:var(--blue);font-weight:600;font-size:0.95rem;padding:0.4rem 1rem;border-radius:99px;margin-bottom:2rem}
+.cta,.email-btn{display:inline-block;background:var(--blue);color:#fff;font-weight:700;border-radius:var(--rs);text-decoration:none;transition:opacity .15s}
+.cta{font-size:1.1rem;padding:1rem 2.5rem}
+.email-btn{font-size:1.05rem;padding:0.8rem 2rem;margin-top:0.5rem}
+.cta:hover,.email-btn:hover{opacity:0.9}
+.icon{font-size:4rem;margin-bottom:1rem}
+.features{margin-top:2rem;text-align:left;font-size:0.95rem;color:var(--text2);line-height:2}
+.features span{margin-right:0.5rem}
+.features a{color:var(--text2)}
+.note{margin-top:1.5rem;font-size:0.85rem;color:var(--text2)}
+.updated{font-size:0.9rem;color:var(--text2);margin-bottom:2rem}
+.faq{margin-top:2rem}
+.back{display:inline-block;margin-top:1.5rem;font-size:0.95rem}
+.page-footer{margin-top:2rem;font-size:0.85rem;color:var(--text2);text-align:center}
+.page-footer a{color:var(--text2);text-decoration:none}
+</style>`;
+
 async function handleDistricts(request, env) {
   const { street, city, state, zip } = await request.json();
   if (!street || !city || !state || !zip) {
@@ -95,79 +129,9 @@ function handleLandingPage() {
   <meta property="og:description" content="Build your personalized voting guide for Austin & Travis County elections in 5 minutes.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://atxvotes.app">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #faf8f0;
-      color: #1e1e24;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-      text-align: center;
-    }
-    .card {
-      background: white;
-      border-radius: 20px;
-      padding: 3rem 2.5rem;
-      max-width: 480px;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-    }
-    .icon { font-size: 4rem; margin-bottom: 1rem; }
-    h1 {
-      font-size: 2rem;
-      font-weight: 800;
-      color: #21598e;
-      margin-bottom: 0.5rem;
-      letter-spacing: -0.5px;
-    }
-    .subtitle {
-      font-size: 1.1rem;
-      color: #73737f;
-      margin-bottom: 1.5rem;
-      line-height: 1.5;
-    }
-    .badge {
-      display: inline-block;
-      background: #21598e15;
-      color: #21598e;
-      font-weight: 600;
-      font-size: 0.95rem;
-      padding: 0.4rem 1rem;
-      border-radius: 99px;
-      margin-bottom: 2rem;
-    }
-    .cta {
-      display: inline-block;
-      background: #21598e;
-      color: white;
-      font-size: 1.1rem;
-      font-weight: 700;
-      padding: 1rem 2.5rem;
-      border-radius: 12px;
-      text-decoration: none;
-      transition: opacity 0.15s;
-    }
-    .cta:hover { opacity: 0.9; }
-    .features {
-      margin-top: 2rem;
-      text-align: left;
-      font-size: 0.95rem;
-      color: #73737f;
-      line-height: 2;
-    }
-    .features span { margin-right: 0.5rem; }
-    .footer {
-      margin-top: 2rem;
-      font-size: 0.85rem;
-      color: #73737f80;
-    }
-  </style>
+  ${PAGE_CSS}
 </head>
-<body>
+<body style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center">
   <div class="card">
     <div class="icon">🗳️</div>
     <h1>ATX Votes</h1>
@@ -180,11 +144,11 @@ function handleLandingPage() {
       <div><span>📋</span> Personalized ballot with recommendations</div>
       <div><span>🖨️</span> Print your cheat sheet for the booth</div>
       <div><span>📍</span> Find your polling location</div>
-      <div><span>⚖️</span> <a href="/nonpartisan" style="color:inherit">Nonpartisan by design</a> — fairness is in our code</div>
+      <div><span>⚖️</span> <a href="/nonpartisan">Nonpartisan by design</a> — fairness is in our code</div>
     </div>
-    <p style="margin-top:1.5rem;font-size:0.85rem;color:#73737f">Works on any device — phone, tablet, or computer. No app download needed.</p>
+    <p class="note">Works on any device — phone, tablet, or computer. No app download needed.</p>
   </div>
-  <p class="footer"><a href="/nonpartisan" style="color:inherit">Nonpartisan by Design</a> &middot; <a href="/privacy" style="color:inherit">Privacy</a> &middot; <a href="mailto:howdy@atxvotes.app" style="color:inherit">howdy@atxvotes.app</a></p>
+  <p class="page-footer"><a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@atxvotes.app">howdy@atxvotes.app</a></p>
 </body>
 </html>`;
 
@@ -201,30 +165,7 @@ function handleNonpartisan() {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Nonpartisan by Design — ATX Votes</title>
   <meta name="description" content="How ATX Votes ensures fairness: randomized order, no party labels, neutral AI, privacy-first design, and more.">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #faf8f0;
-      color: #1e1e24;
-      padding: 2rem;
-      line-height: 1.7;
-    }
-    .container {
-      max-width: 640px;
-      margin: 0 auto;
-      background: white;
-      border-radius: 20px;
-      padding: 3rem 2.5rem;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-    }
-    h1 { font-size: 1.8rem; font-weight: 800; color: #21598e; margin-bottom: 0.3rem; }
-    .subtitle { font-size: 1.05rem; color: #73737f; margin-bottom: 2rem; line-height: 1.6; }
-    h2 { font-size: 1.15rem; font-weight: 700; color: #1e1e24; margin-top: 1.5rem; margin-bottom: 0.5rem; }
-    p { font-size: 1rem; color: #3a3a44; margin-bottom: 0.75rem; }
-    a { color: #21598e; }
-    .back { display: inline-block; margin-top: 1.5rem; font-size: 0.95rem; }
-  </style>
+  ${PAGE_CSS}
 </head>
 <body>
   <div class="container">
@@ -270,7 +211,7 @@ function handleNonpartisan() {
     <h2>Open Source Approach</h2>
     <p>The full prompt sent to the AI and every design decision is documented. Nothing is hidden.</p>
 
-    <p style="margin-top: 2rem; font-size: 0.85rem; color: #73737f80; text-align: center;"><a href="/" style="color:inherit">ATX Votes</a> &middot; <a href="/privacy" style="color:inherit">Privacy</a> &middot; <a href="mailto:howdy@atxvotes.app" style="color:inherit">howdy@atxvotes.app</a></p>
+    <p class="page-footer"><a href="/">ATX Votes</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@atxvotes.app">howdy@atxvotes.app</a></p>
   </div>
 </body>
 </html>`;
@@ -287,43 +228,7 @@ function handleSupport() {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Support — ATX Votes</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #faf8f0;
-      color: #1e1e24;
-      padding: 2rem;
-      line-height: 1.7;
-    }
-    .container {
-      max-width: 640px;
-      margin: 0 auto;
-      background: white;
-      border-radius: 20px;
-      padding: 3rem 2.5rem;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-    }
-    h1 { font-size: 1.8rem; font-weight: 800; color: #21598e; margin-bottom: 0.3rem; }
-    .subtitle { font-size: 1rem; color: #73737f; margin-bottom: 2rem; }
-    h2 { font-size: 1.15rem; font-weight: 700; color: #1e1e24; margin-top: 1.5rem; margin-bottom: 0.5rem; }
-    p { font-size: 1rem; color: #3a3a44; margin-bottom: 0.75rem; }
-    a { color: #21598e; }
-    .email-btn {
-      display: inline-block;
-      background: #21598e;
-      color: white;
-      font-size: 1.05rem;
-      font-weight: 700;
-      padding: 0.8rem 2rem;
-      border-radius: 12px;
-      text-decoration: none;
-      margin-top: 0.5rem;
-    }
-    .email-btn:hover { opacity: 0.9; }
-    .faq { margin-top: 2rem; }
-    .back { display: inline-block; margin-top: 1.5rem; font-size: 0.95rem; }
-  </style>
+  ${PAGE_CSS}
 </head>
 <body>
   <div class="container">
@@ -351,7 +256,7 @@ function handleSupport() {
       <p>Please <a href="mailto:howdy@atxvotes.app">email us</a> with details and we'll correct it as quickly as possible.</p>
     </div>
 
-    <p style="margin-top: 2rem; font-size: 0.85rem; color: #73737f80; text-align: center;"><a href="/" style="color:inherit">ATX Votes</a> &middot; <a href="/nonpartisan" style="color:inherit">Nonpartisan by Design</a> &middot; <a href="/privacy" style="color:inherit">Privacy</a></p>
+    <p class="page-footer"><a href="/">ATX Votes</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/privacy">Privacy</a></p>
   </div>
 </body>
 </html>`;
@@ -368,31 +273,7 @@ function handlePrivacyPolicy() {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Privacy Policy — ATX Votes</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #faf8f0;
-      color: #1e1e24;
-      padding: 2rem;
-      line-height: 1.7;
-    }
-    .container {
-      max-width: 640px;
-      margin: 0 auto;
-      background: white;
-      border-radius: 20px;
-      padding: 3rem 2.5rem;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-    }
-    h1 { font-size: 1.8rem; font-weight: 800; color: #21598e; margin-bottom: 0.3rem; }
-    .updated { font-size: 0.9rem; color: #73737f; margin-bottom: 2rem; }
-    h2 { font-size: 1.15rem; font-weight: 700; color: #1e1e24; margin-top: 1.5rem; margin-bottom: 0.5rem; }
-    p, li { font-size: 1rem; color: #3a3a44; margin-bottom: 0.75rem; }
-    ul { padding-left: 1.5rem; margin-bottom: 0.75rem; }
-    a { color: #21598e; }
-    .back { display: inline-block; margin-top: 1.5rem; font-size: 0.95rem; }
-  </style>
+  ${PAGE_CSS}
 </head>
 <body>
   <div class="container">
@@ -450,7 +331,7 @@ function handlePrivacyPolicy() {
     <h2>Contact</h2>
     <p>Questions? Email <a href="mailto:howdy@atxvotes.app">howdy@atxvotes.app</a></p>
 
-    <p style="margin-top: 2rem; font-size: 0.85rem; color: #73737f80; text-align: center;"><a href="/" style="color:inherit">ATX Votes</a> &middot; <a href="/nonpartisan" style="color:inherit">Nonpartisan by Design</a> &middot; <a href="mailto:howdy@atxvotes.app" style="color:inherit">howdy@atxvotes.app</a></p>
+    <p class="page-footer"><a href="/">ATX Votes</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="mailto:howdy@atxvotes.app">howdy@atxvotes.app</a></p>
   </div>
 </body>
 </html>`;
