@@ -107,6 +107,11 @@ export async function runDailyUpdate(env, options = {}) {
     }
   }
 
+  // Invalidate candidates_index cache if any ballot changed
+  if (updated.length > 0 && !dryRun) {
+    try { await env.ELECTION_DATA.delete("candidates_index"); } catch { /* non-fatal */ }
+  }
+
   // Write update log
   const today = new Date().toISOString().slice(0, 10);
   const logEntry = { timestamp: new Date().toISOString(), log, errors, updated };

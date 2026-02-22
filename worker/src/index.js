@@ -55,18 +55,32 @@ function nameToSlug(name) {
 /**
  * Load all candidates from statewide ballot data across both parties.
  * Returns array of { candidate, race, party, slug } objects.
+ *
+ * Performance: tries a pre-built candidates_index cache first (1 KV read).
+ * On cache miss, reads all ballots in parallel, builds the index, and
+ * writes it back to KV for subsequent requests.
  */
 async function loadAllCandidates(env) {
-  const parties = ["republican", "democrat"];
+  // 1. Try the pre-built cache (single KV read)
+  const cached = await env.ELECTION_DATA.get("candidates_index");
+  if (cached) {
+    try { return JSON.parse(cached); } catch { /* fall through to rebuild */ }
+  }
+
+  // 2. Cache miss — build from individual ballot keys (parallel reads)
   const results = [];
   const seen = new Set(); // deduplicate by slug+party
 
-  // Load statewide ballots
-  for (const party of parties) {
+  // Load statewide ballots — both parties in parallel
+  const parties = ["republican", "democrat"];
+  const statewideRaws = await Promise.all(parties.map(async (party) => {
     let raw = await env.ELECTION_DATA.get(`ballot:statewide:${party}_primary_2026`);
     if (!raw) raw = await env.ELECTION_DATA.get(`ballot:${party}_primary_2026`);
-    if (!raw) continue;
+    return { party, raw };
+  }));
 
+  for (const { party, raw } of statewideRaws) {
+    if (!raw) continue;
     let ballot;
     try { ballot = JSON.parse(raw); } catch { continue; }
 
@@ -88,22 +102,27 @@ async function loadAllCandidates(env) {
     }
   }
 
-  // Load county ballots — scan for ballot:county:* keys
+  // Load county ballots — list keys, then read ALL values in parallel
   const kvList = await env.ELECTION_DATA.list({ prefix: "ballot:county:" });
-  for (const key of (kvList.keys || [])) {
-    const raw = await env.ELECTION_DATA.get(key.name);
+  const countyRaws = await Promise.all(
+    (kvList.keys || []).map(async (key) => {
+      const raw = await env.ELECTION_DATA.get(key.name);
+      return { keyName: key.name, raw };
+    })
+  );
+
+  for (const { keyName, raw } of countyRaws) {
     if (!raw) continue;
     let ballot;
     try { ballot = JSON.parse(raw); } catch { continue; }
-    // Extract party from key name (e.g. ballot:county:48453:democrat_primary_2026)
-    const party = key.name.includes("republican") ? "republican" : "democrat";
+    const party = keyName.includes("republican") ? "republican" : "democrat";
     const countyName = ballot.countyName || "";
 
     for (const race of (ballot.races || [])) {
       for (const candidate of (race.candidates || [])) {
         if (!candidate.name) continue;
         const slug = nameToSlug(candidate.name);
-        if (seen.has(`${slug}|${party}`)) continue; // skip duplicates
+        if (seen.has(`${slug}|${party}`)) continue;
         seen.add(`${slug}|${party}`);
         const raceName = race.office + (race.district ? ` — ${race.district}` : "")
           + (countyName ? ` (${countyName} County)` : "");
@@ -120,7 +139,22 @@ async function loadAllCandidates(env) {
     }
   }
 
+  // 3. Write the cache back to KV (don't let cache write failure block response)
+  try {
+    await env.ELECTION_DATA.put("candidates_index", JSON.stringify(results));
+  } catch { /* non-fatal — cache write failure doesn't affect correctness */ }
+
   return results;
+}
+
+/**
+ * Invalidate the candidates_index cache.
+ * Call this after any ballot KV write so the next loadAllCandidates() rebuilds.
+ */
+async function invalidateCandidatesIndex(env) {
+  try {
+    await env.ELECTION_DATA.delete("candidates_index");
+  } catch { /* non-fatal */ }
 }
 
 /**
@@ -426,7 +460,7 @@ function handleNonpartisan() {
     <p>The full prompt sent to the AI and every design decision is documented. Nothing is hidden. <a href="/open-source">View the source code, architecture details, and independent AI code reviews.</a></p>
 
     <h2>Independent AI Audit</h2>
-    <p>We've submitted our full AI prompts, data pipeline, and methodology to three independent AI systems (ChatGPT, Gemini, and Grok) for bias review. <a href="/audit">Read the full audit results and methodology export.</a></p>
+    <p>We've submitted our full AI prompts, data pipeline, and methodology to four independent AI systems (ChatGPT, Gemini, Grok, and Claude) for bias review. <a href="/audit">Read the full audit results and methodology export.</a></p>
 
     <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/open-source">Open Source</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
@@ -440,17 +474,19 @@ function handleNonpartisan() {
 
 async function handleAuditPage(env) {
   // Load audit results from KV
-  const [summaryRaw, chatgptRaw, geminiRaw, grokRaw] = await Promise.all([
+  const [summaryRaw, chatgptRaw, geminiRaw, grokRaw, claudeRaw] = await Promise.all([
     env.ELECTION_DATA.get("audit:summary"),
     env.ELECTION_DATA.get("audit:result:chatgpt"),
     env.ELECTION_DATA.get("audit:result:gemini"),
     env.ELECTION_DATA.get("audit:result:grok"),
+    env.ELECTION_DATA.get("audit:result:claude"),
   ]);
 
   const providerResults = {
     chatgpt: chatgptRaw ? JSON.parse(chatgptRaw) : null,
     gemini: geminiRaw ? JSON.parse(geminiRaw) : null,
     grok: grokRaw ? JSON.parse(grokRaw) : null,
+    claude: claudeRaw ? JSON.parse(claudeRaw) : null,
   };
 
   const summary = summaryRaw ? JSON.parse(summaryRaw) : null;
@@ -525,7 +561,8 @@ async function handleAuditPage(env) {
 
   const auditCardsHtml = renderAuditCard(providerResults.chatgpt, "ChatGPT (OpenAI)")
     + renderAuditCard(providerResults.gemini, "Gemini (Google)")
-    + renderAuditCard(providerResults.grok, "Grok (xAI)");
+    + renderAuditCard(providerResults.grok, "Grok (xAI)")
+    + renderAuditCard(providerResults.claude, "Claude (Anthropic)");
 
   const lastRunHtml = summary?.completedAt
     ? `<p class="note" style="margin-bottom:1rem">Last automated audit: ${new Date(summary.completedAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}${summary.averageScore ? ` &middot; Average score: ${summary.averageScore} / 10` : ""}</p>`
@@ -537,7 +574,7 @@ async function handleAuditPage(env) {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>AI Audit — Texas Votes</title>
-  <meta name="description" content="Independent AI audit of Texas Votes' recommendation methodology. Full prompts, data sources, and bias reviews by ChatGPT, Gemini, and Grok.">
+  <meta name="description" content="Independent AI audit of Texas Votes' recommendation methodology. Full prompts, data sources, and bias reviews by ChatGPT, Gemini, Grok, and Claude.">
   <meta property="og:title" content="AI Audit — Texas Votes">
   <meta property="og:description" content="Independent AI audit of Texas Votes' recommendation methodology.">
   <meta property="og:type" content="website">
@@ -560,7 +597,7 @@ async function handleAuditPage(env) {
   <div class="container">
     <a class="back" href="/">&larr; Texas Votes</a>
     <h1 style="margin-top:1rem">AI Audit</h1>
-    <p class="subtitle">Texas Votes uses AI to generate personalized voting guides. To prove our process is fair and nonpartisan, we publish our complete methodology and have submitted it to three independent AI systems for bias review.</p>
+    <p class="subtitle">Texas Votes uses AI to generate personalized voting guides. To prove our process is fair and nonpartisan, we publish our complete methodology and have submitted it to four independent AI systems for bias review.</p>
 
     <div style="margin-bottom:2rem">
       <a class="export-btn" href="/api/audit/export" target="_blank">Download Full Methodology Export (JSON)</a>
@@ -573,6 +610,7 @@ async function handleAuditPage(env) {
       <button class="export-btn" onclick="runAudit('https://chatgpt.com/')" style="border:none;cursor:pointer">Audit with ChatGPT</button>
       <button class="export-btn" onclick="runAudit('https://gemini.google.com/app')" style="border:none;cursor:pointer">Audit with Gemini</button>
       <button class="export-btn" onclick="runAudit('https://grok.x.ai/')" style="border:none;cursor:pointer">Audit with Grok</button>
+      <button class="export-btn" onclick="runAudit('https://claude.ai/')" style="border:none;cursor:pointer">Audit with Claude</button>
     </div>
     <div id="audit-toast" style="display:none;background:#16a34a;color:#fff;padding:0.75rem 1.25rem;border-radius:var(--rs);font-weight:600;margin:0.75rem 0;text-align:center;font-size:0.95rem">Prompt copied! Paste it into the chat.</div>
     <script>
@@ -712,15 +750,15 @@ Return ONLY this JSON:
 }</div>
 
     <h2>Independent AI Audit Reports</h2>
-    <p>We submitted our complete methodology export (the same JSON available at <a href="/api/audit/export">/api/audit/export</a>) to three independent AI systems and asked each to evaluate our process for partisan bias, factual accuracy, fairness of framing, balance of analysis, and transparency.</p>
+    <p>We submitted our complete methodology export (the same JSON available at <a href="/api/audit/export">/api/audit/export</a>) to four independent AI systems and asked each to evaluate our process for partisan bias, factual accuracy, fairness of framing, balance of analysis, and transparency.</p>
 
     ${lastRunHtml}
     ${auditCardsHtml}
 
     <p class="note">Each AI was given the same prompt asking for a structured evaluation across five dimensions: partisan bias, factual accuracy, fairness of framing, balance of pros/cons, and transparency of methodology. Scores are extracted automatically from structured JSON in each AI's response. The full audit prompt template is available in our <a href="https://github.com/txvotes">source repository</a>. You can also <a href="/api/audit/results">view the raw results as JSON</a>.</p>
 
-    <h2>Why Three Different AIs?</h2>
-    <p>Texas Votes uses Claude (by Anthropic) to generate recommendations. By asking three <em>competing</em> AI systems — ChatGPT, Gemini, and Grok — to review our methodology, we get genuinely independent assessments. Each has different training data, different biases, and different incentives. If all three find our process fair, that's meaningful. If any identifies bias, we'll address it and publish the fix.</p>
+    <h2>Why Four Different AIs?</h2>
+    <p>Texas Votes uses Claude (by Anthropic) to generate recommendations. By asking four AI systems — ChatGPT, Gemini, Grok, and Claude itself — to review our methodology, we get a range of independent assessments. Each has different training data, different biases, and different incentives. Including Claude as an auditor of its own system adds a self-review dimension — it knows its own capabilities and limitations better than anyone, but may also have blind spots about its own biases. If all four find our process fair, that's meaningful. If any identifies bias, we'll address it and publish the fix.</p>
 
     <h2>Ongoing Commitment</h2>
     <p>This audit is not a one-time event. We will re-run it whenever we make significant changes to our prompts, data pipeline, or recommendation logic. The methodology export at <a href="/api/audit/export">/api/audit/export</a> always reflects the current production code.</p>
@@ -1349,7 +1387,7 @@ function handleOpenSource() {
     </ul>
 
     <h2>Independent AI Code Reviews</h2>
-    <p>We submitted our full codebase — including all AI prompts, the data pipeline, and our methodology — to three independent AI systems for review. Each was asked to evaluate the code for partisan bias, security issues, and overall code quality.</p>
+    <p>We submitted our full codebase — including all AI prompts, the data pipeline, and our methodology — to four independent AI systems for review. Each was asked to evaluate the code for partisan bias, security issues, and overall code quality.</p>
 
     <div class="review-cards">
       <div class="review-card">
@@ -1365,6 +1403,11 @@ function handleOpenSource() {
       <div class="review-card">
         <h3>Grok Code Review</h3>
         <p class="quote">Review pending — full analysis of bias, security, and code quality.</p>
+        <a href="/audit">Read the full review &rarr;</a>
+      </div>
+      <div class="review-card">
+        <h3>Claude Code Review</h3>
+        <p class="quote">Self-review — Claude auditing its own system for blind spots and biases.</p>
         <a href="/audit">Read the full review &rarr;</a>
       </div>
     </div>
@@ -1679,6 +1722,7 @@ async function handleGenerateCandidateTones(request, env) {
       return tv;
     });
     await env.ELECTION_DATA.put(key, JSON.stringify(ballot));
+    await invalidateCandidatesIndex(env);
     return jsonResponse({ success: true, party, candidate: candidateName, tone, note: "stored originals" });
   }
 
@@ -1760,6 +1804,7 @@ Return ONLY valid JSON, no markdown fences, no explanation.`;
   }
 
   await env.ELECTION_DATA.put(key, JSON.stringify(ballot));
+  await invalidateCandidatesIndex(env);
   return jsonResponse({ success: true, party, candidate: candidateName, tone, fieldsUpdated: updated });
 }
 

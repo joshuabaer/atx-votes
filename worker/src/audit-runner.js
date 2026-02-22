@@ -1,5 +1,5 @@
 // audit-runner.js — Automated third-party AI audit runner
-// Calls OpenAI, Gemini, and xAI APIs to audit the methodology export
+// Calls OpenAI, Gemini, xAI, and Anthropic APIs to audit the methodology export
 
 function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
@@ -92,6 +92,36 @@ const PROVIDERS = {
       const u = data.usage;
       if (!u) return null;
       return { promptTokens: u.prompt_tokens, completionTokens: u.completion_tokens, totalTokens: u.total_tokens };
+    },
+  },
+
+  claude: {
+    name: "claude",
+    displayName: "Claude (Anthropic)",
+    model: "claude-sonnet-4-20250514",
+    endpoint: "https://api.anthropic.com/v1/messages",
+    envKey: "ANTHROPIC_API_KEY",
+    buildHeaders(env) {
+      return {
+        "Content-Type": "application/json",
+        "x-api-key": env.ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
+      };
+    },
+    buildBody(prompt) {
+      return {
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 4096,
+        messages: [{ role: "user", content: prompt }],
+      };
+    },
+    extractText(data) {
+      return data.content?.[0]?.text || null;
+    },
+    extractUsage(data) {
+      const u = data.usage;
+      if (!u) return null;
+      return { promptTokens: u.input_tokens, completionTokens: u.output_tokens, totalTokens: (u.input_tokens || 0) + (u.output_tokens || 0) };
     },
   },
 };
@@ -311,7 +341,7 @@ async function runAudit(env, options = {}) {
     return { error: "exportData is required" };
   }
 
-  const providerNames = requestedProviders || ["chatgpt", "gemini", "grok"];
+  const providerNames = requestedProviders || ["chatgpt", "gemini", "grok", "claude"];
   const prompt = buildAuditPrompt(exportData);
   const startedAt = new Date().toISOString();
   const results = {};

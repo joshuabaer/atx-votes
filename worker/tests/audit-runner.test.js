@@ -203,8 +203,8 @@ describe("validateScores", () => {
 // Provider config tests (~6 tests)
 // ---------------------------------------------------------------------------
 describe("PROVIDERS", () => {
-  it("has three providers: chatgpt, gemini, grok", () => {
-    expect(Object.keys(PROVIDERS)).toEqual(["chatgpt", "gemini", "grok"]);
+  it("has four providers: chatgpt, gemini, grok, claude", () => {
+    expect(Object.keys(PROVIDERS)).toEqual(["chatgpt", "gemini", "grok", "claude"]);
   });
 
   it("chatgpt builds correct OpenAI request", () => {
@@ -246,6 +246,21 @@ describe("PROVIDERS", () => {
     expect(body.messages[0].content).toBe("test prompt");
   });
 
+  it("claude builds correct Anthropic request", () => {
+    const config = PROVIDERS.claude;
+    const env = { ANTHROPIC_API_KEY: "sk-ant-test" };
+    const headers = config.buildHeaders(env);
+    expect(headers["x-api-key"]).toBe("sk-ant-test");
+    expect(headers["anthropic-version"]).toBe("2023-06-01");
+    expect(headers["Content-Type"]).toBe("application/json");
+    expect(headers.Authorization).toBeUndefined();
+
+    const body = config.buildBody("test prompt");
+    expect(body.model).toBe("claude-sonnet-4-20250514");
+    expect(body.messages[0].content).toBe("test prompt");
+    expect(body.max_tokens).toBe(4096);
+  });
+
   it("chatgpt extracts text from OpenAI response format", () => {
     const data = { choices: [{ message: { content: "Report text here" } }] };
     expect(PROVIDERS.chatgpt.extractText(data)).toBe("Report text here");
@@ -256,10 +271,16 @@ describe("PROVIDERS", () => {
     expect(PROVIDERS.gemini.extractText(data)).toBe("Gemini report");
   });
 
+  it("claude extracts text from Anthropic response format", () => {
+    const data = { content: [{ type: "text", text: "Claude report" }] };
+    expect(PROVIDERS.claude.extractText(data)).toBe("Claude report");
+  });
+
   it("returns null for empty/malformed responses", () => {
     expect(PROVIDERS.chatgpt.extractText({})).toBeNull();
     expect(PROVIDERS.gemini.extractText({})).toBeNull();
     expect(PROVIDERS.grok.extractText({})).toBeNull();
+    expect(PROVIDERS.claude.extractText({})).toBeNull();
   });
 
   it("extracts usage from OpenAI format", () => {
@@ -275,6 +296,14 @@ describe("PROVIDERS", () => {
     const usage = PROVIDERS.gemini.extractUsage(data);
     expect(usage.promptTokens).toBe(50);
     expect(usage.completionTokens).toBe(150);
+  });
+
+  it("extracts usage from Anthropic format", () => {
+    const data = { usage: { input_tokens: 80, output_tokens: 220 } };
+    const usage = PROVIDERS.claude.extractUsage(data);
+    expect(usage.promptTokens).toBe(80);
+    expect(usage.completionTokens).toBe(220);
+    expect(usage.totalTokens).toBe(300);
   });
 });
 
@@ -404,6 +433,7 @@ describe("runAudit", () => {
       OPENAI_API_KEY: "sk-test",
       GEMINI_API_KEY: "gem-test",
       GROK_API_KEY: "xai-test",
+      ANTHROPIC_API_KEY: "sk-ant-test",
       ADMIN_SECRET: "secret",
       ELECTION_DATA: {
         get: vi.fn((key) => Promise.resolve(kvStore[key] || null)),
@@ -533,6 +563,53 @@ describe("runAudit", () => {
     const storedSummary = JSON.parse(kvStore["audit:summary"]);
     expect(storedSummary.providers.chatgpt.overallScore).toBe(7);
     expect(storedSummary.providers.gemini.overallScore).toBe(8.6); // Preserved
+  });
+
+  it("runs audit with claude provider successfully", async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      status: 200,
+      json: () => Promise.resolve({
+        content: [{ type: "text", text: '```json\n{"overallScore":8.5,"dimensions":{"partisanBias":9,"factualAccuracy":8,"fairnessOfFraming":8,"balanceOfProsCons":8,"transparency":9},"topStrength":"Excellent transparency","topWeakness":"Could add more citations"}\n```' }],
+        usage: { input_tokens: 100, output_tokens: 500 },
+      }),
+    });
+    vi.stubGlobal("fetch", mockFetch);
+
+    const result = await runAudit(mockEnv, {
+      providers: ["claude"],
+      force: true,
+      exportData: { test: true },
+    });
+    expect(result.results.claude.status).toBe("success");
+    expect(result.results.claude.scores.overallScore).toBe(8.5);
+    expect(result.results.claude.provider).toBe("claude");
+    expect(result.results.claude.displayName).toBe("Claude (Anthropic)");
+    expect(result.results.claude.model).toBe("claude-sonnet-4-20250514");
+    expect(result.results.claude.usage.promptTokens).toBe(100);
+    expect(result.results.claude.usage.completionTokens).toBe(500);
+
+    // Verify correct headers were sent
+    const fetchCall = mockFetch.mock.calls[0];
+    const fetchOptions = fetchCall[1];
+    const headers = fetchOptions.headers;
+    expect(headers["x-api-key"]).toBe("sk-ant-test");
+    expect(headers["anthropic-version"]).toBe("2023-06-01");
+    expect(headers.Authorization).toBeUndefined();
+
+    // Verify KV storage
+    const storedResult = JSON.parse(kvStore["audit:result:claude"]);
+    expect(storedResult.status).toBe("success");
+    expect(storedResult.scores.overallScore).toBe(8.5);
+  });
+
+  it("reports missing ANTHROPIC_API_KEY for claude", async () => {
+    delete mockEnv.ANTHROPIC_API_KEY;
+    const result = await runAudit(mockEnv, {
+      providers: ["claude"],
+      exportData: { test: true },
+    });
+    expect(result.results.claude.status).toBe("error");
+    expect(result.results.claude.error).toContain("ANTHROPIC_API_KEY");
   });
 
   it("handles unknown provider name gracefully", async () => {

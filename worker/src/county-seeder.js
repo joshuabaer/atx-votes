@@ -168,6 +168,8 @@ IMPORTANT:
 
   const key = `ballot:county:${countyFips}:${party}_primary_2026`;
   await env.ELECTION_DATA.put(key, JSON.stringify(result));
+  // Invalidate candidates_index cache so it rebuilds with new county data
+  try { await env.ELECTION_DATA.delete("candidates_index"); } catch { /* non-fatal */ }
   return { success: true, countyFips, countyName, party, raceCount: (result.races || []).length };
 }
 
