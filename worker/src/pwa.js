@@ -2296,7 +2296,7 @@ var APP_JS = [
   // ============ SHARE ============
   "function shareGuide(){" +
     "var b=getBallot();if(!b)return;" +
-    "var lines=['Texas Votes \\u2014 My Voting Guide','Build yours at txvotes.app/app',''];" +
+    "var lines=['Texas Votes \\u2014 My Voting Guide','Build yours at txvotes.app',''];" +
     "var races=b.races.slice().sort(function(a,b){return sortOrder(a)-sortOrder(b)}).filter(function(r){return r.isContested&&r.recommendation});" +
     "for(var i=0;i<races.length;i++){" +
       "var r=races[i];" +
@@ -2352,7 +2352,7 @@ var APP_JS = [
     "ctx.restore();" +
     // Convert to blob and share
     "c.toBlob(function(blob){" +
-      "var vText='I voted in the Texas Primary! \\u{1F5F3}\\uFE0F\\n\\nBuild your personalized voting guide at txvotes.app/app';" +
+      "var vText='I voted in the Texas Primary! \\u{1F5F3}\\uFE0F\\n\\nBuild your personalized voting guide at txvotes.app';" +
       "if(navigator.share&&navigator.canShare){" +
         "var file=new File([blob],'i-voted.png',{type:'image/png'});" +
         "var shareData={title:'I Voted!',text:vText,files:[file]};" +
