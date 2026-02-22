@@ -17,6 +17,11 @@ directory = "./public"
 binding = "ELECTION_DATA"
 id = "1b02b19492f243c8b503d99d0ff11761"
 
+# Analytics Engine for custom event tracking
+[[analytics_engine_datasets]]
+binding = "ANALYTICS"
+dataset = "txvotes_events"
+
 # No cron — relies on atxvotes-api's daily updater via shared KV
 # [triggers]
 # crons = ["0 12 * * *"]

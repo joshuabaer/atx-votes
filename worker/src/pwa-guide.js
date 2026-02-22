@@ -6,6 +6,8 @@ const SYSTEM_PROMPT =
   "Your job is to make personalized recommendations based ONLY on the voter's stated values and the candidate data provided. " +
   "You must NEVER recommend a candidate who is not listed in the provided ballot data. " +
   "You must NEVER invent or hallucinate candidate information. " +
+  "VOICE: Always address the voter as \"you\" (second person). Never say \"the voter\" or use third person. " +
+  "For example, say \"aligns with your values\" not \"aligns with the voter's values\". " +
   "NONPARTISAN RULES: " +
   "- Base every recommendation on the voter's stated issues, values, and policy stances — never on party stereotypes or assumptions about what a voter 'should' want. " +
   "- Use neutral, factual language in all reasoning. Avoid loaded terms, partisan framing, or editorial commentary. " +
@@ -106,8 +108,12 @@ export async function handlePWA_Summary(request, env) {
       return json({ error: "profile required" }, 400);
     }
 
-    var issues = (profile.topIssues || []).join(", ");
-    var qualities = (profile.candidateQualities || []).join(", ");
+    var topIssues = (profile.topIssues || []).slice(0, 7);
+    var otherIssues = (profile.topIssues || []).slice(7);
+    var issues = topIssues.map(function(item, i) { return (i + 1) + ". " + item; }).join(", ");
+    if (otherIssues.length) issues += " (also: " + otherIssues.join(", ") + ")";
+    var topQuals = (profile.candidateQualities || []).slice(0, 5);
+    var qualities = topQuals.map(function(item, i) { return (i + 1) + ". " + item; }).join(", ");
     var stances = Object.keys(profile.policyViews || {})
       .map(function (k) { return k + ": " + profile.policyViews[k]; })
       .join("; ");
@@ -252,6 +258,7 @@ var READING_LEVEL_INSTRUCTIONS = {
   4: "TONE: Write with more depth and nuance. Use precise political terminology where helpful. Assume the reader follows politics.\n\n",
   5: "TONE: Write at an expert level, like a political science professor. Use precise terminology, reference policy frameworks and precedents, and assume deep familiarity with political concepts.\n\n",
   6: "TONE: Write EVERYTHING as the Swedish Chef from the Muppets. Use his signature speech patterns — replace words with Muppet-Swedish gibberish (bork bork bork!), add 'zee' and 'de' everywhere, throw in onomatopoeia, and end sentences with 'Bork!' or 'Hurdy gurdy!'. The JSON field values (reasoning, strategicNotes, etc.) should all be in Swedish Chef voice. Keep the actual candidate names and office titles accurate, but everything else should sound like the Swedish Chef is explaining politics. Have fun with it!\n\n",
+  7: "TONE: Write EVERYTHING as a folksy Texas cowboy. Use Texas ranch metaphors, say 'y'all', 'reckon', 'fixin' to', 'partner', 'well I'll be', and 'dadgum'. Compare political situations to cattle ranching, rodeos, and wide open spaces. Keep the actual candidate names and office titles accurate, but everything else should sound like a weathered ranch hand explaining politics over a campfire. Throw in the occasional 'yeehaw' for good measure.\n\n",
 };
 
 function buildUserPrompt(profile, ballotDesc, ballot, party, lang, readingLevel) {
@@ -263,8 +270,12 @@ function buildUserPrompt(profile, ballotDesc, ballot, party, lang, readingLevel)
   });
 
   var partyLabel = party.charAt(0).toUpperCase() + party.slice(1);
-  var issues = (profile.topIssues || []).join(", ");
-  var qualities = (profile.candidateQualities || []).join(", ");
+  var topIssues = (profile.topIssues || []).slice(0, 7);
+  var otherIssues = (profile.topIssues || []).slice(7);
+  var issues = topIssues.map(function(item, i) { return (i + 1) + ". " + item; }).join(", ");
+  if (otherIssues.length) issues += " (also: " + otherIssues.join(", ") + ")";
+  var topQuals = (profile.candidateQualities || []).slice(0, 5);
+  var qualities = topQuals.map(function(item, i) { return (i + 1) + ". " + item; }).join(", ");
   var stances = Object.keys(profile.policyViews || {})
     .map(function (k) {
       return k + ": " + profile.policyViews[k];

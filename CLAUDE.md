@@ -36,7 +36,7 @@ npx wrangler secret put ADMIN_SECRET -c wrangler.txvotes.toml
 - **worker/src/pwa-guide.js** — Claude API integration for personalized voting guide generation
 - **worker/src/county-seeder.js** — Data population pipeline for county races/info via Claude + web_search
 - **worker/src/updater.js** — Daily updater cron (runs on atxvotes-api only)
-- **worker/tests/interview-flow.test.js** — 51 interview flow UI tests (happy-dom + vitest)
+- **worker/tests/interview-flow.test.js** — 71 interview flow UI tests (happy-dom + vitest)
 
 ## Testing
 
@@ -44,7 +44,7 @@ npx wrangler secret put ADMIN_SECRET -c wrangler.txvotes.toml
 cd worker && npx vitest run
 ```
 
-88 tests total: 51 interview flow + 37 pwa-guide.
+108 tests total: 71 interview flow + 37 pwa-guide.
 
 ## Key Patterns
 
@@ -52,5 +52,5 @@ cd worker && npx vitest run
 - pwa.js is very large (~2300+ lines as string array) — use Grep to find references, read in chunks
 - Translations use a `TR` dictionary with `t(key)` function; `lang=es` for Spanish
 - Guide generation piggybacks candidate translations onto the same Claude API call when `lang=es`
-- Interview flow: Phase 0=Welcome, 1=Tone, 2=Issues, 3=Spectrum, 4=DeepDives, 5=Qualities, 6=Freeform, 7=Address, 8=Building
+- Interview flow: Phase 0=auto-advance, 1=Tone, 2=Issues, 3=Spectrum, 4=DeepDives, 5=Qualities, 6=Freeform, 7=Address, 8=Building
 - Reading level 1-5 maps to tone instructions in pwa-guide.js; level 6 is the Swedish Chef easter egg
