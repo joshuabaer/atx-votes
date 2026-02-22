@@ -135,20 +135,82 @@ function handleLandingPage() {
   <div class="card">
     <div class="icon">🗳️</div>
     <h1>ATX Votes</h1>
-    <p class="subtitle">Your personalized voting guide for Austin &amp; Travis County elections.</p>
-    <div class="badge">Texas Primary — March 3, 2026</div>
+    <p class="subtitle" data-t="Your personalized voting guide for Austin &amp; Travis County elections.">Your personalized voting guide for Austin &amp; Travis County elections.</p>
+    <div class="badge" data-t="Texas Primary — March 3, 2026">Texas Primary — March 3, 2026</div>
     <br>
-    <a class="cta" href="/app?start=1">Build My Voting Guide</a>
+    <a class="cta" href="/app?start=1" data-t="Build My Voting Guide">Build My Voting Guide</a>
     <div class="features">
-      <div><span>✅</span> 5-minute interview learns your values</div>
-      <div><span>📋</span> Personalized ballot with recommendations</div>
-      <div><span>🖨️</span> Print your cheat sheet for the booth</div>
-      <div><span>📍</span> Find your polling location</div>
-      <div><span>⚖️</span> <a href="/nonpartisan">Nonpartisan by design</a> — fairness is in our code</div>
+      <div data-t="5-minute interview learns your values"><span>✅</span> 5-minute interview learns your values</div>
+      <div data-t="Personalized ballot with recommendations"><span>📋</span> Personalized ballot with recommendations</div>
+      <div data-t="Print your cheat sheet for the booth"><span>🖨️</span> Print your cheat sheet for the booth</div>
+      <div data-t="Find your polling location"><span>📍</span> Find your polling location</div>
+      <div data-t="Nonpartisan by design"><span>⚖️</span> <a href="/nonpartisan">Nonpartisan by design</a> — fairness is in our code</div>
     </div>
-    <p class="note">Works on any device — phone, tablet, or computer. No app download needed.</p>
+    <p class="note" data-t="Works on any device — phone, tablet, or computer. No app download needed.">Works on any device — phone, tablet, or computer. No app download needed.</p>
   </div>
-  <p class="page-footer"><a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@atxvotes.app">howdy@atxvotes.app</a></p>
+  <div style="text-align:center;margin-top:16px">
+    <button id="lang-toggle" style="font-size:14px;color:var(--text2);background:none;border:none;cursor:pointer;font-family:inherit"></button>
+  </div>
+  <p class="page-footer">
+    <a href="/nonpartisan" data-t="Nonpartisan by Design">Nonpartisan by Design</a> &middot;
+    <a href="/privacy" data-t="Privacy">Privacy</a> &middot;
+    <a href="mailto:howdy@atxvotes.app">howdy@atxvotes.app</a>
+  </p>
+  <script>
+  (function(){
+    var TR={
+      'Your personalized voting guide for Austin & Travis County elections.':'Tu gu\\u00EDa personalizada de votaci\\u00F3n para Austin y el condado de Travis.',
+      'Your personalized voting guide for Austin &amp; Travis County elections.':'Tu gu\\u00EDa personalizada de votaci\\u00F3n para Austin y el condado de Travis.',
+      'Texas Primary \\u2014 March 3, 2026':'Primaria de Texas \\u2014 3 de marzo, 2026',
+      'Build My Voting Guide':'Crear mi gu\\u00EDa de votaci\\u00F3n',
+      '5-minute interview learns your values':'Entrevista r\\u00E1pida sobre tus valores',
+      'Personalized ballot with recommendations':'Boleta personalizada con recomendaciones',
+      'Print your cheat sheet for the booth':'Imprime tu gu\\u00EDa r\\u00E1pida para la casilla',
+      'Find your polling location':'Encuentra tu lugar de votaci\\u00F3n',
+      'Nonpartisan by design':'Apartidista por dise\\u00F1o',
+      'Works on any device \\u2014 phone, tablet, or computer. No app download needed.':'Funciona en cualquier dispositivo \\u2014 tel\\u00E9fono, tableta o computadora. No necesitas descargar una app.',
+      'Nonpartisan by Design':'Apartidista por Dise\\u00F1o',
+      'Privacy':'Privacidad'
+    };
+    var lang=localStorage.getItem('atx_votes_lang')||((navigator.language||'').slice(0,2)==='es'?'es':'en');
+    var features={'5-minute interview learns your values':'\\u2705','Personalized ballot with recommendations':'\\uD83D\\uDCCB','Print your cheat sheet for the booth':'\\uD83D\\uDDA8\\uFE0F','Find your polling location':'\\uD83D\\uDCCD','Nonpartisan by design':'\\u2696\\uFE0F'};
+    function apply(){
+      document.documentElement.lang=lang;
+      document.querySelectorAll('[data-t]').forEach(function(el){
+        var key=el.getAttribute('data-t');
+        var text=lang==='es'?(TR[key]||key):key;
+        var ico=features[key];
+        if(ico){
+          while(el.firstChild)el.removeChild(el.firstChild);
+          var span=document.createElement('span');
+          span.textContent=ico;
+          el.appendChild(span);
+          if(key==='Nonpartisan by design'){
+            el.appendChild(document.createTextNode(' '));
+            var a=document.createElement('a');
+            a.href='/nonpartisan';
+            a.textContent=text;
+            el.appendChild(a);
+            el.appendChild(document.createTextNode(lang==='es'?' \\u2014 la imparcialidad est\\u00E1 en nuestro c\\u00F3digo':' \\u2014 fairness is in our code'));
+          }else{
+            el.appendChild(document.createTextNode(' '+text));
+          }
+        }else{
+          var a=el.querySelector('a');
+          if(a){a.textContent=text}
+          else{el.textContent=text}
+        }
+      });
+      document.getElementById('lang-toggle').textContent=lang==='es'?'Switch to English':'Cambiar a Espa\\u00F1ol';
+    }
+    document.getElementById('lang-toggle').addEventListener('click',function(){
+      lang=lang==='es'?'en':'es';
+      localStorage.setItem('atx_votes_lang',lang);
+      apply();
+    });
+    apply();
+  })();
+  </script>
 </body>
 </html>`;
 
