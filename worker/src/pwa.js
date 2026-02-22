@@ -692,6 +692,9 @@ var APP_JS = [
     "'Use My Location':'Usar mi ubicaci\\u00F3n'," +
     "'Locating...':'Localizando...'," +
     "'Location not available':'Ubicaci\\u00F3n no disponible'," +
+    "'Location permission denied. Please allow location access and try again.':'Permiso de ubicaci\\u00F3n denegado. Por favor, permite el acceso a la ubicaci\\u00F3n e int\\u00E9ntalo de nuevo.'," +
+    "'Location timed out. Please try again.':'La ubicaci\\u00F3n tard\\u00F3 demasiado. Por favor, int\\u00E9ntalo de nuevo.'," +
+    "'Could not look up address. Try entering it manually.':'No se pudo buscar la direcci\\u00F3n. Intenta ingresarla manualmente.'," +
     "'Could not regenerate summary. Please try again.':'No se pudo regenerar el resumen. Por favor, int\\u00E9ntalo de nuevo.'," +
     "'This will erase your profile and recommendations.':'Esto borrar\\u00E1 tu perfil y recomendaciones.'," +
     "'Start over? This will erase your profile and recommendations.':'\\u00BFEmpezar de nuevo? Esto borrar\\u00E1 tu perfil y recomendaciones.'," +
@@ -1344,17 +1347,22 @@ var APP_JS = [
   "function geolocate(){" +
     "S.geolocating=true;S.addressError=null;render();" +
     "navigator.geolocation.getCurrentPosition(function(pos){" +
-      "fetch('https://nominatim.openstreetmap.org/reverse?lat='+pos.coords.latitude+'&lon='+pos.coords.longitude+'&format=json')" +
-      ".then(function(r){return r.json()})" +
+      "fetch('https://nominatim.openstreetmap.org/reverse?lat='+pos.coords.latitude+'&lon='+pos.coords.longitude+'&format=json&email=howdy@txvotes.app')" +
+      ".then(function(r){if(!r.ok)throw new Error(r.status);return r.json()})" +
       ".then(function(d){" +
+        "if(d.error){S.geolocating=false;S.addressError=d.error;render();return}" +
         "var a=d.address||{};" +
         "var street=(a.house_number?a.house_number+' ':'')+(a.road||'');" +
         "S.address.street=street;" +
         "S.address.city=a.city||a.town||a.village||a.hamlet||'';" +
         "S.address.zip=a.postcode?a.postcode.slice(0,5):'';" +
         "S.geolocating=false;render();" +
-      "}).catch(function(){S.geolocating=false;S.addressError=t('Location not available');render()})" +
-    "},function(){S.geolocating=false;S.addressError=t('Location not available');render()},{timeout:10000})" +
+      "}).catch(function(e){S.geolocating=false;S.addressError=t('Could not look up address. Try entering it manually.');render()})" +
+    "},function(err){S.geolocating=false;" +
+      "if(err.code===1)S.addressError=t('Location permission denied. Please allow location access and try again.');" +
+      "else if(err.code===3)S.addressError=t('Location timed out. Please try again.');" +
+      "else S.addressError=t('Location not available');" +
+      "render()},{timeout:15000})" +
   "}",
 
   // Building / Loading — tug-of-war animation (pure CSS, no timer needed)
