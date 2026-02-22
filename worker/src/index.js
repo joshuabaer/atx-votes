@@ -564,67 +564,73 @@ const TONE_LABELS = {
   7: "Texas cowboy (y'all, reckon, fixin' to, partner)",
 };
 
+/**
+ * Generate tone versions for a single proposition.
+ * Accepts: { party, prop (number), tone (single int) }
+ * Generates all fields for that prop+tone in one Claude call.
+ */
 async function handleGenerateTones(request, env) {
   const body = await request.json().catch(() => ({}));
-  const parties = body.parties || ["republican", "democrat"];
-  const tones = body.tones || [1, 2, 3, 4, 5, 6, 7];
-  const fields = ["description", "ifPasses", "ifFails", "background", "fiscalImpact"];
-  const results = {};
+  const party = body.party || "republican";
+  const propNumber = body.prop;
+  const tone = body.tone;
 
-  for (const party of parties) {
-    const key = `ballot:statewide:${party}_primary_2026`;
-    const raw = await env.ELECTION_DATA.get(key);
-    if (!raw) { results[party] = { error: "no ballot data" }; continue; }
-
-    const ballot = JSON.parse(raw);
-    if (!ballot.propositions || !ballot.propositions.length) {
-      results[party] = { error: "no propositions" }; continue;
-    }
-
-    let updated = 0;
-    for (const prop of ballot.propositions) {
-      // For each text field, generate tone versions
-      for (const field of fields) {
-        const original = typeof prop[field] === "string" ? prop[field] : (prop[field] && prop[field]["3"]) || null;
-        if (!original) continue;
-
-        const toneVersions = typeof prop[field] === "object" && !Array.isArray(prop[field]) ? { ...prop[field] } : {};
-
-        // Generate missing tones
-        const missing = tones.filter(t => !toneVersions[String(t)]);
-        if (missing.length === 0) continue;
-
-        // Store original as tone 3 if not set
-        if (!toneVersions["3"]) toneVersions["3"] = original;
-
-        for (const tone of missing) {
-          if (tone === 3) { toneVersions["3"] = original; continue; }
-          try {
-            const result = await callClaudeForTone(env, original, field, prop.number, prop.title, tone);
-            toneVersions[String(tone)] = result;
-          } catch (err) {
-            toneVersions[String(tone)] = original; // fallback to original on error
-          }
-          // Rate limit delay
-          await new Promise(r => setTimeout(r, 1000));
-        }
-
-        prop[field] = toneVersions;
-        updated++;
-      }
-    }
-
-    // Save back to KV
-    await env.ELECTION_DATA.put(key, JSON.stringify(ballot));
-    results[party] = { success: true, fieldsUpdated: updated, propositions: ballot.propositions.length };
+  if (!propNumber || !tone) {
+    return jsonResponse({ error: "Required: party, prop (number), tone (int)" }, 400);
   }
 
-  return jsonResponse(results);
-}
+  const key = `ballot:statewide:${party}_primary_2026`;
+  const raw = await env.ELECTION_DATA.get(key);
+  if (!raw) return jsonResponse({ error: "no ballot data" }, 404);
 
-async function callClaudeForTone(env, text, fieldName, propNumber, propTitle, tone) {
+  const ballot = JSON.parse(raw);
+  if (!ballot.propositions?.length) return jsonResponse({ error: "no propositions" }, 404);
+
+  const prop = ballot.propositions.find(p => p.number === propNumber);
+  if (!prop) return jsonResponse({ error: `prop ${propNumber} not found` }, 404);
+
+  const fields = ["description", "ifPasses", "ifFails", "background", "fiscalImpact"];
+
+  // Collect original text for each field
+  const originals = {};
+  for (const field of fields) {
+    const val = prop[field];
+    const text = typeof val === "string" ? val : (val && val["3"]) || null;
+    if (text) originals[field] = text;
+  }
+
+  if (Object.keys(originals).length === 0) {
+    return jsonResponse({ error: "no text fields to process" });
+  }
+
+  // For tone 3, just store originals as-is
+  if (tone === 3) {
+    for (const [field, text] of Object.entries(originals)) {
+      const toneVersions = typeof prop[field] === "object" && !Array.isArray(prop[field]) ? { ...prop[field] } : {};
+      toneVersions["3"] = text;
+      prop[field] = toneVersions;
+    }
+    await env.ELECTION_DATA.put(key, JSON.stringify(ballot));
+    return jsonResponse({ success: true, party, prop: propNumber, tone, fields: Object.keys(originals) });
+  }
+
+  // Generate all fields in one Claude call
   const toneDesc = TONE_LABELS[tone] || "standard";
-  const prompt = `Rewrite the following proposition text in a ${toneDesc} tone. Keep the same factual content and meaning, just adjust the language style and complexity.\n\nProposition ${propNumber}: ${propTitle}\nField: ${fieldName}\nOriginal text: "${text}"\n\nReturn ONLY the rewritten text, nothing else. No quotes, no explanation.`;
+  const fieldList = Object.entries(originals)
+    .map(([f, t]) => `${f}: "${t}"`)
+    .join("\n\n");
+
+  const prompt = `Rewrite ALL of the following proposition text fields in a ${toneDesc} tone. Keep the same factual content and meaning, just adjust the language style and complexity.
+
+Proposition ${propNumber}: ${prop.title}
+
+FIELDS TO REWRITE:
+${fieldList}
+
+Return a JSON object with the field names as keys and rewritten text as values. Example format:
+{"description": "rewritten...", "ifPasses": "rewritten...", "ifFails": "rewritten..."}
+
+Return ONLY valid JSON, no markdown fences, no explanation.`;
 
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
@@ -635,14 +641,42 @@ async function callClaudeForTone(env, text, fieldName, propNumber, propTitle, to
     },
     body: JSON.stringify({
       model: "claude-sonnet-4-20250514",
-      max_tokens: 512,
+      max_tokens: 2048,
       messages: [{ role: "user", content: prompt }],
     }),
   });
 
-  if (!res.ok) throw new Error(`API error ${res.status}`);
+  if (!res.ok) {
+    return jsonResponse({ error: `Claude API error ${res.status}` }, 502);
+  }
+
   const data = await res.json();
-  return data.content[0].text.trim();
+  const responseText = data.content[0].text.trim();
+
+  // Parse JSON from response
+  let parsed;
+  try {
+    let cleaned = responseText;
+    const fence = cleaned.match(/```(?:json)?\s*([\s\S]*?)```/);
+    if (fence) cleaned = fence[1].trim();
+    parsed = JSON.parse(cleaned);
+  } catch {
+    return jsonResponse({ error: "Failed to parse Claude response", raw: responseText.slice(0, 200) }, 500);
+  }
+
+  // Merge generated text into prop fields
+  let updated = 0;
+  for (const [field, text] of Object.entries(parsed)) {
+    if (!fields.includes(field) || !text) continue;
+    const toneVersions = typeof prop[field] === "object" && !Array.isArray(prop[field]) ? { ...prop[field] } : {};
+    if (!toneVersions["3"]) toneVersions["3"] = originals[field] || prop[field];
+    toneVersions[String(tone)] = text;
+    prop[field] = toneVersions;
+    updated++;
+  }
+
+  await env.ELECTION_DATA.put(key, JSON.stringify(ballot));
+  return jsonResponse({ success: true, party, prop: propNumber, tone, fieldsUpdated: updated });
 }
 
 async function hashString(str) {
