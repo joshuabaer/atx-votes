@@ -2210,7 +2210,7 @@ var APP_JS = [
 
   // ============ REPROCESS GUIDE ============
   "function reprocessGuide(){" +
-    "S.phase=8;S.error=null;S.loadPhase=0;S.loadMsg='Finding your ballot...';S.isLoading=true;render();" +
+    "S.guideComplete=false;S.phase=8;S.error=null;S.loadPhase=0;S.loadMsg='Finding your ballot...';S.isLoading=true;render();" +
     "doGuide();" +
   "}",
 
