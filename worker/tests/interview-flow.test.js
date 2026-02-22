@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { APP_JS } from "../src/pwa.js";
 
 // ---------------------------------------------------------------------------
@@ -569,6 +569,299 @@ describe("Phase 7: Address", () => {
   it("back returns to phase 6", () => {
     clickAction("back");
     expect(S().phase).toBe(6);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Phase 7: Geolocation
+// ---------------------------------------------------------------------------
+describe("Phase 7: Geolocation", () => {
+  let mockGetCurrentPosition;
+
+  beforeEach(() => {
+    // Provide navigator.geolocation so the button renders
+    mockGetCurrentPosition = vi.fn();
+    Object.defineProperty(window.navigator, "geolocation", {
+      value: { getCurrentPosition: mockGetCurrentPosition },
+      configurable: true,
+      writable: true,
+    });
+    // Ensure serviceWorker stub exists for app init (needs both getRegistrations and register)
+    if (!window.navigator.serviceWorker || !window.navigator.serviceWorker.register) {
+      Object.defineProperty(window.navigator, "serviceWorker", {
+        value: {
+          getRegistrations: vi.fn(() => Promise.resolve([])),
+          register: vi.fn(() => Promise.resolve({ scope: "/" })),
+        },
+        configurable: true,
+        writable: true,
+      });
+    }
+
+    // Re-boot app with geolocation available
+    document.documentElement.innerHTML = "<head></head><body></body>";
+    const store = {};
+    vi.stubGlobal("localStorage", {
+      getItem: vi.fn((k) => (k in store ? store[k] : null)),
+      setItem: vi.fn((k, v) => { store[k] = String(v); }),
+      removeItem: vi.fn((k) => { delete store[k]; }),
+      clear: vi.fn(() => { for (const k in store) delete store[k]; }),
+      key: vi.fn((i) => Object.keys(store)[i] ?? null),
+      get length() { return Object.keys(store).length; },
+    });
+    vi.stubGlobal("fetch", vi.fn(() =>
+      Promise.resolve({ ok: true, json: () => Promise.resolve({}), status: 200 })
+    ));
+    vi.stubGlobal("confirm", vi.fn(() => true));
+
+    bootApp();
+
+    // Navigate to phase 7
+    clickAction("start");
+    passTone();
+    clickAction("toggle-issue", "Housing");
+    clickAction("toggle-issue", "Healthcare");
+    clickAction("toggle-issue", "Education");
+    clickAction("next");
+    clickAction("select-spectrum", "Moderate");
+    clickAction("next");
+    const total = S().ddQuestions.length;
+    for (let i = 0; i < total; i++) {
+      clickAction("select-dd", S().ddQuestions[i].opts[0].l);
+      clickAction("next-dd");
+    }
+    clickAction("toggle-quality", "Experience");
+    clickAction("toggle-quality", "Independence");
+    clickAction("next"); // → phase 6
+    clickAction("next"); // → phase 7
+  });
+
+  it("shows Use My Location button when geolocation is available", () => {
+    expect(S().phase).toBe(7);
+    const html = getApp();
+    expect(html).toContain("Use My Location");
+    expect(html).toContain('data-action="geolocate"');
+  });
+
+  it("sets geolocating state on click", () => {
+    expect(S().geolocating).toBe(false);
+    clickAction("geolocate");
+    expect(S().geolocating).toBe(true);
+    expect(mockGetCurrentPosition).toHaveBeenCalledTimes(1);
+  });
+
+  it("shows spinner while geolocating", () => {
+    clickAction("geolocate");
+    const html = getApp();
+    expect(html).toContain("Locating...");
+    expect(html).toContain("spinner");
+    // Button should be disabled
+    const btn = document.querySelector('[data-action="geolocate"]');
+    expect(btn.disabled).toBe(true);
+  });
+
+  it("passes enableHighAccuracy:true on first attempt", () => {
+    clickAction("geolocate");
+    const opts = mockGetCurrentPosition.mock.calls[0][2];
+    expect(opts.enableHighAccuracy).toBe(true);
+    expect(opts.timeout).toBe(15000);
+    expect(opts.maximumAge).toBe(60000);
+  });
+
+  it("populates address fields on successful geolocation", async () => {
+    // Mock Nominatim response
+    vi.stubGlobal("fetch", vi.fn(() =>
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({
+          address: {
+            house_number: "501",
+            road: "Congress Avenue",
+            city: "Austin",
+            postcode: "78701",
+          },
+        }),
+        status: 200,
+      })
+    ));
+
+    clickAction("geolocate");
+
+    // Simulate successful geolocation callback
+    const successCb = mockGetCurrentPosition.mock.calls[0][0];
+    successCb({ coords: { latitude: 30.2672, longitude: -97.7431 } });
+
+    // Wait for fetch promise chain to resolve
+    await vi.waitFor(() => {
+      expect(S().geolocating).toBe(false);
+    });
+
+    expect(S().address.street).toBe("501 Congress Avenue");
+    expect(S().address.city).toBe("Austin");
+    expect(S().address.zip).toBe("78701");
+  });
+
+  it("handles Nominatim error response gracefully", async () => {
+    vi.stubGlobal("fetch", vi.fn(() =>
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ error: "Unable to geocode" }),
+        status: 200,
+      })
+    ));
+
+    clickAction("geolocate");
+    const successCb = mockGetCurrentPosition.mock.calls[0][0];
+    successCb({ coords: { latitude: 0, longitude: 0 } });
+
+    await vi.waitFor(() => {
+      expect(S().geolocating).toBe(false);
+    });
+
+    expect(S().addressError).toBe("Unable to geocode");
+  });
+
+  it("handles Nominatim fetch failure gracefully", async () => {
+    vi.stubGlobal("fetch", vi.fn(() =>
+      Promise.resolve({ ok: false, status: 500 })
+    ));
+
+    clickAction("geolocate");
+    const successCb = mockGetCurrentPosition.mock.calls[0][0];
+    successCb({ coords: { latitude: 30.2672, longitude: -97.7431 } });
+
+    await vi.waitFor(() => {
+      expect(S().geolocating).toBe(false);
+    });
+
+    expect(S().addressError).toContain("Try entering it manually");
+  });
+
+  it("shows permission denied error for code 1", () => {
+    clickAction("geolocate");
+    const errorCb = mockGetCurrentPosition.mock.calls[0][1];
+    errorCb({ code: 1 });
+
+    expect(S().geolocating).toBe(false);
+    expect(S().addressError).toContain("permission denied");
+  });
+
+  it("shows timeout error for code 3", () => {
+    clickAction("geolocate");
+    const errorCb = mockGetCurrentPosition.mock.calls[0][1];
+    errorCb({ code: 3 });
+
+    expect(S().geolocating).toBe(false);
+    expect(S().addressError).toContain("timed out");
+  });
+
+  it("retries with low accuracy on POSITION_UNAVAILABLE (code 2)", () => {
+    clickAction("geolocate");
+    const errorCb = mockGetCurrentPosition.mock.calls[0][1];
+
+    // Trigger POSITION_UNAVAILABLE
+    errorCb({ code: 2 });
+
+    // Should have made a second attempt
+    expect(mockGetCurrentPosition).toHaveBeenCalledTimes(2);
+
+    // Second attempt should use low accuracy
+    const retryOpts = mockGetCurrentPosition.mock.calls[1][2];
+    expect(retryOpts.enableHighAccuracy).toBe(false);
+    expect(retryOpts.timeout).toBe(10000);
+    expect(retryOpts.maximumAge).toBe(300000);
+  });
+
+  it("shows Settings hint when retry also fails", () => {
+    clickAction("geolocate");
+    const errorCb = mockGetCurrentPosition.mock.calls[0][1];
+
+    // First attempt: POSITION_UNAVAILABLE
+    errorCb({ code: 2 });
+
+    // Retry also fails
+    const retryErrorCb = mockGetCurrentPosition.mock.calls[1][1];
+    retryErrorCb({ code: 2 });
+
+    expect(S().geolocating).toBe(false);
+    expect(S().addressError).toContain("Location Services");
+    expect(S().addressError).toContain("Settings");
+  });
+
+  it("retry succeeds after first attempt fails", async () => {
+    vi.stubGlobal("fetch", vi.fn(() =>
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({
+          address: {
+            house_number: "100",
+            road: "Main St",
+            town: "Round Rock",
+            postcode: "78664",
+          },
+        }),
+        status: 200,
+      })
+    ));
+
+    clickAction("geolocate");
+    const errorCb = mockGetCurrentPosition.mock.calls[0][1];
+
+    // First attempt fails
+    errorCb({ code: 2 });
+
+    // Retry succeeds
+    const retrySuccessCb = mockGetCurrentPosition.mock.calls[1][0];
+    retrySuccessCb({ coords: { latitude: 30.5083, longitude: -97.6789 } });
+
+    await vi.waitFor(() => {
+      expect(S().geolocating).toBe(false);
+    });
+
+    expect(S().address.street).toBe("100 Main St");
+    expect(S().address.city).toBe("Round Rock");
+    expect(S().address.zip).toBe("78664");
+  });
+
+  it("uses town/village/hamlet when city is missing", async () => {
+    vi.stubGlobal("fetch", vi.fn(() =>
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({
+          address: {
+            road: "FM 1431",
+            hamlet: "Jonestown",
+            postcode: "78645-1234",
+          },
+        }),
+        status: 200,
+      })
+    ));
+
+    clickAction("geolocate");
+    const successCb = mockGetCurrentPosition.mock.calls[0][0];
+    successCb({ coords: { latitude: 30.5, longitude: -97.9 } });
+
+    await vi.waitFor(() => {
+      expect(S().geolocating).toBe(false);
+    });
+
+    expect(S().address.street).toBe("FM 1431");
+    expect(S().address.city).toBe("Jonestown");
+    expect(S().address.zip).toBe("78645"); // truncated to 5
+  });
+
+  it("clears previous error when geolocating", () => {
+    // Set an existing error
+    S().addressError = "some old error";
+    clickAction("geolocate");
+    // Error should be cleared immediately
+    expect(S().addressError).toBeNull();
+  });
+
+  afterEach(() => {
+    // Remove geolocation stub so it doesn't leak into other tests
+    delete window.navigator.geolocation;
   });
 });
 
