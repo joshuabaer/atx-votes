@@ -679,6 +679,149 @@ Return ONLY valid JSON, no markdown fences, no explanation.`;
   return jsonResponse({ success: true, party, prop: propNumber, tone, fieldsUpdated: updated });
 }
 
+async function handleGenerateCandidateTones(request, env) {
+  const body = await request.json().catch(() => ({}));
+  const party = body.party || "republican";
+  const candidateName = body.candidate;
+  const tone = body.tone;
+
+  if (!candidateName || !tone) {
+    return jsonResponse({ error: "Required: candidate (name), tone (int), optional party" }, 400);
+  }
+
+  const key = `ballot:statewide:${party}_primary_2026`;
+  const raw = await env.ELECTION_DATA.get(key);
+  if (!raw) return jsonResponse({ error: "no ballot data" }, 404);
+
+  const ballot = JSON.parse(raw);
+  if (!ballot.races?.length) return jsonResponse({ error: "no races" }, 404);
+
+  // Find candidate across all races
+  let cand = null, raceIdx = -1, candIdx = -1;
+  for (let ri = 0; ri < ballot.races.length; ri++) {
+    for (let ci = 0; ci < ballot.races[ri].candidates.length; ci++) {
+      if (ballot.races[ri].candidates[ci].name === candidateName) {
+        cand = ballot.races[ri].candidates[ci];
+        raceIdx = ri;
+        candIdx = ci;
+        break;
+      }
+    }
+    if (cand) break;
+  }
+  if (!cand) return jsonResponse({ error: `candidate "${candidateName}" not found` }, 404);
+
+  // Collect original text: summary (string), pros (array), cons (array)
+  const origSummary = typeof cand.summary === "string" ? cand.summary : (cand.summary?.["3"] || null);
+  const origPros = (cand.pros || []).map(p => typeof p === "string" ? p : (p?.["3"] || ""));
+  const origCons = (cand.cons || []).map(c => typeof c === "string" ? c : (c?.["3"] || ""));
+
+  if (!origSummary && origPros.length === 0 && origCons.length === 0) {
+    return jsonResponse({ error: "no text fields to process" });
+  }
+
+  // For tone 3, store originals as tone-keyed objects
+  if (tone === 3) {
+    if (origSummary) {
+      const sv = typeof cand.summary === "object" && !Array.isArray(cand.summary) ? { ...cand.summary } : {};
+      sv["3"] = origSummary;
+      cand.summary = sv;
+    }
+    cand.pros = origPros.map((text, i) => {
+      const tv = typeof cand.pros[i] === "object" && !Array.isArray(cand.pros[i]) ? { ...cand.pros[i] } : {};
+      tv["3"] = text;
+      return tv;
+    });
+    cand.cons = origCons.map((text, i) => {
+      const tv = typeof cand.cons[i] === "object" && !Array.isArray(cand.cons[i]) ? { ...cand.cons[i] } : {};
+      tv["3"] = text;
+      return tv;
+    });
+    await env.ELECTION_DATA.put(key, JSON.stringify(ballot));
+    return jsonResponse({ success: true, party, candidate: candidateName, tone, note: "stored originals" });
+  }
+
+  // Build prompt with all text fields
+  const toneDesc = TONE_LABELS[tone] || "standard";
+  let fieldList = "";
+  if (origSummary) fieldList += `summary: "${origSummary}"\n\n`;
+  if (origPros.length) fieldList += `pros: ${JSON.stringify(origPros)}\n\n`;
+  if (origCons.length) fieldList += `cons: ${JSON.stringify(origCons)}\n\n`;
+
+  const prompt = `Rewrite ALL of the following candidate text fields in a ${toneDesc} tone. Keep the same factual content and meaning, just adjust the language style and complexity. Keep each item roughly the same length as the original.
+
+Candidate: ${candidateName}
+Race: ${ballot.races[raceIdx].office}
+
+FIELDS TO REWRITE:
+${fieldList}
+Return a JSON object with: "summary" (string), "pros" (array of strings), "cons" (array of strings). Keep the same number of items in each array.
+
+Return ONLY valid JSON, no markdown fences, no explanation.`;
+
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": env.ANTHROPIC_API_KEY,
+      "anthropic-version": "2023-06-01",
+    },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 2048,
+      messages: [{ role: "user", content: prompt }],
+    }),
+  });
+
+  if (!res.ok) {
+    return jsonResponse({ error: `Claude API error ${res.status}` }, 502);
+  }
+
+  const data = await res.json();
+  const responseText = data.content[0].text.trim();
+
+  let parsed;
+  try {
+    let cleaned = responseText;
+    const fence = cleaned.match(/```(?:json)?\s*([\s\S]*?)```/);
+    if (fence) cleaned = fence[1].trim();
+    parsed = JSON.parse(cleaned);
+  } catch {
+    return jsonResponse({ error: "Failed to parse Claude response", raw: responseText.slice(0, 300) }, 500);
+  }
+
+  // Merge into candidate data
+  let updated = 0;
+  if (parsed.summary && origSummary) {
+    const sv = typeof cand.summary === "object" && !Array.isArray(cand.summary) ? { ...cand.summary } : {};
+    if (!sv["3"]) sv["3"] = origSummary;
+    sv[String(tone)] = parsed.summary;
+    cand.summary = sv;
+    updated++;
+  }
+  if (parsed.pros && Array.isArray(parsed.pros)) {
+    cand.pros = origPros.map((orig, i) => {
+      const tv = typeof cand.pros[i] === "object" && !Array.isArray(cand.pros[i]) ? { ...cand.pros[i] } : {};
+      if (!tv["3"]) tv["3"] = orig;
+      tv[String(tone)] = parsed.pros[i] || orig;
+      return tv;
+    });
+    updated++;
+  }
+  if (parsed.cons && Array.isArray(parsed.cons)) {
+    cand.cons = origCons.map((orig, i) => {
+      const tv = typeof cand.cons[i] === "object" && !Array.isArray(cand.cons[i]) ? { ...cand.cons[i] } : {};
+      if (!tv["3"]) tv["3"] = orig;
+      tv[String(tone)] = parsed.cons[i] || orig;
+      return tv;
+    });
+    updated++;
+  }
+
+  await env.ELECTION_DATA.put(key, JSON.stringify(ballot));
+  return jsonResponse({ success: true, party, candidate: candidateName, tone, fieldsUpdated: updated });
+}
+
 async function hashString(str) {
   const data = new TextEncoder().encode(str);
   const hash = await crypto.subtle.digest("SHA-256", data);
@@ -706,6 +849,13 @@ function injectBeacon(response, token) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+
+    // Redirect atxvotes.app → txvotes.app
+    if (url.hostname === "atxvotes.app" || url.hostname === "www.atxvotes.app" || url.hostname === "api.atxvotes.app") {
+      const dest = new URL(url.pathname + url.search + url.hash, "https://txvotes.app");
+      return Response.redirect(dest.toString(), 301);
+    }
+
     const response = await this.handleRequest(request, env, url);
     return injectBeacon(response, env.CF_BEACON_TOKEN);
   },
@@ -818,6 +968,15 @@ export default {
         return new Response("Unauthorized", { status: 401 });
       }
       return handleGenerateTones(request, env);
+    }
+
+    // POST: /api/election/generate-candidate-tones — pre-generate candidate text at all tone levels
+    if (url.pathname === "/api/election/generate-candidate-tones") {
+      const auth = request.headers.get("Authorization");
+      if (!auth || auth !== `Bearer ${env.ADMIN_SECRET}`) {
+        return new Response("Unauthorized", { status: 401 });
+      }
+      return handleGenerateCandidateTones(request, env);
     }
 
     return new Response("Not found", { status: 404 });

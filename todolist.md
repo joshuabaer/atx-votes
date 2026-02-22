@@ -18,6 +18,7 @@
 - [x] Update researching loading screen main text based on tone 6 and 7 — show themed text when Swedish Chef or Cowboy tones are active
 - [x] Apply tone to AI personal summary on profile page — summary is regenerated with current tone when user hits "Reprocess Guide"
 - [x] Put "Texas Votes (Cowboy)" in the title of the link for txvotes.app/cowboy and "(Swedish Chef)" for /chef
+- [ ] Candidate profile page — a page for each candidate where they can verify all information and background we have about them in one place
 - [x] Race card description text doesn't use full card width on desktop — text column is narrower than the card, wasting space next to the "Good Match" badge
 - [x] Integrate Polymarket predictions — show prediction market odds alongside race recommendations
 - [x] Geolocate button to auto-fill address — use browser geolocation to fill in street, city, and ZIP; hardcode state to TX

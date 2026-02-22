@@ -1759,12 +1759,12 @@ var APP_JS = [
       "if(odds)h+='<a href=\"'+odds.url+'\" target=\"_blank\" class=\"badge\" style=\"background:rgba(212,168,67,.15);color:#B8860B;text-decoration:none\" title=\"Polymarket prediction\" onclick=\"event.stopPropagation()\">'+odds.pct+'%</a>';" +
       "h+='</div></div>';" +
       "h+='</div></div>';" +
-      "h+='<div class=\"cand-summary\">'+esc(c.summary)+'</div>';" +
+      "h+='<div class=\"cand-summary\">'+esc(tp(c.summary))+'</div>';" +
       "if(isOpen){" +
         "h+='<div class=\"cand-details\">';" +
         "if(c.keyPositions&&c.keyPositions.length){h+='<div class=\"cand-section\"><h5>'+t('Key Positions')+'</h5><div class=\"pos-chips\">';for(var j=0;j<c.keyPositions.length;j++)h+='<span class=\"pos-chip\">'+esc(c.keyPositions[j])+'</span>';h+='</div></div>'}" +
-        "if(c.pros&&c.pros.length){h+='<div class=\"cand-section pros\"><h5>\u2705 '+t('Strengths')+'</h5><ul>';for(var j=0;j<c.pros.length;j++)h+='<li>'+esc(c.pros[j])+'</li>';h+='</ul></div>'}" +
-        "if(c.cons&&c.cons.length){h+='<div class=\"cand-section cons\"><h5>\u26A0\u{FE0F} '+t('Concerns')+'</h5><ul>';for(var j=0;j<c.cons.length;j++)h+='<li>'+esc(c.cons[j])+'</li>';h+='</ul></div>'}" +
+        "if(c.pros&&c.pros.length){h+='<div class=\"cand-section pros\"><h5>\u2705 '+t('Strengths')+'</h5><ul>';for(var j=0;j<c.pros.length;j++)h+='<li>'+esc(tp(c.pros[j]))+'</li>';h+='</ul></div>'}" +
+        "if(c.cons&&c.cons.length){h+='<div class=\"cand-section cons\"><h5>\u26A0\u{FE0F} '+t('Concerns')+'</h5><ul>';for(var j=0;j<c.cons.length;j++)h+='<li>'+esc(tp(c.cons[j]))+'</li>';h+='</ul></div>'}" +
         "if(c.endorsements&&c.endorsements.length){h+='<div class=\"cand-section\"><h5>'+t('Endorsements')+'</h5><ul>';for(var j=0;j<c.endorsements.length;j++)h+='<li>'+esc(c.endorsements[j])+'</li>';h+='</ul></div>'}" +
         "if(c.fundraising){h+='<div class=\"cand-section\"><h5>'+t('Fundraising')+'</h5><p>'+esc(c.fundraising)+'</p></div>'}" +
         "if(c.polling){h+='<div class=\"cand-section\"><h5>'+t('Polling')+'</h5><p>'+esc(c.polling)+'</p></div>'}" +
