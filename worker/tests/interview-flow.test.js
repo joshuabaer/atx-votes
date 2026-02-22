@@ -103,14 +103,9 @@ beforeEach(() => {
 // ---------------------------------------------------------------------------
 // Phase 0 → 1: Welcome → Tone
 // ---------------------------------------------------------------------------
-describe("Phase 0: Welcome", () => {
-  it("shows welcome screen on load", () => {
-    expect(S().phase).toBe(0);
-    expect(getApp()).toContain("Build My Guide");
-  });
-
-  it('clicking "Build My Guide" transitions to phase 1', () => {
-    clickAction("start");
+describe("Phase 0: Welcome (skipped)", () => {
+  it("auto-advances to phase 1 (tone picker) on load", () => {
+    // Welcome screen is skipped; app goes straight to tone picker
     expect(S().phase).toBe(1);
     expect(getApp()).toContain("Talk to me like");
   });
@@ -120,10 +115,6 @@ describe("Phase 0: Welcome", () => {
 // Phase 1: Tone / "Talk to me like..."
 // ---------------------------------------------------------------------------
 describe("Phase 1: Tone", () => {
-  beforeEach(() => {
-    clickAction("start"); // → phase 1
-  });
-
   it("shows tone selection options", () => {
     expect(S().phase).toBe(1);
     const html = getApp();
@@ -156,7 +147,6 @@ describe("Phase 1: Tone", () => {
 // ---------------------------------------------------------------------------
 describe("Phase 2: Issues", () => {
   beforeEach(() => {
-    clickAction("start"); // → phase 1
     passTone();           // → phase 2
   });
 
@@ -235,7 +225,6 @@ describe("Phase 2: Issues", () => {
 // ---------------------------------------------------------------------------
 describe("Phase 3: Spectrum", () => {
   beforeEach(() => {
-    clickAction("start");
     passTone();
     clickAction("toggle-issue", "Housing");
     clickAction("toggle-issue", "Healthcare");
@@ -274,7 +263,6 @@ describe("Phase 3: Spectrum", () => {
 // ---------------------------------------------------------------------------
 describe("Phase 4: Deep Dives", () => {
   beforeEach(() => {
-    clickAction("start");
     passTone();
     clickAction("toggle-issue", "Housing");
     clickAction("toggle-issue", "Healthcare");
@@ -352,7 +340,6 @@ describe("Phase 4: Deep Dives", () => {
 // ---------------------------------------------------------------------------
 describe("Phase 4: Skip when no deep dives", () => {
   it("builds ddQuestions only for issues that have deep dives", () => {
-    clickAction("start");
     passTone();
     clickAction("toggle-issue", "Housing");
     clickAction("toggle-issue", "Healthcare");
@@ -368,7 +355,6 @@ describe("Phase 4: Skip when no deep dives", () => {
 // ---------------------------------------------------------------------------
 describe("Phase 5: Qualities", () => {
   beforeEach(() => {
-    clickAction("start");
     passTone();
     clickAction("toggle-issue", "Housing");
     clickAction("toggle-issue", "Healthcare");
@@ -442,7 +428,6 @@ describe("Phase 5: Qualities", () => {
 // ---------------------------------------------------------------------------
 describe("Phase 6: Freeform", () => {
   beforeEach(() => {
-    clickAction("start");
     passTone();
     clickAction("toggle-issue", "Housing");
     clickAction("toggle-issue", "Healthcare");
@@ -496,7 +481,6 @@ describe("Phase 6: Freeform", () => {
 // ---------------------------------------------------------------------------
 describe("Phase 7: Address", () => {
   beforeEach(() => {
-    clickAction("start");
     passTone();
     clickAction("toggle-issue", "Housing");
     clickAction("toggle-issue", "Healthcare");
@@ -617,7 +601,6 @@ describe("Phase 7: Geolocation", () => {
     bootApp();
 
     // Navigate to phase 7
-    clickAction("start");
     passTone();
     clickAction("toggle-issue", "Housing");
     clickAction("toggle-issue", "Healthcare");
@@ -870,7 +853,6 @@ describe("Phase 7: Geolocation", () => {
 // ---------------------------------------------------------------------------
 describe("Back navigation preserves state", () => {
   it("issues preserved when returning from phase 3", () => {
-    clickAction("start");
     passTone();
     clickAction("toggle-issue", "Housing");
     clickAction("toggle-issue", "Healthcare");
@@ -888,7 +870,6 @@ describe("Back navigation preserves state", () => {
   });
 
   it("spectrum preserved when returning from phase 4", () => {
-    clickAction("start");
     passTone();
     clickAction("toggle-issue", "Housing");
     clickAction("toggle-issue", "Healthcare");
@@ -906,7 +887,6 @@ describe("Back navigation preserves state", () => {
   });
 
   it("deep dive answers preserved when returning from phase 5", () => {
-    clickAction("start");
     passTone();
     clickAction("toggle-issue", "Housing");
     clickAction("toggle-issue", "Healthcare");
@@ -939,7 +919,6 @@ describe("Back navigation preserves state", () => {
   });
 
   it("qualities preserved when returning from phase 6", () => {
-    clickAction("start");
     passTone();
     clickAction("toggle-issue", "Housing");
     clickAction("toggle-issue", "Healthcare");
@@ -969,9 +948,7 @@ describe("Back navigation preserves state", () => {
 // ---------------------------------------------------------------------------
 describe("Full interview happy path", () => {
   it("walks through all phases to guide building", () => {
-    // Phase 0 → 1
-    expect(S().phase).toBe(0);
-    clickAction("start");
+    // Phase 1 (welcome skipped, auto-advanced)
     expect(S().phase).toBe(1);
 
     // Phase 1: Tone (default readingLevel=3, just click Continue)
@@ -1022,13 +999,12 @@ describe("Full interview happy path", () => {
 // ---------------------------------------------------------------------------
 describe("Progress bar", () => {
   it("shows progress bar during interview phases 1-7", () => {
-    clickAction("start");
     expect(getApp()).toContain("progress-fill");
   });
 
-  it("no progress bar on welcome (phase 0)", () => {
-    expect(S().phase).toBe(0);
-    expect(getApp()).not.toContain("progress-fill");
+  it("phase 1 (first screen) shows progress bar", () => {
+    expect(S().phase).toBe(1);
+    expect(getApp()).toContain("progress-fill");
   });
 });
 
@@ -1036,14 +1012,12 @@ describe("Progress bar", () => {
 // Phase 1 has no back button, Phase 2+ do
 // ---------------------------------------------------------------------------
 describe("Back button visibility", () => {
-  it("phase 1 has a back button", () => {
-    clickAction("start");
+  it("phase 1 has no back button (first screen)", () => {
     expect(S().phase).toBe(1);
-    expect(document.querySelector('[data-action="back"]')).not.toBeNull();
+    expect(document.querySelector('[data-action="back"]')).toBeNull();
   });
 
   it("phase 2 has a back button", () => {
-    clickAction("start");
     passTone(); // → phase 2
     expect(S().phase).toBe(2);
     expect(document.querySelector('[data-action="back"]')).not.toBeNull();

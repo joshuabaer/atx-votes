@@ -1233,13 +1233,13 @@ var APP_JS = [
 
   // ============ INTERVIEW VIEWS ============
   "function renderInterview(){" +
-    "if(S.phase===0)return renderWelcome();" +
+    "if(S.phase===0){S.phase=1;save()}" +
     "if(S.phase===8)return renderBuilding();" +
     "var step=S.phase;var total=7;" +
     "if(S.phase===4){step=4};" +
     "var pbar='<div class=\"progress\"><div class=\"progress-fill\" style=\"width:'+(step/total*100)+'%\"></div></div>';" +
     "var back='<button class=\"back-btn\" data-action=\"back\">&larr; Back</button>';" +
-    "if(S.phase===1)return pbar+back+renderTone();" +
+    "if(S.phase===1)return pbar+renderTone();" +
     "if(S.phase===2)return pbar+back+renderIssues();" +
     "if(S.phase===3)return pbar+back+renderSpectrum();" +
     "if(S.phase===4)return pbar+back+renderDeepDive();" +
@@ -2434,7 +2434,6 @@ var APP_JS = [
 
   // ============ INIT ============
   "load();",
-  "if(location.search.indexOf('start=1')!==-1&&!S.guideComplete&&S.phase===0)S.phase=1;",
   "(function(){var m=location.search.match(/tone=(\\d+)/);if(m&&!S.guideComplete){S.readingLevel=parseInt(m[1]);if(S.phase<2)S.phase=2;save()}}());",
   "if(location.search)history.replaceState(null,'',location.pathname+location.hash);",
   "if(!S.guideComplete&&location.hash&&location.hash!=='#/')location.hash='#/';",

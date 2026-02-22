@@ -215,6 +215,11 @@ function handleLandingPage() {
   <meta property="og:description" content="Build your personalized voting guide for Texas elections in 5 minutes.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://txvotes.app">
+  <meta property="og:image" content="https://txvotes.app/og-image.svg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://txvotes.app/og-image.svg">
   ${PAGE_CSS}
 </head>
 <body style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center">
@@ -239,7 +244,7 @@ function handleLandingPage() {
       <div data-t="Find your polling location"><span>📍</span> Find your polling location</div>
       <div data-t="Nonpartisan by design"><span>⚖️</span> <a href="/nonpartisan">Nonpartisan by design</a> — fairness is in our code</div>
     </div>
-    <p class="note" data-t="Works on any device — phone, tablet, or computer. No app download needed.">Works on any device — phone, tablet, or computer. No app download needed.</p>
+    <p class="note" data-t="Works on any device — phone, tablet, or computer. No app download needed. No personal data collected.">Works on any device — phone, tablet, or computer. No app download needed. No personal data collected.</p>
   </div>
   <div style="text-align:center;margin-top:16px">
     <button id="lang-toggle" style="font-size:14px;color:var(--text2);background:none;border:none;cursor:pointer;font-family:inherit"></button>
