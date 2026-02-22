@@ -2168,15 +2168,34 @@ var APP_JS = [
   "window.addEventListener('hashchange',render);",
 
   // ============ BUILD GUIDE ============
+  "function lm(key){" +
+    "var chef={" +
+      "'Finding your ballot...':'Looking for zee ballot, bork bork bork!'," +
+      "'Researching candidates...':'Investigating zee candidates, bork!'," +
+      "'Researching Republicans...':'Researching zee Republican party, bork bork!'," +
+      "'Researching Democrats...':'Researching zee Democrats, bork bork!'," +
+      "'Finalizing recommendations...':'Almost done cooking zee recommendations, bork!'" +
+    "};" +
+    "var cowboy={" +
+      "'Finding your ballot...':'Roundin\\u2019 up yer ballot, partner...'," +
+      "'Researching candidates...':'Scoutin\\u2019 out the candidates, y\\u2019all...'," +
+      "'Researching Republicans...':'Ridin\\u2019 through Republican territory...'," +
+      "'Researching Democrats...':'Moseyin\\u2019 through Democrat country...'," +
+      "'Finalizing recommendations...':'Puttin\\u2019 the final brand on yer guide...'" +
+    "};" +
+    "if(S.readingLevel===6)return chef[key]||t(key);" +
+    "if(S.readingLevel===7)return cowboy[key]||t(key);" +
+    "return t(key)" +
+  "}",
   "function buildGuide(){" +
-    "S.phase=8;S.error=null;S.loadPhase=0;S.loadMsg='Finding your ballot...';S.isLoading=true;render();" +
+    "S.phase=8;S.error=null;S.loadPhase=0;S.loadMsg=lm('Finding your ballot...');S.isLoading=true;render();" +
     "doGuide();" +
   "}",
 
   "async function doGuide(){" +
     "try{" +
       // Districts already resolved before buildGuide — skip to profile
-      "S.loadPhase=1;S.loadMsg='Finding your ballot...';render();" +
+      "S.loadPhase=1;S.loadMsg=lm('Finding your ballot...');render();" +
       // Build profile object for API
       "var profile={" +
         "topIssues:S.issues," +
@@ -2190,7 +2209,7 @@ var APP_JS = [
       "if(S.spectrum==='Progressive'||S.spectrum==='Liberal')demFirst=true;" +
       "else if(S.spectrum==='Moderate'||S.spectrum==='Independent / Issue-by-Issue')demFirst=Math.random()<0.5;" +
       // Step 3: Generate both ballots in parallel
-      "S.loadPhase=2;S.loadMsg='Researching candidates...';render();" +
+      "S.loadPhase=2;S.loadMsg=lm('Researching candidates...');render();" +
       "var cFips=S.districts&&S.districts.countyFips?S.districts.countyFips:null;" +
       "var repP=fetch('/app/api/guide',{method:'POST',headers:{'Content-Type':'application/json'}," +
         "body:JSON.stringify({party:'republican',profile:profile,districts:S.districts,lang:LANG,countyFips:cFips,readingLevel:S.readingLevel})}).then(function(r){return r.json()});" +
@@ -2198,14 +2217,14 @@ var APP_JS = [
         "body:JSON.stringify({party:'democrat',profile:profile,districts:S.districts,lang:LANG,countyFips:cFips,readingLevel:S.readingLevel})}).then(function(r){return r.json()});" +
       // Rotate messages while both requests are in-flight
       "var repResult=null,demResult=null;" +
-      "var msgs=demFirst?['Researching Democrats...','Researching Republicans...']:['Researching Republicans...','Researching Democrats...'];" +
+      "var msgs=demFirst?[lm('Researching Democrats...'),lm('Researching Republicans...')]:['Researching Republicans...','Researching Democrats...'].map(lm);" +
       "var mi=0;S.loadPhase=3;S.loadMsg=msgs[0];render();" +
       "var rotateTimer=setInterval(function(){mi=1-mi;S.loadPhase=Math.max(S.loadPhase,mi===0?3:4);S.loadMsg=msgs[mi];render()},3000);" +
       "var results=await Promise.allSettled([repP,demP]);" +
       "clearInterval(rotateTimer);" +
       "repResult=results[0].status==='fulfilled'?results[0].value:null;" +
       "demResult=results[1].status==='fulfilled'?results[1].value:null;" +
-      "S.loadPhase=5;S.loadMsg='Finalizing recommendations...';render();" +
+      "S.loadPhase=5;S.loadMsg=lm('Finalizing recommendations...');render();" +
       // Process results
       "if(repResult&&repResult.ballot)S.repBallot=repResult.ballot;" +
       "if(demResult&&demResult.ballot)S.demBallot=demResult.ballot;" +
@@ -2236,7 +2255,7 @@ var APP_JS = [
 
   // ============ REPROCESS GUIDE ============
   "function reprocessGuide(){" +
-    "S.guideComplete=false;S.phase=8;S.error=null;S.loadPhase=0;S.loadMsg='Finding your ballot...';S.isLoading=true;render();" +
+    "S.guideComplete=false;S.phase=8;S.error=null;S.loadPhase=0;S.loadMsg=lm('Finding your ballot...');S.isLoading=true;render();" +
     "doGuide();" +
   "}",
 
