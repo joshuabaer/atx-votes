@@ -377,7 +377,7 @@ function handleSupport() {
       <p>Please <a href="mailto:howdy@txvotes.app">email us</a> with details and we'll correct it as quickly as possible.</p>
     </div>
 
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/privacy">Privacy</a></p>
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
 </body>
 </html>`;
@@ -727,10 +727,10 @@ export default {
       }
       // Vanity tone entry points — clear data and start fresh with tone preset
       if (url.pathname === "/cowboy") {
-        return handlePWA_Clear("/app?tone=7");
+        return handlePWA_Clear("/app?tone=7", "Texas Votes (Cowboy)");
       }
       if (url.pathname === "/chef") {
-        return handlePWA_Clear("/app?tone=6");
+        return handlePWA_Clear("/app?tone=6", "Texas Votes (Swedish Chef)");
       }
       // PWA routes (no auth)
       if (url.pathname === "/app/clear") {

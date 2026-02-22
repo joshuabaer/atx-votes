@@ -19,10 +19,12 @@ export function handlePWA_SW() {
   });
 }
 
-export function handlePWA_Clear(redirectUrl = '/app') {
+export function handlePWA_Clear(redirectUrl = '/app', title = 'Texas Votes') {
   var html = '<!DOCTYPE html><html><head><meta charset="utf-8">' +
     '<meta name="viewport" content="width=device-width,initial-scale=1">' +
-    '<title>Texas Votes — Updating</title>' +
+    '<title>' + title + '</title>' +
+    '<meta property="og:title" content="' + title + '">' +
+    '<meta property="og:description" content="Your personalized Texas voting guide">' +
     '<style>body{font-family:-apple-system,system-ui,sans-serif;display:flex;' +
     'align-items:center;justify-content:center;min-height:100vh;margin:0;' +
     'background:#f5f5f5;color:#333;text-align:center}' +
