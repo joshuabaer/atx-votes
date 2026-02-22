@@ -1116,7 +1116,7 @@ var APP_JS = [
     "repBallot:null,demBallot:null,selectedParty:'republican'," +
     "guideComplete:false,summary:null,districts:null," +
     "isLoading:false,loadPhase:0,loadMsg:'',error:null,geolocating:false,polymarket:null," +
-    "readingLevel:3," +
+    "readingLevel:1," +
     "expanded:{'vi-dates':true,'vi-bring':true},disclaimerDismissed:false,hasVoted:false" +
     "};",
 
@@ -1175,7 +1175,7 @@ var APP_JS = [
     "S.policyViews=p.policyViews||{};S.qualities=p.candidateQualities||[];S.freeform=p.freeform||'';" +
     "S.address=p.address||{street:'',city:'',state:'TX',zip:''};" +
     "S.summary=p.summaryText||null;S.districts=p.districts||null;" +
-    "S.readingLevel=p.readingLevel||3}" +
+    "S.readingLevel=p.readingLevel||1}" +
     "var rb=localStorage.getItem('tx_votes_ballot_republican');" +
     "if(rb)S.repBallot=JSON.parse(rb);" +
     "var db=localStorage.getItem('tx_votes_ballot_democrat');" +
@@ -2033,7 +2033,7 @@ var APP_JS = [
       "if(idx!==-1)S.issues.splice(idx,1);else if(S.issues.length<7)S.issues.push(v);" +
       "render()" +
     "}" +
-    "else if(action==='select-tone'){S.readingLevel=parseInt(el.dataset.value)||3;render()}" +
+    "else if(action==='select-tone'){S.readingLevel=parseInt(el.dataset.value)||1;render()}" +
     "else if(action==='select-spectrum'){S.spectrum=el.dataset.value;render()}" +
     "else if(action==='select-dd'){" +
       "var dd=S.ddQuestions[S.ddIndex];" +
@@ -2058,7 +2058,7 @@ var APP_JS = [
     "else if(action==='nav'){location.hash=el.dataset.to}" +
     "else if(action==='reset'){" +
       "if(confirm(t('Start over? This will erase your profile and recommendations.'))){" +
-        "S.phase=0;S.issues=[];S.spectrum=null;S.policyViews={};S.qualities=[];S.freeform='';S.readingLevel=3;" +
+        "S.phase=0;S.issues=[];S.spectrum=null;S.policyViews={};S.qualities=[];S.freeform='';S.readingLevel=1;" +
         "S.address={street:'',city:'',state:'TX',zip:''};S.ddIndex=0;S.ddQuestions=[];S.countyInfo=null;" +
         "S.repBallot=null;S.demBallot=null;S.selectedParty='republican';" +
         "S.guideComplete=false;S.summary=null;S.districts=null;S.expanded={};S.addressError=null;S.verifyingAddress=false;" +
@@ -2084,7 +2084,7 @@ var APP_JS = [
   // Range input handler for reading level slider
   "document.getElementById('app').addEventListener('input',function(e){" +
     "var el=e.target;if(!el.dataset||!el.dataset.action)return;" +
-    "if(el.dataset.action==='set-reading-level'){S.readingLevel=parseInt(el.value)||3;save();render()}" +
+    "if(el.dataset.action==='set-reading-level'){S.readingLevel=parseInt(el.value)||1;save();render()}" +
   "});",
 
   // Tab bar click handler (tabs live outside #app)
