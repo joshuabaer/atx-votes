@@ -147,7 +147,7 @@ var CSS = [
   "body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}",
   "#app{max-width:480px;margin:0 auto;padding:var(--pm)}",
   "@media(min-width:600px){#app{max-width:680px}}",
-  ".card{background:var(--card);border-radius:var(--r);padding:var(--pm);box-shadow:0 2px 8px var(--shadow);margin-bottom:12px;overflow:hidden}",
+  ".card{background:var(--card);border-radius:var(--r);padding:var(--pm);box-shadow:0 2px 8px var(--shadow);margin-bottom:12px;overflow:hidden;word-break:break-word}",
   ".card-touch{cursor:pointer;transition:transform .15s}",
   ".card-touch:active{transform:scale(.98)}",
 
@@ -211,8 +211,8 @@ var CSS = [
   ".tab-icon svg{width:26px;height:26px}",
 
   // Party switcher
-  ".party-row{display:flex;gap:12px;margin-bottom:16px}",
-  ".party-btn{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:var(--rs);font-size:17px;font-weight:700;cursor:pointer;border:1.5px solid;transition:all .2s;font-family:inherit;background:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}",
+  ".party-row{display:flex;gap:10px;margin-bottom:16px}",
+  ".party-btn{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:6px;padding:12px 8px;border-radius:var(--rs);font-size:16px;font-weight:700;cursor:pointer;border:1.5px solid;transition:all .2s;font-family:inherit;background:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;box-sizing:border-box}",
   ".party-rep{color:var(--rep);border-color:rgba(217,38,38,.3)}",
   ".party-rep.on{background:var(--rep);color:#fff;border-color:var(--rep)}",
   ".party-dem{color:var(--dem);border-color:rgba(38,77,191,.3)}",
@@ -260,8 +260,8 @@ var CSS = [
   ".expand-toggle{font-size:14px;color:var(--blue);cursor:pointer;background:none;border:none;padding:8px 0;font-weight:600;font-family:inherit}",
 
   // Proposition card
-  ".prop-header{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}",
-  ".prop-title{font-size:16px;font-weight:700}",
+  ".prop-header{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;min-width:0}",
+  ".prop-title{font-size:16px;font-weight:700;min-width:0;flex:1}",
   ".prop-desc{font-size:14px;color:var(--text2);line-height:1.5;margin-top:6px}",
   ".prop-trans{font-size:13px;color:var(--text2);line-height:1.5;margin-top:4px;font-style:italic}",
   ".prop-details{margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}",
@@ -366,8 +366,8 @@ var CSS = [
   ".voted-early{font-size:24px;font-weight:700;font-style:italic;font-family:Georgia,'Times New Roman',serif;color:#CC1919;line-height:1}",
 
   // Actions row
-  ".actions{display:flex;gap:10px;margin:16px 0}",
-  ".actions .btn{flex:1;padding:10px;font-size:14px}",
+  ".actions{display:flex;gap:8px;margin:16px 0}",
+  ".actions .btn{flex:1;min-width:0;padding:10px 8px;font-size:14px;box-sizing:border-box;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}",
 
   // Cheat sheet
   ".cs-header{text-align:center;padding:12px 0 8px}",
@@ -1618,9 +1618,9 @@ var APP_JS = [
     "var label=race.office+(race.district?' \\u2014 '+race.district:'')+(race.recommendation?' \\u2014 Recommended: '+race.recommendation.candidateName:'');" +
     "var h='<div class=\"card card-touch\" data-action=\"nav\" data-to=\"#/race/'+idx+'\" role=\"link\" aria-label=\"'+esc(label)+'\" tabindex=\"0\">';" +
     // Row 1: office title + badge + chevron
-    "h+='<div style=\"display:flex;justify-content:space-between;align-items:center\">';" +
-    "h+='<div style=\"flex:1;min-width:0;font-size:14px;color:var(--text2)\">'+(race.isKeyRace?'<span class=\"star\">\u2B50</span> ':'')+esc(race.office)+(race.district?' \\u2014 '+esc(race.district):'')+'</div>';" +
-    "h+='<div style=\"display:flex;align-items:center;gap:8px;flex-shrink:0\">';" +
+    "h+='<div style=\"display:flex;justify-content:space-between;align-items:center;gap:6px\">';" +
+    "h+='<div style=\"flex:1;min-width:0;font-size:14px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap\">'+(race.isKeyRace?'<span class=\"star\">\u2B50</span> ':'')+esc(race.office)+(race.district?' \\u2014 '+esc(race.district):'')+'</div>';" +
+    "h+='<div style=\"display:flex;align-items:center;gap:6px;flex-shrink:0\">';" +
     "if(race.recommendation){h+=confBadge(race.recommendation.confidence)}" +
     "h+='<span style=\"color:var(--text2);font-size:18px\">&rsaquo;</span>';" +
     "h+='</div></div>';" +

@@ -13,9 +13,10 @@
 - [x] Fix progress bar animation — dots jump back and forth between 4th and 5th position, line moves awkwardly during the loading screen
 - [x] Reading level slider on profile — adjusts language complexity across the app on a scale from "high school" to "political science professor"
 - [x] Wider content area on desktop — currently displays phone-width on computer screens
-- [ ] Ballot page overflows on iPhone — party switcher, "Good Match" badge, and Share button clip off the right edge on iPhone 17 Pro
-- [ ] "Use my location" is broken — shows "Location not available" error
-- [ ] Update researching loading screen main text based on tone 6 and 7 — show themed text when Swedish Chef or Cowboy tones are active
+- [x] Ballot page overflows on iPhone — party switcher, "Good Match" badge, and Share button clip off the right edge on iPhone 17 Pro
+- [x] "Use my location" is broken — shows "Location not available" error
+- [x] Update researching loading screen main text based on tone 6 and 7 — show themed text when Swedish Chef or Cowboy tones are active
+- [ ] Apply tone to AI personal summary on profile page — the summary at the top of the profile page should match the selected tone level
 - [x] Race card description text doesn't use full card width on desktop — text column is narrower than the card, wasting space next to the "Good Match" badge
 - [x] Integrate Polymarket predictions — show prediction market odds alongside race recommendations
 - [x] Geolocate button to auto-fill address — use browser geolocation to fill in street, city, and ZIP; hardcode state to TX
