@@ -2389,6 +2389,7 @@ var APP_JS = [
   // ============ INIT ============
   "load();",
   "if(location.search.indexOf('start=1')!==-1&&!S.guideComplete&&S.phase===0)S.phase=1;",
+  "(function(){var m=location.search.match(/tone=(\\d+)/);if(m&&!S.guideComplete){S.readingLevel=parseInt(m[1]);if(S.phase<2)S.phase=2;save()}}());",
   "if(location.search)history.replaceState(null,'',location.pathname+location.hash);",
   "if(!S.guideComplete&&location.hash&&location.hash!=='#/')location.hash='#/';",
   "render();",

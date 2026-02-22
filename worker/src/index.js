@@ -725,6 +725,13 @@ export default {
       if (url.pathname === "/api/election/manifest") {
         return handleManifest(env);
       }
+      // Vanity tone entry points — redirect to app with tone preset
+      if (url.pathname === "/cowboy") {
+        return Response.redirect(new URL("/app?tone=7", url.origin), 302);
+      }
+      if (url.pathname === "/chef") {
+        return Response.redirect(new URL("/app?tone=6", url.origin), 302);
+      }
       // PWA routes (no auth)
       if (url.pathname === "/app/clear") {
         return handlePWA_Clear();
