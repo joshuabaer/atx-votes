@@ -146,6 +146,7 @@ var CSS = [
     "}}",
   "body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}",
   "#app{max-width:480px;margin:0 auto;padding:var(--pm)}",
+  "@media(min-width:600px){#app{max-width:680px}}",
   ".card{background:var(--card);border-radius:var(--r);padding:var(--pm);box-shadow:0 2px 8px var(--shadow);margin-bottom:12px;overflow:hidden}",
   ".card-touch{cursor:pointer;transition:transform .15s}",
   ".card-touch:active{transform:scale(.98)}",
@@ -191,7 +192,7 @@ var CSS = [
   "#topnav{display:none}",
   "@media(min-width:600px){" +
     "#topnav{display:block;background:var(--card);border-bottom:1px solid var(--border2);box-shadow:0 1px 4px var(--shadow)}" +
-    ".topnav-inner{max-width:480px;margin:0 auto;display:flex;align-items:center;padding:0 var(--pm)}" +
+    ".topnav-inner{max-width:680px;margin:0 auto;display:flex;align-items:center;padding:0 var(--pm)}" +
     ".topnav-brand{font-size:18px;font-weight:800;color:var(--blue);margin-right:auto;padding:12px 0;letter-spacing:-.3px}" +
     ".topnav-link{display:flex;align-items:center;gap:6px;padding:12px 16px;font-size:14px;font-weight:600;color:var(--text2);text-decoration:none;cursor:pointer;border:none;background:none;font-family:inherit;transition:color .15s;border-bottom:2px solid transparent;margin-bottom:-1px}" +
     ".topnav-link:hover{color:var(--blue)}" +
@@ -201,7 +202,7 @@ var CSS = [
   "}",
 
   // Bottom tab bar (mobile)
-  ".tab-bar{background:var(--card);border-top:2px solid var(--border2);display:flex;max-width:480px;margin:0 auto;width:100%;padding:8px 0;padding-bottom:calc(8px + env(safe-area-inset-bottom,8px));box-shadow:0 -2px 8px var(--shadow)}",
+  ".tab-bar{background:var(--card);border-top:2px solid var(--border2);display:flex;max-width:680px;margin:0 auto;width:100%;padding:8px 0;padding-bottom:calc(8px + env(safe-area-inset-bottom,8px));box-shadow:0 -2px 8px var(--shadow)}",
   "#tabs{background:var(--card);box-shadow:0 -2px 8px var(--shadow)}",
   ".tab{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 0 6px;font-size:13px;font-weight:700;color:var(--text2);text-decoration:none;gap:4px;cursor:pointer;border:none;background:none;font-family:inherit;transition:color .15s;white-space:nowrap}",
   ".tab:hover{color:var(--blue)}",
