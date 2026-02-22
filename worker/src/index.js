@@ -2527,5 +2527,15 @@ export default {
 
   async scheduled(event, env, ctx) {
     ctx.waitUntil(runDailyUpdate(env));
+
+    // Run AI audit daily until election day (March 3, 2026)
+    if (new Date() <= new Date("2026-03-04T00:00:00Z")) {
+      ctx.waitUntil(
+        runAudit(env, {
+          exportData: buildAuditExportData(),
+          triggeredBy: "cron",
+        })
+      );
+    }
   },
 };

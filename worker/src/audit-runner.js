@@ -42,10 +42,10 @@ const PROVIDERS = {
   gemini: {
     name: "gemini",
     displayName: "Gemini (Google)",
-    model: "gemini-2.0-flash",
+    model: "gemini-2.5-flash",
     envKey: "GEMINI_API_KEY",
     buildEndpoint(env) {
-      return `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${env.GEMINI_API_KEY}`;
+      return `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${env.GEMINI_API_KEY}`;
     },
     buildHeaders() {
       return { "Content-Type": "application/json" };

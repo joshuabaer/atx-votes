@@ -22,6 +22,11 @@ const LEGACY_BALLOT_KEYS = {
  * @returns {{ updated: string[], errors: string[] }}
  */
 export async function runDailyUpdate(env, options = {}) {
+  // Stop updating after election day (March 3, 2026)
+  if (new Date() > new Date("2026-03-04T00:00:00Z")) {
+    return { skipped: true, reason: "Past election day (March 3, 2026)" };
+  }
+
   const parties = options.parties || PARTIES;
   const dryRun = options.dryRun || false;
   const log = [];
