@@ -757,6 +757,11 @@ var APP_JS = [
     "'Immigration':'Inmigraci\\u00F3n'," +
     "'Taxes':'Impuestos'," +
     "'Civil Rights':'Derechos civiles'," +
+    "'Gun Policy':'Pol\\u00EDtica de armas'," +
+    "'Abortion & Reproductive Rights':'Aborto y derechos reproductivos'," +
+    "'Water & Land':'Agua y tierras'," +
+    "'Agriculture & Rural':'Agricultura y zonas rurales'," +
+    "'Faith & Religious Liberty':'Fe y libertad religiosa'," +
     // Spectrum
     "'Progressive':'Progresista'," +
     "'Bold systemic change, social justice focused':'Cambio sist\\u00E9mico audaz, enfocado en la justicia social'," +
@@ -779,16 +784,18 @@ var APP_JS = [
     "'Bipartisan / Works Across Aisle':'Bipartidista / Trabaja con ambos partidos'," +
     "'Strong Leadership':'Liderazgo fuerte'," +
     "'Community Ties':'Lazos comunitarios'," +
+    "'Faith & Values':'Fe y valores'," +
+    "'Business Experience':'Experiencia empresarial'," +
     // Deep dive questions
     "'On housing, where do you land?':'Sobre vivienda, \\u00BFcu\\u00E1l es tu postura?'," +
     "'Build, build, build':'Construir, construir, construir'," +
     "'Ease zoning, encourage density, let the market work':'Flexibilizar la zonificaci\\u00F3n, fomentar la densidad, dejar que el mercado funcione'," +
     "'Smart growth':'Crecimiento inteligente'," +
     "'More housing with affordability guardrails':'M\\u00E1s vivienda con protecciones de asequibilidad'," +
-    "'Protect neighborhoods':'Proteger los vecindarios'," +
-    "'Preserve character, limit density changes':'Preservar el car\\u00E1cter, limitar cambios de densidad'," +
+    "'Protect property rights':'Proteger los derechos de propiedad'," +
+    "'Keep property taxes low, limit government land-use rules':'Mantener bajos los impuestos a la propiedad, limitar las reglas gubernamentales de uso de suelo'," +
     "'It\\u2019s complicated':'Es complicado'," +
-    "'Case by case \\u2014 depends on the neighborhood':'Caso por caso \\u2014 depende del vecindario'," +
+    "'Case by case \\u2014 depends on the community':'Caso por caso \\u2014 depende de la comunidad'," +
     "'On public safety, what\\u2019s your approach?':'Sobre seguridad p\\u00FAblica, \\u00BFcu\\u00E1l es tu enfoque?'," +
     "'Fully fund police':'Financiar completamente a la polic\\u00EDa'," +
     "'Hire more officers, strong prosecution':'Contratar m\\u00E1s oficiales, fiscalizaci\\u00F3n firme'," +
@@ -854,13 +861,13 @@ var APP_JS = [
     "'Microgrids, batteries, community-level solutions':'Microrredes, bater\\u00EDas, soluciones a nivel comunitario'," +
     "'On transportation, what\\u2019s the priority?':'Sobre transporte, \\u00BFcu\\u00E1l es la prioridad?'," +
     "'Build more roads':'Construir m\\u00E1s carreteras'," +
-    "'Expand highways and reduce congestion for drivers':'Ampliar autopistas y reducir la congesti\\u00F3n para los conductores'," +
+    "'Expand highways, farm-to-market roads, reduce congestion':'Ampliar autopistas, caminos rurales, reducir la congesti\\u00F3n'," +
     "'Public transit':'Transporte p\\u00FAblico'," +
-    "'Light rail, better buses, less car dependence':'Tren ligero, mejores autobuses, menos dependencia del auto'," +
+    "'Rail, better buses, less car dependence in metro areas':'Tren, mejores autobuses, menos dependencia del auto en zonas metropolitanas'," +
     "'Balanced approach':'Enfoque equilibrado'," +
     "'Roads, transit, bikes, and walkability together':'Carreteras, transporte p\\u00FAblico, bicicletas y peatonalidad juntos'," +
-    "'Remote work first':'Primero el trabajo remoto'," +
-    "'Reduce the need to commute in the first place':'Reducir la necesidad de desplazarse en primer lugar'," +
+    "'Rural infrastructure':'Infraestructura rural'," +
+    "'Fix rural roads, improve connectivity between small towns':'Reparar caminos rurales, mejorar la conectividad entre pueblos peque\\u00F1os'," +
     "'On immigration, what\\u2019s your view?':'Sobre inmigraci\\u00F3n, \\u00BFcu\\u00E1l es tu opini\\u00F3n?'," +
     "'Secure the border':'Asegurar la frontera'," +
     "'Enforcement first, then talk about reform':'Primero aplicar la ley, despu\\u00E9s hablar de reforma'," +
@@ -868,8 +875,8 @@ var APP_JS = [
     "'Secure borders AND create legal pathways':'Asegurar fronteras Y crear v\\u00EDas legales'," +
     "'Welcoming approach':'Enfoque acogedor'," +
     "'Immigrants strengthen our communities, expand protections':'Los inmigrantes fortalecen nuestras comunidades, ampliar protecciones'," +
-    "'Local isn\\u2019t federal':'Lo local no es federal'," +
-    "'City shouldn\\u2019t spend resources on federal immigration enforcement':'La ciudad no deber\\u00EDa gastar recursos en la aplicaci\\u00F3n federal de inmigraci\\u00F3n'," +
+    "'State should stay out':'El estado no deber\\u00EDa intervenir'," +
+    "'Immigration is a federal issue, not a state priority':'La inmigraci\\u00F3n es un asunto federal, no una prioridad estatal'," +
     "'On civil rights and equality?':'\\u00BFSobre derechos civiles e igualdad?'," +
     "'Equal treatment':'Trato igualitario'," +
     "'Same rules for everyone, no special categories':'Las mismas reglas para todos, sin categor\\u00EDas especiales'," +
@@ -878,7 +885,57 @@ var APP_JS = [
     "'Expand protections':'Ampliar protecciones'," +
     "'Stronger anti-discrimination laws and enforcement':'Leyes antidiscriminaci\\u00F3n m\\u00E1s fuertes y mejor aplicaci\\u00F3n'," +
     "'Systemic change':'Cambio sist\\u00E9mico'," +
-    "'Address root causes of inequality, not just symptoms':'Abordar las causas ra\\u00EDz de la desigualdad, no solo los s\\u00EDntomas'" +
+    "'Address root causes of inequality, not just symptoms':'Abordar las causas ra\\u00EDz de la desigualdad, no solo los s\\u00EDntomas'," +
+    // Gun Policy deep dive
+    "'On guns, where do you stand?':'Sobre armas, \\u00BFcu\\u00E1l es tu postura?'," +
+    "'Protect gun rights':'Proteger el derecho a las armas'," +
+    "'Second Amendment is non-negotiable, no new restrictions':'La Segunda Enmienda no es negociable, sin nuevas restricciones'," +
+    "'Rights with responsibility':'Derechos con responsabilidad'," +
+    "'Support gun ownership but common-sense safety laws':'Apoyar la posesi\\u00F3n de armas pero con leyes de seguridad sensatas'," +
+    "'Stronger regulations':'Regulaciones m\\u00E1s estrictas'," +
+    "'Universal background checks, red flag laws, waiting periods':'Verificaci\\u00F3n universal de antecedentes, leyes de alerta, per\\u00EDodos de espera'," +
+    "'Major reform needed':'Se necesita una reforma profunda'," +
+    "'Assault weapons ban, stricter licensing requirements':'Prohibici\\u00F3n de armas de asalto, requisitos de licencia m\\u00E1s estrictos'," +
+    // Abortion & Reproductive Rights deep dive
+    "'On abortion and reproductive rights?':'\\u00BFSobre aborto y derechos reproductivos?'," +
+    "'Pro-life, no exceptions':'Pro-vida, sin excepciones'," +
+    "'Protect life from conception, support current Texas ban':'Proteger la vida desde la concepci\\u00F3n, apoyar la prohibici\\u00F3n actual en Texas'," +
+    "'Pro-life with exceptions':'Pro-vida con excepciones'," +
+    "'Ban most abortions but allow rape, incest, life of mother':'Prohibir la mayor\\u00EDa de los abortos pero permitir en casos de violaci\\u00F3n, incesto o vida de la madre'," +
+    "'Restore some access':'Restaurar algo de acceso'," +
+    "'Current ban goes too far, allow early-term abortion':'La prohibici\\u00F3n actual va demasiado lejos, permitir el aborto temprano'," +
+    "'Pro-choice':'Pro-elecci\\u00F3n'," +
+    "'Women should make their own reproductive decisions':'Las mujeres deben tomar sus propias decisiones reproductivas'," +
+    // Water & Land deep dive
+    "'On water and land use in Texas?':'\\u00BFSobre agua y uso de tierras en Texas?'," +
+    "'Property rights first':'Primero los derechos de propiedad'," +
+    "'Landowners should control their water and land':'Los due\\u00F1os de tierras deben controlar su agua y su tierra'," +
+    "'Protect rural water':'Proteger el agua rural'," +
+    "'Ban large-scale water exports, protect aquifers':'Prohibir las exportaciones de agua a gran escala, proteger los acu\\u00EDferos'," +
+    "'Conservation focus':'Enfoque en conservaci\\u00F3n'," +
+    "'Stricter regulations to prevent water waste and pollution':'Regulaciones m\\u00E1s estrictas para prevenir el desperdicio y la contaminaci\\u00F3n del agua'," +
+    "'Major investment':'Inversi\\u00F3n importante'," +
+    "'Build new reservoirs, desalination, and infrastructure':'Construir nuevos embalses, desalinizaci\\u00F3n e infraestructura'," +
+    // Agriculture & Rural deep dive
+    "'On agriculture and rural Texas?':'\\u00BFSobre agricultura y el Texas rural?'," +
+    "'Support family farms':'Apoyar a las granjas familiares'," +
+    "'Protect small farms, limit corporate agriculture dominance':'Proteger las granjas peque\\u00F1as, limitar el dominio de la agricultura corporativa'," +
+    "'Free market farming':'Agricultura de libre mercado'," +
+    "'Less regulation, let farmers compete globally':'Menos regulaci\\u00F3n, dejar que los agricultores compitan globalmente'," +
+    "'Rural investment':'Inversi\\u00F3n rural'," +
+    "'Broadband, hospitals, schools \\u2014 invest in rural communities':'Internet, hospitales, escuelas \\u2014 invertir en comunidades rurales'," +
+    "'Sustainable agriculture':'Agricultura sostenible'," +
+    "'Incentivize conservation, regenerative farming practices':'Incentivar la conservaci\\u00F3n, pr\\u00E1cticas de agricultura regenerativa'," +
+    // Faith & Religious Liberty deep dive
+    "'On faith and religious liberty?':'\\u00BFSobre fe y libertad religiosa?'," +
+    "'Protect religious freedom':'Proteger la libertad religiosa'," +
+    "'Strong legal protections for faith-based beliefs and practices':'Fuertes protecciones legales para creencias y pr\\u00E1cticas basadas en la fe'," +
+    "'Balance needed':'Se necesita equilibrio'," +
+    "'Protect religious freedom but not at the expense of others\\u2019 rights':'Proteger la libertad religiosa pero no a costa de los derechos de otros'," +
+    "'Strict separation':'Separaci\\u00F3n estricta'," +
+    "'Keep religion out of government and public policy':'Mantener la religi\\u00F3n fuera del gobierno y las pol\\u00EDticas p\\u00FAblicas'," +
+    "'Faith guides policy':'La fe gu\\u00EDa la pol\\u00EDtica'," +
+    "'Moral and religious values should shape our laws':'Los valores morales y religiosos deben dar forma a nuestras leyes'" +
   "};",
   "function t(s){return LANG==='es'&&TR[s]||s}",
 
@@ -895,7 +952,12 @@ var APP_JS = [
     '{v:"Transportation",icon:"\u{1F697}"},' +
     '{v:"Immigration",icon:"\u{1F30E}"},' +
     '{v:"Taxes",icon:"\u{1F4B5}"},' +
-    '{v:"Civil Rights",icon:"\u2696\u{FE0F}"}' +
+    '{v:"Civil Rights",icon:"\u2696\u{FE0F}"},' +
+    '{v:"Gun Policy",icon:"\u{1F3AF}"},' +
+    '{v:"Abortion & Reproductive Rights",icon:"\u2695\u{FE0F}"},' +
+    '{v:"Water & Land",icon:"\u{1F4A7}"},' +
+    '{v:"Agriculture & Rural",icon:"\u{1F33E}"},' +
+    '{v:"Faith & Religious Liberty",icon:"\u{1F54A}\u{FE0F}"}' +
     "];",
 
   'var SPECTRUM=[' +
@@ -915,7 +977,9 @@ var APP_JS = [
     '"Fresh Perspective":"<svg width=\\"16\\" height=\\"16\\" viewBox=\\"0 0 24 24\\" fill=\\"currentColor\\"><path d=\\"M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z\\"/></svg>",' +
     '"Bipartisan / Works Across Aisle":"<svg width=\\"16\\" height=\\"16\\" viewBox=\\"0 0 24 24\\" fill=\\"currentColor\\"><path d=\\"M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z\\"/></svg>",' +
     '"Strong Leadership":"<svg width=\\"16\\" height=\\"16\\" viewBox=\\"0 0 24 24\\" fill=\\"currentColor\\"><path d=\\"M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6h-5.6z\\"/></svg>",' +
-    '"Community Ties":"<svg width=\\"16\\" height=\\"16\\" viewBox=\\"0 0 24 24\\" fill=\\"currentColor\\"><path d=\\"M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z\\"/></svg>"' +
+    '"Community Ties":"<svg width=\\"16\\" height=\\"16\\" viewBox=\\"0 0 24 24\\" fill=\\"currentColor\\"><path d=\\"M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z\\"/></svg>",' +
+    '"Faith & Values":"<svg width=\\"16\\" height=\\"16\\" viewBox=\\"0 0 24 24\\" fill=\\"currentColor\\"><path d=\\"M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z\\"/></svg>",' +
+    '"Business Experience":"<svg width=\\"16\\" height=\\"16\\" viewBox=\\"0 0 24 24\\" fill=\\"currentColor\\"><path d=\\"M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z\\"/></svg>"' +
   '};',
   'var QUALITIES=Object.keys(QUAL_ICONS);',
 
@@ -924,8 +988,8 @@ var APP_JS = [
     '"Housing":{q:"On housing, where do you land?",opts:[' +
       '{l:"Build, build, build",d:"Ease zoning, encourage density, let the market work"},' +
       '{l:"Smart growth",d:"More housing with affordability guardrails"},' +
-      '{l:"Protect neighborhoods",d:"Preserve character, limit density changes"},' +
-      "{l:\"It\\u2019s complicated\",d:\"Case by case \\u2014 depends on the neighborhood\"}" +
+      '{l:"Protect property rights",d:"Keep property taxes low, limit government land-use rules"},' +
+      "{l:\"It\\u2019s complicated\",d:\"Case by case \\u2014 depends on the community\"}" +
     "]}," +
     '"Public Safety":{q:"On public safety, what\\u2019s your approach?",opts:[' +
       '{l:"Fully fund police",d:"Hire more officers, strong prosecution"},' +
@@ -970,22 +1034,52 @@ var APP_JS = [
       '{l:"Local resilience",d:"Microgrids, batteries, community-level solutions"}' +
     "]}," +
     '"Transportation":{q:"On transportation, what\\u2019s the priority?",opts:[' +
-      '{l:"Build more roads",d:"Expand highways and reduce congestion for drivers"},' +
-      '{l:"Public transit",d:"Light rail, better buses, less car dependence"},' +
+      '{l:"Build more roads",d:"Expand highways, farm-to-market roads, reduce congestion"},' +
+      '{l:"Public transit",d:"Rail, better buses, less car dependence in metro areas"},' +
       '{l:"Balanced approach",d:"Roads, transit, bikes, and walkability together"},' +
-      '{l:"Remote work first",d:"Reduce the need to commute in the first place"}' +
+      '{l:"Rural infrastructure",d:"Fix rural roads, improve connectivity between small towns"}' +
     "]}," +
     '"Immigration":{q:"On immigration, what\\u2019s your view?",opts:[' +
       '{l:"Secure the border",d:"Enforcement first, then talk about reform"},' +
       '{l:"Enforce but reform",d:"Secure borders AND create legal pathways"},' +
       '{l:"Welcoming approach",d:"Immigrants strengthen our communities, expand protections"},' +
-      "{l:\"Local isn\\u2019t federal\",d:\"City shouldn\\u2019t spend resources on federal immigration enforcement\"}" +
+      '{l:"State should stay out",d:"Immigration is a federal issue, not a state priority"}' +
     "]}," +
     '"Civil Rights":{q:"On civil rights and equality?",opts:[' +
       '{l:"Equal treatment",d:"Same rules for everyone, no special categories"},' +
       '{l:"Protect what we have",d:"Maintain current protections, don\\u2019t roll them back"},' +
       '{l:"Expand protections",d:"Stronger anti-discrimination laws and enforcement"},' +
       '{l:"Systemic change",d:"Address root causes of inequality, not just symptoms"}' +
+    "]}," +
+    '"Gun Policy":{q:"On guns, where do you stand?",opts:[' +
+      '{l:"Protect gun rights",d:"Second Amendment is non-negotiable, no new restrictions"},' +
+      '{l:"Rights with responsibility",d:"Support gun ownership but common-sense safety laws"},' +
+      '{l:"Stronger regulations",d:"Universal background checks, red flag laws, waiting periods"},' +
+      '{l:"Major reform needed",d:"Assault weapons ban, stricter licensing requirements"}' +
+    "]}," +
+    '"Abortion & Reproductive Rights":{q:"On abortion and reproductive rights?",opts:[' +
+      '{l:"Pro-life, no exceptions",d:"Protect life from conception, support current Texas ban"},' +
+      '{l:"Pro-life with exceptions",d:"Ban most abortions but allow rape, incest, life of mother"},' +
+      '{l:"Restore some access",d:"Current ban goes too far, allow early-term abortion"},' +
+      "{l:\"Pro-choice\",d:\"Women should make their own reproductive decisions\"}" +
+    "]}," +
+    '"Water & Land":{q:"On water and land use in Texas?",opts:[' +
+      '{l:"Property rights first",d:"Landowners should control their water and land"},' +
+      '{l:"Protect rural water",d:"Ban large-scale water exports, protect aquifers"},' +
+      '{l:"Conservation focus",d:"Stricter regulations to prevent water waste and pollution"},' +
+      '{l:"Major investment",d:"Build new reservoirs, desalination, and infrastructure"}' +
+    "]}," +
+    '"Agriculture & Rural":{q:"On agriculture and rural Texas?",opts:[' +
+      '{l:"Support family farms",d:"Protect small farms, limit corporate agriculture dominance"},' +
+      '{l:"Free market farming",d:"Less regulation, let farmers compete globally"},' +
+      '{l:"Rural investment",d:"Broadband, hospitals, schools \\u2014 invest in rural communities"},' +
+      '{l:"Sustainable agriculture",d:"Incentivize conservation, regenerative farming practices"}' +
+    "]}," +
+    '"Faith & Religious Liberty":{q:"On faith and religious liberty?",opts:[' +
+      '{l:"Protect religious freedom",d:"Strong legal protections for faith-based beliefs and practices"},' +
+      '{l:"Balance needed",d:"Protect religious freedom but not at the expense of others\\u2019 rights"},' +
+      '{l:"Strict separation",d:"Keep religion out of government and public policy"},' +
+      '{l:"Faith guides policy",d:"Moral and religious values should shape our laws"}' +
     "]}" +
     "};",
 
