@@ -1602,8 +1602,14 @@ var APP_JS = [
     "var idx=-1;for(var i=0;i<allRaces.length;i++){if(allRaces[i].office===race.office&&allRaces[i].district===race.district){idx=i;break}}" +
     "var label=race.office+(race.district?' \\u2014 '+race.district:'')+(race.recommendation?' \\u2014 Recommended: '+race.recommendation.candidateName:'');" +
     "var h='<div class=\"card card-touch\" data-action=\"nav\" data-to=\"#/race/'+idx+'\" role=\"link\" aria-label=\"'+esc(label)+'\" tabindex=\"0\">';" +
-    "h+='<div style=\"display:flex;justify-content:space-between;align-items:flex-start\">';" +
-    "h+='<div style=\"flex:1;min-width:0\"><div style=\"font-size:14px;color:var(--text2)\">'+(race.isKeyRace?'<span class=\"star\">\u2B50</span> ':'')+esc(race.office)+(race.district?' \\u2014 '+esc(race.district):'')+'</div>';" +
+    // Row 1: office title + badge + chevron
+    "h+='<div style=\"display:flex;justify-content:space-between;align-items:center\">';" +
+    "h+='<div style=\"flex:1;min-width:0;font-size:14px;color:var(--text2)\">'+(race.isKeyRace?'<span class=\"star\">\u2B50</span> ':'')+esc(race.office)+(race.district?' \\u2014 '+esc(race.district):'')+'</div>';" +
+    "h+='<div style=\"display:flex;align-items:center;gap:8px;flex-shrink:0\">';" +
+    "if(race.recommendation){h+=confBadge(race.recommendation.confidence)}" +
+    "h+='<span style=\"color:var(--text2);font-size:18px\">&rsaquo;</span>';" +
+    "h+='</div></div>';" +
+    // Full-width content below
     "if(race.recommendation){" +
       "h+='<div style=\"font-size:17px;font-weight:700;margin-top:4px\">'+esc(race.recommendation.candidateName)+'</div>';" +
       "h+='<div style=\"font-size:13px;color:var(--text2);margin-top:2px;line-height:1.4\">'+esc(race.recommendation.reasoning)+'</div>'" +
@@ -1623,11 +1629,6 @@ var APP_JS = [
     "}" +
     "h+='</div>';" +
     "h+='</div>';" +
-    "h+='<div style=\"display:flex;align-items:center;gap:8px;flex-shrink:0\">';" +
-    "if(race.recommendation){h+=confBadge(race.recommendation.confidence)}" +
-    "h+='<span style=\"color:var(--text2);font-size:18px\">&rsaquo;</span>';" +
-    "h+='</div>';" +
-    "h+='</div></div>';" +
     "return h;" +
   "}",
 
