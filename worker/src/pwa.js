@@ -696,6 +696,15 @@ var APP_JS = [
     "'Location timed out. Please try again.':'La ubicaci\\u00F3n tard\\u00F3 demasiado. Por favor, int\\u00E9ntalo de nuevo.'," +
     "'Could not look up address. Try entering it manually.':'No se pudo buscar la direcci\\u00F3n. Intenta ingresarla manualmente.'," +
     "'Could not regenerate summary. Please try again.':'No se pudo regenerar el resumen. Por favor, int\\u00E9ntalo de nuevo.'," +
+    "'Reading Level':'Nivel de lectura'," +
+    "'Simple':'Simple'," +
+    "'Casual':'Casual'," +
+    "'Standard':'Est\\u00E1ndar'," +
+    "'Detailed':'Detallado'," +
+    "'Expert':'Experto'," +
+    "'High School':'Preparatoria'," +
+    "'Professor':'Profesor'," +
+    "'Reprocess Guide':'Reprocesar gu\\u00EDa'," +
     "'This will erase your profile and recommendations.':'Esto borrar\\u00E1 tu perfil y recomendaciones.'," +
     "'Start over? This will erase your profile and recommendations.':'\\u00BFEmpezar de nuevo? Esto borrar\\u00E1 tu perfil y recomendaciones.'," +
     // Vote Info
@@ -1095,6 +1104,7 @@ var APP_JS = [
     "repBallot:null,demBallot:null,selectedParty:'republican'," +
     "guideComplete:false,summary:null,districts:null," +
     "isLoading:false,loadPhase:0,loadMsg:'',error:null,geolocating:false,polymarket:null," +
+    "readingLevel:3," +
     "expanded:{'vi-dates':true,'vi-bring':true},disclaimerDismissed:false,hasVoted:false" +
     "};",
 
@@ -1136,7 +1146,8 @@ var APP_JS = [
     "try{" +
     "localStorage.setItem('tx_votes_profile',JSON.stringify({" +
       "topIssues:S.issues,politicalSpectrum:S.spectrum,policyViews:S.policyViews," +
-      "candidateQualities:S.qualities,freeform:S.freeform,address:S.address,summaryText:S.summary,districts:S.districts" +
+      "candidateQualities:S.qualities,freeform:S.freeform,address:S.address,summaryText:S.summary,districts:S.districts," +
+      "readingLevel:S.readingLevel" +
     "}));" +
     "if(S.repBallot)localStorage.setItem('tx_votes_ballot_republican',JSON.stringify(S.repBallot));" +
     "if(S.demBallot)localStorage.setItem('tx_votes_ballot_democrat',JSON.stringify(S.demBallot));" +
@@ -1151,7 +1162,8 @@ var APP_JS = [
     "if(p){p=JSON.parse(p);S.issues=p.topIssues||[];S.spectrum=p.politicalSpectrum||null;" +
     "S.policyViews=p.policyViews||{};S.qualities=p.candidateQualities||[];S.freeform=p.freeform||'';" +
     "S.address=p.address||{street:'',city:'',state:'TX',zip:''};" +
-    "S.summary=p.summaryText||null;S.districts=p.districts||null}" +
+    "S.summary=p.summaryText||null;S.districts=p.districts||null;" +
+    "S.readingLevel=p.readingLevel||3}" +
     "var rb=localStorage.getItem('tx_votes_ballot_republican');" +
     "if(rb)S.repBallot=JSON.parse(rb);" +
     "var db=localStorage.getItem('tx_votes_ballot_democrat');" +
@@ -1752,6 +1764,18 @@ var APP_JS = [
     "h+='<button class=\"party-btn'+(LANG==='en'?' lang-on':' lang-off')+'\" data-action=\"set-lang\" data-value=\"en\">English</button>';" +
     "h+='<button class=\"party-btn'+(LANG==='es'?' lang-on':' lang-off')+'\" data-action=\"set-lang\" data-value=\"es\">Espa\\u00F1ol</button>';" +
     "h+='</div></div>';" +
+    // Reading level slider
+    "h+='<div class=\"card\" style=\"margin-top:16px\">';" +
+    "h+='<div style=\"font-size:15px;font-weight:600;margin-bottom:12px\">\u{1F4D6} '+t('Reading Level')+'</div>';" +
+    "var rlLabels=[t('Simple'),t('Casual'),t('Standard'),t('Detailed'),t('Expert')];" +
+    "h+='<input type=\"range\" min=\"1\" max=\"5\" value=\"'+S.readingLevel+'\" data-action=\"set-reading-level\" style=\"width:100%;accent-color:var(--blue)\">';" +
+    "h+='<div style=\"display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-top:4px\">';" +
+    "h+='<span>'+t('High School')+'</span>';" +
+    "h+='<span style=\"font-weight:600;color:var(--text1)\">'+rlLabels[S.readingLevel-1]+'</span>';" +
+    "h+='<span>'+t('Professor')+'</span>';" +
+    "h+='</div>';" +
+    "if(S.guideComplete&&!S.isLoading){h+='<button class=\"btn btn-primary\" style=\"width:100%;margin-top:12px\" data-action=\"reprocess-guide\">'+t('Reprocess Guide')+'</button>'}" +
+    "h+='</div>';" +
     // Start Over
     "h+='<div style=\"margin-top:32px;padding-top:20px;border-top:1px solid var(--border)\">';" +
     "h+='<button class=\"btn btn-danger\" data-action=\"reset\">'+t('Start Over')+'</button>';" +
@@ -2016,6 +2040,13 @@ var APP_JS = [
     "else if(action==='do-print'){window.print()}" +
     "else if(action==='share'){shareGuide()}" +
     "else if(action==='regen-summary'){regenerateSummary()}" +
+    "else if(action==='reprocess-guide'){reprocessGuide()}" +
+  "});",
+
+  // Range input handler for reading level slider
+  "document.getElementById('app').addEventListener('input',function(e){" +
+    "var el=e.target;if(!el.dataset||!el.dataset.action)return;" +
+    "if(el.dataset.action==='set-reading-level'){S.readingLevel=parseInt(el.value)||3;save();render()}" +
   "});",
 
   // Tab bar click handler (tabs live outside #app)
@@ -2099,9 +2130,9 @@ var APP_JS = [
       "S.loadPhase=2;S.loadMsg='Researching candidates...';render();" +
       "var cFips=S.districts&&S.districts.countyFips?S.districts.countyFips:null;" +
       "var repP=fetch('/app/api/guide',{method:'POST',headers:{'Content-Type':'application/json'}," +
-        "body:JSON.stringify({party:'republican',profile:profile,districts:S.districts,lang:LANG,countyFips:cFips})}).then(function(r){return r.json()});" +
+        "body:JSON.stringify({party:'republican',profile:profile,districts:S.districts,lang:LANG,countyFips:cFips,readingLevel:S.readingLevel})}).then(function(r){return r.json()});" +
       "var demP=fetch('/app/api/guide',{method:'POST',headers:{'Content-Type':'application/json'}," +
-        "body:JSON.stringify({party:'democrat',profile:profile,districts:S.districts,lang:LANG,countyFips:cFips})}).then(function(r){return r.json()});" +
+        "body:JSON.stringify({party:'democrat',profile:profile,districts:S.districts,lang:LANG,countyFips:cFips,readingLevel:S.readingLevel})}).then(function(r){return r.json()});" +
       // Rotate messages while both requests are in-flight
       "var repResult=null,demResult=null;" +
       "var msgs=demFirst?['Researching Democrats...','Researching Republicans...']:['Researching Republicans...','Researching Democrats...'];" +
@@ -2140,11 +2171,17 @@ var APP_JS = [
     "}" +
   "}",
 
+  // ============ REPROCESS GUIDE ============
+  "function reprocessGuide(){" +
+    "S.phase=7;S.error=null;S.loadPhase=0;S.loadMsg='Finding your ballot...';S.isLoading=true;render();" +
+    "doGuide();" +
+  "}",
+
   // ============ REGENERATE SUMMARY ============
   "function regenerateSummary(){" +
     "S.regenerating=true;render();" +
     "var profile={topIssues:S.issues,politicalSpectrum:S.spectrum,candidateQualities:S.qualities,policyViews:S.policyViews,freeform:S.freeform||null};" +
-    "fetch('/app/api/summary',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({profile:profile,lang:LANG})})" +
+    "fetch('/app/api/summary',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({profile:profile,lang:LANG,readingLevel:S.readingLevel})})" +
     ".then(function(r){return r.json()})" +
     ".then(function(d){" +
       "if(d.error)throw new Error(d.error);" +

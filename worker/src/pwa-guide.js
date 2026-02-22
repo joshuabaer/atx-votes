@@ -27,7 +27,7 @@ function json(data, status = 200) {
 
 export async function handlePWA_Guide(request, env) {
   try {
-    const { party, profile, districts, lang, countyFips } = await request.json();
+    const { party, profile, districts, lang, countyFips, readingLevel } = await request.json();
 
     if (!party || !["republican", "democrat"].includes(party)) {
       return json({ error: "party required (republican|democrat)" }, 400);
@@ -73,7 +73,7 @@ export async function handlePWA_Guide(request, env) {
 
     // Build prompts
     var ballotDesc = buildCondensedBallotDescription(ballot);
-    var userPrompt = buildUserPrompt(profile, ballotDesc, ballot, party, lang);
+    var userPrompt = buildUserPrompt(profile, ballotDesc, ballot, party, lang, readingLevel);
 
     // Call Claude with model fallback
     var responseText = await callClaude(env, SYSTEM_PROMPT, userPrompt, lang);
@@ -101,7 +101,7 @@ const SUMMARY_SYSTEM =
 
 export async function handlePWA_Summary(request, env) {
   try {
-    const { profile, lang } = await request.json();
+    const { profile, lang, readingLevel } = await request.json();
     if (!profile) {
       return json({ error: "profile required" }, 400);
     }
@@ -116,8 +116,11 @@ export async function handlePWA_Summary(request, env) {
       ? "Write your response in Spanish. "
       : "";
 
+    var toneInstruction = READING_LEVEL_INSTRUCTIONS[readingLevel] || "";
+
     var userMessage =
       langInstruction +
+      toneInstruction +
       "Write 2-3 sentences describing this person's politics the way they might describe it to a friend. " +
       "Be conversational, specific, and insightful \u2014 synthesize who they are as a voter, don't just list positions. " +
       'NEVER say "I\'m a Democrat" or "I\'m a Republican" or identify with a party label \u2014 focus on their actual views, values, and priorities. ' +
@@ -242,7 +245,15 @@ function buildCondensedBallotDescription(ballot) {
 
 // MARK: - User Prompt
 
-function buildUserPrompt(profile, ballotDesc, ballot, party, lang) {
+var READING_LEVEL_INSTRUCTIONS = {
+  1: "TONE: Write at a high school reading level. Use simple, everyday language. Avoid jargon and political terminology. Explain concepts as if to someone voting for the first time.\n\n",
+  2: "TONE: Write casually, like explaining politics to a friend. Keep it conversational and approachable. Minimize jargon.\n\n",
+  3: "",
+  4: "TONE: Write with more depth and nuance. Use precise political terminology where helpful. Assume the reader follows politics.\n\n",
+  5: "TONE: Write at an expert level, like a political science professor. Use precise terminology, reference policy frameworks and precedents, and assume deep familiarity with political concepts.\n\n",
+};
+
+function buildUserPrompt(profile, ballotDesc, ballot, party, lang, readingLevel) {
   var raceLines = ballot.races.map(function (r) {
     var names = r.candidates.map(function (c) {
       return c.name;
@@ -259,8 +270,11 @@ function buildUserPrompt(profile, ballotDesc, ballot, party, lang) {
     })
     .join("; ");
 
+  var toneInstruction = READING_LEVEL_INSTRUCTIONS[readingLevel] || "";
+
   return (
     "Recommend ONE candidate per race and a stance on each proposition. Be concise.\n\n" +
+    toneInstruction +
     "NONPARTISAN: All reasoning must be factual and issue-based. Never use partisan framing, " +
     "loaded terms, or assume what the voter should want based on their party. Treat every candidate " +
     "and proposition with equal analytical rigor. Connect recommendations to the voter's specific " +
