@@ -2126,3 +2126,5 @@ var APP_HTML =
   APP_JS +
   "</script>" +
   "</body></html>";
+
+export { APP_JS };
