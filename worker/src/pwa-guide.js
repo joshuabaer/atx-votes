@@ -203,7 +203,9 @@ function buildCondensedBallotDescription(ballot) {
       var c = race.candidates[j];
       var inc = c.isIncumbent ? " (incumbent)" : "";
       lines.push("  - " + c.name + inc);
-      lines.push("    Positions: " + c.keyPositions.join("; "));
+      if (c.keyPositions && c.keyPositions.length) {
+        lines.push("    Positions: " + c.keyPositions.join("; "));
+      }
       if (c.endorsements && c.endorsements.length) {
         lines.push("    Endorsements: " + c.endorsements.join("; "));
       }

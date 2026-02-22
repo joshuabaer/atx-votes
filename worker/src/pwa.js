@@ -1580,7 +1580,7 @@ var APP_JS = [
       "if(c.isIncumbent)h+='<span class=\"badge badge-blue\">'+t('Incumbent')+'</span>';" +
       "if(c.isRecommended)h+='<span class=\"badge badge-ok\">'+t('Recommended')+'</span>';" +
       "var odds=getOdds(c.name,race.office,S.selectedParty);" +
-      "if(odds)h+='<span class=\"badge\" style=\"background:rgba(212,168,67,.15);color:#B8860B\" title=\"Polymarket prediction\">'+odds+'%</span>';" +
+      "if(odds)h+='<a href=\"'+odds.url+'\" target=\"_blank\" class=\"badge\" style=\"background:rgba(212,168,67,.15);color:#B8860B;text-decoration:none\" title=\"Polymarket prediction\" onclick=\"event.stopPropagation()\">'+odds.pct+'%</a>';" +
       "h+='</div></div>';" +
       "h+='</div></div>';" +
       "h+='<div class=\"cand-summary\">'+esc(c.summary)+'</div>';" +
@@ -2135,12 +2135,14 @@ var APP_JS = [
   "function getOdds(candidateName,office,party){" +
     "if(!S.polymarket)return null;" +
     "var key=office+'|'+party;" +
-    "var raceOdds=S.polymarket[key];" +
-    "if(!raceOdds)return null;" +
+    "var rd=S.polymarket[key];" +
+    "if(!rd||!rd.candidates)return null;" +
+    "var cands=rd.candidates;" +
+    "var url='https://polymarket.com/event/'+rd.slug;" +
     // Try exact match first, then last-name match
-    "if(raceOdds[candidateName])return raceOdds[candidateName];" +
+    "if(cands[candidateName])return{pct:cands[candidateName],url:url};" +
     "var last=candidateName.split(' ').pop();" +
-    "for(var k in raceOdds){if(k.split(' ').pop()===last)return raceOdds[k]}" +
+    "for(var k in cands){if(k.split(' ').pop()===last)return{pct:cands[k],url:url}}" +
     "return null" +
   "}",
 

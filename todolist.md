@@ -7,6 +7,9 @@
 - [ ] Expand coverage to all of Texas — generalize beyond Austin/Travis County to support all Texas counties, districts, and races statewide
 - [ ] Make city/region support self-service — configuration-driven approach so any city/region can set up their own voting guide without code changes
 - [ ] Create versions for runoffs and general election — support multiple election cycles beyond the primary
+- [ ] Add statewide issues: Gun Rights/Safety, Abortion/Reproductive Rights, Water Rights/Scarcity, Agriculture/Rural Issues, Faith/Religious Liberty
+- [ ] Broaden deep dives for rural Texas — Housing (property rights/taxes vs density), Transportation (rural roads vs light rail), Immigration (remove Austin city-council framing)
+- [ ] Add candidate qualities: Faith & Values, Business Experience
 - [x] Integrate Polymarket predictions — show prediction market odds alongside race recommendations
 - [x] Geolocate button to auto-fill address — use browser geolocation to fill in street, city, and ZIP; hardcode state to TX
 - [x] Balance loading screen timing — "Researching Republicans" and "Researching Democrats" should show for roughly equal time; currently the first one displays much longer and looks uneven

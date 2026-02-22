@@ -61,12 +61,12 @@ async function handlePolymarket(env) {
       const events = await res.json();
       if (!events.length) return;
       const key = `${office}|${party}`;
-      odds[key] = {};
+      odds[key] = { slug, candidates: {} };
       for (const m of events[0].markets) {
         if (!m.active || !m.outcomePrices || !m.groupItemTitle) continue;
         const prices = JSON.parse(m.outcomePrices);
         const pct = Math.round(parseFloat(prices[0]) * 100);
-        if (pct >= 1) odds[key][m.groupItemTitle] = pct;
+        if (pct >= 1) odds[key].candidates[m.groupItemTitle] = pct;
       }
     } catch { /* skip failed fetch */ }
   }));
