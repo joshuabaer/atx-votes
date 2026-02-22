@@ -12,16 +12,18 @@
 - [ ] Candidate contact outreach — for each candidate, identify the best contact name and email address for asking them to review their candidate info on our website (research done, see docs/plans/candidate_contacts.md)
 
 ### Bugs
-- [ ] Recommendation engine should not recommend withdrawn candidates — e.g. Andrew White (dropped out Jan 5, 2026). Guide generation and ballot display should filter out candidates marked as withdrawn.
+- [x] Recommendation engine should not recommend withdrawn candidates — e.g. Andrew White (dropped out Jan 5, 2026). Guide generation and ballot display should filter out candidates marked as withdrawn.
+- [x] Candidates page throwing Error 1101 — `nameToSlug` crashing on null candidate name in KV data. Fixed with null guard.
 
 ### Features
 - [ ] Make city/region support self-service — configuration-driven approach so any city/region can set up their own voting guide without code changes
 - [ ] Create versions for runoffs and general election — support multiple election cycles beyond the primary (detailed plan at docs/plans/plan_runoff_general_election.md, 4-phase timeline March-October)
 - [ ] LLM choice — let users choose which LLM and model to use for generating their ballot (Claude, GPT, Gemini, Grok)
+- [ ] URL flags for alternate LLMs — `?gemini`, `?grok`, and `?chatgpt` query params that tell the app to use that LLM for generating recommendations instead of Claude
 - [ ] Create new txvotes repo in GitHub — fresh copy of the code without all the dev history
 
 ### Technical Debt
-- [ ] AI audit execution — submit methodology export to ChatGPT, Gemini, and Grok using the audit prompt template, then publish results on /audit page
+- [x] AI audit execution — automated daily cron calls ChatGPT, Gemini, and Grok APIs; results on /audit page; stops after election day
 - [ ] Comprehensive memory management review — audit localStorage usage, service worker cache lifecycle, KV data retention, and state cleanup
 - [ ] Comprehensive Claude API usage review — analyze token usage across guide generation, county seeding, tone variants, and candidate research; identify optimization opportunities
 

@@ -268,6 +268,7 @@ function mergeRaceUpdates(race, updates) {
     const candidate = merged.candidates.find((c) => c.name === update.name);
     if (!candidate) continue;
 
+    // Only update whitelisted fields — `withdrawn` and other manual flags are preserved
     const fields = [
       "polling",
       "fundraising",

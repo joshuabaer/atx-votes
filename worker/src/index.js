@@ -48,6 +48,7 @@ li{font-size:1rem;color:var(--text);margin-bottom:0.75rem}
 // MARK: - Candidate Profile Helpers
 
 function nameToSlug(name) {
+  if (!name) return "";
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
@@ -71,6 +72,7 @@ async function loadAllCandidates(env) {
 
     for (const race of (ballot.races || [])) {
       for (const candidate of (race.candidates || [])) {
+        if (!candidate.name) continue;
         const slug = nameToSlug(candidate.name);
         seen.add(`${slug}|${party}`);
         results.push({
@@ -99,6 +101,7 @@ async function loadAllCandidates(env) {
 
     for (const race of (ballot.races || [])) {
       for (const candidate of (race.candidates || [])) {
+        if (!candidate.name) continue;
         const slug = nameToSlug(candidate.name);
         if (seen.has(`${slug}|${party}`)) continue; // skip duplicates
         seen.add(`${slug}|${party}`);
@@ -1807,11 +1810,18 @@ async function handleCandidateProfile(slug, env) {
 
   // Meta badges
   const badges = [];
+  if (c.withdrawn) badges.push("Withdrawn");
   if (c.incumbent || c.isIncumbent) badges.push("Incumbent");
   badges.push(partyLabel);
   if (c.age) badges.push(`Age ${escapeHtml(String(c.age))}`);
   if (badges.length) {
-    sections.push(`<div style="margin-bottom:1.5rem">${badges.map(b => `<span class="badge" style="margin-right:0.5rem;margin-bottom:0.5rem">${escapeHtml(b)}</span>`).join("")}</div>`);
+    sections.push(`<div style="margin-bottom:1.5rem">${badges.map(b => {
+      const style = b === "Withdrawn" ? "margin-right:0.5rem;margin-bottom:0.5rem;background:#c62626;color:#fff" : "margin-right:0.5rem;margin-bottom:0.5rem";
+      return `<span class="badge" style="${style}">${escapeHtml(b)}</span>`;
+    }).join("")}</div>`);
+  }
+  if (c.withdrawn) {
+    sections.push(`<div style="background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:0.75rem 1rem;margin-bottom:1.5rem;font-size:0.95rem"><strong>This candidate has withdrawn</strong> from the race and will not appear on the ballot.</div>`);
   }
 
   // Summary
@@ -1925,11 +1935,14 @@ async function handleCandidatesIndex(env) {
     if (candidates.length === 0) return `<p style="color:var(--text2);font-size:0.9rem;margin:0.5rem 0">No primary candidates</p>`;
     return `<ul style="padding-left:0;margin:0.5rem 0">${candidates.map(e => {
       const isIncumbent = e.candidate.incumbent || e.candidate.isIncumbent;
+      const isWithdrawn = e.candidate.withdrawn;
       const incumbentBadge = isIncumbent ? ' <span style="font-size:0.8rem;color:var(--text2)">(incumbent)</span>' : "";
+      const withdrawnBadge = isWithdrawn ? ' <span style="font-size:0.8rem;color:#c62626;font-style:italic">(withdrawn)</span>' : "";
+      const nameStyle = isWithdrawn ? ' style="color:var(--text2);text-decoration:line-through"' : "";
       const initials = e.candidate.name.split(' ').map(w => w[0]).join('').slice(0, 2);
       const placeholder = `<span style="display:none;width:32px;height:32px;border-radius:50%;background:var(--border);vertical-align:middle;margin-right:8px;line-height:32px;text-align:center;font-size:12px;color:var(--text2)">${escapeHtml(initials)}</span>`;
-      const headshot = `<img src="/headshots/${escapeHtml(e.slug)}.jpg?v=2" alt="" style="width:32px;height:32px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:8px;border:1px solid var(--border)" onerror="if(this.src.indexOf('.jpg')!==-1){this.src=this.src.replace('.jpg','.png')}else{this.style.display='none';this.nextElementSibling.style.display='inline-block'}">`;
-      return `<li style="list-style:none;margin-bottom:0.5rem">${headshot}${placeholder}<a href="/candidate/${escapeHtml(e.slug)}">${escapeHtml(e.candidate.name)}</a>${incumbentBadge}</li>`;
+      const headshot = `<img src="/headshots/${escapeHtml(e.slug)}.jpg?v=2" alt="" style="width:32px;height:32px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:8px;border:1px solid var(--border)${isWithdrawn ? ";opacity:0.5" : ""}" onerror="if(this.src.indexOf('.jpg')!==-1){this.src=this.src.replace('.jpg','.png')}else{this.style.display='none';this.nextElementSibling.style.display='inline-block'}">`;
+      return `<li style="list-style:none;margin-bottom:0.5rem">${headshot}${placeholder}<a href="/candidate/${escapeHtml(e.slug)}"${nameStyle}>${escapeHtml(e.candidate.name)}</a>${incumbentBadge}${withdrawnBadge}</li>`;
     }).join("")}</ul>`;
   }
 

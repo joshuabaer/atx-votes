@@ -205,11 +205,12 @@ function buildCondensedBallotDescription(ballot) {
     var label = race.district
       ? race.office + " \u2014 " + race.district
       : race.office;
-    var contested = race.isContested ? "" : " [UNCONTESTED]";
+    var activeCandidates = race.candidates.filter(function(c){ return !c.withdrawn; });
+    var effectivelyContested = activeCandidates.length > 1;
+    var contested = effectivelyContested ? "" : " [UNCONTESTED]";
     lines.push("RACE: " + label + contested);
-
-    for (var j = 0; j < race.candidates.length; j++) {
-      var c = race.candidates[j];
+    for (var j = 0; j < activeCandidates.length; j++) {
+      var c = activeCandidates[j];
       var inc = c.isIncumbent ? " (incumbent)" : "";
       lines.push("  - " + c.name + inc);
       if (c.keyPositions && c.keyPositions.length) {
@@ -263,7 +264,7 @@ var READING_LEVEL_INSTRUCTIONS = {
 
 function buildUserPrompt(profile, ballotDesc, ballot, party, lang, readingLevel) {
   var raceLines = ballot.races.map(function (r) {
-    var names = r.candidates.map(function (c) {
+    var names = r.candidates.filter(function(c){ return !c.withdrawn; }).map(function (c) {
       return c.name;
     });
     return r.office + ": " + names.join(", ");
@@ -476,10 +477,10 @@ function mergeRecommendations(guideResponse, ballot, lang) {
     }
     merged.races[ri].recommendation = null;
 
-    // Find and set recommended candidate
+    // Find and set recommended candidate (skip withdrawn)
     var candIdx = -1;
     for (var k = 0; k < race.candidates.length; k++) {
-      if (race.candidates[k].name === rec.recommendedCandidate) {
+      if (race.candidates[k].name === rec.recommendedCandidate && !race.candidates[k].withdrawn) {
         candIdx = k;
         break;
       }

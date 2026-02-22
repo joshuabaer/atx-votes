@@ -1668,8 +1668,9 @@ var APP_JS = [
     "var b=getBallot();" +
     "if(!b)return '<div class=\"card\"><p>'+t('No ballot available for this party.')+'</p></div>'+renderPartySwitcher();" +
     "var races=b.races.slice().sort(function(a,b){return sortOrder(a)-sortOrder(b)});" +
-    "var contested=races.filter(function(r){return r.isContested});" +
-    "var uncontested=races.filter(function(r){return!r.isContested});" +
+    "races.forEach(function(r){r._active=r.candidates.filter(function(c){return !c.withdrawn})});" +
+    "var contested=races.filter(function(r){return r._active.length>1});" +
+    "var uncontested=races.filter(function(r){return r._active.length<=1});" +
     "var keyRaces=contested.filter(function(r){return r.isKeyRace});" +
     "var otherContested=contested.filter(function(r){return!r.isKeyRace});" +
     "var h=renderPartySwitcher();" +
@@ -1755,8 +1756,9 @@ var APP_JS = [
     "var b=getBallot();" +
     "if(!b)return '<p>No ballot available.</p>';" +
     "var races=b.races.slice().sort(function(a,b){return sortOrder(a)-sortOrder(b)});" +
-    "var contested=races.filter(function(r){return r.isContested});" +
-    "var uncontested=races.filter(function(r){return!r.isContested});" +
+    "races.forEach(function(r){r._active=r.candidates.filter(function(c){return !c.withdrawn})});" +
+    "var contested=races.filter(function(r){return r._active.length>1});" +
+    "var uncontested=races.filter(function(r){return r._active.length<=1});" +
     "var profile=null;try{var p=localStorage.getItem('tx_votes_profile');if(p)profile=JSON.parse(p)}catch(e){}" +
     "var addr=profile&&profile.address?profile.address:null;" +
     "var partyName=S.selectedParty==='democrat'?'Democrat':'Republican';" +
@@ -1801,7 +1803,7 @@ var APP_JS = [
       "h+='<table class=\"cs-table\" style=\"margin-top:8px\"><thead><tr><th>'+t('UNCONTESTED')+'</th><th style=\"text-align:right\">'+t('CANDIDATE')+'</th></tr></thead><tbody>';" +
       "for(var i=0;i<uncontested.length;i++){" +
         "var r=uncontested[i];" +
-        "var name=r.candidates.length?esc(r.candidates[0].name):'TBD';" +
+        "var name=r._active.length?esc(r._active[0].name):'TBD';" +
         "var label=esc(r.office)+(r.district?' \\u2014 '+esc(r.district):'');" +
         "h+='<tr><td>'+label+'</td><td class=\"cs-vote cs-uncontested\">'+name+'</td></tr>'" +
       "}" +
@@ -1845,11 +1847,12 @@ var APP_JS = [
       "h+='<div style=\"font-size:17px;font-weight:700;margin-top:4px\">'+esc(race.recommendation.candidateName)+'</div>';" +
       "h+='<div style=\"font-size:13px;color:var(--text2);margin-top:2px;line-height:1.4\">'+esc(race.recommendation.reasoning)+'</div>'" +
     "}" +
-    "h+='<div style=\"font-size:13px;color:var(--text2);margin-top:4px\">'+race.candidates.length+' '+(race.candidates.length!==1?t('candidates'):t('candidate'))+'</div>';" +
+    "var activeCands=race.candidates.filter(function(c){return !c.withdrawn});" +
+    "h+='<div style=\"font-size:13px;color:var(--text2);margin-top:4px\">'+activeCands.length+' '+(activeCands.length!==1?t('candidates'):t('candidate'))+'</div>';" +
     "var colors=['#4A90D9','#D95B43','#5B8C5A','#8E6BBF','#D4A843','#C75B8F','#5BBFC7','#7B8D6F','#D97B43','#6B8FBF'];" +
     "h+='<div style=\"display:flex;gap:4px;margin-top:6px\">';" +
-    "for(var j=0;j<race.candidates.length;j++){" +
-      "var c=race.candidates[j];" +
+    "for(var j=0;j<activeCands.length;j++){" +
+      "var c=activeCands[j];" +
       "var slug=c.name.toLowerCase().replace(/[^a-z0-9 -]/g,'').replace(/\\s+/g,'-');" +
       "var initial=c.name.charAt(0).toUpperCase();" +
       "var ac=colors[j%colors.length];" +
@@ -1930,7 +1933,7 @@ var APP_JS = [
     "var b=getBallot();if(!b)return '<p>No ballot</p>';" +
     "var races=b.races.slice().sort(function(a,b){return sortOrder(a)-sortOrder(b)});" +
     "var race=races[idx];if(!race)return '<p>Race not found</p>';" +
-    "var candidates=shuffle(race.candidates);" +
+    "var candidates=shuffle(race.candidates.filter(function(c){return !c.withdrawn}));" +
     "var h='<button class=\"back-btn\" data-action=\"nav\" data-to=\"#/ballot\">&larr; '+t('Back to Ballot')+'</button>';" +
     "h+='<h2 style=\"font-size:22px;font-weight:800;margin-bottom:4px\">'+esc(race.office)+'</h2>';" +
     "if(race.district)h+='<div style=\"font-size:15px;color:var(--text2);margin-bottom:16px\">'+esc(race.district)+'</div>';" +
