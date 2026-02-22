@@ -1462,7 +1462,7 @@ var APP_JS = [
     "if(S.phase===4){step=4};" +
     "var pbar='<div class=\"progress\"><div class=\"progress-fill\" style=\"width:'+(step/total*100)+'%\"></div></div>';" +
     "var back='<button class=\"back-btn\" data-action=\"back\">&larr; Back</button>';" +
-    "if(S.phase===1)return pbar+renderTone();" +
+    "if(S.phase===1)return pbar+back+renderTone();" +
     "if(S.phase===2)return pbar+back+renderIssues();" +
     "if(S.phase===3)return pbar+back+renderSpectrum();" +
     "if(S.phase===4)return pbar+back+renderDeepDive();" +

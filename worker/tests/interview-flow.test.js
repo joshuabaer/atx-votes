@@ -997,12 +997,12 @@ describe("Progress bar", () => {
 });
 
 // ---------------------------------------------------------------------------
-// Phase 1 has no back button, Phase 2+ do
+// All interview phases have a back button
 // ---------------------------------------------------------------------------
 describe("Back button visibility", () => {
-  it("phase 1 has no back button (first screen)", () => {
+  it("phase 1 has a back button to return to welcome", () => {
     expect(S().phase).toBe(1);
-    expect(document.querySelector('[data-action="back"]')).toBeNull();
+    expect(document.querySelector('[data-action="back"]')).not.toBeNull();
   });
 
   it("phase 2 has a back button", () => {
