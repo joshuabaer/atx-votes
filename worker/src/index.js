@@ -595,13 +595,12 @@ async function handleTrigger(request, env) {
 
 const TONE_LABELS = {
   1: "high school / simplest",
-  2: "casual / friendly",
   3: "standard / news level",
   4: "detailed / political",
-  5: "expert / professor",
   6: "Swedish Chef from the Muppets (bork bork bork!)",
   7: "Texas cowboy (y'all, reckon, fixin' to, partner)",
 };
+const VALID_TONES = [1, 3, 4, 6, 7];
 
 /**
  * Generate tone versions for a single proposition.
@@ -724,11 +723,22 @@ async function handleGenerateCandidateTones(request, env) {
   const candidateName = body.candidate;
   const tone = body.tone;
 
+  const countyFips = body.countyFips;
+
   if (!candidateName || !tone) {
-    return jsonResponse({ error: "Required: candidate (name), tone (int), optional party" }, 400);
+    return jsonResponse({ error: "Required: candidate (name), tone (int), optional party, optional countyFips" }, 400);
   }
 
-  const key = `ballot:statewide:${party}_primary_2026`;
+  // Support both statewide and county ballots
+  let key;
+  if (countyFips) {
+    key = `ballot:county:${countyFips}:${party}_primary_2026`;
+  } else {
+    key = `ballot:statewide:${party}_primary_2026`;
+    // Fallback to legacy key format
+    const raw0 = await env.ELECTION_DATA.get(key);
+    if (!raw0) key = `ballot:${party}_primary_2026`;
+  }
   const raw = await env.ELECTION_DATA.get(key);
   if (!raw) return jsonResponse({ error: "no ballot data" }, 404);
 
