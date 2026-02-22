@@ -372,6 +372,18 @@ async function callClaude(env, system, userMessage, lang) {
         return text;
       }
 
+      if (res.status === 429) {
+        var retryAfter = parseInt(res.headers.get("retry-after") || "0", 10);
+        var wait = Math.max(retryAfter, attempt === 0 ? 5 : 15) * 1000;
+        if (attempt === 0) {
+          await new Promise(function (r) { setTimeout(r, wait); });
+          continue;
+        }
+        // Second 429 — try next model
+        if (i < MODELS.length - 1) break;
+        throw new Error("Rate limited — please try again in a minute");
+      }
+
       if (res.status === 529) {
         if (attempt === 0) {
           await new Promise(function (r) {
