@@ -31,7 +31,7 @@ Items not yet attempted or needing a fresh approach after failed verification.
 ### Improvements
 
 #### Headshots
-- [ ] Try harder to find missing candidate photos — MANIFEST.md lists 3 candidates with placeholder SVGs (including Anthony Gupta, SBOE Dist 5 Republican). Search harder: campaign Facebook pages, LinkedIn, local news photos, candidate forums, Texas SOS filings, county party websites.
+- [x] Try harder to find missing candidate photos — Found Anthony Gupta headshot from LXMI Capital website (he was mislabeled as SBOE Dist 5; actually State Rep Dist 48). Searched extensively for Ofelia Maldonado Zapata and Gavino Fernandez Jr. (County Commissioner Pct 4): no individual photos available on Ballotpedia, KUT, Austin Chronicle, Community Impact, Travis County Dem party, Vote411, or campaign sites. Only a KUT composite of all 4 Pct 4 candidates exists. 60/62 headshots now found.
 
 #### Landing Page
 
@@ -54,7 +54,7 @@ Items not yet attempted or needing a fresh approach after failed verification.
 
 ### Testing
 
-- [ ] Interview flow UI tests — walk through all interview phases, verify required field validation (3+ issues, 2+ qualities, address fields), verify back navigation preserves selections.
+- [x] Interview flow UI tests — 47 tests covering all 8 phases, required field validation (3-5 issues, spectrum, deep dives, 2-3 qualities, street/ZIP), back navigation preserving state, full happy-path walkthrough. Uses happy-dom for DOM simulation.
 - [x] Verify candidate-to-race accuracy — cross-referenced against Ballotpedia, Texas Tribune, Travis County Clerk, and Texas SOS. Fixed: added 3 missing GOP Railroad Commissioner candidates (including Jim Matlock at 20% in polls), removed withdrawn Christopher Hurt from GOP TX-10, added 4 missing Dem HD-49 candidates, added 2 missing Dem SBOE-5 candidates. Updated both JSON files and remote KV. Note: statewide races intentionally exclude minor/perennial candidates as editorial choice.
 - [x] Partisan bias audit — reviewed all 200+ Spanish translations: no bias found. Added explicit NONPARTISAN instruction blocks to all Claude API prompts (guide system/user, summary system/user). Instructions require factual/issue-based reasoning, prohibit partisan framing and loaded terms, and mandate equal analytical rigor for all candidates.
 
@@ -138,8 +138,8 @@ Verified working. Collapsed for reference.
 </details>
 
 <details>
-<summary>Tests (0 resolved)</summary>
+<summary>Tests (1 resolved)</summary>
 
-(none yet)
+- [x] Interview flow UI tests — 47 tests covering all 8 phases with happy-dom DOM simulation.
 
 </details>

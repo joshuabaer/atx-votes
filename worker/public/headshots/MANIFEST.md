@@ -72,10 +72,12 @@
 
 > **Note:** According to Ballotpedia, these candidates are running for U.S. House TX-10, not Land Commissioner.
 
-### State Board of Education Dist 5
+### State Representative District 48
 | Candidate | Found | Filename | Source URL |
 |-----------|-------|----------|------------|
-| Anthony Gupta | No | -- | Not found on Ballotpedia or other sources |
+| Anthony Gupta | Yes | anthony-gupta.jpg | https://www.lxmicapital.com/wp-content/uploads/2025/02/Tony-Gupta-1.jpg |
+
+> **Note:** Anthony Gupta was previously mislabeled as SBOE Dist 5. He is running for State Rep District 48 (Republican).
 
 ---
 
@@ -164,10 +166,9 @@
 ## Summary
 
 - **Total candidates listed:** 62
-- **Headshots found and downloaded:** 59
-- **Headshots not found:** 3
-  - Anthony Gupta (SBOE Dist 5 Republican) -- not found as a candidate on Ballotpedia
-  - Ofelia Maldonado Zapata (County Commissioner Pct 4) -- no photo available on Ballotpedia
-  - Gavino Fernandez Jr. (County Commissioner Pct 4) -- no photo available on Ballotpedia
+- **Headshots found and downloaded:** 60
+- **Headshots not found:** 2
+  - Ofelia Maldonado Zapata (County Commissioner Pct 4) -- no individual photo available online
+  - Gavino Fernandez Jr. (County Commissioner Pct 4) -- no individual photo available online
 
 All images sourced from Ballotpedia at 200x300 pixel resolution (JPEG or PNG format).
