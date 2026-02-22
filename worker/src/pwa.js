@@ -2109,7 +2109,7 @@ var APP_JS = [
   // Range input handler for reading level slider
   "document.getElementById('app').addEventListener('input',function(e){" +
     "var el=e.target;if(!el.dataset||!el.dataset.action)return;" +
-    "if(el.dataset.action==='set-reading-level'){S.readingLevel=parseInt(el.value)||1;save();render();if(S.summary&&S.guideComplete){regenerateSummary()}}" +
+    "if(el.dataset.action==='set-reading-level'){S.readingLevel=parseInt(el.value)||1;save();render()}" +
   "});",
 
   // Tab bar click handler (tabs live outside #app)

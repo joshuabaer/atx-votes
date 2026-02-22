@@ -16,8 +16,7 @@
 - [x] Ballot page overflows on iPhone — party switcher, "Good Match" badge, and Share button clip off the right edge on iPhone 17 Pro
 - [x] "Use my location" is broken — shows "Location not available" error
 - [x] Update researching loading screen main text based on tone 6 and 7 — show themed text when Swedish Chef or Cowboy tones are active
-- [x] Apply tone to AI personal summary on profile page — the summary at the top of the profile page should match the selected tone level
-- [ ] Location-specific voting resources — research and add more local resources per county/city (polling locations, early voting sites, voter registration links, local election office info) similar to the detailed Austin/Travis County resources we had before expanding statewide
+- [ ] Apply tone to AI personal summary on profile page — the summary at the top of the profile page should match the selected tone level
 - [x] Race card description text doesn't use full card width on desktop — text column is narrower than the card, wasting space next to the "Good Match" badge
 - [x] Integrate Polymarket predictions — show prediction market odds alongside race recommendations
 - [x] Geolocate button to auto-fill address — use browser geolocation to fill in street, city, and ZIP; hardcode state to TX
