@@ -693,6 +693,7 @@ var APP_JS = [
     "'Use My Location':'Usar mi ubicaci\\u00F3n'," +
     "'Locating...':'Localizando...'," +
     "'Location not available':'Ubicaci\\u00F3n no disponible'," +
+    "'Location not available. Check that Location Services is enabled in Settings.':'Ubicaci\\u00F3n no disponible. Verifica que los Servicios de ubicaci\\u00F3n est\\u00E9n activados en Configuraci\\u00F3n.'," +
     "'Location permission denied. Please allow location access and try again.':'Permiso de ubicaci\\u00F3n denegado. Por favor, permite el acceso a la ubicaci\\u00F3n e int\\u00E9ntalo de nuevo.'," +
     "'Location timed out. Please try again.':'La ubicaci\\u00F3n tard\\u00F3 demasiado. Por favor, int\\u00E9ntalo de nuevo.'," +
     "'Could not look up address. Try entering it manually.':'No se pudo buscar la direcci\\u00F3n. Intenta ingresarla manualmente.'," +
@@ -1401,7 +1402,7 @@ var APP_JS = [
   // ============ GEOLOCATE ============
   "function geolocate(){" +
     "S.geolocating=true;S.addressError=null;render();" +
-    "navigator.geolocation.getCurrentPosition(function(pos){" +
+    "function onPos(pos){" +
       "fetch('https://nominatim.openstreetmap.org/reverse?lat='+pos.coords.latitude+'&lon='+pos.coords.longitude+'&format=json&email=howdy@txvotes.app')" +
       ".then(function(r){if(!r.ok)throw new Error(r.status);return r.json()})" +
       ".then(function(d){" +
@@ -1413,11 +1414,18 @@ var APP_JS = [
         "S.address.zip=a.postcode?a.postcode.slice(0,5):'';" +
         "S.geolocating=false;render();" +
       "}).catch(function(e){S.geolocating=false;S.addressError=t('Could not look up address. Try entering it manually.');render()})" +
-    "},function(err){S.geolocating=false;" +
-      "if(err.code===1)S.addressError=t('Location permission denied. Please allow location access and try again.');" +
-      "else if(err.code===3)S.addressError=t('Location timed out. Please try again.');" +
-      "else S.addressError=t('Location not available');" +
-      "render()},{timeout:15000})" +
+    "}" +
+    "function onErr(err){" +
+      "if(err.code===1){S.geolocating=false;S.addressError=t('Location permission denied. Please allow location access and try again.');render()}" +
+      "else if(err.code===3){S.geolocating=false;S.addressError=t('Location timed out. Please try again.');render()}" +
+      "else{" +
+        // Retry once without high accuracy on POSITION_UNAVAILABLE
+        "navigator.geolocation.getCurrentPosition(onPos,function(){" +
+          "S.geolocating=false;S.addressError=t('Location not available. Check that Location Services is enabled in Settings.');render()" +
+        "},{enableHighAccuracy:false,timeout:10000,maximumAge:300000})" +
+      "}" +
+    "}" +
+    "navigator.geolocation.getCurrentPosition(onPos,onErr,{enableHighAccuracy:true,timeout:15000,maximumAge:60000})" +
   "}",
 
   // Building / Loading — tug-of-war animation (pure CSS, no timer needed)
