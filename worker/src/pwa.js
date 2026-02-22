@@ -2106,7 +2106,7 @@ var APP_JS = [
       "var repResult=null,demResult=null;" +
       "var msgs=demFirst?['Researching Democrats...','Researching Republicans...']:['Researching Republicans...','Researching Democrats...'];" +
       "var mi=0;S.loadPhase=3;S.loadMsg=msgs[0];render();" +
-      "var rotateTimer=setInterval(function(){mi=1-mi;S.loadPhase=mi===0?3:4;S.loadMsg=msgs[mi];render()},3000);" +
+      "var rotateTimer=setInterval(function(){mi=1-mi;S.loadPhase=Math.max(S.loadPhase,mi===0?3:4);S.loadMsg=msgs[mi];render()},3000);" +
       "var results=await Promise.allSettled([repP,demP]);" +
       "clearInterval(rotateTimer);" +
       "repResult=results[0].status==='fulfilled'?results[0].value:null;" +
