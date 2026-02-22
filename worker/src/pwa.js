@@ -19,7 +19,7 @@ export function handlePWA_SW() {
   });
 }
 
-export function handlePWA_Clear() {
+export function handlePWA_Clear(redirectUrl = '/app') {
   var html = '<!DOCTYPE html><html><head><meta charset="utf-8">' +
     '<meta name="viewport" content="width=device-width,initial-scale=1">' +
     '<title>Texas Votes — Updating</title>' +
@@ -43,7 +43,7 @@ export function handlePWA_Clear() {
         'var keys=await caches.keys();' +
         'for(var k of keys) await caches.delete(k);' +
         's.innerHTML="<span class=done>Updated!</span><br><br>Redirecting...";' +
-        'setTimeout(function(){location.href="/app"},1000);' +
+        'setTimeout(function(){location.href="' + redirectUrl + '"},1000);' +
       '}catch(e){' +
         's.textContent="Error: "+e.message+". Try manually clearing browser data.";' +
       '}' +

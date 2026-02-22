@@ -17,6 +17,7 @@
 - [x] "Use my location" is broken — shows "Location not available" error
 - [x] Update researching loading screen main text based on tone 6 and 7 — show themed text when Swedish Chef or Cowboy tones are active
 - [ ] Apply tone to AI personal summary on profile page — the summary at the top of the profile page should match the selected tone level
+- [ ] Put "Texas Votes (Cowboy)" in the title of the link for txvotes.app/cowboy and "(Swedish Chef)" for /chef
 - [x] Race card description text doesn't use full card width on desktop — text column is narrower than the card, wasting space next to the "Good Match" badge
 - [x] Integrate Polymarket predictions — show prediction market odds alongside race recommendations
 - [x] Geolocate button to auto-fill address — use browser geolocation to fill in street, city, and ZIP; hardcode state to TX
