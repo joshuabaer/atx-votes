@@ -146,7 +146,7 @@ var CSS = [
     "}}",
   "body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}",
   "#app{max-width:480px;margin:0 auto;padding:var(--pm)}",
-  ".card{background:var(--card);border-radius:var(--r);padding:var(--pm);box-shadow:0 2px 8px var(--shadow);margin-bottom:12px}",
+  ".card{background:var(--card);border-radius:var(--r);padding:var(--pm);box-shadow:0 2px 8px var(--shadow);margin-bottom:12px;overflow:hidden}",
   ".card-touch{cursor:pointer;transition:transform .15s}",
   ".card-touch:active{transform:scale(.98)}",
 
@@ -183,9 +183,9 @@ var CSS = [
   ".back-btn{display:inline-flex;align-items:center;gap:4px;font-size:15px;color:var(--blue);background:none;border:none;cursor:pointer;padding:8px 0;margin-bottom:8px;font-family:inherit;font-weight:600}",
 
   // Layout: body is flex column, #app scrolls, #tabs sticks to bottom
-  "html,body{height:100%;margin:0}",
+  "html,body{height:100%;margin:0;overflow-x:hidden}",
   "body{display:flex;flex-direction:column}",
-  "#app{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}",
+  "#app{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}",
 
   // Top nav (desktop)
   "#topnav{display:none}",
@@ -211,7 +211,7 @@ var CSS = [
 
   // Party switcher
   ".party-row{display:flex;gap:12px;margin-bottom:16px}",
-  ".party-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:var(--rs);font-size:17px;font-weight:700;cursor:pointer;border:1.5px solid;transition:all .2s;font-family:inherit;background:none}",
+  ".party-btn{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:var(--rs);font-size:17px;font-weight:700;cursor:pointer;border:1.5px solid;transition:all .2s;font-family:inherit;background:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}",
   ".party-rep{color:var(--rep);border-color:rgba(217,38,38,.3)}",
   ".party-rep.on{background:var(--rep);color:#fff;border-color:var(--rep)}",
   ".party-dem{color:var(--dem);border-color:rgba(38,77,191,.3)}",
