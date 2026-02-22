@@ -19,7 +19,9 @@
 - [ ] Make city/region support self-service — configuration-driven approach so any city/region can set up their own voting guide without code changes
 - [ ] Create versions for runoffs and general election — support multiple election cycles beyond the primary (detailed plan at docs/plans/plan_runoff_general_election.md, 4-phase timeline March-October)
 - [ ] LLM choice — let users choose which LLM and model to use for generating their ballot (Claude, GPT, Gemini, Grok)
-- [ ] URL flags for alternate LLMs — `?gemini`, `?grok`, and `?chatgpt` query params that tell the app to use that LLM for generating recommendations instead of Claude
+- [x] URL flags for alternate LLMs — `?gemini`, `?grok`, and `?chatgpt` query params that tell the app to use that LLM for generating recommendations instead of Claude. Routes to OpenAI gpt-4o, Gemini 2.5 Flash, or Grok 3. API keys already set from audit runner.
+- [x] Hidden LLM debug/comparison view — 5-tap version number in footer → `#/debug/compare`. Race-by-race and agreement summary views, cached in localStorage. Vanity URLs `/gemini`, `/grok`, `/chatgpt` with branded link previews. "Powered by" badge on loading screen and ballot header.
+- [x] Cowboy & Swedish Chef easter eggs — triple-tap "Reading Level" on profile unlocks Swedish Chef (tone 6), type "yeehaw" unlocks Cowboy (tone 7). Both trigger emoji burst, haptic feedback, and immediate guide recalculation.
 - [ ] Create new txvotes repo in GitHub — fresh copy of the code without all the dev history
 
 ### Technical Debt

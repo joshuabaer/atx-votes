@@ -373,6 +373,7 @@ var CSS = [
   "@keyframes pulse{50%{transform:scale(1.3)}}",
   "@keyframes confettiFall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}",
   ".confetti-piece{position:fixed;top:-10px;width:10px;height:10px;z-index:9999;animation:confettiFall 3s ease-in forwards;pointer-events:none}",
+  "@keyframes emojiFall{0%{transform:translateY(0) scale(0);opacity:1}20%{transform:translateY(-40vh) scale(1.2);opacity:1}100%{transform:translateY(-120vh) scale(0.6) rotate(360deg);opacity:0}}",
   ".share-prompt-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:10000;display:flex;align-items:center;justify-content:center;padding:24px;animation:fadeIn .3s ease}",
   ".share-prompt-card{background:var(--card);border-radius:16px;padding:28px 24px;max-width:340px;width:100%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.2)}",
   ".share-prompt-card h3{font-size:22px;margin:0 0 8px}",
@@ -515,6 +516,39 @@ var CSS = [
   // Skip link
   ".skip-link{position:absolute;top:-40px;left:0;background:var(--blue);color:#fff;padding:8px 16px;z-index:100;font-size:14px;font-weight:600;text-decoration:none;border-radius:0 0 var(--rs) 0}",
   ".skip-link:focus{top:0}",
+
+  // LLM Compare debug view
+  ".llm-compare-header{text-align:center;margin-bottom:20px}",
+  ".llm-compare-header h2{font-size:22px;font-weight:800;margin-bottom:4px}",
+  ".llm-compare-header p{font-size:13px;color:var(--text2)}",
+  ".llm-btn-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px}",
+  ".llm-btn{padding:12px 8px;border:2px solid var(--border2);border-radius:var(--rs);background:var(--card);cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--text);text-align:center;transition:border-color .15s,opacity .15s}",
+  ".llm-btn:active{opacity:.85}",
+  ".llm-btn.llm-loading{opacity:.6;pointer-events:none}",
+  ".llm-btn.llm-done{border-color:var(--ok)}",
+  ".llm-btn.llm-error{border-color:var(--bad)}",
+  ".llm-btn .llm-icon{font-size:24px;display:block;margin-bottom:4px}",
+  ".llm-btn .llm-status{font-size:11px;color:var(--text2);margin-top:2px}",
+  ".llm-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:16px;overflow-x:auto}",
+  ".llm-tab{flex:1;padding:10px 6px;text-align:center;font-size:13px;font-weight:600;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;color:var(--text2);white-space:nowrap;background:none;border-top:none;border-left:none;border-right:none;font-family:inherit}",
+  ".llm-tab.llm-tab-on{color:var(--blue);border-bottom-color:var(--blue)}",
+  ".llm-race-row{background:var(--card);border-radius:var(--rs);padding:12px;margin-bottom:8px;box-shadow:0 1px 4px var(--shadow)}",
+  ".llm-race-office{font-size:13px;color:var(--text2);margin-bottom:6px;font-weight:600}",
+  ".llm-rec-grid{display:grid;gap:8px}",
+  ".llm-rec-grid.cols-2{grid-template-columns:1fr 1fr}",
+  ".llm-rec-grid.cols-3{grid-template-columns:1fr 1fr 1fr}",
+  ".llm-rec-grid.cols-4{grid-template-columns:1fr 1fr 1fr 1fr}",
+  "@media(max-width:500px){.llm-rec-grid.cols-3,.llm-rec-grid.cols-4{grid-template-columns:1fr 1fr}}",
+  ".llm-rec-cell{padding:8px;border-radius:6px;border:1px solid var(--border);font-size:12px;line-height:1.4}",
+  ".llm-rec-cell.llm-disagree{border-color:var(--warn);background:rgba(230,140,26,.06)}",
+  ".llm-rec-cell .llm-cell-label{font-size:10px;text-transform:uppercase;font-weight:700;color:var(--text2);margin-bottom:3px;letter-spacing:.5px}",
+  ".llm-rec-cell .llm-cell-name{font-size:14px;font-weight:700;margin-bottom:2px}",
+  ".llm-rec-cell .llm-cell-reason{font-size:11px;color:var(--text2);line-height:1.35}",
+  ".llm-rec-cell .llm-cell-conf{margin-top:3px}",
+  ".llm-legend{display:flex;gap:16px;justify-content:center;font-size:12px;color:var(--text2);margin-bottom:16px;flex-wrap:wrap}",
+  ".llm-legend-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:-1px}",
+  ".llm-spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--border2);border-top-color:var(--blue);border-radius:50%;animation:spin .6s linear infinite}",
+  "@keyframes spin{to{transform:rotate(360deg)}}",
 ].join("\n");
 
 // MARK: - App JavaScript
@@ -1237,6 +1271,12 @@ var APP_JS = [
   // Shuffled arrays (set once per question display)
   "var shuffledSpectrum=null,shuffledDD={};",
 
+  // Easter egg unlocks (persisted in localStorage)
+  "var eeChef=!!localStorage.getItem('tx_votes_ee_chef');",
+  "var eeCowboy=!!localStorage.getItem('tx_votes_ee_cowboy');",
+  "var profileChefTaps=0;var profileChefTimer=null;",
+  "var yeehawBuf='';var yeehawTimer=null;",
+
   // ============ UTILS ============
   "function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;')}",
 
@@ -1393,6 +1433,7 @@ var APP_JS = [
     "}" +
     "if(h.indexOf('#/race/')===0){app.innerHTML=renderRaceDetail(parseInt(h.split('/')[2]));tabs.innerHTML=tabBar('#/ballot');tnav.innerHTML=topNav('#/ballot')}" +
     "else if(h==='#/cheatsheet'){app.innerHTML=renderCheatSheet();tabs.innerHTML='';tnav.innerHTML=topNav('#/ballot')}" +
+    "else if(h==='#/debug/compare'){app.innerHTML=renderLLMCompare();tabs.innerHTML='';tnav.innerHTML=topNav('#/ballot')}" +
     "else if(h==='#/profile'){app.innerHTML=renderProfile();tabs.innerHTML=tabBar('#/profile');tnav.innerHTML=topNav('#/profile')}" +
     "else if(h==='#/info'){app.innerHTML=renderVoteInfo();tabs.innerHTML=tabBar('#/info');tnav.innerHTML=topNav('#/info')}" +
     "else{app.innerHTML=renderBallot();tabs.innerHTML=tabBar('#/ballot');tnav.innerHTML=topNav('#/ballot')}" +
@@ -1461,9 +1502,14 @@ var APP_JS = [
     "{v:4,l:'I follow politics',d:'More depth, nuance, and political terminology'}" +
   "];",
   "var chefTaps=0;",
+  "var debugTaps=0;",
+  "var llmCompareResults={};",
+  "var llmCompareLoading={};",
+  "var llmCompareErrors={};",
+  "var llmCompareTab='table';",
   "function renderTone(){" +
     "var opts=TONE_OPTS.slice();" +
-    "if(chefTaps>=5||S.readingLevel>=6){" +
+    "if(chefTaps>=5||eeChef||eeCowboy||S.readingLevel>=6){" +
       "opts.push({v:6,l:'Bork bork bork!',d:'The Swedish Chef from the Muppets explains your ballot'});" +
       "opts.push({v:7,l:'Howdy, partner',d:'A Texas cowboy explains your ballot, y\\u2019all'})" +
     "}" +
@@ -1641,11 +1687,14 @@ var APP_JS = [
   "function startMascotTimer(){}",
   "function stopMascotTimer(){}",
 
+  "function llmLabel(){var m=window._llmOverride;if(!m)return'Claude';if(m==='chatgpt')return'ChatGPT';if(m==='gemini')return'Gemini';if(m==='grok')return'Grok';return m}",
+
   "function renderBuilding(){" +
     "var pct=Math.min(100,Math.round((S.loadPhase/5)*100));" +
     "var h='<div class=\"loading\">';" +
     "h+='<div class=\"tug-arena\"><span class=\"tug-left\">\u{1FACF}</span><span class=\"tug-star\">\u2B50</span><span class=\"tug-right\">\u{1F418}</span></div>';" +
     "h+='<h2>'+t('Building Your Guide')+'</h2>';" +
+    "if(window._llmOverride){h+='<div style=\"text-align:center;margin-bottom:8px\"><span class=\"badge\" style=\"font-size:12px\">Powered by '+esc(llmLabel())+'</span></div>'}" +
     "h+='<p style=\"min-height:24px\" class=\"loading-msg\" aria-live=\"polite\">'+t(S.loadMsg||'Finding your ballot...')+'</p>';" +
     "h+='<div class=\"progress\" style=\"max-width:240px;margin:20px auto 16px;height:6px\"><div class=\"progress-fill\" style=\"width:'+pct+'%;transition:width .5s ease\"></div></div>';" +
     "if(S.error){h+='<div class=\"error-box\" style=\"margin-top:16px\"><p>'+t(S.error)+'</p></div><button class=\"btn btn-primary mt-md\" data-action=\"retry\">'+t('Try Again')+'</button>'}" +
@@ -1679,6 +1728,7 @@ var APP_JS = [
     "h+='<div class=\"card\" style=\"margin-bottom:16px;text-align:center\">';" +
     "h+='<div style=\"font-size:18px;font-weight:800\"><span style=\"color:var(--red)\">&starf;</span> Texas '+esc(partyLabel)+' '+t('Primary')+'</div>';" +
     "h+='<div style=\"font-size:14px;color:var(--text2);margin-top:2px\">'+t('Tuesday, March 3, 2026')+'</div>';" +
+    "if(window._llmOverride){h+='<div style=\"margin-top:6px\"><span class=\"badge\" style=\"font-size:11px;background:var(--card);border:1px solid var(--border)\">Powered by '+esc(llmLabel())+'</span></div>'}" +
     "if(S.districts&&(S.districts.congressional||S.districts.stateSenate||S.districts.stateHouse)){" +
       "h+='<div style=\"display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px\">';" +
       "if(S.districts.congressional)h+='<span class=\"badge badge-blue\">CD-'+esc(S.districts.congressional)+'</span>';" +
@@ -1746,7 +1796,7 @@ var APP_JS = [
     "h+='<a href=\"/nonpartisan\" target=\"_blank\" style=\"color:var(--text2)\">'+t('Nonpartisan by Design')+'</a>';" +
     "h+=' &middot; ';" +
     "h+='<a href=\"/privacy\" target=\"_blank\" style=\"color:var(--text2)\">'+t('Privacy Policy')+'</a>';" +
-    "h+='<br><span style=\"margin-top:6px;display:inline-block\"><span style=\"color:var(--red)\">&starf;</span> Built in Texas &middot; <a href=\"mailto:howdy@txvotes.app\" style=\"color:var(--text2)\">howdy@txvotes.app</a> &middot; v'+APP_VERSION+'</span>';" +
+    "h+='<br><span style=\"margin-top:6px;display:inline-block\"><span style=\"color:var(--red)\">&starf;</span> Built in Texas &middot; <a href=\"mailto:howdy@txvotes.app\" style=\"color:var(--text2)\">howdy@txvotes.app</a> &middot; <span data-action=\"debug-tap\" style=\"cursor:default;-webkit-user-select:none;user-select:none\">v'+APP_VERSION+'</span></span>';" +
     "h+='</div>';" +
     "return h;" +
   "}",
@@ -2049,16 +2099,18 @@ var APP_JS = [
     "h+='<button class=\"party-btn'+(LANG==='en'?' lang-on':' lang-off')+'\" data-action=\"set-lang\" data-value=\"en\">English</button>';" +
     "h+='<button class=\"party-btn'+(LANG==='es'?' lang-on':' lang-off')+'\" data-action=\"set-lang\" data-value=\"es\">Espa\\u00F1ol</button>';" +
     "h+='</div></div>';" +
-    // Reading level slider
+    // Reading level slider (extends with easter eggs)
     "h+='<div class=\"card\" style=\"margin-top:16px\">';" +
-    "h+='<div style=\"font-size:15px;font-weight:600;margin-bottom:12px\">\u{1F4D6} '+t('Reading Level')+'</div>';" +
-    "var rlMap=[1,3,4];var rlNames={1:t('Simple'),3:t('Standard'),4:t('Detailed'),6:'Bork!',7:'Howdy!'};" +
+    "h+='<div data-action=\"chef-tap-profile\" style=\"font-size:15px;font-weight:600;margin-bottom:12px;cursor:default;-webkit-user-select:none;user-select:none\">\u{1F4D6} '+t('Reading Level')+'</div>';" +
+    "var rlMap=[1,3,4];if(eeChef)rlMap.push(6);if(eeCowboy)rlMap.push(7);" +
+    "var rlNames={1:t('Simple'),3:t('Standard'),4:t('Detailed'),6:'\\uD83E\\uDD7C Bork Bork Bork!',7:'\\uD83E\\uDD20 Howdy Partner!'};" +
     "var rlIdx=rlMap.indexOf(S.readingLevel);if(rlIdx<0)rlIdx=1;" +
-    "h+='<input type=\"range\" min=\"0\" max=\"2\" value=\"'+rlIdx+'\" data-action=\"set-reading-level\" style=\"width:100%;accent-color:var(--blue)\">';" +
+    "var rlMax=rlMap.length-1;" +
+    "h+='<input type=\"range\" min=\"0\" max=\"'+rlMax+'\" value=\"'+rlIdx+'\" data-action=\"set-reading-level\" style=\"width:100%;accent-color:'+(S.readingLevel===6?'#f59e0b':S.readingLevel===7?'#a16207':'var(--blue)')+'\">';" +
     "h+='<div style=\"display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-top:4px\">';" +
     "h+='<span>'+t('Simple')+'</span>';" +
-    "h+='<span style=\"font-weight:600;color:var(--text1)\">'+(rlNames[S.readingLevel]||t('Standard'))+'</span>';" +
-    "h+='<span>'+t('Detailed')+'</span>';" +
+    "h+='<span style=\"font-weight:600;color:'+(S.readingLevel>=6?'#a16207':'var(--text1)')+'\">'+(rlNames[S.readingLevel]||t('Standard'))+'</span>';" +
+    "h+='<span>'+(eeCowboy?'\\uD83E\\uDD20':(eeChef?'\\uD83E\\uDD7C':t('Detailed')))+'</span>';" +
     "h+='</div>';" +
     "if(S.guideComplete&&!S.isLoading){h+='<button class=\"btn btn-primary\" style=\"width:100%;margin-top:12px\" data-action=\"reprocess-guide\">'+t('Reprocess Guide')+'</button>'}" +
     "h+='</div>';" +
@@ -2072,6 +2124,212 @@ var APP_JS = [
     "h+='<a href=\"/nonpartisan\" target=\"_blank\" style=\"color:var(--text2)\">'+t('Nonpartisan by Design')+'</a>';" +
     "h+=' &middot; ';" +
     "h+='<a href=\"/privacy\" target=\"_blank\" style=\"color:var(--text2)\">'+t('Privacy Policy')+'</a>';" +
+    "h+='</div>';" +
+    "return h;" +
+  "}",
+
+  // ============ LLM COMPARE (DEBUG) ============
+  "var LLM_META={" +
+    "claude:{name:'Claude',icon:'\\u{1F7E3}',color:'#7B61FF'}," +
+    "chatgpt:{name:'ChatGPT',icon:'\\u{1F7E2}',color:'#10A37F'}," +
+    "gemini:{name:'Gemini',icon:'\\u{1F535}',color:'#4285F4'}," +
+    "grok:{name:'Grok',icon:'\\u26AB',color:'#1DA1F2'}" +
+  "};",
+
+  "function llmGenerate(llmKey){" +
+    "if(llmCompareLoading[llmKey])return;" +
+    "var profile=null;try{var p=localStorage.getItem('tx_votes_profile');if(p)profile=JSON.parse(p)}catch(e){}" +
+    "if(!profile){llmCompareErrors[llmKey]='No profile found';render();return}" +
+    "llmCompareLoading[llmKey]=true;llmCompareErrors[llmKey]=null;render();" +
+    "var cFips=S.districts&&S.districts.countyFips?S.districts.countyFips:null;" +
+    "var parties=[];" +
+    "if(S.repBallot)parties.push('republican');" +
+    "if(S.demBallot)parties.push('democrat');" +
+    "if(!parties.length)parties=['republican','democrat'];" +
+    "var promises=parties.map(function(party){" +
+      "return fetch('/app/api/guide',{method:'POST',headers:{'Content-Type':'application/json'}," +
+        "body:JSON.stringify({party:party,profile:profile,districts:S.districts,lang:LANG,countyFips:cFips,readingLevel:S.readingLevel,llm:llmKey})" +
+      "}).then(function(r){return r.json()}).then(function(d){return{party:party,data:d}})" +
+    "});" +
+    "Promise.allSettled(promises).then(function(results){" +
+      "llmCompareLoading[llmKey]=false;" +
+      "var ballots={};" +
+      "for(var i=0;i<results.length;i++){" +
+        "if(results[i].status==='fulfilled'&&results[i].value.data.ballot){" +
+          "ballots[results[i].value.party]=results[i].value.data.ballot" +
+        "}" +
+      "}" +
+      "if(Object.keys(ballots).length===0){llmCompareErrors[llmKey]='Generation failed';render();return}" +
+      "llmCompareResults[llmKey]=ballots;" +
+      "try{localStorage.setItem('tx_votes_llm_compare_'+llmKey,JSON.stringify(ballots))}catch(e){}" +
+      "render()" +
+    "}).catch(function(err){" +
+      "llmCompareLoading[llmKey]=false;llmCompareErrors[llmKey]=err.message||'Request failed';render()" +
+    "})" +
+  "}",
+
+  "function renderLLMCompare(){" +
+    "var h='<button class=\"back-btn\" data-action=\"nav\" data-to=\"#/ballot\">&larr; Back to Ballot</button>';" +
+    "h+='<div class=\"llm-compare-header\">';" +
+    "h+='<h2>\\u{1F50D} LLM Comparison</h2>';" +
+    "h+='<p>Compare ballot recommendations across different AI models</p>';" +
+    "h+='</div>';" +
+    "var partyLabel=S.selectedParty==='democrat'?'Democratic':'Republican';" +
+    "h+='<div class=\"card\" style=\"text-align:center;margin-bottom:16px\">';" +
+    "h+='<div style=\"font-size:14px;color:var(--text2)\">Comparing '+partyLabel+' Primary ballots</div>';" +
+    "h+='</div>';" +
+    "var llmKeys=['claude','chatgpt','gemini','grok'];" +
+    "for(var li=0;li<llmKeys.length;li++){" +
+      "var lk=llmKeys[li];" +
+      "if(!llmCompareResults[lk]){" +
+        "try{var cached=localStorage.getItem('tx_votes_llm_compare_'+lk);if(cached)llmCompareResults[lk]=JSON.parse(cached)}catch(e){}" +
+      "}" +
+    "}" +
+    "if(!llmCompareResults.claude&&(S.repBallot||S.demBallot)){" +
+      "var cb={};if(S.repBallot)cb.republican=S.repBallot;if(S.demBallot)cb.democrat=S.demBallot;" +
+      "llmCompareResults.claude=cb" +
+    "}" +
+    "h+='<div class=\"llm-btn-grid\">';" +
+    "for(var i=0;i<llmKeys.length;i++){" +
+      "var key=llmKeys[i];var meta=LLM_META[key];" +
+      "var isDone=!!llmCompareResults[key];var isLoading=!!llmCompareLoading[key];var hasErr=!!llmCompareErrors[key];" +
+      "var cls='llm-btn'+(isDone?' llm-done':'')+(isLoading?' llm-loading':'')+(hasErr?' llm-error':'');" +
+      "h+='<button class=\"'+cls+'\" data-action=\"llm-generate\" data-llm=\"'+key+'\">';" +
+      "h+='<span class=\"llm-icon\">'+meta.icon+'</span>';" +
+      "h+=meta.name;" +
+      "if(isLoading){h+='<div class=\"llm-status\"><span class=\"llm-spinner\"></span> Generating...</div>'}" +
+      "else if(hasErr){h+='<div class=\"llm-status\" style=\"color:var(--bad)\">'+esc(llmCompareErrors[key])+'</div>'}" +
+      "else if(isDone){h+='<div class=\"llm-status\" style=\"color:var(--ok)\">\\u2713 Ready</div>'}" +
+      "else{h+='<div class=\"llm-status\">Tap to generate</div>'}" +
+      "h+='</button>'" +
+    "}" +
+    "h+='</div>';" +
+    "var readyLLMs=llmKeys.filter(function(k){return!!llmCompareResults[k]});" +
+    "if(readyLLMs.length<2){" +
+      "h+='<div class=\"card\" style=\"text-align:center;color:var(--text2);font-size:14px\">';" +
+      "h+='<p>Generate ballots with at least 2 LLMs to see the comparison table.</p>';" +
+      "h+='</div>';return h" +
+    "}" +
+    "h+='<div class=\"llm-tabs\">';" +
+    "h+='<button class=\"llm-tab'+(llmCompareTab==='table'?' llm-tab-on':'')+'\" data-action=\"llm-tab\" data-tab=\"table\">\\u{1F4CA} Race by Race</button>';" +
+    "h+='<button class=\"llm-tab'+(llmCompareTab==='summary'?' llm-tab-on':'')+'\" data-action=\"llm-tab\" data-tab=\"summary\">\\u{1F4CB} Agreement Summary</button>';" +
+    "h+='</div>';" +
+    "var currentBallot=S.selectedParty==='democrat'?S.demBallot:S.repBallot;" +
+    "if(!currentBallot){h+='<div class=\"card\"><p>No ballot for selected party.</p></div>';return h}" +
+    "var races=currentBallot.races.slice().sort(function(a,b){return sortOrder(a)-sortOrder(b)});" +
+    "var contested=races.filter(function(r){return r.candidates&&r.candidates.filter(function(c){return !c.withdrawn}).length>1});" +
+    "h+='<div class=\"llm-legend\">';" +
+    "for(var ri2=0;ri2<readyLLMs.length;ri2++){" +
+      "var rm=LLM_META[readyLLMs[ri2]];" +
+      "h+='<span><span class=\"llm-legend-dot\" style=\"background:'+rm.color+'\"></span>'+rm.name+'</span>'" +
+    "}" +
+    "h+='<span><span class=\"llm-legend-dot\" style=\"background:var(--warn)\"></span>Disagree</span>';" +
+    "h+='</div>';" +
+    "if(llmCompareTab==='summary'){" +
+      "var agree=0,disagree=0,total=contested.length;" +
+      "for(var si=0;si<contested.length;si++){" +
+        "var sr=contested[si];var sRecs=[];" +
+        "for(var sj=0;sj<readyLLMs.length;sj++){" +
+          "var sb=llmCompareResults[readyLLMs[sj]];" +
+          "var sBallot=sb&&sb[S.selectedParty];" +
+          "if(!sBallot)continue;" +
+          "var sRace=null;for(var sk=0;sk<sBallot.races.length;sk++){if(sBallot.races[sk].office===sr.office&&sBallot.races[sk].district===sr.district){sRace=sBallot.races[sk];break}}" +
+          "if(sRace&&sRace.recommendation)sRecs.push(sRace.recommendation.candidateName)" +
+        "}" +
+        "var allSame=sRecs.length>1&&sRecs.every(function(r){return r===sRecs[0]});" +
+        "if(allSame)agree++;else if(sRecs.length>1)disagree++" +
+      "}" +
+      "var pct=total>0?Math.round(agree/total*100):0;" +
+      "h+='<div class=\"card\" style=\"text-align:center;margin-bottom:16px\">';" +
+      "h+='<div style=\"font-size:48px;font-weight:800;color:var(--blue)\">'+pct+'%</div>';" +
+      "h+='<div style=\"font-size:15px;color:var(--text2)\">Agreement across '+readyLLMs.length+' LLMs</div>';" +
+      "h+='<div style=\"display:flex;gap:16px;justify-content:center;margin-top:12px;font-size:14px\">';" +
+      "h+='<span style=\"color:var(--ok)\">\\u2713 '+agree+' agree</span>';" +
+      "h+='<span style=\"color:var(--warn)\">\\u2717 '+disagree+' disagree</span>';" +
+      "h+='</div></div>';" +
+      "if(disagree>0){" +
+        "h+='<div class=\"section-head\">\\u26A0\\uFE0F Disagreements</div>';" +
+        "for(var di=0;di<contested.length;di++){" +
+          "var dr=contested[di];var dRecs={};" +
+          "for(var dj=0;dj<readyLLMs.length;dj++){" +
+            "var dBal=llmCompareResults[readyLLMs[dj]]&&llmCompareResults[readyLLMs[dj]][S.selectedParty];" +
+            "if(!dBal)continue;" +
+            "var dRace=null;for(var dk=0;dk<dBal.races.length;dk++){if(dBal.races[dk].office===dr.office&&dBal.races[dk].district===dr.district){dRace=dBal.races[dk];break}}" +
+            "if(dRace&&dRace.recommendation)dRecs[readyLLMs[dj]]=dRace.recommendation" +
+          "}" +
+          "var dNames=Object.values(dRecs).map(function(r){return r.candidateName});" +
+          "var allEq=dNames.length>1&&dNames.every(function(n){return n===dNames[0]});" +
+          "if(!allEq&&dNames.length>1){" +
+            "h+='<div class=\"llm-race-row\">';" +
+            "h+='<div class=\"llm-race-office\">'+esc(dr.office)+(dr.district?' \\u2014 '+esc(dr.district):'')+'</div>';" +
+            "var dCols=Math.min(readyLLMs.length,4);" +
+            "h+='<div class=\"llm-rec-grid cols-'+dCols+'\">';" +
+            "for(var dl=0;dl<readyLLMs.length;dl++){" +
+              "var dKey=readyLLMs[dl];var dMeta=LLM_META[dKey];var dRec=dRecs[dKey];" +
+              "h+='<div class=\"llm-rec-cell llm-disagree\">';" +
+              "h+='<div class=\"llm-cell-label\" style=\"color:'+dMeta.color+'\">'+dMeta.name+'</div>';" +
+              "if(dRec){" +
+                "h+='<div class=\"llm-cell-name\">'+esc(dRec.candidateName)+'</div>';" +
+                "h+='<div class=\"llm-cell-reason\">'+esc((dRec.reasoning||'').slice(0,120))+(dRec.reasoning&&dRec.reasoning.length>120?'...':'')+'</div>'" +
+              "}else{h+='<div class=\"llm-cell-name\" style=\"color:var(--text2)\">No data</div>'}" +
+              "h+='</div>'" +
+            "}" +
+            "h+='</div></div>'" +
+          "}" +
+        "}" +
+      "}" +
+      "if(agree>0){" +
+        "h+='<div class=\"section-head\">\\u2705 Agreements</div>';" +
+        "for(var ai2=0;ai2<contested.length;ai2++){" +
+          "var ar=contested[ai2];var aRecs={};" +
+          "for(var aj=0;aj<readyLLMs.length;aj++){" +
+            "var aBal=llmCompareResults[readyLLMs[aj]]&&llmCompareResults[readyLLMs[aj]][S.selectedParty];" +
+            "if(!aBal)continue;" +
+            "var aRace=null;for(var ak=0;ak<aBal.races.length;ak++){if(aBal.races[ak].office===ar.office&&aBal.races[ak].district===ar.district){aRace=aBal.races[ak];break}}" +
+            "if(aRace&&aRace.recommendation)aRecs[readyLLMs[aj]]=aRace.recommendation" +
+          "}" +
+          "var aNames=Object.values(aRecs).map(function(r){return r.candidateName});" +
+          "var aAllEq=aNames.length>1&&aNames.every(function(n){return n===aNames[0]});" +
+          "if(aAllEq&&aNames.length>1){" +
+            "h+='<div class=\"llm-race-row\">';" +
+            "h+='<div class=\"llm-race-office\">'+esc(ar.office)+(ar.district?' \\u2014 '+esc(ar.district):'')+'</div>';" +
+            "h+='<div style=\"font-size:15px;font-weight:700\">\\u2713 '+esc(aNames[0])+'</div>';" +
+            "h+='</div>'" +
+          "}" +
+        "}" +
+      "}" +
+    "}else{" +
+      "for(var ti=0;ti<contested.length;ti++){" +
+        "var tRace2=contested[ti];" +
+        "h+='<div class=\"llm-race-row\">';" +
+        "h+='<div class=\"llm-race-office\">'+esc(tRace2.office)+(tRace2.district?' \\u2014 '+esc(tRace2.district):'')+'</div>';" +
+        "var tRecs={};var tNames=[];" +
+        "for(var tj=0;tj<readyLLMs.length;tj++){" +
+          "var tBal=llmCompareResults[readyLLMs[tj]]&&llmCompareResults[readyLLMs[tj]][S.selectedParty];" +
+          "if(!tBal)continue;" +
+          "var tRace3=null;for(var tk=0;tk<tBal.races.length;tk++){if(tBal.races[tk].office===tRace2.office&&tBal.races[tk].district===tRace2.district){tRace3=tBal.races[tk];break}}" +
+          "if(tRace3&&tRace3.recommendation){tRecs[readyLLMs[tj]]=tRace3.recommendation;tNames.push(tRace3.recommendation.candidateName)}" +
+        "}" +
+        "var tAllSame=tNames.length>1&&tNames.every(function(n){return n===tNames[0]});" +
+        "var tCols=Math.min(readyLLMs.length,4);" +
+        "h+='<div class=\"llm-rec-grid cols-'+tCols+'\">';" +
+        "for(var tl=0;tl<readyLLMs.length;tl++){" +
+          "var tKey=readyLLMs[tl];var tMeta=LLM_META[tKey];var tRec=tRecs[tKey];" +
+          "var tDisagree=!tAllSame&&tNames.length>1?' llm-disagree':'';" +
+          "h+='<div class=\"llm-rec-cell'+tDisagree+'\">';" +
+          "h+='<div class=\"llm-cell-label\" style=\"color:'+tMeta.color+'\">'+tMeta.name+'</div>';" +
+          "if(tRec){" +
+            "h+='<div class=\"llm-cell-name\">'+esc(tRec.candidateName)+'</div>';" +
+            "if(tRec.confidence){h+='<div class=\"llm-cell-conf\">'+confBadge(tRec.confidence)+'</div>'}" +
+            "h+='<div class=\"llm-cell-reason\">'+esc((tRec.reasoning||'').slice(0,100))+(tRec.reasoning&&tRec.reasoning.length>100?'...':'')+'</div>'" +
+          "}else{h+='<div class=\"llm-cell-name\" style=\"color:var(--text2)\">No data</div>'}" +
+          "h+='</div>'" +
+        "}" +
+        "h+='</div></div>'" +
+      "}" +
+    "}" +
+    "h+='<div style=\"text-align:center;padding:24px 0\">';" +
+    "h+='<button class=\"btn btn-secondary\" style=\"max-width:280px;margin:0 auto\" data-action=\"llm-clear\">Clear All Comparisons</button>';" +
     "h+='</div>';" +
     "return h;" +
   "}",
@@ -2302,6 +2560,17 @@ var APP_JS = [
       "if(idx<S[key].length-1){var tmp=S[key][idx+1];S[key][idx+1]=S[key][idx];S[key][idx]=tmp;render()}" +
     "}" +
     "else if(action==='chef-tap'){chefTaps++;if(chefTaps===5)render()}" +
+    "else if(action==='chef-tap-profile'){" +
+      "clearTimeout(profileChefTimer);" +
+      "profileChefTaps++;" +
+      "profileChefTimer=setTimeout(function(){profileChefTaps=0},800);" +
+      "if(profileChefTaps>=3&&!eeChef){" +
+        "eeChef=true;localStorage.setItem('tx_votes_ee_chef','1');" +
+        "profileChefTaps=0;emojiBurst('\\uD83E\\uDD7C',25);" +
+        "if(navigator.vibrate)navigator.vibrate([50,30,50,30,100]);" +
+        "S.readingLevel=6;save();reprocessGuide()" +
+      "}" +
+    "}" +
     "else if(action==='select-tone'){S.readingLevel=parseInt(el.dataset.value)||1;trk('tone_select',{d1:''+S.readingLevel,v:S.readingLevel});render()}" +
     "else if(action==='select-spectrum'){S.spectrum=el.dataset.value;render()}" +
     "else if(action==='select-dd'){" +
@@ -2345,12 +2614,20 @@ var APP_JS = [
     "else if(action==='share-race'){trk('share_race',{d1:el.dataset.idx});shareRace(parseInt(el.dataset.idx))}" +
     "else if(action==='regen-summary'){regenerateSummary()}" +
     "else if(action==='reprocess-guide'){reprocessGuide()}" +
+    "else if(action==='debug-tap'){debugTaps++;if(debugTaps>=5){debugTaps=0;location.hash='#/debug/compare'}}" +
+    "else if(action==='llm-generate'){llmGenerate(el.dataset.llm)}" +
+    "else if(action==='llm-tab'){llmCompareTab=el.dataset.tab;render()}" +
+    "else if(action==='llm-clear'){" +
+      "llmCompareResults={};llmCompareErrors={};llmCompareLoading={};" +
+      "try{var lks=['claude','chatgpt','gemini','grok'];for(var lci=0;lci<lks.length;lci++)localStorage.removeItem('tx_votes_llm_compare_'+lks[lci])}catch(e){}" +
+      "render()" +
+    "}" +
   "});",
 
   // Range input handler for reading level slider
   "document.getElementById('app').addEventListener('input',function(e){" +
     "var el=e.target;if(!el.dataset||!el.dataset.action)return;" +
-    "if(el.dataset.action==='set-reading-level'){var rlMap=[1,3,4];S.readingLevel=rlMap[parseInt(el.value)]||3;save();render()}" +
+    "if(el.dataset.action==='set-reading-level'){var rlMap=[1,3,4];if(eeChef)rlMap.push(6);if(eeCowboy)rlMap.push(7);S.readingLevel=rlMap[parseInt(el.value)]||3;save();render()}" +
   "});",
 
   // Tab bar click handler (tabs live outside #app)
@@ -2368,6 +2645,22 @@ var APP_JS = [
     "if(e.key==='Enter'||e.key===' '){" +
       "var el=e.target.closest('[data-action]');if(!el||el.tagName==='BUTTON'||el.tagName==='A'||el.tagName==='INPUT')return;" +
       "e.preventDefault();el.click()" +
+    "}" +
+  "});",
+
+  // Easter egg: type 'yeehaw' on profile page to unlock Texas Cowboy (tone 7)
+  "document.addEventListener('keydown',function(e){" +
+    "if(eeCowboy)return;" +
+    "if(location.hash!=='#/profile')return;" +
+    "if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;" +
+    "clearTimeout(yeehawTimer);" +
+    "yeehawBuf+=e.key.toLowerCase();" +
+    "yeehawTimer=setTimeout(function(){yeehawBuf=''},2000);" +
+    "if(yeehawBuf.indexOf('yeehaw')!==-1){" +
+      "eeCowboy=true;localStorage.setItem('tx_votes_ee_cowboy','1');" +
+      "yeehawBuf='';emojiBurst('\\uD83E\\uDD20',25);" +
+      "if(navigator.vibrate)navigator.vibrate([100,50,100,50,200]);" +
+      "S.readingLevel=7;save();reprocessGuide()" +
     "}" +
   "});",
 
@@ -2454,10 +2747,11 @@ var APP_JS = [
       // Step 3: Generate both ballots in parallel
       "S.loadPhase=2;S.loadMsg=lm('Researching candidates...');render();" +
       "var cFips=S.districts&&S.districts.countyFips?S.districts.countyFips:null;" +
+      "var _llm=window._llmOverride||null;" +
       "var repP=fetch('/app/api/guide',{method:'POST',headers:{'Content-Type':'application/json'}," +
-        "body:JSON.stringify({party:'republican',profile:profile,districts:S.districts,lang:LANG,countyFips:cFips,readingLevel:S.readingLevel})}).then(function(r){return r.json()});" +
+        "body:JSON.stringify({party:'republican',profile:profile,districts:S.districts,lang:LANG,countyFips:cFips,readingLevel:S.readingLevel,llm:_llm})}).then(function(r){return r.json()});" +
       "var demP=fetch('/app/api/guide',{method:'POST',headers:{'Content-Type':'application/json'}," +
-        "body:JSON.stringify({party:'democrat',profile:profile,districts:S.districts,lang:LANG,countyFips:cFips,readingLevel:S.readingLevel})}).then(function(r){return r.json()});" +
+        "body:JSON.stringify({party:'democrat',profile:profile,districts:S.districts,lang:LANG,countyFips:cFips,readingLevel:S.readingLevel,llm:_llm})}).then(function(r){return r.json()});" +
       // Rotate messages while both requests are in-flight
       "var repResult=null,demResult=null;" +
       "var msgs=demFirst?[lm('Researching Democrats...'),lm('Researching Republicans...')]:['Researching Republicans...','Researching Democrats...'].map(lm);" +
@@ -2507,7 +2801,7 @@ var APP_JS = [
   "function regenerateSummary(){" +
     "S.regenerating=true;render();" +
     "var profile={topIssues:S.issues,politicalSpectrum:S.spectrum,candidateQualities:S.qualities,policyViews:S.policyViews,freeform:S.freeform||null};" +
-    "fetch('/app/api/summary',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({profile:profile,lang:LANG,readingLevel:S.readingLevel})})" +
+    "fetch('/app/api/summary',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({profile:profile,lang:LANG,readingLevel:S.readingLevel,llm:window._llmOverride||null})})" +
     ".then(function(r){return r.json()})" +
     ".then(function(d){" +
       "if(d.error)throw new Error(d.error);" +
@@ -2644,6 +2938,17 @@ var APP_JS = [
     "}" +
   "}",
 
+  // Emoji burst animation for easter egg unlocks
+  "function emojiBurst(emoji,count){" +
+    "for(var i=0;i<(count||20);i++){" +
+      "var el=document.createElement('div');" +
+      "el.textContent=emoji;" +
+      "el.style.cssText='position:fixed;font-size:'+(20+Math.random()*24)+'px;left:'+Math.random()*100+'vw;top:100vh;z-index:99999;pointer-events:none;animation:emojiFall '+(2+Math.random()*2)+'s ease-out '+(Math.random()*0.5)+'s forwards;';" +
+      "document.body.appendChild(el);" +
+      "setTimeout(function(){el.remove()},5000)" +
+    "}" +
+  "}",
+
   // ============ SHARE PROMPT (post-vote) ============
   "function showSharePrompt(){" +
     "if(localStorage.getItem('tx_votes_sharePromptSeen'))return;" +
@@ -2720,6 +3025,7 @@ var APP_JS = [
   // ============ INIT ============
   "load();",
   "(function(){var m=location.search.match(/tone=(\\d+)/);if(m&&!S.guideComplete){S.readingLevel=parseInt(m[1]);if(S.phase<2)S.phase=2;save()}}());",
+  "(function(){var s=location.search.toLowerCase();var llms=['gemini','grok','chatgpt'];for(var i=0;i<llms.length;i++){if(s.indexOf(llms[i])!==-1){window._llmOverride=llms[i];break}}}());",
   "if(location.search)history.replaceState(null,'',location.pathname+location.hash);",
   "if(!S.guideComplete&&location.hash&&location.hash!=='#/')location.hash='#/';",
   "render();",

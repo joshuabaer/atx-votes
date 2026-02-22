@@ -2408,6 +2408,16 @@ export default {
       if (url.pathname === "/chef") {
         return handlePWA_Clear("/app?tone=6", "Texas Votes (Swedish Chef)");
       }
+      // Vanity LLM entry points
+      if (url.pathname === "/gemini") {
+        return handlePWA_Clear("/app?gemini", "Texas Votes (Powered by Gemini)");
+      }
+      if (url.pathname === "/grok") {
+        return handlePWA_Clear("/app?grok", "Texas Votes (Powered by Grok)");
+      }
+      if (url.pathname === "/chatgpt") {
+        return handlePWA_Clear("/app?chatgpt", "Texas Votes (Powered by ChatGPT)");
+      }
       // PWA routes (no auth)
       if (url.pathname === "/app/clear" || url.pathname === "/clear") {
         return handlePWA_Clear();

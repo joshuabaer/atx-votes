@@ -29,7 +29,7 @@ function json(data, status = 200) {
 
 export async function handlePWA_Guide(request, env) {
   try {
-    const { party, profile, districts, lang, countyFips, readingLevel } = await request.json();
+    const { party, profile, districts, lang, countyFips, readingLevel, llm } = await request.json();
 
     if (!party || !["republican", "democrat"].includes(party)) {
       return json({ error: "party required (republican|democrat)" }, 400);
@@ -77,8 +77,8 @@ export async function handlePWA_Guide(request, env) {
     var ballotDesc = buildCondensedBallotDescription(ballot);
     var userPrompt = buildUserPrompt(profile, ballotDesc, ballot, party, lang, readingLevel);
 
-    // Call Claude with model fallback
-    var responseText = await callClaude(env, SYSTEM_PROMPT, userPrompt, lang);
+    // Call LLM (Claude by default, or alternative if specified)
+    var responseText = await callLLM(env, SYSTEM_PROMPT, userPrompt, lang, llm);
 
     // Parse and merge
     var guideResponse = parseResponse(responseText);
@@ -87,6 +87,7 @@ export async function handlePWA_Guide(request, env) {
     return json({
       ballot: mergedBallot,
       profileSummary: guideResponse.profileSummary,
+      llm: llm || "claude",
     });
   } catch (err) {
     console.error("Guide generation error:", err);
@@ -103,7 +104,7 @@ const SUMMARY_SYSTEM =
 
 export async function handlePWA_Summary(request, env) {
   try {
-    const { profile, lang, readingLevel } = await request.json();
+    const { profile, lang, readingLevel, llm } = await request.json();
     if (!profile) {
       return json({ error: "profile required" }, 400);
     }
@@ -138,7 +139,7 @@ export async function handlePWA_Summary(request, env) {
       (profile.freeform ? "- Additional context: " + profile.freeform + "\n" : "") +
       "\nReturn ONLY the summary text \u2014 no JSON, no quotes, no labels.";
 
-    var text = await callClaude(env, SUMMARY_SYSTEM, userMessage);
+    var text = await callLLM(env, SUMMARY_SYSTEM, userMessage, lang, llm);
     return json({ summary: text.trim() });
   } catch (err) {
     console.error("Summary generation error:", err);
@@ -418,6 +419,135 @@ async function callClaude(env, system, userMessage, lang) {
   throw new Error("All models failed");
 }
 
+// MARK: - OpenAI-compatible API Call (ChatGPT, Grok)
+
+async function callOpenAICompatible(env, system, userMessage, lang, endpoint, apiKey, model) {
+  var maxTokens = lang === "es" ? 8192 : 4096;
+  for (var attempt = 0; attempt <= 1; attempt++) {
+    var res = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + apiKey,
+      },
+      body: JSON.stringify({
+        model: model,
+        max_tokens: maxTokens,
+        messages: [
+          { role: "system", content: system },
+          { role: "user", content: userMessage },
+        ],
+      }),
+    });
+
+    if (res.status === 200) {
+      var data = await res.json();
+      var text = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+      if (!text) throw new Error("No text in " + model + " API response");
+      return text;
+    }
+
+    if (res.status === 429) {
+      if (attempt === 0) {
+        var retryAfter = parseInt(res.headers.get("retry-after") || "0", 10);
+        var wait = Math.max(retryAfter, 5) * 1000;
+        await new Promise(function (r) { setTimeout(r, wait); });
+        continue;
+      }
+      throw new Error(model + " rate limited — please try again in a minute");
+    }
+
+    if (res.status >= 500) {
+      if (attempt === 0) {
+        await new Promise(function (r) { setTimeout(r, 2000); });
+        continue;
+      }
+      throw new Error(model + " server error");
+    }
+
+    var body = await res.text();
+    throw new Error(model + " API error " + res.status + ": " + body.slice(0, 200));
+  }
+  throw new Error(model + " call failed");
+}
+
+// MARK: - Gemini API Call
+
+async function callGemini(env, system, userMessage, lang) {
+  var maxTokens = lang === "es" ? 8192 : 4096;
+  var endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + env.GEMINI_API_KEY;
+
+  for (var attempt = 0; attempt <= 1; attempt++) {
+    var res = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: system }] },
+        contents: [{ parts: [{ text: userMessage }] }],
+        generationConfig: { maxOutputTokens: maxTokens },
+      }),
+    });
+
+    if (res.status === 200) {
+      var data = await res.json();
+      var text = data.candidates && data.candidates[0] && data.candidates[0].content &&
+        data.candidates[0].content.parts && data.candidates[0].content.parts[0] &&
+        data.candidates[0].content.parts[0].text;
+      if (!text) throw new Error("No text in Gemini API response");
+      return text;
+    }
+
+    if (res.status === 429) {
+      if (attempt === 0) {
+        await new Promise(function (r) { setTimeout(r, 5000); });
+        continue;
+      }
+      throw new Error("Gemini rate limited — please try again in a minute");
+    }
+
+    if (res.status >= 500) {
+      if (attempt === 0) {
+        await new Promise(function (r) { setTimeout(r, 2000); });
+        continue;
+      }
+      throw new Error("Gemini server error");
+    }
+
+    var body = await res.text();
+    throw new Error("Gemini API error " + res.status + ": " + body.slice(0, 200));
+  }
+  throw new Error("Gemini call failed");
+}
+
+// MARK: - LLM Router
+
+var VALID_LLMS = ["claude", "chatgpt", "gemini", "grok"];
+
+async function callLLM(env, system, userMessage, lang, llm) {
+  if (!llm || llm === "claude") {
+    return callClaude(env, system, userMessage, lang);
+  }
+
+  if (llm === "chatgpt") {
+    if (!env.OPENAI_API_KEY) throw new Error("OpenAI API key not configured");
+    return callOpenAICompatible(env, system, userMessage, lang,
+      "https://api.openai.com/v1/chat/completions", env.OPENAI_API_KEY, "gpt-4o");
+  }
+
+  if (llm === "grok") {
+    if (!env.GROK_API_KEY) throw new Error("Grok API key not configured");
+    return callOpenAICompatible(env, system, userMessage, lang,
+      "https://api.x.ai/v1/chat/completions", env.GROK_API_KEY, "grok-3");
+  }
+
+  if (llm === "gemini") {
+    if (!env.GEMINI_API_KEY) throw new Error("Gemini API key not configured");
+    return callGemini(env, system, userMessage, lang);
+  }
+
+  throw new Error("Unknown LLM: " + llm + ". Valid options: " + VALID_LLMS.join(", "));
+}
+
 // MARK: - Parse Response
 
 function parseResponse(text) {
@@ -521,4 +651,4 @@ function mergeRecommendations(guideResponse, ballot, lang) {
   return merged;
 }
 
-export { sortOrder, parseResponse, filterBallotToDistricts, buildUserPrompt, mergeRecommendations, buildCondensedBallotDescription };
+export { sortOrder, parseResponse, filterBallotToDistricts, buildUserPrompt, mergeRecommendations, buildCondensedBallotDescription, callLLM, VALID_LLMS };
