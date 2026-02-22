@@ -2,6 +2,7 @@ import { runDailyUpdate } from "./updater.js";
 import { handlePWA, handlePWA_SW, handlePWA_Manifest, handlePWA_Clear } from "./pwa.js";
 import { handlePWA_Guide, handlePWA_Summary } from "./pwa-guide.js";
 import { seedFullCounty, seedCountyInfo, seedCountyBallot, seedPrecinctMap } from "./county-seeder.js";
+import { runAudit } from "./audit-runner.js";
 
 // Shared CSS for static pages — matches app design tokens from pwa.js
 const PAGE_CSS = `<meta name="theme-color" content="rgb(33,89,143)" media="(prefers-color-scheme:light)"><meta name="theme-color" content="rgb(28,28,31)" media="(prefers-color-scheme:dark)">
@@ -434,7 +435,99 @@ function handleNonpartisan() {
   });
 }
 
-function handleAuditPage() {
+async function handleAuditPage(env) {
+  // Load audit results from KV
+  const [summaryRaw, chatgptRaw, geminiRaw, grokRaw] = await Promise.all([
+    env.ELECTION_DATA.get("audit:summary"),
+    env.ELECTION_DATA.get("audit:result:chatgpt"),
+    env.ELECTION_DATA.get("audit:result:gemini"),
+    env.ELECTION_DATA.get("audit:result:grok"),
+  ]);
+
+  const providerResults = {
+    chatgpt: chatgptRaw ? JSON.parse(chatgptRaw) : null,
+    gemini: geminiRaw ? JSON.parse(geminiRaw) : null,
+    grok: grokRaw ? JSON.parse(grokRaw) : null,
+  };
+
+  const summary = summaryRaw ? JSON.parse(summaryRaw) : null;
+
+  // Build audit cards HTML dynamically
+  function renderAuditCard(result, fallbackName) {
+    const displayName = result?.displayName || fallbackName;
+    const model = result?.model ? ` (${result.model})` : "";
+
+    if (!result) {
+      return `<div class="audit-card">
+      <h3>${displayName} Review</h3>
+      <span class="audit-score audit-pending">Pending</span>
+      <p style="margin-top:0.5rem;font-size:0.9rem;color:var(--text2)">Audit not yet run. Results will be published here when complete.</p>
+    </div>`;
+    }
+
+    if (result.status === "success" && result.scores) {
+      const score = result.scores.overallScore;
+      const dims = result.scores.dimensions || {};
+      const dimLabels = {
+        partisanBias: "Partisan Bias",
+        factualAccuracy: "Factual Accuracy",
+        fairnessOfFraming: "Fairness of Framing",
+        balanceOfProsCons: "Balance of Pros/Cons",
+        transparency: "Transparency",
+      };
+      let dimRows = "";
+      for (const [key, label] of Object.entries(dimLabels)) {
+        if (key in dims) {
+          dimRows += `<tr><td style="padding:0.2rem 0.5rem 0.2rem 0;font-size:0.85rem">${label}</td><td style="padding:0.2rem 0;font-size:0.85rem;font-weight:600;text-align:right">${dims[key]} / 10</td></tr>`;
+        }
+      }
+      const dimTable = dimRows ? `<table style="width:100%;margin:0.75rem 0;border-collapse:collapse">${dimRows}</table>` : "";
+      const summary = result.scores.topStrength ? `<p style="margin-top:0.5rem;font-size:0.85rem;color:var(--text2)"><strong>Strength:</strong> ${escapeHtml(result.scores.topStrength)}</p>` : "";
+      const weakness = result.scores.topWeakness ? `<p style="font-size:0.85rem;color:var(--text2)"><strong>Weakness:</strong> ${escapeHtml(result.scores.topWeakness)}</p>` : "";
+      const timestamp = result.timestamp ? `<p style="font-size:0.8rem;color:var(--text2);margin-top:0.5rem">Last run: ${new Date(result.timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}${model}</p>` : "";
+      const fullReport = result.responseText ? `<details style="margin-top:0.75rem"><summary style="font-size:0.85rem">View Full Report</summary><div class="prompt-box" style="margin-top:0.5rem">${escapeHtml(result.responseText)}</div></details>` : "";
+
+      return `<div class="audit-card">
+      <h3>${displayName} Review</h3>
+      <span class="audit-score">${score} / 10</span>
+      ${dimTable}${summary}${weakness}${timestamp}${fullReport}
+    </div>`;
+    }
+
+    if (result.status === "api_error") {
+      return `<div class="audit-card">
+      <h3>${displayName} Review</h3>
+      <span class="audit-score audit-pending">Error</span>
+      <p style="margin-top:0.5rem;font-size:0.9rem;color:var(--text2)">API error: ${escapeHtml(result.error || "Unknown error")}${model}</p>
+    </div>`;
+    }
+
+    if (result.status === "parse_failed") {
+      const fullReport = result.responseText ? `<details style="margin-top:0.75rem"><summary style="font-size:0.85rem">View Raw Response</summary><div class="prompt-box" style="margin-top:0.5rem">${escapeHtml(result.responseText)}</div></details>` : "";
+      return `<div class="audit-card">
+      <h3>${displayName} Review</h3>
+      <span class="audit-score audit-pending">Score Parse Failed</span>
+      <p style="margin-top:0.5rem;font-size:0.9rem;color:var(--text2)">The AI returned a report but scores could not be extracted automatically.${model}</p>
+      ${fullReport}
+    </div>`;
+    }
+
+    // Fallback for unknown status
+    return `<div class="audit-card">
+      <h3>${displayName} Review</h3>
+      <span class="audit-score audit-pending">Pending</span>
+      <p style="margin-top:0.5rem;font-size:0.9rem;color:var(--text2)">Status: ${escapeHtml(result.status || "unknown")}</p>
+    </div>`;
+  }
+
+  const auditCardsHtml = renderAuditCard(providerResults.chatgpt, "ChatGPT (OpenAI)")
+    + renderAuditCard(providerResults.gemini, "Gemini (Google)")
+    + renderAuditCard(providerResults.grok, "Grok (xAI)");
+
+  const lastRunHtml = summary?.completedAt
+    ? `<p class="note" style="margin-bottom:1rem">Last automated audit: ${new Date(summary.completedAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}${summary.averageScore ? ` &middot; Average score: ${summary.averageScore} / 10` : ""}</p>`
+    : "";
+
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -618,25 +711,10 @@ Return ONLY this JSON:
     <h2>Independent AI Audit Reports</h2>
     <p>We submitted our complete methodology export (the same JSON available at <a href="/api/audit/export">/api/audit/export</a>) to three independent AI systems and asked each to evaluate our process for partisan bias, factual accuracy, fairness of framing, balance of analysis, and transparency.</p>
 
-    <div class="audit-card">
-      <h3>ChatGPT (OpenAI) Review</h3>
-      <span class="audit-score">6 / 10</span>
-      <p style="margin-top:0.5rem;font-size:0.9rem;color:var(--text2)">Solid foundation, but needs stronger evidence trails and bias testing. Highest-priority gap: no per-claim source citations.</p>
-    </div>
+    ${lastRunHtml}
+    ${auditCardsHtml}
 
-    <div class="audit-card">
-      <h3>Gemini (Google) Review</h3>
-      <span class="audit-score">8.6 / 10</span>
-      <p style="margin-top:0.5rem;font-size:0.9rem;color:var(--text2)">A gold-standard model for nonpartisan AI voting tools. Technically rigorous with strong data validation and exceptional transparency.</p>
-    </div>
-
-    <div class="audit-card">
-      <h3>Grok (xAI) Review</h3>
-      <span class="audit-score audit-pending">Pending</span>
-      <p style="margin-top:0.5rem;font-size:0.9rem;color:var(--text2)">Audit submitted. Results will be published here when complete.</p>
-    </div>
-
-    <p class="note">Each AI was given the same prompt asking for a structured evaluation across five dimensions: partisan bias, factual accuracy, fairness of framing, balance of pros/cons, and transparency of methodology. The full audit prompt template is available in our <a href="https://github.com/txvotes">source repository</a>.</p>
+    <p class="note">Each AI was given the same prompt asking for a structured evaluation across five dimensions: partisan bias, factual accuracy, fairness of framing, balance of pros/cons, and transparency of methodology. Scores are extracted automatically from structured JSON in each AI's response. The full audit prompt template is available in our <a href="https://github.com/txvotes">source repository</a>. You can also <a href="/api/audit/results">view the raw results as JSON</a>.</p>
 
     <h2>Why Three Different AIs?</h2>
     <p>Texas Votes uses Claude (by Anthropic) to generate recommendations. By asking three <em>competing</em> AI systems — ChatGPT, Gemini, and Grok — to review our methodology, we get genuinely independent assessments. Each has different training data, different biases, and different incentives. If all three find our process fair, that's meaningful. If any identifies bias, we'll address it and publish the fix.</p>
@@ -654,8 +732,8 @@ Return ONLY this JSON:
   });
 }
 
-function handleAuditExport() {
-  const exportData = {
+function buildAuditExportData() {
+  return {
     _meta: {
       name: "Texas Votes AI Methodology Export",
       version: "1.0",
@@ -1088,7 +1166,10 @@ function handleAuditExport() {
       ],
     },
   };
+}
 
+function handleAuditExport() {
+  const exportData = buildAuditExportData();
   return new Response(JSON.stringify(exportData, null, 2), {
     status: 200,
     headers: {
@@ -2275,10 +2356,20 @@ export default {
         return handleNonpartisan();
       }
       if (url.pathname === "/audit") {
-        return handleAuditPage();
+        return handleAuditPage(env);
       }
       if (url.pathname === "/api/audit/export") {
         return handleAuditExport();
+      }
+      if (url.pathname === "/api/audit/results") {
+        const raw = await env.ELECTION_DATA.get("audit:summary");
+        return jsonResponse(raw ? JSON.parse(raw) : { providers: {}, averageScore: null });
+      }
+      if (url.pathname.startsWith("/api/audit/results/")) {
+        const provider = url.pathname.slice("/api/audit/results/".length).replace(/\/+$/, "");
+        const raw = await env.ELECTION_DATA.get(`audit:result:${provider}`);
+        if (!raw) return jsonResponse({ error: "No results for provider: " + provider }, 404);
+        return jsonResponse(JSON.parse(raw));
       }
       if (url.pathname === "/open-source") {
         return handleOpenSource();
@@ -2371,6 +2462,23 @@ export default {
     }
     if (url.pathname === "/app/api/districts") {
       return handleDistricts(request, env);
+    }
+
+    // POST: /api/audit/run — trigger automated AI audit
+    if (url.pathname === "/api/audit/run") {
+      const auth = request.headers.get("Authorization");
+      if (!auth || auth !== `Bearer ${env.ADMIN_SECRET}`) {
+        return new Response("Unauthorized", { status: 401 });
+      }
+      const body = await request.json().catch(() => ({}));
+      const exportData = buildAuditExportData();
+      const result = await runAudit(env, {
+        providers: body.providers,
+        force: body.force,
+        exportData,
+        triggeredBy: "api",
+      });
+      return jsonResponse(result);
     }
 
     // POST: /api/election/trigger uses ADMIN_SECRET

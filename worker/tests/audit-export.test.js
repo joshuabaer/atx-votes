@@ -15,8 +15,8 @@ const updaterSrc = readFileSync(join(__dirname, "../src/updater.js"), "utf-8");
 // Helper: extract the audit export function block
 function getExportBlock() {
   return indexSrc.slice(
-    indexSrc.indexOf("handleAuditExport"),
-    indexSrc.indexOf("handleSupport")
+    indexSrc.indexOf("buildAuditExportData"),
+    indexSrc.indexOf("handleAuditExport")
   );
 }
 
@@ -429,17 +429,17 @@ describe("Audit export source: tone variants", () => {
 // Completeness: export size
 // ---------------------------------------------------------------------------
 describe("Audit export source: completeness", () => {
-  it("handleAuditExport function is at least 15000 characters", () => {
-    const start = indexSrc.indexOf("function handleAuditExport()");
-    const end = indexSrc.indexOf("function handleSupport()");
+  it("buildAuditExportData function is at least 15000 characters", () => {
+    const start = indexSrc.indexOf("function buildAuditExportData()");
+    const end = indexSrc.indexOf("function handleAuditExport()");
     const fnLength = end - start;
     expect(fnLength).toBeGreaterThan(15000);
   });
 
   it("export has at least 10 top-level keys in the exportData object", () => {
     const exportBlock = indexSrc.slice(
-      indexSrc.indexOf("const exportData = {"),
-      indexSrc.indexOf("return new Response(JSON.stringify(exportData")
+      indexSrc.indexOf("function buildAuditExportData()"),
+      indexSrc.indexOf("function handleAuditExport()")
     );
     const topKeys = [
       "_meta", "guideGeneration", "profileSummary", "candidateResearch",
