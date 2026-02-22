@@ -20,15 +20,26 @@
 - [x] Put "Texas Votes (Cowboy)" in the title of the link for txvotes.app/cowboy and "(Swedish Chef)" for /chef
 - [ ] Candidate profile page — a page for each candidate where they can verify all information and background we have about them in one place
 - [ ] AI audit — figure out the best way to have ChatGPT, Gemini, and Grok audit the detailed content and methodologies of this app
-- [ ] Data coverage dashboard — a web page showing what data/districts/counties/candidates are missing (county_info, county ballots, headshots, tone variants, endorsements, polling, fundraising)
+- [x] Data coverage dashboard — `/admin/coverage` shows candidate completeness, tone variants, county info, and county ballot coverage across all 254 counties
 - [x] Fix district resolution — Census geocoder + filterBallotToDistricts() already work; fixed by populating county ballot data and moving Travis races out of statewide
 - [x] Move Travis County races out of statewide ballot — Commissioner Pct 2/4 moved to `ballot:county:48453:democrat_primary_2026`
 - [ ] Seed county ballots for top 20 counties by population — covers ~75% of TX voters with local races
 - [ ] Seed county_info for remaining 202 counties — voting logistics (hours, locations, contact) for rural/smaller counties
 - [ ] Fill missing headshots — 9 candidates completely missing, 2 have SVG only (need .jpg/.png)
 - [ ] Fill sparse candidate data — endorsements (43% missing), Democrat polling (55% missing), Democrat fundraising (35% missing)
-- [ ] Pre-generate candidate tone variants — summary/strengths/concerns for all 73 statewide candidates across 7 tones (in progress)
+- [x] Pre-generate candidate tone variants — summary/strengths/concerns for all 73 statewide candidates across 7 tones
 - [ ] LLM choice — let users choose which LLM and model to use for generating their ballot (Claude, GPT, Gemini, Grok)
+- [ ] Fireworks animation after "I Voted" — celebratory fireworks/confetti when the user taps the "I Voted" button
+- [ ] Make the app more patriotic visually — red/white/blue theme touches, stars, flag-inspired design elements
+- [ ] Make the app more viral — built-in sharing prompts, social hooks, referral mechanics
+- [ ] Volunteer opportunities near you — add a "Volunteer" section on the Vote Info page showing nearby volunteer opportunities
+- [ ] Post-voting share prompt — after voting, ask the user to share the app with 3 people who could use encouragement to vote
+- [ ] Fix back button on /cowboy and /chef — after entering via a vanity URL, the browser back button doesn't work properly; it should clear data and take you back to /cowboy (or /chef)
+- [ ] Always show a back button in the interview flow — e.g., the tone picker screen has no way to go back to the previous step
+- [ ] Open source code — create an open source page on the website that links to the repo and includes links to 3 different AI code reviews to demonstrate fairness and impartiality
+- [ ] Remove Polymarket stats — remove prediction market odds from the app
+- [ ] Create new txvotes repo in GitHub — fresh copy of the code without all the dev history
+- [ ] Put Texas flag on the home page — add Texas flag graphic to the landing/welcome page
 - [x] Race card description text doesn't use full card width on desktop — text column is narrower than the card, wasting space next to the "Good Match" badge
 - [x] Integrate Polymarket predictions — show prediction market odds alongside race recommendations
 - [x] Geolocate button to auto-fill address — use browser geolocation to fill in street, city, and ZIP; hardcode state to TX

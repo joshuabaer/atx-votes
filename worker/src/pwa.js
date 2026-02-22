@@ -45,7 +45,7 @@ export function handlePWA_Clear(redirectUrl = '/app', title = 'Texas Votes') {
         'var keys=await caches.keys();' +
         'for(var k of keys) await caches.delete(k);' +
         's.innerHTML="<span class=done>Updated!</span><br><br>Redirecting...";' +
-        'setTimeout(function(){location.href="' + redirectUrl + '"},1000);' +
+        'setTimeout(function(){location.replace("' + redirectUrl + '")},1000);' +
       '}catch(e){' +
         's.textContent="Error: "+e.message+". Try manually clearing browser data.";' +
       '}' +
@@ -309,6 +309,8 @@ var CSS = [
   ".dot-done{background:var(--blue)}",
   ".dot-active{background:var(--blue);animation:pulse 1s ease-in-out infinite}",
   "@keyframes pulse{50%{transform:scale(1.3)}}",
+  "@keyframes confettiFall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}",
+  ".confetti-piece{position:fixed;top:-10px;width:10px;height:10px;z-index:9999;animation:confettiFall 3s ease-in forwards;pointer-events:none}",
 
   // Form
   ".form-group{margin-bottom:16px}",
@@ -713,14 +715,10 @@ var APP_JS = [
     "'How should we explain things?':'\\u00BFC\\u00F3mo deber\\u00EDamos explicarte las cosas?'," +
     "'Keep it simple':'Hazlo simple'," +
     "'Simple, everyday language \\u2014 like a high school class':'Lenguaje simple y cotidiano \\u2014 como en una clase de preparatoria'," +
-    "'Talk like a friend':'H\\u00E1blame como amigo'," +
-    "'Casual and conversational':'Casual y conversacional'," +
     "'Just the facts':'Solo los hechos'," +
     "'Clear and balanced \\u2014 standard news level':'Claro y equilibrado \\u2014 nivel de noticias est\\u00E1ndar'," +
     "'I follow politics':'Sigo la pol\\u00EDtica'," +
     "'More depth, nuance, and political terminology':'M\\u00E1s profundidad, matices y terminolog\\u00EDa pol\\u00EDtica'," +
-    "'Full professor mode':'Modo profesor'," +
-    "'Expert-level analysis with policy frameworks':'An\\u00E1lisis a nivel experto con marcos de pol\\u00EDtica p\\u00FAblica'," +
     "'This will erase your profile and recommendations.':'Esto borrar\\u00E1 tu perfil y recomendaciones.'," +
     "'Start over? This will erase your profile and recommendations.':'\\u00BFEmpezar de nuevo? Esto borrar\\u00E1 tu perfil y recomendaciones.'," +
     // Vote Info
@@ -1119,7 +1117,7 @@ var APP_JS = [
     "countyInfo:null," +
     "repBallot:null,demBallot:null,selectedParty:'republican'," +
     "guideComplete:false,summary:null,districts:null," +
-    "isLoading:false,loadPhase:0,loadMsg:'',error:null,geolocating:false,polymarket:null," +
+    "isLoading:false,loadPhase:0,loadMsg:'',error:null,geolocating:false," +
     "readingLevel:1," +
     "expanded:{'vi-dates':true,'vi-bring':true},disclaimerDismissed:false,hasVoted:false" +
     "};",
@@ -1187,7 +1185,7 @@ var APP_JS = [
     "var sp=localStorage.getItem('tx_votes_selected_party');" +
     "if(sp)S.selectedParty=sp;" +
     "S.hasVoted=!!localStorage.getItem('tx_votes_has_voted');" +
-    "if(S.repBallot||S.demBallot){S.guideComplete=true;fetchPolymarket()}" +
+    "if(S.repBallot||S.demBallot){S.guideComplete=true}" +
     "}catch(e){}" +
   "}",
 
@@ -1234,7 +1232,7 @@ var APP_JS = [
     "if(S.phase===4){step=4};" +
     "var pbar='<div class=\"progress\"><div class=\"progress-fill\" style=\"width:'+(step/total*100)+'%\"></div></div>';" +
     "var back='<button class=\"back-btn\" data-action=\"back\">&larr; Back</button>';" +
-    "if(S.phase===1)return pbar+renderTone();" +
+    "if(S.phase===1)return pbar+back+renderTone();" +
     "if(S.phase===2)return pbar+back+renderIssues();" +
     "if(S.phase===3)return pbar+back+renderSpectrum();" +
     "if(S.phase===4)return pbar+back+renderDeepDive();" +
@@ -1270,10 +1268,8 @@ var APP_JS = [
   // Tone / Reading Level
   "var TONE_OPTS=[" +
     "{v:1,l:'Keep it simple',d:'Simple, everyday language \\u2014 like a high school class'}," +
-    "{v:2,l:'Talk like a friend',d:'Casual and conversational'}," +
     "{v:3,l:'Just the facts',d:'Clear and balanced \\u2014 standard news level'}," +
-    "{v:4,l:'I follow politics',d:'More depth, nuance, and political terminology'}," +
-    "{v:5,l:'Full professor mode',d:'Expert-level analysis with policy frameworks'}" +
+    "{v:4,l:'I follow politics',d:'More depth, nuance, and political terminology'}" +
   "];",
   "var chefTaps=0;",
   "function renderTone(){" +
@@ -1755,8 +1751,6 @@ var APP_JS = [
       "h+='<div class=\"cand-tags\">';" +
       "if(c.isIncumbent)h+='<span class=\"badge badge-blue\">'+t('Incumbent')+'</span>';" +
       "if(c.isRecommended)h+='<span class=\"badge badge-ok\">'+t('Recommended')+'</span>';" +
-      "var odds=getOdds(c.name,race.office,S.selectedParty);" +
-      "if(odds)h+='<a href=\"'+odds.url+'\" target=\"_blank\" class=\"badge\" style=\"background:rgba(212,168,67,.15);color:#B8860B;text-decoration:none\" title=\"Polymarket prediction\" onclick=\"event.stopPropagation()\">'+odds.pct+'%</a>';" +
       "h+='</div></div>';" +
       "h+='</div></div>';" +
       "h+='<div class=\"cand-summary\">'+esc(tp(c.summary))+'</div>';" +
@@ -1829,13 +1823,13 @@ var APP_JS = [
     // Reading level slider
     "h+='<div class=\"card\" style=\"margin-top:16px\">';" +
     "h+='<div style=\"font-size:15px;font-weight:600;margin-bottom:12px\">\u{1F4D6} '+t('Reading Level')+'</div>';" +
-    "var rlLabels=[t('Simple'),t('Casual'),t('Standard'),t('Detailed'),t('Expert'),'Bork!','Howdy!'];" +
-    "var rlVal=S.readingLevel>5?5:S.readingLevel;" +
-    "h+='<input type=\"range\" min=\"1\" max=\"5\" value=\"'+rlVal+'\" data-action=\"set-reading-level\" style=\"width:100%;accent-color:var(--blue)\">';" +
+    "var rlMap=[1,3,4];var rlNames={1:t('Simple'),3:t('Standard'),4:t('Detailed'),6:'Bork!',7:'Howdy!'};" +
+    "var rlIdx=rlMap.indexOf(S.readingLevel);if(rlIdx<0)rlIdx=1;" +
+    "h+='<input type=\"range\" min=\"0\" max=\"2\" value=\"'+rlIdx+'\" data-action=\"set-reading-level\" style=\"width:100%;accent-color:var(--blue)\">';" +
     "h+='<div style=\"display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-top:4px\">';" +
-    "h+='<span>'+t('High School')+'</span>';" +
-    "h+='<span style=\"font-weight:600;color:var(--text1)\">'+rlLabels[S.readingLevel-1]+'</span>';" +
-    "h+='<span>'+t('Professor')+'</span>';" +
+    "h+='<span>'+t('Simple')+'</span>';" +
+    "h+='<span style=\"font-weight:600;color:var(--text1)\">'+(rlNames[S.readingLevel]||t('Standard'))+'</span>';" +
+    "h+='<span>'+t('Detailed')+'</span>';" +
     "h+='</div>';" +
     "if(S.guideComplete&&!S.isLoading){h+='<button class=\"btn btn-primary\" style=\"width:100%;margin-top:12px\" data-action=\"reprocess-guide\">'+t('Reprocess Guide')+'</button>'}" +
     "h+='</div>';" +
@@ -2099,7 +2093,7 @@ var APP_JS = [
     "}" +
     "else if(action==='dismiss-disclaimer'){S.disclaimerDismissed=true;render()}" +
     "else if(action==='set-lang'){setLang(el.dataset.value)}" +
-    "else if(action==='mark-voted'){S.hasVoted=true;save();render()}" +
+    "else if(action==='mark-voted'){S.hasVoted=true;save();render();launchConfetti()}" +
     "else if(action==='unvote'){S.hasVoted=false;save();render()}" +
     "else if(action==='share-voted'){shareStickerImage()}" +
     "else if(action==='do-print'){window.print()}" +
@@ -2111,7 +2105,7 @@ var APP_JS = [
   // Range input handler for reading level slider
   "document.getElementById('app').addEventListener('input',function(e){" +
     "var el=e.target;if(!el.dataset||!el.dataset.action)return;" +
-    "if(el.dataset.action==='set-reading-level'){S.readingLevel=parseInt(el.value)||1;save();render()}" +
+    "if(el.dataset.action==='set-reading-level'){var rlMap=[1,3,4];S.readingLevel=rlMap[parseInt(el.value)]||3;save();render()}" +
   "});",
 
   // Tab bar click handler (tabs live outside #app)
@@ -2246,7 +2240,6 @@ var APP_JS = [
       "if(S.selectedParty==='democrat'&&!S.demBallot)S.selectedParty='republican';" +
       // Save and show
       "S.guideComplete=true;S.isLoading=false;stopMascotTimer();" +
-      "fetchPolymarket();" +
       "save();" +
       "await new Promise(function(r){setTimeout(r,500)});" +
       "location.hash='#/ballot';render();" +
@@ -2348,25 +2341,26 @@ var APP_JS = [
     "},'image/png');" +
   "}",
 
-  // ============ POLYMARKET ODDS ============
-  "function fetchPolymarket(){" +
-    "fetch('/app/api/polymarket').then(function(r){return r.ok?r.json():null}).then(function(d){" +
-      "if(d&&d.odds){S.polymarket=d.odds;render()}" +
-    "}).catch(function(){})" +
-  "}",
 
-  "function getOdds(candidateName,office,party){" +
-    "if(!S.polymarket)return null;" +
-    "var key=office+'|'+party;" +
-    "var rd=S.polymarket[key];" +
-    "if(!rd||!rd.candidates)return null;" +
-    "var cands=rd.candidates;" +
-    "var url='https://polymarket.com/event/'+rd.slug;" +
-    // Try exact match first, then last-name match
-    "if(cands[candidateName])return{pct:cands[candidateName],url:url};" +
-    "var last=candidateName.split(' ').pop();" +
-    "for(var k in cands){if(k.split(' ').pop()===last)return{pct:cands[k],url:url}}" +
-    "return null" +
+  // ============ CONFETTI BURST ============
+  "function launchConfetti(){" +
+    "var colors=['#CC1919','#fff','#0D2738','#B8860B','#22c55e','#3b82f6'];" +
+    "var shapes=['square','circle'];" +
+    "for(var i=0;i<60;i++){" +
+      "var el=document.createElement('div');" +
+      "el.className='confetti-piece';" +
+      "var c=colors[Math.floor(Math.random()*colors.length)];" +
+      "var s=shapes[Math.floor(Math.random()*shapes.length)];" +
+      "el.style.left=Math.random()*100+'vw';" +
+      "el.style.background=c;" +
+      "el.style.width=(6+Math.random()*8)+'px';" +
+      "el.style.height=(6+Math.random()*8)+'px';" +
+      "if(s==='circle')el.style.borderRadius='50%';" +
+      "el.style.animationDuration=(2+Math.random()*2)+'s';" +
+      "el.style.animationDelay=(Math.random()*0.5)+'s';" +
+      "document.body.appendChild(el);" +
+      "setTimeout(function(){el.remove()},5000)" +
+    "}" +
   "}",
 
   // ============ BACKGROUND REFRESH ============

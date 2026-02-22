@@ -37,46 +37,72 @@ li{font-size:1rem;color:var(--text);margin-bottom:0.75rem}
 .page-footer a{color:var(--text2);text-decoration:none}
 </style>`;
 
-// Polymarket event slug → ballot race office mapping
-const POLYMARKET_EVENTS = [
-  { slug: "texas-republican-senate-primary-winner", office: "U.S. Senator", party: "republican" },
-  { slug: "texas-democratic-senate-primary-winner", office: "U.S. Senator", party: "democrat" },
-  { slug: "texas-governor-republican-primary-winner", office: "Governor", party: "republican" },
-  { slug: "texas-governor-democratic-primary-winner", office: "Governor", party: "democrat" },
-];
+// MARK: - Candidate Profile Helpers
 
-async function handlePolymarket(env) {
-  // Check KV cache first (1-hour TTL)
-  const cached = await env.ELECTION_DATA.get("polymarket:odds");
-  if (cached) {
-    return new Response(cached, {
-      headers: { "Content-Type": "application/json", "Cache-Control": "public, max-age=3600" },
-    });
+function nameToSlug(name) {
+  return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
+
+/**
+ * Load all candidates from statewide ballot data across both parties.
+ * Returns array of { candidate, race, party, slug } objects.
+ */
+async function loadAllCandidates(env) {
+  const parties = ["republican", "democrat"];
+  const results = [];
+
+  for (const party of parties) {
+    let raw = await env.ELECTION_DATA.get(`ballot:statewide:${party}_primary_2026`);
+    if (!raw) raw = await env.ELECTION_DATA.get(`ballot:${party}_primary_2026`);
+    if (!raw) continue;
+
+    let ballot;
+    try { ballot = JSON.parse(raw); } catch { continue; }
+
+    for (const race of (ballot.races || [])) {
+      for (const candidate of (race.candidates || [])) {
+        results.push({
+          candidate,
+          race: race.office + (race.district ? ` — ${race.district}` : ""),
+          raceOffice: race.office,
+          raceDistrict: race.district || null,
+          party,
+          electionName: ballot.electionName || `${party} Primary 2026`,
+          slug: nameToSlug(candidate.name),
+        });
+      }
+    }
   }
 
-  const odds = {};
-  await Promise.all(POLYMARKET_EVENTS.map(async ({ slug, office, party }) => {
-    try {
-      const res = await fetch(`https://gamma-api.polymarket.com/events?slug=${slug}`);
-      const events = await res.json();
-      if (!events.length) return;
-      const key = `${office}|${party}`;
-      odds[key] = { slug, candidates: {} };
-      for (const m of events[0].markets) {
-        if (!m.active || !m.outcomePrices || !m.groupItemTitle) continue;
-        const prices = JSON.parse(m.outcomePrices);
-        const pct = Math.round(parseFloat(prices[0]) * 100);
-        if (pct >= 1) odds[key].candidates[m.groupItemTitle] = pct;
-      }
-    } catch { /* skip failed fetch */ }
-  }));
-
-  const body = JSON.stringify({ odds, updated: new Date().toISOString() });
-  await env.ELECTION_DATA.put("polymarket:odds", body, { expirationTtl: 3600 });
-  return new Response(body, {
-    headers: { "Content-Type": "application/json", "Cache-Control": "public, max-age=3600" },
-  });
+  return results;
 }
+
+/**
+ * Extract plain text from a field that may be a tone-variant object.
+ * Defaults to tone 3, falls back to first available key.
+ */
+function resolveTone(value) {
+  if (value === null || value === undefined) return null;
+  if (typeof value === "string") return value;
+  if (typeof value === "object" && !Array.isArray(value)) {
+    return value["3"] || value[Object.keys(value).sort()[0]] || null;
+  }
+  return null;
+}
+
+/**
+ * Resolve an array where each element may be a tone-variant object.
+ */
+function resolveToneArray(arr) {
+  if (!Array.isArray(arr)) return [];
+  return arr.map(item => resolveTone(item)).filter(Boolean);
+}
+
+function escapeHtml(str) {
+  if (!str) return "";
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
 
 async function handleDistricts(request, env) {
   const { street, city, state, zip } = await request.json();
@@ -822,6 +848,227 @@ Return ONLY valid JSON, no markdown fences, no explanation.`;
   return jsonResponse({ success: true, party, candidate: candidateName, tone, fieldsUpdated: updated });
 }
 
+// MARK: - Candidate Profile & Index Pages
+
+async function handleCandidateProfile(slug, env) {
+  const allCandidates = await loadAllCandidates(env);
+  const entry = allCandidates.find(e => e.slug === slug);
+
+  if (!entry) {
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Candidate Not Found — Texas Votes</title>
+  ${PAGE_CSS}
+</head>
+<body>
+  <div class="container">
+    <h1>Candidate Not Found</h1>
+    <p class="subtitle">We couldn't find a candidate matching "${escapeHtml(slug)}". The candidate may not be in our database yet, or the URL may be incorrect.</p>
+    <a class="back" href="/candidates">&larr; Browse all candidates</a>
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+  </div>
+</body>
+</html>`;
+    return new Response(html, {
+      status: 404,
+      headers: { "Content-Type": "text/html;charset=utf-8" },
+    });
+  }
+
+  const c = entry.candidate;
+  const name = escapeHtml(c.name);
+  const partyLabel = entry.party.charAt(0).toUpperCase() + entry.party.slice(1);
+  const summary = escapeHtml(resolveTone(c.summary));
+  const pros = resolveToneArray(c.pros);
+  const cons = resolveToneArray(c.cons);
+
+  // Build sections conditionally
+  const sections = [];
+
+  // Headshot
+  if (c.headshot) {
+    sections.push(`<div style="text-align:center;margin-bottom:1.5rem"><img src="${escapeHtml(c.headshot)}" alt="Photo of ${name}" style="width:160px;height:160px;border-radius:50%;object-fit:cover;border:3px solid var(--border)"></div>`);
+  }
+
+  // Meta badges
+  const badges = [];
+  if (c.incumbent || c.isIncumbent) badges.push("Incumbent");
+  badges.push(partyLabel);
+  if (c.age) badges.push(`Age ${escapeHtml(String(c.age))}`);
+  if (badges.length) {
+    sections.push(`<div style="margin-bottom:1.5rem">${badges.map(b => `<span class="badge" style="margin-right:0.5rem;margin-bottom:0.5rem">${escapeHtml(b)}</span>`).join("")}</div>`);
+  }
+
+  // Summary
+  if (summary) {
+    sections.push(`<h2>About</h2><p>${summary}</p>`);
+  }
+
+  // Education
+  if (c.education) {
+    sections.push(`<h2>Education</h2><p>${escapeHtml(c.education)}</p>`);
+  }
+
+  // Experience
+  if (c.experience) {
+    const exp = Array.isArray(c.experience) ? c.experience : [c.experience];
+    sections.push(`<h2>Experience</h2><ul>${exp.map(e => `<li>${escapeHtml(String(e))}</li>`).join("")}</ul>`);
+  }
+
+  // Key Positions
+  if (c.keyPositions && c.keyPositions.length) {
+    sections.push(`<h2>Key Positions</h2><ul>${c.keyPositions.map(p => `<li>${escapeHtml(String(p))}</li>`).join("")}</ul>`);
+  }
+
+  // Strengths (pros)
+  if (pros.length) {
+    sections.push(`<h2>Strengths</h2><ul>${pros.map(p => `<li>${escapeHtml(p)}</li>`).join("")}</ul>`);
+  }
+
+  // Concerns (cons)
+  if (cons.length) {
+    sections.push(`<h2>Concerns</h2><ul>${cons.map(p => `<li>${escapeHtml(p)}</li>`).join("")}</ul>`);
+  }
+
+  // Endorsements
+  if (c.endorsements) {
+    const endorsements = Array.isArray(c.endorsements) ? c.endorsements : [c.endorsements];
+    if (endorsements.length && endorsements[0]) {
+      sections.push(`<h2>Endorsements</h2><ul>${endorsements.map(e => `<li>${escapeHtml(String(e))}</li>`).join("")}</ul>`);
+    }
+  }
+
+  // Polling
+  if (c.polling) {
+    const polling = typeof c.polling === "string" ? c.polling : JSON.stringify(c.polling);
+    sections.push(`<h2>Polling</h2><p>${escapeHtml(polling)}</p>`);
+  }
+
+  // Fundraising
+  if (c.fundraising) {
+    const fundraising = typeof c.fundraising === "string" ? c.fundraising : JSON.stringify(c.fundraising);
+    sections.push(`<h2>Fundraising</h2><p>${escapeHtml(fundraising)}</p>`);
+  }
+
+  const ogDescription = summary
+    ? summary.slice(0, 160) + (summary.length > 160 ? "..." : "")
+    : `${name} is running for ${escapeHtml(entry.race)} in the 2026 Texas ${partyLabel} Primary.`;
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>${name} — ${escapeHtml(entry.race)} — Texas Votes</title>
+  <meta name="description" content="${escapeHtml(ogDescription)}">
+  <meta property="og:title" content="${name} — ${escapeHtml(entry.race)} — Texas Votes">
+  <meta property="og:description" content="${escapeHtml(ogDescription)}">
+  <meta property="og:type" content="profile">
+  <meta property="og:url" content="https://txvotes.app/candidate/${escapeHtml(entry.slug)}">
+  ${c.headshot ? `<meta property="og:image" content="${escapeHtml(c.headshot)}">` : ""}
+  ${PAGE_CSS}
+</head>
+<body>
+  <div class="container">
+    <a class="back" href="/candidates">&larr; Back to all candidates</a>
+    <h1 style="margin-top:1rem">${name}</h1>
+    <p class="subtitle">${escapeHtml(entry.race)} &middot; ${escapeHtml(partyLabel)} Primary 2026</p>
+    ${sections.join("\n    ")}
+    <p style="margin-top:2rem;font-size:0.9rem;color:var(--text2)">See something wrong? <a href="mailto:howdy@txvotes.app?subject=Data correction: ${encodeURIComponent(c.name)}">Let us know</a> and we'll fix it.</p>
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+  </div>
+</body>
+</html>`;
+
+  return new Response(html, {
+    headers: {
+      "Content-Type": "text/html;charset=utf-8",
+      "Cache-Control": "public, max-age=3600",
+    },
+  });
+}
+
+async function handleCandidatesIndex(env) {
+  const allCandidates = await loadAllCandidates(env);
+
+  // Group by race (using raceOffice + district as key), preserving party
+  const raceMap = new Map();
+  for (const entry of allCandidates) {
+    const raceKey = `${entry.party}|${entry.race}`;
+    if (!raceMap.has(raceKey)) {
+      raceMap.set(raceKey, {
+        race: entry.race,
+        party: entry.party,
+        candidates: [],
+      });
+    }
+    raceMap.get(raceKey).candidates.push(entry);
+  }
+
+  // Group races by party
+  const parties = ["republican", "democrat"];
+  let partySections = "";
+
+  for (const party of parties) {
+    const partyLabel = party.charAt(0).toUpperCase() + party.slice(1);
+    const partyRaces = [...raceMap.values()].filter(r => r.party === party);
+    if (partyRaces.length === 0) continue;
+
+    let raceCards = "";
+    for (const race of partyRaces) {
+      const candidateLinks = race.candidates.map(e => {
+        const isIncumbent = e.candidate.incumbent || e.candidate.isIncumbent;
+        const incumbentBadge = isIncumbent ? ' <span style="font-size:0.8rem;color:var(--text2)">(incumbent)</span>' : "";
+        const headshot = e.candidate.headshot
+          ? `<img src="${escapeHtml(e.candidate.headshot)}" alt="" style="width:32px;height:32px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:8px;border:1px solid var(--border)">`
+          : `<span style="display:inline-block;width:32px;height:32px;border-radius:50%;background:var(--border);vertical-align:middle;margin-right:8px"></span>`;
+        return `<li style="list-style:none;margin-bottom:0.5rem">${headshot}<a href="/candidate/${escapeHtml(e.slug)}">${escapeHtml(e.candidate.name)}</a>${incumbentBadge}</li>`;
+      }).join("");
+      raceCards += `<div style="margin-bottom:1.5rem"><h2 style="margin-top:0.5rem">${escapeHtml(race.race)}</h2><ul style="padding-left:0">${candidateLinks}</ul></div>`;
+    }
+
+    partySections += `<div style="margin-bottom:2rem"><div class="badge">${escapeHtml(partyLabel)} Primary</div>${raceCards}</div>`;
+  }
+
+  if (!partySections) {
+    partySections = `<p class="subtitle">No candidate data is available yet. Check back soon.</p>`;
+  }
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>All Candidates — Texas Votes</title>
+  <meta name="description" content="Browse all candidates in the 2026 Texas Primary Election. View detailed profiles, positions, and endorsements.">
+  <meta property="og:title" content="All Candidates — Texas Votes">
+  <meta property="og:description" content="Browse all candidates in the 2026 Texas Primary Election.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://txvotes.app/candidates">
+  ${PAGE_CSS}
+</head>
+<body>
+  <div class="container">
+    <a class="back" href="/">&larr; Texas Votes</a>
+    <h1 style="margin-top:1rem">All Candidates</h1>
+    <p class="subtitle">2026 Texas Primary Election — March 3, 2026</p>
+    ${partySections}
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+  </div>
+</body>
+</html>`;
+
+  return new Response(html, {
+    headers: {
+      "Content-Type": "text/html;charset=utf-8",
+      "Cache-Control": "public, max-age=3600",
+    },
+  });
+}
+
 // MARK: - Admin Coverage Dashboard
 
 // All 254 Texas county FIPS codes (48001 to 48507, odd numbers only)
@@ -1098,6 +1345,13 @@ export default {
       if (url.pathname === "/nonpartisan") {
         return handleNonpartisan();
       }
+      if (url.pathname === "/candidates") {
+        return handleCandidatesIndex(env);
+      }
+      if (url.pathname.startsWith("/candidate/")) {
+        const slug = url.pathname.slice("/candidate/".length).replace(/\/+$/, "");
+        if (slug) return handleCandidateProfile(slug, env);
+      }
       if (url.pathname === "/api/election/manifest") {
         return handleManifest(env);
       }
@@ -1131,7 +1385,7 @@ export default {
         return handleCountyInfo(request, env);
       }
       if (url.pathname === "/app/api/polymarket") {
-        return handlePolymarket(env);
+        return new Response(JSON.stringify({ odds: {} }), { headers: { "Content-Type": "application/json" } });
       }
       // Admin coverage dashboard (GET with Bearer auth)
       if (url.pathname === "/admin/coverage") {

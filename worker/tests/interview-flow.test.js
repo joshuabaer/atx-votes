@@ -140,8 +140,8 @@ describe("Phase 1: Tone", () => {
     // Use querySelector directly — CSS.escape("1") produces "\31 " which happy-dom mishandles
     document.querySelector('[data-action="select-tone"][data-value="1"]').click();
     expect(S().readingLevel).toBe(1);
-    document.querySelector('[data-action="select-tone"][data-value="5"]').click();
-    expect(S().readingLevel).toBe(5);
+    document.querySelector('[data-action="select-tone"][data-value="4"]').click();
+    expect(S().readingLevel).toBe(4);
   });
 
   it("clicking Continue advances to phase 2 (Issues)", () => {
@@ -1036,10 +1036,10 @@ describe("Progress bar", () => {
 // Phase 1 has no back button, Phase 2+ do
 // ---------------------------------------------------------------------------
 describe("Back button visibility", () => {
-  it("phase 1 has no back button", () => {
+  it("phase 1 has a back button", () => {
     clickAction("start");
     expect(S().phase).toBe(1);
-    expect(document.querySelector('[data-action="back"]')).toBeNull();
+    expect(document.querySelector('[data-action="back"]')).not.toBeNull();
   });
 
   it("phase 2 has a back button", () => {
