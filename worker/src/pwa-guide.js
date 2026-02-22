@@ -2,7 +2,7 @@
 // Ported from ClaudeService.swift
 
 const SYSTEM_PROMPT =
-  "You are a non-partisan voting guide assistant for Austin, Texas elections. " +
+  "You are a non-partisan voting guide assistant for Texas elections. " +
   "Your job is to make personalized recommendations based ONLY on the voter's stated values and the candidate data provided. " +
   "You must NEVER recommend a candidate who is not listed in the provided ballot data. " +
   "You must NEVER invent or hallucinate candidate information. " +
@@ -27,7 +27,7 @@ function json(data, status = 200) {
 
 export async function handlePWA_Guide(request, env) {
   try {
-    const { party, profile, districts, lang } = await request.json();
+    const { party, profile, districts, lang, countyFips } = await request.json();
 
     if (!party || !["republican", "democrat"].includes(party)) {
       return json({ error: "party required (republican|democrat)" }, 400);
@@ -36,14 +36,35 @@ export async function handlePWA_Guide(request, env) {
       return json({ error: "profile required" }, 400);
     }
 
-    // Load base ballot from KV
-    const raw = await env.ELECTION_DATA.get(
-      "ballot:" + party + "_primary_2026"
+    // Load statewide ballot from KV (new key structure), fall back to legacy key
+    var raw = await env.ELECTION_DATA.get(
+      "ballot:statewide:" + party + "_primary_2026"
     );
+    if (!raw) {
+      raw = await env.ELECTION_DATA.get(
+        "ballot:" + party + "_primary_2026"
+      );
+    }
     if (!raw) {
       return json({ error: "No ballot data available" }, 404);
     }
     var ballot = JSON.parse(raw);
+
+    // Merge county-specific races if countyFips provided
+    if (countyFips) {
+      var countyRaw = await env.ELECTION_DATA.get(
+        "ballot:county:" + countyFips + ":" + party + "_primary_2026"
+      );
+      if (countyRaw) {
+        try {
+          var countyBallot = JSON.parse(countyRaw);
+          ballot.races = ballot.races.concat(countyBallot.races || []);
+          if (countyBallot.propositions) {
+            ballot.propositions = (ballot.propositions || []).concat(countyBallot.propositions);
+          }
+        } catch (e) { /* use statewide-only if merge fails */ }
+      }
+    }
 
     // Filter by districts
     if (districts) {

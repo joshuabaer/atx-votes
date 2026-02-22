@@ -4,6 +4,11 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const PARTIES = ["republican", "democrat"];
 const BALLOT_KEYS = {
+  republican: "ballot:statewide:republican_primary_2026",
+  democrat: "ballot:statewide:democrat_primary_2026",
+};
+// Legacy keys — checked as fallback during migration period
+const LEGACY_BALLOT_KEYS = {
   republican: "ballot:republican_primary_2026",
   democrat: "ballot:democrat_primary_2026",
 };
@@ -25,7 +30,11 @@ export async function runDailyUpdate(env, options = {}) {
 
   for (const party of parties) {
     const key = BALLOT_KEYS[party];
-    const raw = await env.ELECTION_DATA.get(key);
+    let raw = await env.ELECTION_DATA.get(key);
+    // Fall back to legacy key during migration
+    if (!raw && LEGACY_BALLOT_KEYS[party]) {
+      raw = await env.ELECTION_DATA.get(LEGACY_BALLOT_KEYS[party]);
+    }
     if (!raw) {
       errors.push(`${party}: no existing ballot in KV`);
       continue;

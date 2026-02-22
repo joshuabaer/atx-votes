@@ -1,20 +1,7 @@
 import { runDailyUpdate } from "./updater.js";
 import { handlePWA, handlePWA_SW, handlePWA_Manifest, handlePWA_Clear } from "./pwa.js";
 import { handlePWA_Guide, handlePWA_Summary } from "./pwa-guide.js";
-
-// Travis County commissioner precinct lookup by ZIP code
-// Source: Travis County Clerk precinct maps
-const ZIP_TO_PRECINCT = {
-  "78701": "2", "78702": "1", "78703": "2", "78704": "2", "78705": "2",
-  "78712": "2", "78721": "1", "78722": "1", "78723": "1", "78724": "1",
-  "78725": "1", "78726": "3", "78727": "2", "78728": "2", "78729": "3",
-  "78730": "3", "78731": "2", "78732": "3", "78733": "3", "78734": "3",
-  "78735": "3", "78736": "3", "78737": "3", "78738": "3", "78739": "3",
-  "78741": "4", "78742": "4", "78744": "4", "78745": "4", "78746": "3",
-  "78747": "4", "78748": "4", "78749": "3", "78750": "2", "78751": "2",
-  "78752": "1", "78753": "1", "78754": "1", "78756": "2", "78757": "2",
-  "78758": "2", "78759": "2",
-};
+import { seedFullCounty, seedCountyInfo, seedCountyBallot, seedPrecinctMap } from "./county-seeder.js";
 
 // Shared CSS for static pages — matches app design tokens from pwa.js
 const PAGE_CSS = `<meta name="theme-color" content="rgb(33,89,143)" media="(prefers-color-scheme:light)"><meta name="theme-color" content="rgb(28,28,31)" media="(prefers-color-scheme:dark)">
@@ -50,15 +37,56 @@ li{font-size:1rem;color:var(--text);margin-bottom:0.75rem}
 .page-footer a{color:var(--text2);text-decoration:none}
 </style>`;
 
+// Polymarket event slug → ballot race office mapping
+const POLYMARKET_EVENTS = [
+  { slug: "texas-republican-senate-primary-winner", office: "U.S. Senator", party: "republican" },
+  { slug: "texas-democratic-senate-primary-winner", office: "U.S. Senator", party: "democrat" },
+  { slug: "texas-governor-republican-primary-winner", office: "Governor", party: "republican" },
+  { slug: "texas-governor-democratic-primary-winner", office: "Governor", party: "democrat" },
+];
+
+async function handlePolymarket(env) {
+  // Check KV cache first (1-hour TTL)
+  const cached = await env.ELECTION_DATA.get("polymarket:odds");
+  if (cached) {
+    return new Response(cached, {
+      headers: { "Content-Type": "application/json", "Cache-Control": "public, max-age=3600" },
+    });
+  }
+
+  const odds = {};
+  await Promise.all(POLYMARKET_EVENTS.map(async ({ slug, office, party }) => {
+    try {
+      const res = await fetch(`https://gamma-api.polymarket.com/events?slug=${slug}`);
+      const events = await res.json();
+      if (!events.length) return;
+      const key = `${office}|${party}`;
+      odds[key] = {};
+      for (const m of events[0].markets) {
+        if (!m.active || !m.outcomePrices || !m.groupItemTitle) continue;
+        const prices = JSON.parse(m.outcomePrices);
+        const pct = Math.round(parseFloat(prices[0]) * 100);
+        if (pct >= 1) odds[key][m.groupItemTitle] = pct;
+      }
+    } catch { /* skip failed fetch */ }
+  }));
+
+  const body = JSON.stringify({ odds, updated: new Date().toISOString() });
+  await env.ELECTION_DATA.put("polymarket:odds", body, { expirationTtl: 3600 });
+  return new Response(body, {
+    headers: { "Content-Type": "application/json", "Cache-Control": "public, max-age=3600" },
+  });
+}
+
 async function handleDistricts(request, env) {
   const { street, city, state, zip } = await request.json();
-  if (!street || !city || !state || !zip) {
+  if (!street || !state || !zip) {
     return jsonResponse({ error: "Missing address fields" }, 400);
   }
 
   const params = new URLSearchParams({
     street,
-    city,
+    city: city || "",
     state,
     zip,
     benchmark: "Public_AR_Current",
@@ -87,14 +115,36 @@ async function handleDistricts(request, env) {
   const congressional = findBasename(geos, "Congressional Districts");
   const stateSenate = findBasename(geos, "Legislative Districts - Upper");
   const stateHouse = findBasename(geos, "Legislative Districts - Lower");
-  const precinct = ZIP_TO_PRECINCT[zip] || null;
+
+  // Extract county FIPS and name from Census "Counties" geography
+  const countyGeo = findGeo(geos, "Counties");
+  const countyFips = countyGeo ? countyGeo.GEOID : null;
+  const countyName = countyGeo ? countyGeo.NAME : null;
+
+  // Extract school district from Census "Unified School Districts" geography
+  const schoolGeo = findGeo(geos, "Unified School Districts");
+  const schoolBoard = schoolGeo ? schoolGeo.NAME : null;
+
+  // Look up commissioner precinct from KV (per-county ZIP mapping)
+  let precinct = null;
+  if (countyFips) {
+    try {
+      const raw = await env.ELECTION_DATA.get(`precinct_map:${countyFips}`);
+      if (raw) {
+        const map = JSON.parse(raw);
+        precinct = map[zip] || null;
+      }
+    } catch { /* no precinct map for this county yet */ }
+  }
 
   return jsonResponse({
     congressional: congressional ? `District ${congressional}` : null,
     stateSenate: stateSenate ? `District ${stateSenate}` : null,
     stateHouse: stateHouse ? `District ${stateHouse}` : null,
     countyCommissioner: precinct ? `Precinct ${precinct}` : null,
-    schoolBoard: "District 5",
+    schoolBoard,
+    countyFips,
+    countyName,
   });
 }
 
@@ -102,6 +152,15 @@ function findBasename(geos, partialKey) {
   for (const key of Object.keys(geos)) {
     if (key.includes(partialKey) && geos[key].length > 0) {
       return geos[key][0].BASENAME;
+    }
+  }
+  return null;
+}
+
+function findGeo(geos, partialKey) {
+  for (const key of Object.keys(geos)) {
+    if (key.includes(partialKey) && geos[key].length > 0) {
+      return geos[key][0];
     }
   }
   return null;
@@ -123,19 +182,19 @@ function handleLandingPage() {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ATX Votes — Your Personalized Austin Voting Guide</title>
-  <meta name="description" content="Build your personalized voting guide for Austin & Travis County elections in 5 minutes. Know exactly who to vote for based on your values.">
-  <meta property="og:title" content="ATX Votes — Your Personalized Austin Voting Guide">
-  <meta property="og:description" content="Build your personalized voting guide for Austin & Travis County elections in 5 minutes.">
+  <title>Texas Votes — Your Personalized Texas Voting Guide</title>
+  <meta name="description" content="Build your personalized voting guide for Texas elections in 5 minutes. Know exactly who to vote for based on your values.">
+  <meta property="og:title" content="Texas Votes — Your Personalized Texas Voting Guide">
+  <meta property="og:description" content="Build your personalized voting guide for Texas elections in 5 minutes.">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://atxvotes.app">
+  <meta property="og:url" content="https://txvotes.app">
   ${PAGE_CSS}
 </head>
 <body style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center">
   <div class="card">
     <div class="icon">🗳️</div>
-    <h1>ATX Votes</h1>
-    <p class="subtitle" data-t="Your personalized voting guide for Austin &amp; Travis County elections.">Your personalized voting guide for Austin &amp; Travis County elections.</p>
+    <h1>Texas Votes</h1>
+    <p class="subtitle" data-t="Your personalized voting guide for Texas elections.">Your personalized voting guide for Texas elections.</p>
     <div class="badge" data-t="Texas Primary — March 3, 2026">Texas Primary — March 3, 2026</div>
     <br>
     <a class="cta" href="/app?start=1" data-t="Build My Voting Guide">Build My Voting Guide</a>
@@ -154,13 +213,13 @@ function handleLandingPage() {
   <p class="page-footer">
     <a href="/nonpartisan" data-t="Nonpartisan by Design">Nonpartisan by Design</a> &middot;
     <a href="/privacy" data-t="Privacy">Privacy</a> &middot;
-    <a href="mailto:howdy@atxvotes.app">howdy@atxvotes.app</a>
+    <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a>
   </p>
   <script>
   (function(){
     var TR={
-      'Your personalized voting guide for Austin & Travis County elections.':'Tu gu\\u00EDa personalizada de votaci\\u00F3n para Austin y el condado de Travis.',
-      'Your personalized voting guide for Austin &amp; Travis County elections.':'Tu gu\\u00EDa personalizada de votaci\\u00F3n para Austin y el condado de Travis.',
+      'Your personalized voting guide for Texas elections.':'Tu gu\\u00EDa personalizada de votaci\\u00F3n para las elecciones de Texas.',
+      'Your personalized voting guide for Texas elections.':'Tu gu\\u00EDa personalizada de votaci\\u00F3n para las elecciones de Texas.',
       'Texas Primary \\u2014 March 3, 2026':'Primaria de Texas \\u2014 3 de marzo, 2026',
       'Build My Voting Guide':'Crear mi gu\\u00EDa de votaci\\u00F3n',
       '5-minute interview learns your values':'Entrevista r\\u00E1pida sobre tus valores',
@@ -172,7 +231,7 @@ function handleLandingPage() {
       'Nonpartisan by Design':'Apartidista por Dise\\u00F1o',
       'Privacy':'Privacidad'
     };
-    var lang=localStorage.getItem('atx_votes_lang')||((navigator.language||'').slice(0,2)==='es'?'es':'en');
+    var lang=localStorage.getItem('tx_votes_lang')||localStorage.getItem('atx_votes_lang')||((navigator.language||'').slice(0,2)==='es'?'es':'en');
     var features={'5-minute interview learns your values':'\\u2705','Personalized ballot with recommendations':'\\uD83D\\uDCCB','Print your cheat sheet for the booth':'\\uD83D\\uDDA8\\uFE0F','Find your polling location':'\\uD83D\\uDCCD','Nonpartisan by design':'\\u2696\\uFE0F'};
     function apply(){
       document.documentElement.lang=lang;
@@ -205,7 +264,7 @@ function handleLandingPage() {
     }
     document.getElementById('lang-toggle').addEventListener('click',function(){
       lang=lang==='es'?'en':'es';
-      localStorage.setItem('atx_votes_lang',lang);
+      localStorage.setItem('tx_votes_lang',lang);
       apply();
     });
     apply();
@@ -225,14 +284,14 @@ function handleNonpartisan() {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Nonpartisan by Design — ATX Votes</title>
-  <meta name="description" content="How ATX Votes ensures fairness: randomized order, no party labels, neutral AI, privacy-first design, and more.">
+  <title>Nonpartisan by Design — Texas Votes</title>
+  <meta name="description" content="How Texas Votes ensures fairness: randomized order, no party labels, neutral AI, privacy-first design, and more.">
   ${PAGE_CSS}
 </head>
 <body>
   <div class="container">
     <h1>Nonpartisan by Design</h1>
-    <p class="subtitle">ATX Votes matches candidates to your values, not your party. Every design decision is made to keep the experience fair for all voters — regardless of where you fall on the political spectrum.</p>
+    <p class="subtitle">Texas Votes matches candidates to your values, not your party. Every design decision is made to keep the experience fair for all voters — regardless of where you fall on the political spectrum.</p>
 
     <h2>Randomized Candidate Order</h2>
     <p>Candidates and answer options are shuffled every time so position on screen never creates bias.</p>
@@ -259,7 +318,7 @@ function handleNonpartisan() {
     <p>Every AI prompt includes an explicit NONPARTISAN instruction block requiring: factual, issue-based reasoning only; no partisan framing or loaded terms; equal analytical rigor for all candidates regardless of position; and recommendations connected to the voter's specific stated values — never to party-line assumptions. Disclaimers appear on every recommendation screen. Confidence levels (Strong Match, Good Match, Best Available) prevent false certainty.</p>
 
     <h2>Verified Candidate Data</h2>
-    <p>All candidates are cross-referenced against official filings from the Texas Secretary of State, Travis County Clerk, and Ballotpedia. Candidate data includes positions, endorsements, strengths, and concerns — presented with equal depth for every candidate in a race.</p>
+    <p>All candidates are cross-referenced against official filings from the Texas Secretary of State, county clerks, and Ballotpedia. Candidate data includes positions, endorsements, strengths, and concerns — presented with equal depth for every candidate in a race.</p>
 
     <h2>Nonpartisan Translations</h2>
     <p>All Spanish translations are reviewed for partisan bias. Proposition titles and descriptions use identical grammatical structures for both parties. Data terms (candidate names, positions) stay in English for accuracy; only the display layer is translated.</p>
@@ -273,7 +332,7 @@ function handleNonpartisan() {
     <h2>Open Source Approach</h2>
     <p>The full prompt sent to the AI and every design decision is documented. Nothing is hidden.</p>
 
-    <p class="page-footer"><a href="/">ATX Votes</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@atxvotes.app">howdy@atxvotes.app</a></p>
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
 </body>
 </html>`;
@@ -289,7 +348,7 @@ function handleSupport() {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Support — ATX Votes</title>
+  <title>Support — Texas Votes</title>
   ${PAGE_CSS}
 </head>
 <body>
@@ -297,7 +356,7 @@ function handleSupport() {
     <h1>Support</h1>
     <p class="subtitle">We're here to help.</p>
 
-    <a class="email-btn" href="mailto:howdy@atxvotes.app">Email Us</a>
+    <a class="email-btn" href="mailto:howdy@txvotes.app">Email Us</a>
 
     <div class="faq">
       <h2>Frequently Asked Questions</h2>
@@ -312,13 +371,13 @@ function handleSupport() {
       <p>Everything stays on your device (and in your iCloud account if you have iCloud enabled). We don't store your data on our servers. See our <a href="/privacy">privacy policy</a> for details.</p>
 
       <h2>Which elections are covered?</h2>
-      <p>ATX Votes currently covers the March 3, 2026 Texas Primary Election for Austin and Travis County voters, including both Republican and Democratic primaries.</p>
+      <p>Texas Votes covers the March 3, 2026 Texas Primary Election for all Texas voters, including both Republican and Democratic primaries.</p>
 
       <h2>I found wrong information about a candidate.</h2>
-      <p>Please <a href="mailto:howdy@atxvotes.app">email us</a> with details and we'll correct it as quickly as possible.</p>
+      <p>Please <a href="mailto:howdy@txvotes.app">email us</a> with details and we'll correct it as quickly as possible.</p>
     </div>
 
-    <p class="page-footer"><a href="/">ATX Votes</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/privacy">Privacy</a></p>
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/privacy">Privacy</a></p>
   </div>
 </body>
 </html>`;
@@ -334,7 +393,7 @@ function handlePrivacyPolicy() {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Privacy Policy — ATX Votes</title>
+  <title>Privacy Policy — Texas Votes</title>
   ${PAGE_CSS}
 </head>
 <body>
@@ -342,7 +401,7 @@ function handlePrivacyPolicy() {
     <h1>Privacy Policy</h1>
     <p class="updated">Last updated: February 21, 2026</p>
 
-    <p>ATX Votes ("the app") is a free voting guide for Austin and Travis County elections. Your privacy matters — here's exactly what happens with your data.</p>
+    <p>Texas Votes ("the app") is a free voting guide for Texas elections. Your privacy matters — here's exactly what happens with your data.</p>
 
     <h2>What we collect</h2>
     <p>The app collects only what you provide during the interview:</p>
@@ -391,9 +450,9 @@ function handlePrivacyPolicy() {
     <p>If this policy changes, we'll update the date above and publish the new version at this URL.</p>
 
     <h2>Contact</h2>
-    <p>Questions? Email <a href="mailto:howdy@atxvotes.app">howdy@atxvotes.app</a></p>
+    <p>Questions? Email <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
 
-    <p class="page-footer"><a href="/">ATX Votes</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="mailto:howdy@atxvotes.app">howdy@atxvotes.app</a></p>
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
 </body>
 </html>`;
@@ -420,14 +479,34 @@ async function handleManifest(env) {
 async function handleBallotFetch(request, env) {
   const url = new URL(request.url);
   const party = url.searchParams.get("party");
+  const county = url.searchParams.get("county");
   if (!party || !["republican", "democrat"].includes(party)) {
     return jsonResponse({ error: "party parameter required (republican|democrat)" }, 400);
   }
 
-  const key = `ballot:${party}_primary_2026`;
-  const raw = await env.ELECTION_DATA.get(key);
+  // Load statewide ballot (new key structure), fall back to legacy key
+  let raw = await env.ELECTION_DATA.get(`ballot:statewide:${party}_primary_2026`);
+  if (!raw) {
+    raw = await env.ELECTION_DATA.get(`ballot:${party}_primary_2026`);
+  }
   if (!raw) {
     return jsonResponse({ error: "No ballot data available" }, 404);
+  }
+
+  // If county FIPS provided, merge county-specific races
+  if (county) {
+    const countyRaw = await env.ELECTION_DATA.get(`ballot:county:${county}:${party}_primary_2026`);
+    if (countyRaw) {
+      try {
+        const statewide = JSON.parse(raw);
+        const countyBallot = JSON.parse(countyRaw);
+        statewide.races = statewide.races.concat(countyBallot.races || []);
+        if (countyBallot.propositions) {
+          statewide.propositions = (statewide.propositions || []).concat(countyBallot.propositions);
+        }
+        raw = JSON.stringify(statewide);
+      } catch { /* use statewide-only if merge fails */ }
+    }
   }
 
   const etag = `"${await hashString(raw)}"`;
@@ -442,6 +521,28 @@ async function handleBallotFetch(request, env) {
       "Content-Type": "application/json",
       "Cache-Control": "public, max-age=3600",
       ETag: etag,
+    },
+  });
+}
+
+async function handleCountyInfo(request, env) {
+  const url = new URL(request.url);
+  const fips = url.searchParams.get("fips");
+  if (!fips) {
+    return jsonResponse({ error: "fips parameter required" }, 400);
+  }
+
+  const raw = await env.ELECTION_DATA.get(`county_info:${fips}`);
+  if (!raw) {
+    return jsonResponse({ error: "No county info available", countyFips: fips }, 404);
+  }
+
+  return new Response(raw, {
+    status: 200,
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "public, max-age=3600",
+      "Access-Control-Allow-Origin": "*",
     },
   });
 }
@@ -518,6 +619,12 @@ export default {
       if (url.pathname === "/app/api/ballot") {
         return handleBallotFetch(request, env);
       }
+      if (url.pathname === "/app/api/county-info") {
+        return handleCountyInfo(request, env);
+      }
+      if (url.pathname === "/app/api/polymarket") {
+        return handlePolymarket(env);
+      }
       return handleLandingPage();
     }
 
@@ -556,6 +663,20 @@ export default {
         return new Response("Unauthorized", { status: 401 });
       }
       return handleTrigger(request, env);
+    }
+
+    // POST: /api/election/seed-county — populate county-specific data
+    if (url.pathname === "/api/election/seed-county") {
+      const auth = request.headers.get("Authorization");
+      if (!auth || auth !== `Bearer ${env.ADMIN_SECRET}`) {
+        return new Response("Unauthorized", { status: 401 });
+      }
+      const body = await request.json().catch(() => ({}));
+      if (!body.countyFips || !body.countyName) {
+        return jsonResponse({ error: "countyFips and countyName required" }, 400);
+      }
+      const result = await seedFullCounty(body.countyFips, body.countyName, env);
+      return jsonResponse(result);
     }
 
     return new Response("Not found", { status: 404 });

@@ -22,14 +22,14 @@ export function handlePWA_SW() {
 export function handlePWA_Clear() {
   var html = '<!DOCTYPE html><html><head><meta charset="utf-8">' +
     '<meta name="viewport" content="width=device-width,initial-scale=1">' +
-    '<title>ATX Votes — Updating</title>' +
+    '<title>Texas Votes — Updating</title>' +
     '<style>body{font-family:-apple-system,system-ui,sans-serif;display:flex;' +
     'align-items:center;justify-content:center;min-height:100vh;margin:0;' +
     'background:#f5f5f5;color:#333;text-align:center}' +
     '@media(prefers-color-scheme:dark){body{background:#1a1a1a;color:#e5e5e5}}' +
     '.box{padding:2rem;max-width:400px}h2{margin:0 0 1rem}p{color:#666;line-height:1.5}' +
     '.done{color:#22c55e;font-weight:600}</style></head><body><div class="box">' +
-    '<h2>Updating ATX Votes...</h2><p id="status">Clearing old cache...</p></div>' +
+    '<h2>Updating Texas Votes...</h2><p id="status">Clearing old cache...</p></div>' +
     '<script>' +
     '(async function(){' +
       'var s=document.getElementById("status");' +
@@ -69,7 +69,7 @@ export function handlePWA_Manifest() {
 // MARK: - Service Worker
 
 var SERVICE_WORKER = [
-  "var CACHE='atxvotes-v2';",
+  "var CACHE='txvotes-v2';",
   "self.addEventListener('install',function(e){",
   "  self.skipWaiting();",
   "});",
@@ -98,10 +98,10 @@ var SERVICE_WORKER = [
 // MARK: - Manifest
 
 var MANIFEST = JSON.stringify({
-  name: "ATX Votes",
-  short_name: "ATX Votes",
+  name: "Texas Votes",
+  short_name: "TX Votes",
   description:
-    "Your personalized voting guide for Austin & Travis County elections",
+    "Your personalized voting guide for Texas elections",
   start_url: "/app",
   display: "standalone",
   background_color: "#faf8f0",
@@ -446,16 +446,16 @@ var APP_JS = [
   "var APP_VERSION=25;",
 
   // ============ i18n ============
-  "var LANG=localStorage.getItem('atx_votes_lang')||((navigator.language||'').slice(0,2)==='es'?'es':'en');",
+  "var LANG=localStorage.getItem('tx_votes_lang')||localStorage.getItem('atx_votes_lang')||((navigator.language||'').slice(0,2)==='es'?'es':'en');",
   "var _lastLangSwitch=0;",
   "function setLang(l){" +
     "var now=Date.now();if(now-_lastLangSwitch<500)return;_lastLangSwitch=now;" +
-    "LANG=l;localStorage.setItem('atx_votes_lang',l);shuffledIssues=null;shuffledSpectrum=null;shuffledQualities=null;shuffledDD={};render();" +
+    "LANG=l;localStorage.setItem('tx_votes_lang',l);shuffledIssues=null;shuffledSpectrum=null;shuffledQualities=null;shuffledDD={};render();" +
     "if(S.summary&&S.guideComplete){regenerateSummary()}" +
   "}",
   "var TR={" +
     // Welcome & General
-    "'Your personalized voting guide for Austin & Travis County elections.':'Tu gu\\u00EDa personalizada de votaci\\u00F3n para Austin y el condado de Travis.'," +
+    "'Your personalized voting guide for Texas elections.':'Tu gu\\u00EDa personalizada de votaci\\u00F3n para las elecciones de Texas.'," +
     "'Texas Primary \\u2014 March 3, 2026':'Primaria de Texas \\u2014 3 de marzo, 2026'," +
     "'5-minute interview learns your values':'Entrevista r\\u00E1pida sobre tus valores'," +
     "'Personalized ballot with recommendations':'Boleta personalizada con recomendaciones'," +
@@ -634,7 +634,7 @@ var APP_JS = [
     "'Unlikely to fail. A weak showing would suggest Democratic voters do not prioritize process reforms over policy issues, reducing its prominence as a campaign theme.':'Poco probable que falle. Un resultado d\\u00E9bil sugerir\\u00EDa que los votantes no priorizan reformas de proceso sobre temas de pol\\u00EDtica p\\u00FAblica.'," +
     "'Signals Democratic voter support for progressive federal tax reform. Provides a platform position for Texas Democrats heading into the 2026 midterms. Could influence the federal debate over expiring Trump-era tax cuts.':'Indica apoyo a una reforma tributaria federal progresiva. Proporciona una posici\\u00F3n de plataforma para los dem\\u00F3cratas de Texas de cara a las elecciones intermedias de 2026.'," +
     "'Would suggest Democratic primary voters are skeptical of tax-the-wealthy messaging or view it as outside the scope of state politics. Could indicate a preference for addressing Texas\\u2019s regressive state tax structure instead.':'Sugerir\\u00EDa que los votantes dem\\u00F3cratas son esc\\u00E9pticos del mensaje de gravar a los ricos o lo ven fuera del \\u00E1mbito de la pol\\u00EDtica estatal. Podr\\u00EDa indicar preferencia por abordar la estructura tributaria regresiva de Texas.'," +
-    "'Signals strong Democratic voter support for public transit investment. Strengthens the case for state transit funding and bolsters local initiatives like Austin\\u2019s Project Connect. Could influence TxDOT\\u2019s multimodal transit plan.':'Indica un fuerte apoyo a la inversi\\u00F3n en transporte p\\u00FAblico. Fortalece el caso para financiamiento estatal de transporte y refuerza iniciativas locales como Project Connect de Austin.'," +
+    "'Signals strong Democratic voter support for public transit investment. Strengthens the case for state transit funding and bolsters local transit initiatives. Could influence TxDOT\\u2019s multimodal transit plan.':'Indica un fuerte apoyo a la inversi\\u00F3n en transporte p\\u00FAblico. Fortalece el caso para financiamiento estatal de transporte y refuerza iniciativas locales de transporte.'," +
     "'Unlikely to fail. A weak showing would suggest even Democratic voters prioritize other spending over transit, reducing momentum for state-level transit funding.':'Poco probable que falle. Un resultado d\\u00E9bil sugerir\\u00EDa que incluso los votantes dem\\u00F3cratas priorizan otros gastos sobre el transporte, reduciendo el impulso para financiamiento estatal.'," +
     "'Signals Democratic voter support for red flag laws focused on domestic violence, directly contradicting the 2025 Anti-Red Flag Act. Provides a sharp general election contrast on gun safety. Could motivate suburban voters, particularly women, who support common-sense gun measures.':'Indica apoyo a leyes de alerta roja enfocadas en violencia dom\\u00E9stica, contradiciendo directamente la Ley Anti-Alerta Roja de 2025. Proporciona un fuerte contraste en seguridad de armas. Podr\\u00EDa motivar a votantes suburbanos, particularmente mujeres.'," +
     "'Would suggest the Democratic base is divided on gun policy, perhaps due to concerns about government overreach or Second Amendment protections. Could lead candidates to soften gun safety messaging.':'Sugerir\\u00EDa que la base dem\\u00F3crata est\\u00E1 dividida sobre pol\\u00EDtica de armas, quiz\\u00E1s por preocupaciones sobre el exceso gubernamental o las protecciones de la Segunda Enmienda. Podr\\u00EDa llevar a candidatos a suavizar el mensaje sobre seguridad de armas.'," +
@@ -671,7 +671,7 @@ var APP_JS = [
     "'CANDIDATE':'CANDIDATO'," +
     "'= Key race':'= Contienda clave'," +
     "'AI-generated \\u2014 do your own research':'Generado por IA \\u2014 haz tu propia investigaci\\u00F3n'," +
-    "'Built with ATX Votes':'Hecho con ATX Votes'," +
+    "'Built with Texas Votes':'Hecho con Texas Votes'," +
     "'Back to Ballot':'Volver a la boleta'," +
     // Profile
     "'Your Profile':'Tu perfil'," +
@@ -689,6 +689,9 @@ var APP_JS = [
     "'Please enter a valid 5-digit ZIP code.':'Por favor, ingresa un c\\u00F3digo postal v\\u00E1lido de 5 d\\u00EDgitos.'," +
     "'We couldn\\u2019t find that address. Please check your street and ZIP, or skip to see all races.':'No pudimos encontrar esa direcci\\u00F3n. Verifica tu calle y c\\u00F3digo postal, o salta para ver todas las contiendas.'," +
     "'Verifying address...':'Verificando direcci\\u00F3n...'," +
+    "'Use My Location':'Usar mi ubicaci\\u00F3n'," +
+    "'Locating...':'Localizando...'," +
+    "'Location not available':'Ubicaci\\u00F3n no disponible'," +
     "'Could not regenerate summary. Please try again.':'No se pudo regenerar el resumen. Por favor, int\\u00E9ntalo de nuevo.'," +
     "'This will erase your profile and recommendations.':'Esto borrar\\u00E1 tu perfil y recomendaciones.'," +
     "'Start over? This will erase your profile and recommendations.':'\\u00BFEmpezar de nuevo? Esto borrar\\u00E1 tu perfil y recomendaciones.'," +
@@ -703,7 +706,7 @@ var APP_JS = [
     "'You voted! Thank you for participating in democracy.':'\\u00A1Ya votaste! Gracias por participar en la democracia.'," +
     "'Actually, I didn\\u2019t vote yet.':'En realidad, a\\u00FAn no he votado.'," +
     "'Find Your Polling Location':'Encuentra tu lugar de votaci\\u00F3n'," +
-    "'Travis County uses Vote Centers \\u2014 you can vote at any location.':'El condado de Travis usa centros de votaci\\u00F3n \\u2014 puedes votar en cualquier ubicaci\\u00F3n.'," +
+    "'Your county uses Vote Centers \\u2014 you can vote at any location.':'Tu condado usa centros de votaci\\u00F3n \\u2014 puedes votar en cualquier ubicaci\\u00F3n.'," +
     "'Find Locations':'Encontrar ubicaciones'," +
     "'Key Dates':'Fechas clave'," +
     "'Registration deadline':'Fecha l\\u00EDmite de registro'," +
@@ -711,7 +714,7 @@ var APP_JS = [
     "'Early voting':'Votaci\\u00F3n anticipada'," +
     "'Election Day':'D\\u00EDa de elecciones'," +
     "'Early Voting':'Votaci\\u00F3n anticipada'," +
-    "'Vote at any early voting location in Travis County.':'Vota en cualquier lugar de votaci\\u00F3n anticipada en el condado de Travis.'," +
+    "'Vote at any early voting location in your county.':'Vota en cualquier lugar de votaci\\u00F3n anticipada en tu condado.'," +
     "'Hours':'Horario'," +
     "'Open Primary:':'Primaria abierta:'," +
     "'Texas has open primaries \\u2014 tell the poll worker which party\\u2019s primary you want. You can only vote in one.':'Texas tiene primarias abiertas \\u2014 dile al trabajador electoral en cu\\u00E1l primaria quieres votar. Solo puedes votar en una.'," +
@@ -730,14 +733,17 @@ var APP_JS = [
     "'Voter registration card':'Tarjeta de registro de votante'," +
     "'REQUIRED':'OBLIGATORIO'," +
     "'Optional':'Opcional'," +
-    "'Travis County:':'Condado de Travis:'," +
+    "'Note:':'Nota:'," +
     "'You may NOT use your phone in the voting booth. Print your cheat sheet before you go!':'NO puedes usar tu tel\\u00E9fono en la casilla de votaci\\u00F3n. \\u00A1Imprime tu gu\\u00EDa antes de ir!'," +
     "'Resources':'Recursos'," +
-    "'Travis County Elections':'Elecciones del condado de Travis'," +
+    "'County Elections':'Elecciones del condado'," +
+    "'Find your polling location for Election Day.':'Encuentra tu lugar de votaci\\u00F3n para el d\\u00EDa de elecciones.'," +
+    "'Vote at any Vote Center in your county.':'Vota en cualquier centro de votaci\\u00F3n en tu condado.'," +
+    "'Check your county\\u2019s phone policy. Some counties prohibit phones in the booth. Print your cheat sheet to be safe!':'Consulta la pol\\u00EDtica de tu condado sobre tel\\u00E9fonos. Algunos condados proh\\u00EDben tel\\u00E9fonos en la casilla. \\u00A1Imprime tu gu\\u00EDa para estar seguro!'," +
     // Footer
     "'Nonpartisan by Design':'Apartidista por dise\\u00F1o'," +
     "'Privacy Policy':'Pol\\u00EDtica de privacidad'," +
-    "'Built in Austin, TX':'Hecho en Austin, TX'," +
+    "'Built in Texas':'Hecho en Texas'," +
     // Issues
     "'Economy & Cost of Living':'Econom\\u00EDa y costo de vida'," +
     "'Housing':'Vivienda'," +
@@ -836,7 +842,7 @@ var APP_JS = [
     "'Go green fast':'Transici\\u00F3n verde r\\u00E1pida'," +
     "'Aggressive renewable targets and climate action':'Metas agresivas de energ\\u00EDa renovable y acci\\u00F3n clim\\u00E1tica'," +
     "'Local focus':'Enfoque local'," +
-    "'Clean air and water in Austin, green spaces, urban heat':'Aire y agua limpios en Austin, espacios verdes, calor urbano'," +
+    "'Clean air and water, green spaces, urban heat':'Aire y agua limpios, espacios verdes, calor urbano'," +
     "'On the power grid and infrastructure?':'\\u00BFSobre la red el\\u00E9ctrica e infraestructura?'," +
     "'Deregulate more':'Mayor desregulaci\\u00F3n'," +
     "'Competition drives reliability, less ERCOT control':'La competencia mejora la fiabilidad, menos control de ERCOT'," +
@@ -846,7 +852,7 @@ var APP_JS = [
     "'Link Texas to national grid for backup':'Conectar Texas a la red nacional como respaldo'," +
     "'Local resilience':'Resiliencia local'," +
     "'Microgrids, batteries, community-level solutions':'Microrredes, bater\\u00EDas, soluciones a nivel comunitario'," +
-    "'On Austin transportation, what\\u2019s the priority?':'Sobre transporte en Austin, \\u00BFcu\\u00E1l es la prioridad?'," +
+    "'On transportation, what\\u2019s the priority?':'Sobre transporte, \\u00BFcu\\u00E1l es la prioridad?'," +
     "'Build more roads':'Construir m\\u00E1s carreteras'," +
     "'Expand highways and reduce congestion for drivers':'Ampliar autopistas y reducir la congesti\\u00F3n para los conductores'," +
     "'Public transit':'Transporte p\\u00FAblico'," +
@@ -861,7 +867,7 @@ var APP_JS = [
     "'Enforce but reform':'Aplicar la ley pero reformar'," +
     "'Secure borders AND create legal pathways':'Asegurar fronteras Y crear v\\u00EDas legales'," +
     "'Welcoming approach':'Enfoque acogedor'," +
-    "'Immigrants strengthen Austin, expand protections':'Los inmigrantes fortalecen Austin, ampliar protecciones'," +
+    "'Immigrants strengthen our communities, expand protections':'Los inmigrantes fortalecen nuestras comunidades, ampliar protecciones'," +
     "'Local isn\\u2019t federal':'Lo local no es federal'," +
     "'City shouldn\\u2019t spend resources on federal immigration enforcement':'La ciudad no deber\\u00EDa gastar recursos en la aplicaci\\u00F3n federal de inmigraci\\u00F3n'," +
     "'On civil rights and equality?':'\\u00BFSobre derechos civiles e igualdad?'," +
@@ -955,7 +961,7 @@ var APP_JS = [
       "{l:\"Don\\u2019t overreact\",d:\"Protect energy jobs, market-driven solutions\"}," +
       '{l:"All of the above",d:"Renewables and fossil fuels, pragmatic transition"},' +
       '{l:"Go green fast",d:"Aggressive renewable targets and climate action"},' +
-      '{l:"Local focus",d:"Clean air and water in Austin, green spaces, urban heat"}' +
+      '{l:"Local focus",d:"Clean air and water, green spaces, urban heat"}' +
     "]}," +
     '"Grid & Infrastructure":{q:"On the power grid and infrastructure?",opts:[' +
       '{l:"Deregulate more",d:"Competition drives reliability, less ERCOT control"},' +
@@ -963,7 +969,7 @@ var APP_JS = [
       '{l:"Connect the grid",d:"Link Texas to national grid for backup"},' +
       '{l:"Local resilience",d:"Microgrids, batteries, community-level solutions"}' +
     "]}," +
-    '"Transportation":{q:"On Austin transportation, what\\u2019s the priority?",opts:[' +
+    '"Transportation":{q:"On transportation, what\\u2019s the priority?",opts:[' +
       '{l:"Build more roads",d:"Expand highways and reduce congestion for drivers"},' +
       '{l:"Public transit",d:"Light rail, better buses, less car dependence"},' +
       '{l:"Balanced approach",d:"Roads, transit, bikes, and walkability together"},' +
@@ -972,7 +978,7 @@ var APP_JS = [
     '"Immigration":{q:"On immigration, what\\u2019s your view?",opts:[' +
       '{l:"Secure the border",d:"Enforcement first, then talk about reform"},' +
       '{l:"Enforce but reform",d:"Secure borders AND create legal pathways"},' +
-      '{l:"Welcoming approach",d:"Immigrants strengthen Austin, expand protections"},' +
+      '{l:"Welcoming approach",d:"Immigrants strengthen our communities, expand protections"},' +
       "{l:\"Local isn\\u2019t federal\",d:\"City shouldn\\u2019t spend resources on federal immigration enforcement\"}" +
     "]}," +
     '"Civil Rights":{q:"On civil rights and equality?",opts:[' +
@@ -986,11 +992,12 @@ var APP_JS = [
   // ============ STATE ============
   "var S={" +
     "phase:0,issues:[],spectrum:null,policyViews:{},qualities:[],freeform:''," +
-    "address:{street:'',city:'Austin',state:'TX',zip:''}," +
+    "address:{street:'',city:'',state:'TX',zip:''}," +
     "ddIndex:0,ddQuestions:[]," +
+    "countyInfo:null," +
     "repBallot:null,demBallot:null,selectedParty:'republican'," +
     "guideComplete:false,summary:null,districts:null," +
-    "isLoading:false,loadPhase:0,loadMsg:'',error:null," +
+    "isLoading:false,loadPhase:0,loadMsg:'',error:null,geolocating:false,polymarket:null," +
     "expanded:{'vi-dates':true,'vi-bring':true},disclaimerDismissed:false,hasVoted:false" +
     "};",
 
@@ -1020,41 +1027,49 @@ var APP_JS = [
     "return 50}",
 
   // ============ PERSISTENCE ============
+  // One-time migration: atx_votes_* → tx_votes_*
+  "(function(){try{" +
+    "if(localStorage.getItem('atx_votes_profile')&&!localStorage.getItem('tx_votes_profile')){" +
+      "var keys=['profile','ballot_republican','ballot_democrat','selected_party','has_voted','lang'];" +
+      "for(var i=0;i<keys.length;i++){var v=localStorage.getItem('atx_votes_'+keys[i]);if(v)localStorage.setItem('tx_votes_'+keys[i],v)}" +
+    "}" +
+  "}catch(e){}}());",
+
   "function save(){" +
     "try{" +
-    "localStorage.setItem('atx_votes_profile',JSON.stringify({" +
+    "localStorage.setItem('tx_votes_profile',JSON.stringify({" +
       "topIssues:S.issues,politicalSpectrum:S.spectrum,policyViews:S.policyViews," +
       "candidateQualities:S.qualities,freeform:S.freeform,address:S.address,summaryText:S.summary,districts:S.districts" +
     "}));" +
-    "if(S.repBallot)localStorage.setItem('atx_votes_ballot_republican',JSON.stringify(S.repBallot));" +
-    "if(S.demBallot)localStorage.setItem('atx_votes_ballot_democrat',JSON.stringify(S.demBallot));" +
-    "localStorage.setItem('atx_votes_selected_party',S.selectedParty);" +
-    "localStorage.setItem('atx_votes_has_voted',S.hasVoted?'1':'');" +
+    "if(S.repBallot)localStorage.setItem('tx_votes_ballot_republican',JSON.stringify(S.repBallot));" +
+    "if(S.demBallot)localStorage.setItem('tx_votes_ballot_democrat',JSON.stringify(S.demBallot));" +
+    "localStorage.setItem('tx_votes_selected_party',S.selectedParty);" +
+    "localStorage.setItem('tx_votes_has_voted',S.hasVoted?'1':'');" +
     "}catch(e){}" +
   "}",
 
   "function load(){" +
     "try{" +
-    "var p=localStorage.getItem('atx_votes_profile');" +
+    "var p=localStorage.getItem('tx_votes_profile');" +
     "if(p){p=JSON.parse(p);S.issues=p.topIssues||[];S.spectrum=p.politicalSpectrum||null;" +
     "S.policyViews=p.policyViews||{};S.qualities=p.candidateQualities||[];S.freeform=p.freeform||'';" +
-    "S.address=p.address||{street:'',city:'Austin',state:'TX',zip:''};" +
+    "S.address=p.address||{street:'',city:'',state:'TX',zip:''};" +
     "S.summary=p.summaryText||null;S.districts=p.districts||null}" +
-    "var rb=localStorage.getItem('atx_votes_ballot_republican');" +
+    "var rb=localStorage.getItem('tx_votes_ballot_republican');" +
     "if(rb)S.repBallot=JSON.parse(rb);" +
-    "var db=localStorage.getItem('atx_votes_ballot_democrat');" +
+    "var db=localStorage.getItem('tx_votes_ballot_democrat');" +
     "if(db)S.demBallot=JSON.parse(db);" +
-    "var sp=localStorage.getItem('atx_votes_selected_party');" +
+    "var sp=localStorage.getItem('tx_votes_selected_party');" +
     "if(sp)S.selectedParty=sp;" +
-    "S.hasVoted=!!localStorage.getItem('atx_votes_has_voted');" +
-    "if(S.repBallot||S.demBallot)S.guideComplete=true;" +
+    "S.hasVoted=!!localStorage.getItem('tx_votes_has_voted');" +
+    "if(S.repBallot||S.demBallot){S.guideComplete=true;fetchPolymarket()}" +
     "}catch(e){}" +
   "}",
 
   // ============ RENDER ============
   "function topNav(active){" +
     "return '<div class=\"topnav-inner\">" +
-      "<span class=\"topnav-brand\">ATX Votes</span>" +
+      "<span class=\"topnav-brand\">Texas Votes</span>" +
       "<a class=\"topnav-link'+(active==='#/ballot'?' on':'')+'\" data-action=\"nav\" data-to=\"#/ballot\">'+ICON_BALLOT+t('My Ballot')+'</a>" +
       "<a class=\"topnav-link'+(active==='#/info'?' on':'')+'\" data-action=\"nav\" data-to=\"#/info\">'+ICON_INFO+t('Vote Info')+'</a>" +
       "<a class=\"topnav-link'+(active==='#/profile'?' on':'')+'\" data-action=\"nav\" data-to=\"#/profile\">'+ICON_PROFILE+t('Profile')+'</a>" +
@@ -1107,8 +1122,8 @@ var APP_JS = [
   "function renderWelcome(){" +
     "return '<div class=\"hero\">" +
       "<div class=\"hero-icon\">\u{1F5F3}\u{FE0F}</div>" +
-      "<h1>ATX Votes</h1>" +
-      "<p>'+t('Your personalized voting guide for Austin & Travis County elections.')+'</p>" +
+      "<h1>Texas Votes</h1>" +
+      "<p>'+t('Your personalized voting guide for Texas elections.')+'</p>" +
     "</div>" +
     "<div class=\"card\"><div style=\"text-align:center;margin-bottom:16px\">" +
       "<span class=\"badge badge-blue\">'+t('Texas Primary \\u2014 March 3, 2026')+'</span></div>" +
@@ -1202,6 +1217,12 @@ var APP_JS = [
   // Address
   "function renderAddress(){" +
     "var h='<div class=\"phase-header\"><h2>'+t('Where do you vote?')+'</h2><p>'+t('We\\u2019ll look up your districts to show the right races.')+'</p></div>';" +
+    "if(navigator.geolocation){" +
+      "h+='<button type=\"button\" class=\"btn btn-secondary\" data-action=\"geolocate\" style=\"width:100%;margin-bottom:16px\"'+(S.geolocating?' disabled':'')+'>';" +
+      "if(S.geolocating){h+='<span class=\"spinner\" style=\"width:16px;height:16px;display:inline-block;vertical-align:middle;margin-right:8px\"></span>'+t('Locating...')}" +
+      "else{h+='\\uD83D\\uDCCD '+t('Use My Location')}" +
+      "h+='</button>';" +
+    "}" +
     "h+='<form id=\"addr-form\">';" +
     "h+='<div class=\"form-group\"><label>'+t('Street Address')+'</label><input name=\"street\" placeholder=\"123 Congress Ave\" value=\"'+esc(S.address.street)+'\" autofocus></div>';" +
     "h+='<div class=\"form-row\">';" +
@@ -1223,6 +1244,23 @@ var APP_JS = [
     "h+='<p class=\"text-center mt-md\" style=\"font-size:13px;color:var(--text2)\">'+t('You can skip the address \\u2014 we\\u2019ll show all races.')+'</p>';" +
     "h+='<button class=\"btn btn-secondary mt-sm\" data-action=\"skip-address\">'+t('Skip & Build Guide')+'</button>';" +
     "return h;" +
+  "}",
+
+  // ============ GEOLOCATE ============
+  "function geolocate(){" +
+    "S.geolocating=true;S.addressError=null;render();" +
+    "navigator.geolocation.getCurrentPosition(function(pos){" +
+      "fetch('https://nominatim.openstreetmap.org/reverse?lat='+pos.coords.latitude+'&lon='+pos.coords.longitude+'&format=json')" +
+      ".then(function(r){return r.json()})" +
+      ".then(function(d){" +
+        "var a=d.address||{};" +
+        "var street=(a.house_number?a.house_number+' ':'')+(a.road||'');" +
+        "S.address.street=street;" +
+        "S.address.city=a.city||a.town||a.village||a.hamlet||'';" +
+        "S.address.zip=a.postcode?a.postcode.slice(0,5):'';" +
+        "S.geolocating=false;render();" +
+      "}).catch(function(){S.geolocating=false;S.addressError=t('Location not available');render()})" +
+    "},function(){S.geolocating=false;S.addressError=t('Location not available');render()},{timeout:10000})" +
   "}",
 
   // Building / Loading — tug-of-war animation (pure CSS, no timer needed)
@@ -1326,7 +1364,7 @@ var APP_JS = [
     "h+='<a href=\"/nonpartisan\" target=\"_blank\" style=\"color:var(--text2)\">'+t('Nonpartisan by Design')+'</a>';" +
     "h+=' &middot; ';" +
     "h+='<a href=\"/privacy\" target=\"_blank\" style=\"color:var(--text2)\">'+t('Privacy Policy')+'</a>';" +
-    "h+='<br><span style=\"margin-top:6px;display:inline-block\">Built in Austin, TX &middot; <a href=\"mailto:howdy@atxvotes.app\" style=\"color:var(--text2)\">howdy@atxvotes.app</a> &middot; v'+APP_VERSION+'</span>';" +
+    "h+='<br><span style=\"margin-top:6px;display:inline-block\">Built in Texas &middot; <a href=\"mailto:howdy@txvotes.app\" style=\"color:var(--text2)\">howdy@txvotes.app</a> &middot; v'+APP_VERSION+'</span>';" +
     "h+='</div>';" +
     "return h;" +
   "}",
@@ -1338,14 +1376,14 @@ var APP_JS = [
     "var races=b.races.slice().sort(function(a,b){return sortOrder(a)-sortOrder(b)});" +
     "var contested=races.filter(function(r){return r.isContested});" +
     "var uncontested=races.filter(function(r){return!r.isContested});" +
-    "var profile=null;try{var p=localStorage.getItem('atx_votes_profile');if(p)profile=JSON.parse(p)}catch(e){}" +
+    "var profile=null;try{var p=localStorage.getItem('tx_votes_profile');if(p)profile=JSON.parse(p)}catch(e){}" +
     "var addr=profile&&profile.address?profile.address:null;" +
     "var partyName=S.selectedParty==='democrat'?'Democrat':'Republican';" +
     "var partyCls=S.selectedParty==='democrat'?'cs-party-dem':'cs-party-rep';" +
     // Header
     "var h='<div class=\"cs-header\">';" +
     "h+='<h2>'+t('Your Ballot Cheat Sheet')+'</h2>';" +
-    "if(addr&&addr.street){h+='<div class=\"cs-meta\">'+esc(addr.street)+', '+esc(addr.city||'Austin')+' '+esc(addr.zip||'')+'</div>'}" +
+    "if(addr&&addr.street){h+='<div class=\"cs-meta\">'+esc(addr.street)+(addr.city?', '+esc(addr.city):'')+' '+esc(addr.zip||'')+'</div>'}" +
     "h+='<span class=\"cs-party '+partyCls+'\">'+esc(partyName)+' '+t('Primary')+'</span>';" +
     "h+='<div class=\"cs-meta\">'+t('March 3, 2026')+'</div>';" +
     "h+='</div>';" +
@@ -1390,7 +1428,7 @@ var APP_JS = [
     "}" +
     // Legend & footer
     "h+='<div class=\"cs-legend\"><span>\u2B50 '+t('= Key race')+'</span><span>\u26A0\uFE0F '+t('AI-generated \\u2014 do your own research')+'</span></div>';" +
-    "h+='<div class=\"cs-footer\">'+t('Built with ATX Votes')+' &middot; atxvotes.app</div>';" +
+    "h+='<div class=\"cs-footer\">'+t('Built with Texas Votes')+' &middot; txvotes.app</div>';" +
     // Party switcher + back link (hidden in print)
     "h+=renderPartySwitcher();" +
     "h+='<div style=\"text-align:center;margin-top:8px\" class=\"cs-actions\"><button class=\"btn btn-secondary\" data-action=\"nav\" data-to=\"#/ballot\">&larr; '+t('Back to Ballot')+'</button></div>';" +
@@ -1541,6 +1579,8 @@ var APP_JS = [
       "h+='<div class=\"cand-tags\">';" +
       "if(c.isIncumbent)h+='<span class=\"badge badge-blue\">'+t('Incumbent')+'</span>';" +
       "if(c.isRecommended)h+='<span class=\"badge badge-ok\">'+t('Recommended')+'</span>';" +
+      "var odds=getOdds(c.name,race.office,S.selectedParty);" +
+      "if(odds)h+='<span class=\"badge\" style=\"background:rgba(212,168,67,.15);color:#B8860B\" title=\"Polymarket prediction\">'+odds+'%</span>';" +
       "h+='</div></div>';" +
       "h+='</div></div>';" +
       "h+='<div class=\"cand-summary\">'+esc(c.summary)+'</div>';" +
@@ -1600,7 +1640,7 @@ var APP_JS = [
     "h+='</div>';" +
     // Send Feedback + Credits
     "h+='<div class=\"card\" style=\"margin-top:16px;text-align:center\">';" +
-    "h+='<a href=\"mailto:howdy@atxvotes.app\" style=\"font-size:15px;font-weight:600\">'+t('Send Feedback')+' &rarr;</a>';" +
+    "h+='<a href=\"mailto:howdy@txvotes.app\" style=\"font-size:15px;font-weight:600\">'+t('Send Feedback')+' &rarr;</a>';" +
     "h+='<p style=\"font-size:13px;color:var(--text2);margin-top:8px\">'+t('Powered by Claude (Anthropic)')+'</p>';" +
     "h+='</div>';" +
     // Language toggle
@@ -1681,13 +1721,21 @@ var APP_JS = [
     "}" +
     "h+='</div>';" +
 
-    // Polling location card
+    // Polling location card — dynamic based on county info
+    "var ci=S.countyInfo;" +
     "h+='<div class=\"card\" style=\"margin-bottom:16px\">';" +
     "h+='<div style=\"font-size:16px;font-weight:700;margin-bottom:4px\">'+t('Find Your Polling Location')+'</div>';" +
-    "h+='<p style=\"font-size:14px;color:var(--text2);margin-bottom:12px\">'+t('Travis County uses Vote Centers \\u2014 you can vote at any location.')+'</p>';" +
+    "if(ci&&ci.voteCenters){" +
+      "h+='<p style=\"font-size:14px;color:var(--text2);margin-bottom:12px\">'+t('Your county uses Vote Centers \\u2014 you can vote at any location.')+'</p>'" +
+    "}else{" +
+      "h+='<p style=\"font-size:14px;color:var(--text2);margin-bottom:12px\">'+t('Find your polling location for Election Day.')+'</p>'" +
+    "}" +
     "h+='<div style=\"display:flex;gap:8px;flex-wrap:wrap\">';" +
-    "h+='<a href=\"https://countyclerk.traviscountytx.gov/departments/elections/current-election/\" target=\"_blank\" class=\"btn btn-primary\" style=\"flex:1;text-align:center;text-decoration:none\">'+t('Find Locations')+' &rarr;</a>';" +
-    "h+='<a href=\"https://votetravis.gov\" target=\"_blank\" class=\"btn btn-secondary\" style=\"flex:1;text-align:center;text-decoration:none\">VoteTravis.gov</a>';" +
+    "if(ci&&ci.electionsWebsite){" +
+      "h+='<a href=\"'+esc(ci.electionsWebsite)+'\" target=\"_blank\" class=\"btn btn-primary\" style=\"flex:1;text-align:center;text-decoration:none\">'+t('Find Locations')+' &rarr;</a>'" +
+    "}else{" +
+      "h+='<a href=\"https://votetexas.gov/voting/where.html\" target=\"_blank\" class=\"btn btn-primary\" style=\"flex:1;text-align:center;text-decoration:none\">'+t('Find Locations')+' &rarr;</a>'" +
+    "}" +
     "h+='</div></div>';" +
 
     // Key Dates accordion
@@ -1704,22 +1752,37 @@ var APP_JS = [
     "kdBody+='<div class=\"vi-row\"><span class=\"vi-highlight\">'+t('Election Day')+'</span><span class=\"vi-highlight\">'+t('March 3, 2026')+'</span></div>';" +
     "h+=accSection('vi-dates','\u{1F4C5}',t('Key Dates'),kdBody);" +
 
-    // Early Voting accordion
+    // Early Voting accordion — dynamic from county info
     "var evBody='';" +
-    "evBody+='<div class=\"vi-row\"><span>Feb 17 \\u2013 21</span><span>7:00 AM \\u2013 7:00 PM</span></div>';" +
-    "evBody+='<div class=\"vi-row\"><span>Feb 22 (Sunday)</span><span>12:00 PM \\u2013 6:00 PM</span></div>';" +
-    "evBody+='<div class=\"vi-row\"><span>Feb 23 \\u2013 25</span><span>7:00 AM \\u2013 7:00 PM</span></div>';" +
-    "evBody+='<div class=\"vi-row\"><span style=\"font-weight:600\">Feb 26 \\u2013 27</span><span style=\"font-weight:600\">7:00 AM \\u2013 10:00 PM</span></div>';" +
-    "evBody+='<p style=\"font-size:13px;color:var(--text2);margin-top:8px\">'+t('Vote at any early voting location in Travis County.')+'</p>';" +
+    "if(ci&&ci.earlyVoting&&ci.earlyVoting.periods){" +
+      "for(var evi=0;evi<ci.earlyVoting.periods.length;evi++){" +
+        "var evp=ci.earlyVoting.periods[evi];" +
+        "var isLast=evi===ci.earlyVoting.periods.length-1;" +
+        "evBody+='<div class=\"vi-row\"><span'+(isLast?' style=\"font-weight:600\"':'')+'>'+esc(evp.dates)+'</span><span'+(isLast?' style=\"font-weight:600\"':'')+'>'+esc(evp.hours)+'</span></div>'" +
+      "}" +
+    "}else{" +
+      "evBody+='<div class=\"vi-row\"><span>Feb 17 \\u2013 21</span><span>7:00 AM \\u2013 7:00 PM</span></div>';" +
+      "evBody+='<div class=\"vi-row\"><span>Feb 22 (Sunday)</span><span>12:00 PM \\u2013 6:00 PM</span></div>';" +
+      "evBody+='<div class=\"vi-row\"><span>Feb 23 \\u2013 25</span><span>7:00 AM \\u2013 7:00 PM</span></div>';" +
+      "evBody+='<div class=\"vi-row\"><span style=\"font-weight:600\">Feb 26 \\u2013 27</span><span style=\"font-weight:600\">7:00 AM \\u2013 10:00 PM</span></div>'" +
+    "}" +
+    "evBody+='<p style=\"font-size:13px;color:var(--text2);margin-top:8px\">'+t('Vote at any early voting location in your county.')+'</p>';" +
     "h+=accSection('vi-early','\u{1F552}',t('Early Voting'),evBody);" +
 
-    // Election Day accordion
+    // Election Day accordion — dynamic from county info
     "var edBody='';" +
-    "edBody+='<div class=\"vi-row\"><span style=\"font-weight:600\">'+t('Hours')+'</span><span style=\"font-weight:600\">7:00 AM \\u2013 7:00 PM</span></div>';" +
-    "edBody+='<p style=\"margin-top:8px\">Vote at any Vote Center in Travis County with a \\u201CVote Here / Aqu\\u00ED\\u201D sign.</p>';" +
+    "var edHours=(ci&&ci.electionDay&&ci.electionDay.hours)?ci.electionDay.hours:'7:00 AM \\u2013 7:00 PM';" +
+    "edBody+='<div class=\"vi-row\"><span style=\"font-weight:600\">'+t('Hours')+'</span><span style=\"font-weight:600\">'+esc(edHours)+'</span></div>';" +
+    "if(ci&&ci.voteCenters){" +
+      "edBody+='<p style=\"margin-top:8px\">'+t('Vote at any Vote Center in your county.')+'</p>'" +
+    "}" +
     "edBody+='<p style=\"margin-top:8px;padding:10px;background:rgba(33,89,143,.06);border-radius:var(--rs);font-size:13px\">" +
       "<b>'+t('Open Primary:')+'</b> '+t('Texas has open primaries \\u2014 tell the poll worker which party\\u2019s primary you want. You can only vote in one.')+'</p>';" +
-    "edBody+='<div style=\"margin-top:10px\"><a href=\"https://countyclerk.traviscountytx.gov/departments/elections/current-election/\" target=\"_blank\" style=\"font-size:14px;font-weight:600;color:var(--blue)\">'+t('Find Election Day locations')+' &rarr;</a></div>';" +
+    "if(ci&&ci.electionDay&&ci.electionDay.locationUrl){" +
+      "edBody+='<div style=\"margin-top:10px\"><a href=\"'+esc(ci.electionDay.locationUrl)+'\" target=\"_blank\" style=\"font-size:14px;font-weight:600;color:var(--blue)\">'+t('Find Election Day locations')+' &rarr;</a></div>'" +
+    "}else{" +
+      "edBody+='<div style=\"margin-top:10px\"><a href=\"https://votetexas.gov/voting/where.html\" target=\"_blank\" style=\"font-size:14px;font-weight:600;color:var(--blue)\">'+t('Find Election Day locations')+' &rarr;</a></div>'" +
+    "}" +
     "h+=accSection('vi-eday','\u{1F3DB}\u{FE0F}',t('Election Day'),edBody);" +
 
     // Voter ID accordion
@@ -1737,23 +1800,41 @@ var APP_JS = [
     "bringBody+='<span>\u{1F4C4} '+t('Your cheat sheet (printed)')+'</span><span class=\"vi-badge vi-badge-opt\">'+t('Optional')+'</span></div>';" +
     "bringBody+='<div style=\"padding:8px 0;display:flex;justify-content:space-between;align-items:center\">';" +
     "bringBody+='<span>\u{1F4B3} '+t('Voter registration card')+'</span><span class=\"vi-badge vi-badge-opt\">'+t('Optional')+'</span></div>';" +
-    "bringBody+='<div class=\"vi-warn\"><span style=\"font-size:18px\">\u26A0\u{FE0F}</span><div><b>'+t('Travis County:')+'</b> '+t('You may NOT use your phone in the voting booth. Print your cheat sheet before you go!')+'</div></div>';" +
+    "if(ci&&ci.phoneInBooth===false){" +
+      "bringBody+='<div class=\"vi-warn\"><span style=\"font-size:18px\">\u26A0\u{FE0F}</span><div><b>'+t('Note:')+'</b> '+t('You may NOT use your phone in the voting booth. Print your cheat sheet before you go!')+'</div></div>'" +
+    "}else{" +
+      "bringBody+='<div class=\"vi-warn\"><span style=\"font-size:18px\">\u26A0\u{FE0F}</span><div>'+t('Check your county\\u2019s phone policy. Some counties prohibit phones in the booth. Print your cheat sheet to be safe!')+'</div></div>'" +
+    "}" +
     "h+=accSection('vi-bring','\u{1F6CD}\u{FE0F}',t('What to Bring'),bringBody);" +
 
-    // Resources accordion
+    // Resources accordion — dynamic from county info with statewide defaults
     "var resBody='';" +
-    "resBody+='<div class=\"vi-link\"><a href=\"https://lwvaustin.org/voters-guide\" target=\"_blank\">League of Women Voters Guide &rarr;</a></div>';" +
+    "if(ci&&ci.resources){" +
+      "for(var ri=0;ri<ci.resources.length;ri++){" +
+        "var res=ci.resources[ri];" +
+        "resBody+='<div class=\"vi-link\"><a href=\"'+esc(res.url)+'\" target=\"_blank\">'+esc(res.name)+' &rarr;</a></div>'" +
+      "}" +
+    "}" +
     "resBody+='<div class=\"vi-link\"><a href=\"https://vote411.org\" target=\"_blank\">VOTE411 \\u2014 Personalized ballot &rarr;</a></div>';" +
-    "resBody+='<div class=\"vi-link\"><a href=\"https://votetravis.gov\" target=\"_blank\">VoteTravis.gov \\u2014 Official info &rarr;</a></div>';" +
     "resBody+='<div class=\"vi-link\"><a href=\"https://votetexas.gov\" target=\"_blank\">VoteTexas.gov \\u2014 State info &rarr;</a></div>';" +
-    "resBody+='<div class=\"vi-link\"><a href=\"https://www.kut.org\" target=\"_blank\">KUT Austin Voter Guide &rarr;</a></div>';" +
     "h+=accSection('vi-res','\u{1F517}',t('Resources'),resBody);" +
 
-    // Contact card
+    // Contact card — dynamic from county info
     "h+='<div class=\"card\" style=\"margin-top:16px\">';" +
-    "h+='<div style=\"font-size:16px;font-weight:700;margin-bottom:8px\">'+t('Travis County Elections')+'</div>';" +
-    "h+='<div style=\"padding:6px 0\"><a href=\"tel:5122388683\" style=\"font-size:15px;color:var(--blue);font-weight:600\">\u{1F4DE} (512) 238-8683</a></div>';" +
-    "h+='<div style=\"padding:6px 0\"><a href=\"https://votetravis.gov\" target=\"_blank\" style=\"font-size:15px;color:var(--blue);font-weight:600\">\u{1F310} votetravis.gov</a></div>';" +
+    "if(ci&&ci.countyName){" +
+      "h+='<div style=\"font-size:16px;font-weight:700;margin-bottom:8px\">'+esc(ci.countyName)+' '+t('County Elections')+'</div>'" +
+    "}else{" +
+      "h+='<div style=\"font-size:16px;font-weight:700;margin-bottom:8px\">'+t('County Elections')+'</div>'" +
+    "}" +
+    "if(ci&&ci.electionsPhone){" +
+      "h+='<div style=\"padding:6px 0\"><a href=\"tel:'+esc(ci.electionsPhone.replace(/[^0-9+]/g,''))+'\" style=\"font-size:15px;color:var(--blue);font-weight:600\">\u{1F4DE} '+esc(ci.electionsPhone)+'</a></div>'" +
+    "}" +
+    "if(ci&&ci.electionsWebsite){" +
+      "var domain=ci.electionsWebsite.replace(/^https?:\\/\\//,'').replace(/\\/$/,'');" +
+      "h+='<div style=\"padding:6px 0\"><a href=\"'+esc(ci.electionsWebsite)+'\" target=\"_blank\" style=\"font-size:15px;color:var(--blue);font-weight:600\">\u{1F310} '+esc(domain)+'</a></div>'" +
+    "}else{" +
+      "h+='<div style=\"padding:6px 0\"><a href=\"https://votetexas.gov\" target=\"_blank\" style=\"font-size:15px;color:var(--blue);font-weight:600\">\u{1F310} votetexas.gov</a></div>'" +
+    "}" +
     "h+='</div>';" +
 
     // Footer links
@@ -1761,7 +1842,7 @@ var APP_JS = [
     "h+='<a href=\"/nonpartisan\" target=\"_blank\" style=\"color:var(--text2)\">'+t('Nonpartisan by Design')+'</a>';" +
     "h+=' &middot; ';" +
     "h+='<a href=\"/privacy\" target=\"_blank\" style=\"color:var(--text2)\">'+t('Privacy Policy')+'</a>';" +
-    "h+='<br><span style=\"margin-top:6px;display:inline-block\">Built in Austin, TX &middot; <a href=\"mailto:howdy@atxvotes.app\" style=\"color:var(--text2)\">howdy@atxvotes.app</a></span>';" +
+    "h+='<br><span style=\"margin-top:6px;display:inline-block\">Built in Texas &middot; <a href=\"mailto:howdy@txvotes.app\" style=\"color:var(--text2)\">howdy@txvotes.app</a></span>';" +
     "h+='</div>';" +
     "return h;" +
   "}",
@@ -1804,6 +1885,7 @@ var APP_JS = [
       "render()" +
     "}" +
     "else if(action==='skip-address'){S.address={street:'',city:'',state:'TX',zip:''};buildGuide()}" +
+    "else if(action==='geolocate'){geolocate()}" +
     "else if(action==='retry'){buildGuide()}" +
     "else if(action==='set-party'){S.selectedParty=el.dataset.value;save();render()}" +
     "else if(action==='toggle-expand'){" +
@@ -1813,11 +1895,13 @@ var APP_JS = [
     "else if(action==='reset'){" +
       "if(confirm(t('Start over? This will erase your profile and recommendations.'))){" +
         "S.phase=0;S.issues=[];S.spectrum=null;S.policyViews={};S.qualities=[];S.freeform='';" +
-        "S.address={street:'',city:'Austin',state:'TX',zip:''};S.ddIndex=0;S.ddQuestions=[];" +
+        "S.address={street:'',city:'',state:'TX',zip:''};S.ddIndex=0;S.ddQuestions=[];S.countyInfo=null;" +
         "S.repBallot=null;S.demBallot=null;S.selectedParty='republican';" +
         "S.guideComplete=false;S.summary=null;S.districts=null;S.expanded={};S.addressError=null;S.verifyingAddress=false;" +
         "shuffledIssues=null;shuffledSpectrum=null;shuffledQualities=null;shuffledDD={};" +
-        "try{localStorage.removeItem('atx_votes_profile');localStorage.removeItem('atx_votes_ballot_republican');" +
+        "try{localStorage.removeItem('tx_votes_profile');localStorage.removeItem('tx_votes_ballot_republican');" +
+        "localStorage.removeItem('tx_votes_ballot_democrat');localStorage.removeItem('tx_votes_selected_party');localStorage.removeItem('tx_votes_has_voted');" +
+        "localStorage.removeItem('atx_votes_profile');localStorage.removeItem('atx_votes_ballot_republican');" +
         "localStorage.removeItem('atx_votes_ballot_democrat');localStorage.removeItem('atx_votes_selected_party');localStorage.removeItem('atx_votes_has_voted')}catch(e){}" +
         "location.hash='#/';render()" +
       "}" +
@@ -1855,22 +1939,24 @@ var APP_JS = [
     "e.preventDefault();" +
     "var form=e.target;" +
     "var st=form.street.value.trim();" +
-    "if(st.toLowerCase()==='station'){st='701 Brazos St.';form.city.value='Austin';form.zip.value='78701'}" +
+    "" +
     "var zip=form.zip.value.trim();" +
     // Client-side validation
     "if(!st){S.addressError=t('Please enter your street address.');render();return}" +
     "if(!/^\\d{5}$/.test(zip)){S.addressError=t('Please enter a valid 5-digit ZIP code.');render();return}" +
-    "S.address={street:st,city:form.city.value||'Austin',state:'TX',zip:zip};" +
+    "S.address={street:st,city:form.city.value||'',state:'TX',zip:zip};" +
     "S.addressError=null;S.verifyingAddress=true;render();" +
     // Verify address via districts API
     "fetch('/app/api/districts',{method:'POST',headers:{'Content-Type':'application/json'}," +
-      "body:JSON.stringify({street:st,city:form.city.value||'Austin',state:'TX',zip:zip})})" +
+      "body:JSON.stringify({street:st,city:form.city.value||'',state:'TX',zip:zip})})" +
     ".then(function(r){" +
       "if(r.ok)return r.json();" +
       "if(r.status===404)throw new Error('not_found');" +
       "throw new Error('unavailable')" +
     "})" +
-    ".then(function(d){S.districts=d;S.verifyingAddress=false;buildGuide()})" +
+    ".then(function(d){S.districts=d;S.verifyingAddress=false;" +
+      "if(d.countyFips){fetch('/app/api/county-info?fips='+d.countyFips).then(function(r){return r.ok?r.json():null}).then(function(ci){if(ci)S.countyInfo=ci}).catch(function(){})}" +
+      "buildGuide()})" +
     ".catch(function(err){" +
       "S.verifyingAddress=false;" +
       "if(err.message==='not_found'){" +
@@ -1909,23 +1995,20 @@ var APP_JS = [
       "else if(S.spectrum==='Moderate'||S.spectrum==='Independent / Issue-by-Issue')demFirst=Math.random()<0.5;" +
       // Step 3: Generate both ballots in parallel
       "S.loadPhase=2;S.loadMsg='Researching candidates...';render();" +
+      "var cFips=S.districts&&S.districts.countyFips?S.districts.countyFips:null;" +
       "var repP=fetch('/app/api/guide',{method:'POST',headers:{'Content-Type':'application/json'}," +
-        "body:JSON.stringify({party:'republican',profile:profile,districts:S.districts,lang:LANG})}).then(function(r){return r.json()});" +
+        "body:JSON.stringify({party:'republican',profile:profile,districts:S.districts,lang:LANG,countyFips:cFips})}).then(function(r){return r.json()});" +
       "var demP=fetch('/app/api/guide',{method:'POST',headers:{'Content-Type':'application/json'}," +
-        "body:JSON.stringify({party:'democrat',profile:profile,districts:S.districts,lang:LANG})}).then(function(r){return r.json()});" +
-      // Await in order
+        "body:JSON.stringify({party:'democrat',profile:profile,districts:S.districts,lang:LANG,countyFips:cFips})}).then(function(r){return r.json()});" +
+      // Rotate messages while both requests are in-flight
       "var repResult=null,demResult=null;" +
-      "if(demFirst){" +
-        "S.loadPhase=3;S.loadMsg='Researching Democrats...';render();" +
-        "try{demResult=await demP}catch(e){}" +
-        "S.loadPhase=4;S.loadMsg='Researching Republicans...';render();" +
-        "try{repResult=await repP}catch(e){}" +
-      "}else{" +
-        "S.loadPhase=3;S.loadMsg='Researching Republicans...';render();" +
-        "try{repResult=await repP}catch(e){}" +
-        "S.loadPhase=4;S.loadMsg='Researching Democrats...';render();" +
-        "try{demResult=await demP}catch(e){}" +
-      "}" +
+      "var msgs=demFirst?['Researching Democrats...','Researching Republicans...']:['Researching Republicans...','Researching Democrats...'];" +
+      "var mi=0;S.loadPhase=3;S.loadMsg=msgs[0];render();" +
+      "var rotateTimer=setInterval(function(){mi=1-mi;S.loadPhase=mi===0?3:4;S.loadMsg=msgs[mi];render()},3000);" +
+      "var results=await Promise.allSettled([repP,demP]);" +
+      "clearInterval(rotateTimer);" +
+      "repResult=results[0].status==='fulfilled'?results[0].value:null;" +
+      "demResult=results[1].status==='fulfilled'?results[1].value:null;" +
       "S.loadPhase=5;S.loadMsg='Finalizing recommendations...';render();" +
       // Process results
       "if(repResult&&repResult.ballot)S.repBallot=repResult.ballot;" +
@@ -1946,6 +2029,7 @@ var APP_JS = [
       "if(S.selectedParty==='democrat'&&!S.demBallot)S.selectedParty='republican';" +
       // Save and show
       "S.guideComplete=true;S.isLoading=false;stopMascotTimer();" +
+      "fetchPolymarket();" +
       "save();" +
       "await new Promise(function(r){setTimeout(r,500)});" +
       "location.hash='#/ballot';render();" +
@@ -1973,7 +2057,7 @@ var APP_JS = [
   // ============ SHARE ============
   "function shareGuide(){" +
     "var b=getBallot();if(!b)return;" +
-    "var lines=['ATX Votes \\u2014 My Voting Guide','Build yours at atxvotes.app/app',''];" +
+    "var lines=['Texas Votes \\u2014 My Voting Guide','Build yours at txvotes.app/app',''];" +
     "var races=b.races.slice().sort(function(a,b){return sortOrder(a)-sortOrder(b)}).filter(function(r){return r.isContested&&r.recommendation});" +
     "for(var i=0;i<races.length;i++){" +
       "var r=races[i];" +
@@ -1988,7 +2072,7 @@ var APP_JS = [
     "" +
     "var text=lines.join('\\n');" +
     "if(navigator.share){" +
-      "navigator.share({title:'ATX Votes',text:text}).catch(function(){})" +
+      "navigator.share({title:'Texas Votes',text:text}).catch(function(){})" +
     "}else{" +
       "navigator.clipboard.writeText(text).then(function(){alert('Copied to clipboard!')}).catch(function(){alert(text)})" +
     "}" +
@@ -2024,12 +2108,12 @@ var APP_JS = [
     // "Early!" text if during early voting
     "var election=new Date(2026,2,3);var now=new Date();var diff=Math.ceil((election-now)/(1000*60*60*24));" +
     "if(diff>0){ctx.fillStyle='#CC1919';ctx.font='bold italic 48px Georgia,serif';ctx.fillText('Early!',W/2,fy+fh+88);}" +
-    // "atxvotes.app" at bottom
-    "ctx.fillStyle='#888';ctx.font='24px -apple-system,sans-serif';ctx.fillText('atxvotes.app',W/2,H-40);" +
+    // "txvotes.app" at bottom
+    "ctx.fillStyle='#888';ctx.font='24px -apple-system,sans-serif';ctx.fillText('txvotes.app',W/2,H-40);" +
     "ctx.restore();" +
     // Convert to blob and share
     "c.toBlob(function(blob){" +
-      "var vText='I voted in the Texas Primary! \\u{1F5F3}\\uFE0F\\n\\nBuild your personalized voting guide at atxvotes.app/app';" +
+      "var vText='I voted in the Texas Primary! \\u{1F5F3}\\uFE0F\\n\\nBuild your personalized voting guide at txvotes.app/app';" +
       "if(navigator.share&&navigator.canShare){" +
         "var file=new File([blob],'i-voted.png',{type:'image/png'});" +
         "var shareData={title:'I Voted!',text:vText,files:[file]};" +
@@ -2041,6 +2125,25 @@ var APP_JS = [
     "},'image/png');" +
   "}",
 
+  // ============ POLYMARKET ODDS ============
+  "function fetchPolymarket(){" +
+    "fetch('/app/api/polymarket').then(function(r){return r.ok?r.json():null}).then(function(d){" +
+      "if(d&&d.odds){S.polymarket=d.odds;render()}" +
+    "}).catch(function(){})" +
+  "}",
+
+  "function getOdds(candidateName,office,party){" +
+    "if(!S.polymarket)return null;" +
+    "var key=office+'|'+party;" +
+    "var raceOdds=S.polymarket[key];" +
+    "if(!raceOdds)return null;" +
+    // Try exact match first, then last-name match
+    "if(raceOdds[candidateName])return raceOdds[candidateName];" +
+    "var last=candidateName.split(' ').pop();" +
+    "for(var k in raceOdds){if(k.split(' ').pop()===last)return raceOdds[k]}" +
+    "return null" +
+  "}",
+
   // ============ BACKGROUND REFRESH ============
   "function refreshBallots(){" +
     "if(!S.guideComplete)return;" +
@@ -2048,7 +2151,9 @@ var APP_JS = [
     "if(S.repBallot)parties.push('republican');" +
     "if(S.demBallot)parties.push('democrat');" +
     "parties.forEach(function(party){" +
-      "fetch('/app/api/ballot?party='+party).then(function(r){" +
+      "var bUrl='/app/api/ballot?party='+party;" +
+      "if(S.districts&&S.districts.countyFips)bUrl+='&county='+S.districts.countyFips;" +
+      "fetch(bUrl).then(function(r){" +
         "if(!r.ok)return null;return r.json()" +
       "}).then(function(remote){" +
         "if(!remote)return;" +
@@ -2108,12 +2213,12 @@ var APP_HTML =
   '<!DOCTYPE html><html lang="en"><head>' +
   '<meta charset="utf-8">' +
   '<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">' +
-  "<title>ATX Votes</title>" +
+  "<title>Texas Votes</title>" +
   '<link rel="manifest" href="/app/manifest.json">' +
   '<meta name="theme-color" content="#21598e">' +
   '<meta name="apple-mobile-web-app-capable" content="yes">' +
   '<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">' +
-  '<meta name="description" content="Your personalized voting guide for Austin &amp; Travis County elections.">' +
+  '<meta name="description" content="Your personalized voting guide for Texas elections.">' +
   "<style>" +
   CSS +
   "</style>" +

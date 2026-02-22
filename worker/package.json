@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "wrangler dev",
+    "dev:tx": "wrangler dev -c wrangler.txvotes.toml",
     "deploy": "wrangler deploy",
+    "deploy:tx": "wrangler deploy -c wrangler.txvotes.toml",
     "test": "vitest run"
   },
   "devDependencies": {
