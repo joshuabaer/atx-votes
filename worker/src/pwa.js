@@ -1272,11 +1272,14 @@ var APP_JS = [
     "{v:4,l:'I follow politics',d:'More depth, nuance, and political terminology'}," +
     "{v:5,l:'Full professor mode',d:'Expert-level analysis with policy frameworks'}" +
   "];",
+  "var chefTaps=0;",
   "function renderTone(){" +
-    "var h='<div class=\"phase-header\"><h2>'+t('Talk to me like...')+'</h2><p>'+t('How should we explain things?')+'</p></div>';" +
+    "var opts=TONE_OPTS.slice();" +
+    "if(chefTaps>=5||S.readingLevel===6)opts.push({v:6,l:'Bork bork bork!',d:'The Swedish Chef from the Muppets explains your ballot'});" +
+    "var h='<div class=\"phase-header\"><h2 data-action=\"chef-tap\">'+t('Talk to me like...')+'</h2><p>'+t('How should we explain things?')+'</p></div>';" +
     "h+='<div class=\"radio-list\">';" +
-    "for(var i=0;i<TONE_OPTS.length;i++){" +
-      "var o=TONE_OPTS[i];var on=S.readingLevel===o.v;" +
+    "for(var i=0;i<opts.length;i++){" +
+      "var o=opts[i];var on=S.readingLevel===o.v;" +
       "h+='<div class=\"radio'+(on?' radio-on':'')+'\" data-action=\"select-tone\" data-value=\"'+o.v+'\" role=\"option\" aria-selected=\"'+on+'\" tabindex=\"0\">';" +
       "h+='<div class=\"radio-label\">'+t(o.l)+'</div>';" +
       "h+='<div class=\"radio-desc\">'+t(o.d)+'</div>';" +
@@ -1805,8 +1808,9 @@ var APP_JS = [
     // Reading level slider
     "h+='<div class=\"card\" style=\"margin-top:16px\">';" +
     "h+='<div style=\"font-size:15px;font-weight:600;margin-bottom:12px\">\u{1F4D6} '+t('Reading Level')+'</div>';" +
-    "var rlLabels=[t('Simple'),t('Casual'),t('Standard'),t('Detailed'),t('Expert')];" +
-    "h+='<input type=\"range\" min=\"1\" max=\"5\" value=\"'+S.readingLevel+'\" data-action=\"set-reading-level\" style=\"width:100%;accent-color:var(--blue)\">';" +
+    "var rlLabels=[t('Simple'),t('Casual'),t('Standard'),t('Detailed'),t('Expert'),'Bork!'];" +
+    "var rlVal=S.readingLevel>5?5:S.readingLevel;" +
+    "h+='<input type=\"range\" min=\"1\" max=\"5\" value=\"'+rlVal+'\" data-action=\"set-reading-level\" style=\"width:100%;accent-color:var(--blue)\">';" +
     "h+='<div style=\"display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-top:4px\">';" +
     "h+='<span>'+t('High School')+'</span>';" +
     "h+='<span style=\"font-weight:600;color:var(--text1)\">'+rlLabels[S.readingLevel-1]+'</span>';" +
@@ -2034,6 +2038,7 @@ var APP_JS = [
       "if(idx!==-1)S.issues.splice(idx,1);else if(S.issues.length<7)S.issues.push(v);" +
       "render()" +
     "}" +
+    "else if(action==='chef-tap'){chefTaps++;if(chefTaps===5)render()}" +
     "else if(action==='select-tone'){S.readingLevel=parseInt(el.dataset.value)||1;render()}" +
     "else if(action==='select-spectrum'){S.spectrum=el.dataset.value;render()}" +
     "else if(action==='select-dd'){" +

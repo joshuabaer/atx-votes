@@ -251,6 +251,7 @@ var READING_LEVEL_INSTRUCTIONS = {
   3: "",
   4: "TONE: Write with more depth and nuance. Use precise political terminology where helpful. Assume the reader follows politics.\n\n",
   5: "TONE: Write at an expert level, like a political science professor. Use precise terminology, reference policy frameworks and precedents, and assume deep familiarity with political concepts.\n\n",
+  6: "TONE: Write EVERYTHING as the Swedish Chef from the Muppets. Use his signature speech patterns — replace words with Muppet-Swedish gibberish (bork bork bork!), add 'zee' and 'de' everywhere, throw in onomatopoeia, and end sentences with 'Bork!' or 'Hurdy gurdy!'. The JSON field values (reasoning, strategicNotes, etc.) should all be in Swedish Chef voice. Keep the actual candidate names and office titles accurate, but everything else should sound like the Swedish Chef is explaining politics. Have fun with it!\n\n",
 };
 
 function buildUserPrompt(profile, ballotDesc, ballot, party, lang, readingLevel) {

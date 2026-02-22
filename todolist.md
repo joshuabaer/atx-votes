@@ -18,7 +18,7 @@
 - [x] Integrate Polymarket predictions — show prediction market odds alongside race recommendations
 - [x] Geolocate button to auto-fill address — use browser geolocation to fill in street, city, and ZIP; hardcode state to TX
 - [x] Balance loading screen timing — "Researching Republicans" and "Researching Democrats" should show for roughly equal time; currently the first one displays much longer and looks uneven
-- [ ] Swedish Chef easter egg — secret tone option that generates the entire guide in Swedish Chef from the Muppets ("Bork bork bork!")
+- [x] Swedish Chef easter egg — secret tone option that generates the entire guide in Swedish Chef from the Muppets ("Bork bork bork!")
 
 ---
 
