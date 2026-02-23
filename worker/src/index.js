@@ -186,6 +186,37 @@ function pageI18n(pageTR) {
   <\/script>`;
 }
 
+// IMPORTANT: Keep footer in sync with pwa.js (search for "FOOTER_SYNC" in pwa.js)
+// When changing footer links or structure, update BOTH files.
+// FOOTER_SYNC_INDEX
+
+/**
+ * Generates the standard public-facing page footer.
+ * All static pages should call this instead of inlining footer HTML.
+ * Uses data-t attributes for i18n support (translated by pageI18n script).
+ *
+ * @param {Object} [opts] - Options
+ * @param {boolean} [opts.noDataT] - If true, omit data-t attributes (for pages without i18n)
+ * @returns {string} Footer HTML
+ */
+function generateFooter({ noDataT = false } = {}) {
+  if (noDataT) {
+    return `<div class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a><br><span style="color:#fff">&starf;</span> Built in Texas &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>`;
+  }
+  return `<div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:#fff">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>`;
+}
+
+/**
+ * Generates footer for admin pages with admin-specific navigation links.
+ * @param {string[]} [extraLinks] - Additional link pairs as [{href, label}]
+ * @returns {string} Admin footer HTML
+ */
+function generateAdminFooter(extraLinks = []) {
+  const extras = extraLinks.map(l => `<a href="${l.href}">${l.label}</a>`).join(' &middot; ');
+  const mid = extras ? extras + ' &middot; ' : '';
+  return `<div class="page-footer"><a href="/">Texas Votes</a> &middot; ${mid}<a href="/privacy">Privacy</a><br><span style="color:#fff">&starf;</span> Built in Texas &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>`;
+}
+
 // MARK: - Candidate Profile Helpers
 
 /**
@@ -494,14 +525,7 @@ function handleLandingPage() {
   <div style="text-align:center;margin-top:16px">
     <button id="lang-toggle" style="font-size:14px;color:var(--text2);background:none;border:none;cursor:pointer;font-family:inherit"></button>
   </div>
-  <div class="page-footer">
-    <a href="/" data-t="Texas Votes">Texas Votes</a> &middot;
-    <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot;
-    <a href="/privacy" data-t="Privacy">Privacy</a>
-    <br>
-    <span style="color:#fff">&starf;</span> Built in Texas &middot;
-    <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a>
-  </div>
+  ${generateFooter()}
   <script>
   (function(){
     var TR={
@@ -1264,14 +1288,7 @@ function handleSampleBallot() {
     </div>
 
     <!-- Footer -->
-    <div class="page-footer">
-      <a href="/" data-t="Texas Votes">Texas Votes</a> &middot;
-      <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot;
-      <a href="/privacy" data-t="Privacy">Privacy</a>
-      <br>
-      <span style="color:#fff">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot;
-      <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a>
-    </div>
+    ${generateFooter()}
 
   </div><!-- /ballot-container -->
 
@@ -1509,7 +1526,7 @@ function handleHowItWorks() {
       <li><a href="/candidates" data-t="All Candidates">All Candidates</a> — <span data-t="Browse every candidate with detailed profiles">Browse every candidate with detailed profiles</span></li>
     </ul>
 
-    <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:#fff">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
+    ${generateFooter()}
   </div>
   ${pageI18n({
     'Texas Votes is a free tool that helps you figure out which candidates on your ballot match your values. Here\'s how it works, in plain language.': 'Texas Votes es una herramienta gratuita que te ayuda a descubrir qu\u00E9 candidatos en tu boleta coinciden con tus valores. As\u00ED funciona, en palabras sencillas.',
@@ -1654,7 +1671,7 @@ function handleNonpartisan() {
       <li><a href="/candidates" data-t="All Candidates">All Candidates</a> — <span data-t="Browse every candidate with detailed profiles">Browse every candidate with detailed profiles</span></li>
     </ul>
 
-    <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:#fff">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
+    ${generateFooter()}
   </div>
   ${pageI18n({
     'Texas Votes matches candidates to your values, not your party. Every design decision is made to keep the experience fair for all voters.': 'Texas Votes empareja candidatos con tus valores, no con tu partido. Cada decisi\u00F3n de dise\u00F1o se toma para mantener la experiencia justa para todos los votantes.',
@@ -2058,7 +2075,7 @@ CONFLICT RESOLUTION: If sources disagree, trust official filings over campaign c
       <li><a href="/candidates" data-t="All Candidates">All Candidates</a> — <span data-t="Browse every candidate with detailed profiles">Browse every candidate with detailed profiles</span></li>
     </ul>
 
-    <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:#fff">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
+    ${generateFooter()}
   </div>
   ${pageI18n({
     'AI Audit': 'Auditor\u00EDa de IA',
@@ -2766,7 +2783,7 @@ function handleRunAuditNow() {
       <div id="results-container"></div>
     </div>
 
-    <div class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/audit">AI Bias Audit</a> &middot; <a href="/privacy">Privacy</a><br><span style="color:#fff">&starf;</span> Built in Texas &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
+    ${generateFooter({ noDataT: true })}
   </div>
   <script>
   (function(){
@@ -3125,7 +3142,7 @@ function handleSupport() {
       <li><a href="/candidates" data-t="All Candidates">All Candidates</a> — <span data-t="Browse every candidate with detailed profiles">Browse every candidate with detailed profiles</span></li>
     </ul>
 
-    <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:#fff">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
+    ${generateFooter()}
   </div>
   ${pageI18n({
     'Support': 'Soporte',
@@ -3238,7 +3255,7 @@ function handlePrivacyPolicy() {
       <li><a href="/candidates" data-t="All Candidates">All Candidates</a> — <span data-t="Browse every candidate with detailed profiles">Browse every candidate with detailed profiles</span></li>
     </ul>
 
-    <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:#fff">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
+    ${generateFooter()}
   </div>
   ${pageI18n({
     'Last updated: February 22, 2026': '\u00DAltima actualizaci\u00F3n: 22 de febrero de 2026',
@@ -3400,7 +3417,7 @@ async function handleOpenSource(env) {
       <li><a href="/candidates" data-t="All Candidates">All Candidates</a> — <span data-t="Browse every candidate with detailed profiles">Browse every candidate with detailed profiles</span></li>
     </ul>
 
-    <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:#fff">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
+    ${generateFooter()}
   </div>
   ${pageI18n({
     'Texas Votes is Open Source': 'Texas Votes es C\u00F3digo Abierto',
@@ -3851,7 +3868,7 @@ async function handleCandidateProfile(slug, env) {
     <a href="/candidates" class="back-top">&larr; <span data-t="All Candidates">All Candidates</span></a>
     <h1 data-t="Candidate Not Found">Candidate Not Found</h1>
     <p class="subtitle" data-t="We couldn't find a candidate matching this URL.">We couldn't find a candidate matching "${escapeHtml(slug)}". The candidate may not be in our database yet, or the URL may be incorrect.</p>
-    <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:#fff">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
+    ${generateFooter()}
   </div>
   ${pageI18n({
     'Candidate Not Found': 'Candidato No Encontrado',
@@ -4038,7 +4055,7 @@ async function handleCandidateProfile(slug, env) {
       <li><a href="/nonpartisan" data-t="Nonpartisan by Design">Nonpartisan by Design</a> — <span data-t="How we keep the app fair for all voters">How we keep the app fair for all voters</span></li>
     </ul>
 
-    <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:#fff">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
+    ${generateFooter()}
   </div>
   ${pageI18n({
     'See something wrong? Let us know and we\'ll fix it.': '\u00BFVes algo incorrecto? D\u00EDnoslo y lo corregiremos.',
@@ -4191,7 +4208,7 @@ async function handleCandidatesIndex(env) {
       <li><a href="/open-source" data-t="Open Source">Open Source</a> — <span data-t="Source code, architecture, and independent code reviews">Source code, architecture, and independent code reviews</span></li>
     </ul>
 
-    <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:#fff">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
+    ${generateFooter()}
   </div>
   <script>
   (function(){
@@ -4709,7 +4726,7 @@ async function handleDataQuality(env) {
       <li><a href="/candidates" data-t="Candidate Profiles">Candidate Profiles</a> — <span data-t="Browse all candidates with detailed information">Browse all candidates with detailed information</span></li>
     </ul>
 
-    <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:#fff">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
+    ${generateFooter()}
   </div>
   <script>
   (function(){
@@ -5071,16 +5088,12 @@ async function handleAdminStatus(env) {
       ${healthLogRows}
     </table>
 
-    <div class="page-footer">
-      <a href="/">Texas Votes</a> &middot;
-      <a href="/admin/coverage">Coverage</a> &middot;
-      <a href="/admin/analytics">Analytics</a> &middot;
-      <a href="/admin/errors">AI Errors</a> &middot;
-      <a href="/health">Health API</a> &middot;
-      <a href="/privacy">Privacy</a><br>
-      <span style="color:#fff">&starf;</span> Built in Texas &middot;
-      <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a>
-    </div>
+    ${generateAdminFooter([
+      { href: '/admin/coverage', label: 'Coverage' },
+      { href: '/admin/analytics', label: 'Analytics' },
+      { href: '/admin/errors', label: 'AI Errors' },
+      { href: '/health', label: 'Health API' },
+    ])}
   </div>
 </body>
 </html>`;
@@ -5369,7 +5382,7 @@ async function handleAdminCoverage(env) {
     </table>
     </div>
 
-    <div class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a><br><span style="color:#fff">&starf;</span> Built in Texas &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
+    ${generateFooter({ noDataT: true })}
   </div>
 </body>
 </html>`;
@@ -5569,7 +5582,7 @@ async function handleAdminAnalytics(env) {
     </div>
     <h2>Guide Errors</h2>
     <div class="scroll-table"><table><tr><th>Error Message</th><th style="text-align:right">Count</th></tr>${er}</table></div>
-    <div class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/admin/coverage">Coverage</a> &middot; <a href="/privacy">Privacy</a><br><span style="color:#fff">&starf;</span> Built in Texas &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
+    ${generateAdminFooter([{ href: '/admin/coverage', label: 'Coverage' }])}
   </div>
 </body>
 </html>`;
@@ -6168,15 +6181,11 @@ async function handleAdminErrors(request, env) {
     <h2>Daily Breakdown</h2>
     ${dayCards}
 
-    <div class="page-footer">
-      <a href="/">Texas Votes</a> &middot;
-      <a href="/admin/status">Status</a> &middot;
-      <a href="/admin/coverage">Coverage</a> &middot;
-      <a href="/admin/analytics">Analytics</a> &middot;
-      <a href="/privacy">Privacy</a><br>
-      <span style="color:#fff">&starf;</span> Built in Texas &middot;
-      <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a>
-    </div>
+    ${generateAdminFooter([
+      { href: '/admin/status', label: 'Status' },
+      { href: '/admin/coverage', label: 'Coverage' },
+      { href: '/admin/analytics', label: 'Analytics' },
+    ])}
   </div>
 </body>
 </html>`;
