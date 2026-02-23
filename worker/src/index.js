@@ -368,6 +368,7 @@ function handleLandingPage() {
   <p class="page-footer">
     <a href="/" data-t="Texas Votes">Texas Votes</a> &middot;
     <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot;
+    <a href="/candidates" data-t="All Candidates">All Candidates</a> &middot;
     <a href="/privacy" data-t="Privacy">Privacy</a> &middot;
     <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a>
   </p>
@@ -389,6 +390,7 @@ function handleLandingPage() {
       'Data Quality':'Calidad de Datos',
       'Open Source':'C\\u00F3digo Abierto',
       'Privacy':'Privacidad',
+      'All Candidates':'Todos los Candidatos',
       'See a Sample Ballot':'Ver una boleta de ejemplo'
     };
     var lang=localStorage.getItem('tx_votes_lang')||localStorage.getItem('atx_votes_lang')||((navigator.language||'').slice(0,2)==='es'?'es':'en');
@@ -1114,6 +1116,7 @@ function handleSampleBallot() {
     <div class="page-footer">
       <a href="/">Texas Votes</a> &middot;
       <a href="/how-it-works">How It Works</a> &middot;
+      <a href="/candidates">All Candidates</a> &middot;
       <a href="/privacy">Privacy</a>
       <br>
       <span style="color:var(--red)">&starf;</span> Built in Texas &middot;
@@ -1240,6 +1243,7 @@ function handleHowItWorks() {
       <li><a href="/data-quality">Data Quality Dashboard</a> — Live metrics on how complete our data is</li>
       <li><a href="/open-source">Open Source</a> — Source code, architecture, and independent code reviews</li>
       <li><a href="/privacy">Privacy Policy</a> — What data we collect (almost none) and why</li>
+      <li><a href="/candidates">All Candidates</a> — Browse every candidate with detailed profiles</li>
     </ul>
 
     <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
@@ -1344,6 +1348,7 @@ function handleNonpartisan() {
       <li><a href="/audit">AI Bias Audit</a> — Independent review by four AI systems</li>
       <li><a href="/data-quality">Data Quality Dashboard</a> — Live metrics on ballot coverage and candidate completeness</li>
       <li><a href="/open-source">Open Source</a> — Source code, architecture, and independent code reviews</li>
+      <li><a href="/candidates">All Candidates</a> — Browse every candidate with detailed profiles</li>
     </ul>
 
     <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
@@ -1690,6 +1695,7 @@ CONFLICT RESOLUTION: If sources disagree, trust official filings over campaign c
       <li><a href="/open-source">Open Source</a> — Source code, architecture, and independent code reviews</li>
       <li><a href="/nonpartisan">Nonpartisan by Design</a> — How we ensure fairness for all voters</li>
       <li><a href="/api/audit/export">Methodology Export</a> — Full transparency of all AI prompts and data pipelines</li>
+      <li><a href="/candidates">All Candidates</a> — Browse every candidate with detailed profiles</li>
     </ul>
 
     <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
@@ -2297,6 +2303,13 @@ function handleSupport() {
       <p>The interview lets you select from 21 issues: Economy &amp; Cost of Living, Housing, Public Safety, Education, Healthcare, Environment &amp; Climate, Grid &amp; Infrastructure, Tech &amp; Innovation, Transportation, Immigration, Taxes, Civil Rights, Gun Policy, Abortion &amp; Reproductive Rights, Water &amp; Land, Agriculture &amp; Rural, Faith &amp; Religious Liberty, Criminal Justice, Energy &amp; Oil/Gas, LGBTQ+ Rights, and Voting &amp; Elections. You pick your top 3-5, and the interview dives deeper into each one.</p>
     </div>
 
+    <h2>Related</h2>
+    <ul class="related-links">
+      <li><a href="/how-it-works">How It Works</a> — Plain-language explanation of the app and AI</li>
+      <li><a href="/nonpartisan">Nonpartisan by Design</a> — How we keep the app fair for all voters</li>
+      <li><a href="/candidates">All Candidates</a> — Browse every candidate with detailed profiles</li>
+    </ul>
+
     <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
 </body>
@@ -2380,6 +2393,7 @@ function handlePrivacyPolicy() {
       <li><a href="/audit">AI Bias Audit</a> — Independent review of our AI by four different systems</li>
       <li><a href="/data-quality">Data Quality Dashboard</a> — Live metrics on how complete our data is</li>
       <li><a href="/open-source">Open Source</a> — Source code, architecture, and independent code reviews</li>
+      <li><a href="/candidates">All Candidates</a> — Browse every candidate with detailed profiles</li>
     </ul>
 
     <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
@@ -2491,6 +2505,7 @@ function handleOpenSource() {
       <li><a href="/audit">AI Bias Audit</a> — Independent review by four AI systems</li>
       <li><a href="/data-quality">Data Quality Dashboard</a> — Live metrics on ballot coverage and candidate completeness</li>
       <li><a href="/nonpartisan">Nonpartisan by Design</a> — How we ensure fairness for all voters</li>
+      <li><a href="/candidates">All Candidates</a> — Browse every candidate with detailed profiles</li>
     </ul>
 
     <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
