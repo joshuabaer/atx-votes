@@ -16,12 +16,15 @@
 //   --only-info     Only seed county info (skip ballots + precinct maps)
 //   --only-ballots  Only seed ballots (skip info + precinct maps)
 //   --only-precincts Only seed precinct maps
+//   --reverse       Process counties in reverse order
+//   --reset         Delete progress file and start fresh
 //   --resume        Resume from progress file (default: true)
 //
 // Requires: Node 18+, wrangler CLI available in PATH
 //
 // Progress is saved to /tmp/seed_county_progress.json after every successful step.
 // Re-running the script will skip already-completed steps.
+// Only successful steps are marked as completed; failed steps will be retried.
 
 const fs = require("fs");
 const { execFileSync } = require("child_process");
@@ -93,6 +96,7 @@ const SKIP_INFO = args.includes("--skip-info");
 const ONLY_INFO = args.includes("--only-info");
 const ONLY_BALLOTS = args.includes("--only-ballots");
 const ONLY_PRECINCTS = args.includes("--only-precincts");
+const RESET = args.includes("--reset");
 
 const countyArg = args.find((a) => a.startsWith("--county="));
 const FILTER_COUNTY = countyArg ? countyArg.split("=")[1] : null;
@@ -102,11 +106,36 @@ const FILTER_PARTY = partyArg ? partyArg.split("=")[1] : null;
 
 // ─── Progress Tracking ───────────────────────────────────────────────────────
 
+function resetProgress() {
+  try {
+    fs.unlinkSync(PROGRESS_FILE);
+    console.log(`Deleted progress file: ${PROGRESS_FILE}`);
+  } catch {
+    console.log(`No progress file to delete.`);
+  }
+}
+
 function loadProgress() {
   try {
-    return JSON.parse(fs.readFileSync(PROGRESS_FILE, "utf8"));
+    const data = JSON.parse(fs.readFileSync(PROGRESS_FILE, "utf8"));
+    // Clear stale errors from previous runs — keep completed successes only
+    const staleErrorCount = (data.errors || []).length;
+    if (staleErrorCount > 0) {
+      console.log(`Clearing ${staleErrorCount} stale error(s) from previous run(s)`);
+      data.errors = [];
+      data.currentRunErrors = [];
+    }
+    // Ensure completed only contains truthy entries (defensive check)
+    if (data.completed) {
+      for (const key of Object.keys(data.completed)) {
+        if (data.completed[key] !== true) {
+          delete data.completed[key];
+        }
+      }
+    }
+    return data;
   } catch {
-    return { completed: {}, errors: [], startedAt: new Date().toISOString() };
+    return { completed: {}, errors: [], currentRunErrors: [], startedAt: new Date().toISOString() };
   }
 }
 
@@ -124,12 +153,40 @@ function markCompleted(progress, stepKey, meta = {}) {
   saveProgress(progress);
 }
 
+function classifyError(error) {
+  const msg = error.message || String(error);
+  if (msg.includes("401")) return "AUTH";
+  if (msg.includes("403")) return "AUTH";
+  if (msg.includes("429")) return "RATE_LIMIT";
+  if (msg.includes("529")) return "OVERLOADED";
+  if (msg.includes("500") || msg.includes("502") || msg.includes("503")) return "SERVER";
+  if (msg.includes("fetch") || msg.includes("ECONNREFUSED") || msg.includes("ENOTFOUND") || msg.includes("ETIMEDOUT") || msg.includes("network")) return "NETWORK";
+  return "OTHER";
+}
+
+function errorCategoryLabel(category) {
+  switch (category) {
+    case "AUTH": return "Auth error (401/403) — check ANTHROPIC_API_KEY";
+    case "RATE_LIMIT": return "Rate limited (429) — wait and retry";
+    case "OVERLOADED": return "API overloaded (529) — wait and retry";
+    case "SERVER": return "Server error (5xx) — transient, retry later";
+    case "NETWORK": return "Network error — check connectivity";
+    default: return "Other error";
+  }
+}
+
 function markError(progress, stepKey, error) {
-  progress.errors.push({
+  const category = classifyError(error);
+  const entry = {
     step: stepKey,
     error: error.message || String(error),
+    category,
     at: new Date().toISOString(),
-  });
+  };
+  progress.errors.push(entry);
+  if (!progress.currentRunErrors) progress.currentRunErrors = [];
+  progress.currentRunErrors.push(entry);
+  // Explicitly do NOT mark as completed — failed steps will be retried on next run
   saveProgress(progress);
 }
 
@@ -176,7 +233,14 @@ async function callClaudeWithSearch(prompt, maxUses = 10) {
 
     if (!response.ok) {
       const text = await response.text();
-      throw new Error(`Claude API returned ${response.status}: ${text.slice(0, 200)}`);
+      const status = response.status;
+      if (status === 401 || status === 403) {
+        throw new Error(`Claude API auth error (${status}): check ANTHROPIC_API_KEY — ${text.slice(0, 200)}`);
+      }
+      if (status >= 500) {
+        throw new Error(`Claude API server error (${status}): ${text.slice(0, 200)}`);
+      }
+      throw new Error(`Claude API returned ${status}: ${text.slice(0, 200)}`);
     }
 
     const result = await response.json();
@@ -386,8 +450,10 @@ async function seedCountyInfo(county, progress) {
     markCompleted(progress, stepKey, { county: county.name });
     console.log(`  County info for ${county.name}: done`);
   } catch (err) {
-    console.error(`  ERROR county info ${county.name}: ${err.message}`);
+    const category = classifyError(err);
+    console.error(`  ERROR [${category}] county info ${county.name}: ${err.message}`);
     markError(progress, stepKey, err);
+    if (category === "AUTH") throw err; // Abort run — all calls will fail
   }
 }
 
@@ -425,8 +491,10 @@ async function seedCountyBallot(county, party, progress) {
     });
     console.log(`  ${party} ballot for ${county.name}: ${raceCount} races, ${candCount} candidates`);
   } catch (err) {
-    console.error(`  ERROR ${party} ballot ${county.name}: ${err.message}`);
+    const category = classifyError(err);
+    console.error(`  ERROR [${category}] ${party} ballot ${county.name}: ${err.message}`);
     markError(progress, stepKey, err);
+    if (category === "AUTH") throw err; // Abort run — all calls will fail
   }
 }
 
@@ -455,8 +523,10 @@ async function seedPrecinctMap(county, progress) {
     markCompleted(progress, stepKey, { county: county.name, zips: zipCount });
     console.log(`  Precinct map for ${county.name}: ${zipCount} ZIP codes`);
   } catch (err) {
-    console.error(`  ERROR precinct map ${county.name}: ${err.message}`);
+    const category = classifyError(err);
+    console.error(`  ERROR [${category}] precinct map ${county.name}: ${err.message}`);
     markError(progress, stepKey, err);
+    if (category === "AUTH") throw err; // Abort run — all calls will fail
   }
 }
 
@@ -469,7 +539,13 @@ async function main() {
   console.log(`Progress file: ${PROGRESS_FILE}`);
   console.log("");
 
+  // Handle --reset flag
+  if (RESET) {
+    resetProgress();
+  }
+
   const progress = loadProgress();
+  progress.currentRunErrors = []; // Track errors from this run only
 
   // Determine which counties to process
   let counties = TOP_COUNTIES;
@@ -546,36 +622,57 @@ async function main() {
 
   console.log("\n\n=== SEEDING COMPLETE ===");
   const completedCount = Object.keys(progress.completed).length;
-  const errorCount = progress.errors.length;
-  console.log(`Completed steps: ${completedCount}`);
-  console.log(`Errors: ${errorCount}`);
+  const runErrors = progress.currentRunErrors || [];
+  const runErrorCount = runErrors.length;
+  console.log(`Completed steps (all runs): ${completedCount}`);
+  console.log(`Errors (this run): ${runErrorCount}`);
 
-  if (errorCount > 0) {
-    console.log("\nErrors encountered:");
-    for (const err of progress.errors.slice(-20)) {
-      console.log(`  ${err.step}: ${err.error}`);
+  if (runErrorCount > 0) {
+    // Group errors by category for a clear summary
+    const byCategory = {};
+    for (const err of runErrors) {
+      const cat = err.category || "OTHER";
+      if (!byCategory[cat]) byCategory[cat] = [];
+      byCategory[cat].push(err);
+    }
+
+    console.log("\nError summary (this run):");
+    for (const [category, errs] of Object.entries(byCategory)) {
+      console.log(`\n  ${errorCategoryLabel(category)} (${errs.length}):`);
+      for (const err of errs.slice(0, 10)) {
+        console.log(`    ${err.step}: ${err.error.slice(0, 120)}`);
+      }
+      if (errs.length > 10) {
+        console.log(`    ... and ${errs.length - 10} more`);
+      }
     }
   }
 
-  // Write log
+  // Write log (only includes current run errors)
   const log = {
     finishedAt: new Date().toISOString(),
     completedSteps: completedCount,
-    errors: errorCount,
+    errors: runErrorCount,
     dryRun: DRY_RUN,
-    errorDetails: progress.errors,
+    errorDetails: runErrors,
   };
   fs.writeFileSync(LOG_FILE, JSON.stringify(log, null, 2));
   console.log(`\nFull log: ${LOG_FILE}`);
   console.log(`Progress: ${PROGRESS_FILE}`);
 
-  if (errorCount > 0) {
+  if (runErrorCount > 0) {
     console.log(`\nTo retry failed steps, just re-run the script.`);
-    console.log(`To start fresh, delete ${PROGRESS_FILE} first.`);
+    console.log(`To start completely fresh, run with --reset.`);
   }
 }
 
 main().catch((err) => {
-  console.error("Fatal error:", err);
+  const category = classifyError(err);
+  if (category === "AUTH") {
+    console.error(`\nFATAL: Authentication failed — your ANTHROPIC_API_KEY is invalid or expired.`);
+    console.error(`Update the key and re-run. Previously completed steps are preserved.`);
+  } else {
+    console.error("Fatal error:", err);
+  }
   process.exit(1);
 });
