@@ -22,10 +22,10 @@
 _Latest audit: ChatGPT 7.8, Gemini 7.7, Claude 7.6, Grok 7.8 (avg 7.7/10). Remaining:_
 
 - [ ] Add human spot-checking of AI-generated candidate data — manual review process for AI-generated summaries, pros/cons, and endorsements to catch errors
-- [ ] Add automated balance checks for pros/cons — measure length, sentiment, and specificity symmetry across candidates in each race, flag imbalances
-- [ ] Surface collected pros/cons directly in recommendation output — currently collected but not shown to users in the final ballot view
-- [ ] Create simplified transparency page for non-technical users — plain-language version of how the AI works, without technical jargon
-- [ ] Add user-facing error/bias reporting mechanism — button or form for users to flag incorrect candidate info or perceived bias
+- [x] Add automated balance checks for pros/cons — balance-check.js module, /api/balance-check endpoint, integrated into data quality dashboard (53 tests)
+- [x] Surface collected pros/cons directly in recommendation output — strengths (green) and concerns (orange) boxes in ballot recommendation view
+- [x] Create simplified transparency page for non-technical users — /how-it-works with 4-step walkthrough, plain language, linked from all transparency pages
+- [x] Add user-facing error/bias reporting mechanism — "Flag this info" button on candidate cards, modal with issue types, sends to flagged@txvotes.app
 - [x] Implement automated bias test suite — same voter profile with swapped party ballots, measure recommendation shifts and flag asymmetries. Publishable evidence of fairness. (61 tests, 5 voter profiles, 4 reusable helpers — see docs/plans/plan_bias_test_suite.md)
 
 ### Code Review Findings (PR #2)
@@ -44,7 +44,7 @@ _From automated code review of "Add automated AI audit runner" (interview-flow-t
 
 ### PWA Bugs
 - [x] Back button on first "Talk to Me" page doesn't work — Phase 0 now renders welcome screen, back from Phase 1 returns to it
-- [ ] Phase 0 should render the website home page, not the welcome screen — back button from Phase 1 should take user to the landing page instead of an in-app welcome screen
+- [x] Phase 0 should render the website home page, not the welcome screen — Phase 0 now redirects to landing page (/), ?start=1 auto-advances to Phase 1
 
 ### Technical Debt
 - [ ] Comprehensive memory management review — audit localStorage usage, service worker cache lifecycle, KV data retention, and state cleanup
