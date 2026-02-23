@@ -1339,16 +1339,16 @@ function handleHowItWorks() {
     <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
   </div>
   ${pageI18n({
-    'Texas Votes is a free tool that helps you figure out which candidates on your ballot match your values. Here\\'s how it works, in plain language.': 'Texas Votes es una herramienta gratuita que te ayuda a descubrir qu\u00E9 candidatos en tu boleta coinciden con tus valores. As\u00ED funciona, en palabras sencillas.',
+    'Texas Votes is a free tool that helps you figure out which candidates on your ballot match your values. Here\'s how it works, in plain language.': 'Texas Votes es una herramienta gratuita que te ayuda a descubrir qu\u00E9 candidatos en tu boleta coinciden con tus valores. As\u00ED funciona, en palabras sencillas.',
     'What Does This App Do?': '\u00BFQu\u00E9 Hace Esta App?',
     'Texas Votes asks you a few questions about what matters to you \\u2014 things like education, public safety, the economy, or healthcare. Then it looks at the candidates running in your area and suggests which ones are the best fit based on your answers.': 'Texas Votes te hace algunas preguntas sobre lo que te importa \\u2014 como educaci\u00F3n, seguridad p\u00FAblica, la econom\u00EDa o salud. Luego revisa los candidatos en tu \u00E1rea y sugiere cu\u00E1les son los m\u00E1s compatibles seg\u00FAn tus respuestas.',
     'Think of it like a matchmaker, but for elections. You tell it what you care about, and it connects you with candidates who share those priorities.': 'Pi\u00E9nsalo como un servicio de compatibilidad, pero para elecciones. T\u00FA dices lo que te importa y te conecta con candidatos que comparten esas prioridades.',
     'How Does the AI Part Work?': '\u00BFC\u00F3mo Funciona la Parte de IA?',
-    'The app uses artificial intelligence (the same kind of technology behind tools like ChatGPT) to read through candidate information and compare it to your answers. Here\\'s the process, step by step:': 'La app usa inteligencia artificial (la misma tecnolog\u00EDa detr\u00E1s de herramientas como ChatGPT) para leer la informaci\u00F3n de candidatos y compararla con tus respuestas. As\u00ED funciona el proceso, paso a paso:',
+    'The app uses artificial intelligence (the same kind of technology behind tools like ChatGPT) to read through candidate information and compare it to your answers. Here\'s the process, step by step:': 'La app usa inteligencia artificial (la misma tecnolog\u00EDa detr\u00E1s de herramientas como ChatGPT) para leer la informaci\u00F3n de candidatos y compararla con tus respuestas. As\u00ED funciona el proceso, paso a paso:',
     'You answer a short interview': 'Respondes una entrevista corta',
     'It takes about 5 minutes. You pick the issues you care about, how you lean politically, and what qualities matter to you in a candidate.': 'Toma unos 5 minutos. Eliges los temas que te importan, tu inclinaci\u00F3n pol\u00EDtica y qu\u00E9 cualidades valoras en un candidato.',
     'The AI reads candidate profiles': 'La IA lee los perfiles de candidatos',
-    'It looks at each candidate\\'s positions, endorsements, track record, and public statements \\u2014 information gathered from official government sources, news outlets, and nonpartisan references.': 'Revisa las posiciones, respaldos, historial y declaraciones p\u00FAblicas de cada candidato \\u2014 informaci\u00F3n recopilada de fuentes gubernamentales oficiales, medios de comunicaci\u00F3n y referencias apartidistas.',
+    'It looks at each candidate\'s positions, endorsements, track record, and public statements \\u2014 information gathered from official government sources, news outlets, and nonpartisan references.': 'Revisa las posiciones, respaldos, historial y declaraciones p\u00FAblicas de cada candidato \\u2014 informaci\u00F3n recopilada de fuentes gubernamentales oficiales, medios de comunicaci\u00F3n y referencias apartidistas.',
     'It finds your best matches': 'Encuentra tus mejores coincidencias',
     'The AI compares what you said you care about with what each candidate stands for, then ranks them as a Strong Match, Good Match, or Best Available.': 'La IA compara lo que dijiste que te importa con lo que representa cada candidato, y los clasifica como Coincidencia Fuerte, Buena Coincidencia o Mejor Disponible.',
     'You get a personalized ballot': 'Recibes una boleta personalizada',
@@ -1358,16 +1358,16 @@ function handleHowItWorks() {
     'Official government records \\u2014 filings with the Texas Secretary of State, county election offices': 'Registros gubernamentales oficiales \\u2014 archivos del Secretario de Estado de Texas, oficinas electorales del condado',
     'Nonpartisan references \\u2014 Ballotpedia, VoteSmart, and similar databases': 'Referencias apartidistas \\u2014 Ballotpedia, VoteSmart y bases de datos similares',
     'News coverage \\u2014 reporting from established news organizations': 'Cobertura de noticias \\u2014 reportajes de organizaciones de noticias establecidas',
-    'Campaign materials \\u2014 candidates\\' own websites and public statements': 'Materiales de campa\u00F1a \\u2014 sitios web y declaraciones p\u00FAblicas de los candidatos',
+    'Campaign materials \\u2014 candidates\' own websites and public statements': 'Materiales de campa\u00F1a \\u2014 sitios web y declaraciones p\u00FAblicas de los candidatos',
     'The data is automatically re-checked every day to stay current. When sources disagree, official government records take priority.': 'Los datos se verifican autom\u00E1ticamente todos los d\u00EDas para mantenerse actualizados. Cuando las fuentes no coinciden, los registros gubernamentales oficiales tienen prioridad.',
     'What This App Does NOT Do': 'Lo Que Esta App NO Hace',
     'It does not tell you who to vote for. It shows you matches and explains why, but the final choice is always yours.': 'No te dice por qui\u00E9n votar. Te muestra coincidencias y explica por qu\u00E9, pero la decisi\u00F3n final siempre es tuya.',
     'It does not store your personal information. Your answers stay on your phone or computer. They are never sent to our servers or saved anywhere we can see them.': 'No almacena tu informaci\u00F3n personal. Tus respuestas permanecen en tu tel\u00E9fono o computadora. Nunca se env\u00EDan a nuestros servidores ni se guardan donde podamos verlas.',
-    'It does not track you. No cookies, no ad tracking, no personal data collection. We count anonymous page views to improve the app \\u2014 that\\'s it.': 'No te rastrea. Sin cookies, sin seguimiento publicitario, sin recolecci\u00F3n de datos personales. Contamos visitas an\u00F3nimas para mejorar la app \\u2014 eso es todo.',
+    'It does not track you. No cookies, no ad tracking, no personal data collection. We count anonymous page views to improve the app \\u2014 that\'s it.': 'No te rastrea. Sin cookies, sin seguimiento publicitario, sin recolecci\u00F3n de datos personales. Contamos visitas an\u00F3nimas para mejorar la app \\u2014 eso es todo.',
     'It does not favor any political party. The AI is given strict instructions to be neutral. Candidates are shuffled randomly so no one gets an unfair advantage from being listed first.': 'No favorece a ning\u00FAn partido pol\u00EDtico. La IA tiene instrucciones estrictas de ser neutral. Los candidatos se mezclan al azar para que nadie tenga ventaja por aparecer primero.',
     'It does not replace your own research. This is a starting point to help you explore candidates. We always encourage you to verify information on your own.': 'No reemplaza tu propia investigaci\u00F3n. Es un punto de partida para explorar candidatos. Siempre te animamos a verificar la informaci\u00F3n por tu cuenta.',
     'How Can I Trust It?': '\u00BFC\u00F3mo Puedo Confiar en Esto?',
-    'We\\'ve built this app to be as transparent as possible:': 'Hemos construido esta app para ser lo m\u00E1s transparente posible:',
+    'We\'ve built this app to be as transparent as possible:': 'Hemos construido esta app para ser lo m\u00E1s transparente posible:',
     'The entire source code is public \\u2014 anyone can inspect it': 'Todo el c\u00F3digo fuente es p\u00FAblico \\u2014 cualquiera puede inspeccionarlo',
     'Four independent AI systems reviewed our code and methodology for bias': 'Cuatro sistemas de IA independientes revisaron nuestro c\u00F3digo y metodolog\u00EDa en busca de sesgo',
     'Every recommendation tells you why a candidate was matched to you': 'Cada recomendaci\u00F3n te dice por qu\u00E9 un candidato fue emparejado contigo',
@@ -1524,7 +1524,7 @@ function handleNonpartisan() {
     'Open Source Approach': 'Enfoque de C\u00F3digo Abierto',
     'The full prompt sent to the AI and every design decision is documented. Nothing is hidden.': 'El prompt completo enviado a la IA y cada decisi\u00F3n de dise\u00F1o est\u00E1 documentado. Nada est\u00E1 oculto.',
     'Independent AI Audit': 'Auditor\u00EDa Independiente de IA',
-    'We\\'ve submitted our full AI prompts, data pipeline, and methodology to four independent AI systems for bias review.': 'Hemos enviado nuestros prompts de IA completos, pipeline de datos y metodolog\u00EDa a cuatro sistemas de IA independientes para revisi\u00F3n de sesgo.',
+    'We\'ve submitted our full AI prompts, data pipeline, and methodology to four independent AI systems for bias review.': 'Hemos enviado nuestros prompts de IA completos, pipeline de datos y metodolog\u00EDa a cuatro sistemas de IA independientes para revisi\u00F3n de sesgo.',
     'Automated Balance Checks': 'Verificaciones Autom\u00E1ticas de Equilibrio',
     'An automated balance check system scores the symmetry of pros and cons across all candidates in every race.': 'Un sistema autom\u00E1tico de verificaci\u00F3n de equilibrio eval\u00FAa la simetr\u00EDa de pros y contras entre todos los candidatos en cada carrera.',
     'Flag This Info': 'Reportar Esta Info',
@@ -2509,19 +2509,19 @@ function handleSupport() {
   </div>
   ${pageI18n({
     'Support': 'Soporte',
-    'We\\'re here to help.': 'Estamos aqu\u00ED para ayudarte.',
+    'We\'re here to help.': 'Estamos aqu\u00ED para ayudarte.',
     'Email Us': 'Env\u00EDanos un Correo',
     'Frequently Asked Questions': 'Preguntas Frecuentes',
     'How do I reset my voting guide?': '\u00BFC\u00F3mo reinicio mi gu\u00EDa de votaci\u00F3n?',
     'Go to the Profile tab and tap Start Over at the bottom. This erases your profile and recommendations so you can retake the interview.': 'Ve a la pesta\u00F1a de Perfil y toca "Empezar de Nuevo" en la parte inferior. Esto borra tu perfil y recomendaciones para que puedas retomar la entrevista.',
     'Are the recommendations accurate?': '\u00BFSon precisas las recomendaciones?',
-    'Recommendations are generated by AI based on real candidate data and your stated preferences. They\\'re a starting point \\u2014 we always encourage doing your own research. The app includes a disclaimer on every screen.': 'Las recomendaciones son generadas por IA basadas en datos reales de candidatos y tus preferencias. Son un punto de partida \\u2014 siempre recomendamos hacer tu propia investigaci\u00F3n. La app incluye un aviso en cada pantalla.',
+    'Recommendations are generated by AI based on real candidate data and your stated preferences. They\'re a starting point \\u2014 we always encourage doing your own research. The app includes a disclaimer on every screen.': 'Las recomendaciones son generadas por IA basadas en datos reales de candidatos y tus preferencias. Son un punto de partida \\u2014 siempre recomendamos hacer tu propia investigaci\u00F3n. La app incluye un aviso en cada pantalla.',
     'Where is my data stored?': '\u00BFD\u00F3nde se almacenan mis datos?',
-    'Everything stays on your device. We don\\'t store your data on our servers.': 'Todo permanece en tu dispositivo. No almacenamos tus datos en nuestros servidores.',
+    'Everything stays on your device. We don\'t store your data on our servers.': 'Todo permanece en tu dispositivo. No almacenamos tus datos en nuestros servidores.',
     'Which elections are covered?': '\u00BFQu\u00E9 elecciones est\u00E1n cubiertas?',
     'Texas Votes covers the March 3, 2026 Texas Primary Election for all Texas voters, including both Republican and Democratic primaries.': 'Texas Votes cubre la Elecci\u00F3n Primaria de Texas del 3 de marzo de 2026 para todos los votantes de Texas, incluyendo las primarias Republicana y Dem\u00F3crata.',
     'I found wrong information about a candidate.': 'Encontr\u00E9 informaci\u00F3n incorrecta sobre un candidato.',
-    'Use the Flag this info button on any candidate card in the app to report inaccuracies or bias. You can also email us directly and we\\'ll correct it as quickly as possible.': 'Usa el bot\u00F3n "Reportar esta info" en cualquier tarjeta de candidato en la app para reportar inexactitudes o sesgo. Tambi\u00E9n puedes enviarnos un correo directamente y lo corregiremos lo m\u00E1s r\u00E1pido posible.',
+    'Use the Flag this info button on any candidate card in the app to report inaccuracies or bias. You can also email us directly and we\'ll correct it as quickly as possible.': 'Usa el bot\u00F3n "Reportar esta info" en cualquier tarjeta de candidato en la app para reportar inexactitudes o sesgo. Tambi\u00E9n puedes enviarnos un correo directamente y lo corregiremos lo m\u00E1s r\u00E1pido posible.',
     'Where does the candidate data come from?': '\u00BFDe d\u00F3nde vienen los datos de los candidatos?',
     'Candidate data is researched using AI with web search, cross-referenced against official filings from the Texas Secretary of State, county clerks, and Ballotpedia.': 'Los datos de candidatos se investigan usando IA con b\u00FAsqueda web, verificados contra archivos oficiales del Secretario de Estado de Texas, secretarios del condado y Ballotpedia.',
     'Can I preview what the ballot looks like before doing the interview?': '\u00BFPuedo ver c\u00F3mo se ve la boleta antes de hacer la entrevista?',
@@ -2529,7 +2529,7 @@ function handleSupport() {
     'How do you ensure candidates are treated equally?': '\u00BFC\u00F3mo aseguran que los candidatos sean tratados por igual?',
     'We run automated balance checks that score the symmetry of pros/cons across all candidates in every race.': 'Ejecutamos verificaciones autom\u00E1ticas de equilibrio que eval\u00FAan la simetr\u00EDa de pros y contras entre todos los candidatos en cada carrera.',
     'What are the strengths and concerns on my ballot?': '\u00BFQu\u00E9 son las fortalezas y preocupaciones en mi boleta?',
-    'Each candidate\\'s strengths and concerns are displayed directly on your ballot recommendation cards.': 'Las fortalezas y preocupaciones de cada candidato se muestran directamente en tus tarjetas de recomendaci\u00F3n de boleta.',
+    'Each candidate\'s strengths and concerns are displayed directly on your ballot recommendation cards.': 'Las fortalezas y preocupaciones de cada candidato se muestran directamente en tus tarjetas de recomendaci\u00F3n de boleta.',
     'What issues does the interview cover?': '\u00BFQu\u00E9 temas cubre la entrevista?',
     'The interview lets you select from 21 issues. You pick your top 3-5, and the interview dives deeper into each one.': 'La entrevista te permite seleccionar entre 21 temas. Eliges tus 3-5 principales y la entrevista profundiza en cada uno.',
   })}
@@ -2621,7 +2621,7 @@ function handlePrivacyPolicy() {
   </div>
   ${pageI18n({
     'Last updated: February 22, 2026': '\u00DAltima actualizaci\u00F3n: 22 de febrero de 2026',
-    'Texas Votes is a free voting guide website for Texas elections. Your privacy matters \\u2014 here\\'s exactly what happens with your data.': 'Texas Votes es un sitio web gratuito de gu\u00EDa de votaci\u00F3n para las elecciones de Texas. Tu privacidad importa \\u2014 aqu\u00ED est\u00E1 exactamente lo que pasa con tus datos.',
+    'Texas Votes is a free voting guide website for Texas elections. Your privacy matters \\u2014 here\'s exactly what happens with your data.': 'Texas Votes es un sitio web gratuito de gu\u00EDa de votaci\u00F3n para las elecciones de Texas. Tu privacidad importa \\u2014 aqu\u00ED est\u00E1 exactamente lo que pasa con tus datos.',
     'What we collect': 'Lo que recopilamos',
     'We collect only what you provide during the interview:': 'Solo recopilamos lo que proporcionas durante la entrevista:',
     'Voter preferences \\u2014 your top issues, political outlook, policy views, and candidate qualities': 'Preferencias del votante \\u2014 tus temas principales, perspectiva pol\u00EDtica, opiniones sobre pol\u00EDticas y cualidades de candidatos',
@@ -2630,7 +2630,7 @@ function handlePrivacyPolicy() {
     'Your preferences are sent to our server to generate personalized ballot recommendations using AI': 'Tus preferencias se env\u00EDan a nuestro servidor para generar recomendaciones personalizadas de boleta usando IA',
     'Your address is sent to the U.S. Census Bureau Geocoder API to determine your districts': 'Tu direcci\u00F3n se env\u00EDa a la API del Geocodificador del Censo de EE.UU. para determinar tus distritos',
     'After generating your guide, your profile and ballot are stored locally in your browser': 'Despu\u00E9s de generar tu gu\u00EDa, tu perfil y boleta se almacenan localmente en tu navegador',
-    'What we don\\'t do': 'Lo que NO hacemos',
+    'What we don\'t do': 'Lo que NO hacemos',
     'We do not store your data on our servers': 'NO almacenamos tus datos en nuestros servidores',
     'We do not sell, share, or rent your personal information to anyone': 'NO vendemos, compartimos ni alquilamos tu informaci\u00F3n personal a nadie',
     'We use Cloudflare Web Analytics for anonymous page-view counts only \\u2014 no cookies, no personal data': 'Usamos Cloudflare Web Analytics solo para conteos an\u00F3nimos de visitas \\u2014 sin cookies, sin datos personales',
@@ -2638,18 +2638,18 @@ function handlePrivacyPolicy() {
     'We do not use tracking pixels or advertising SDKs': 'NO usamos p\u00EDxeles de seguimiento ni SDKs publicitarios',
     'We do not collect device identifiers, IP addresses, or usage data': 'NO recopilamos identificadores de dispositivo, direcciones IP ni datos de uso',
     'Local storage': 'Almacenamiento local',
-    'Your voter profile and ballot are saved in your browser\\'s local storage so they persist between visits. This data never leaves your device unless you generate a new guide.': 'Tu perfil de votante y boleta se guardan en el almacenamiento local de tu navegador para que persistan entre visitas. Estos datos nunca salen de tu dispositivo a menos que generes una nueva gu\u00EDa.',
+    'Your voter profile and ballot are saved in your browser\'s local storage so they persist between visits. This data never leaves your device unless you generate a new guide.': 'Tu perfil de votante y boleta se guardan en el almacenamiento local de tu navegador para que persistan entre visitas. Estos datos nunca salen de tu dispositivo a menos que generes una nueva gu\u00EDa.',
     'Third-party services': 'Servicios de terceros',
     'Anthropic (Claude API) \\u2014 processes your voter profile to generate recommendations.': 'Anthropic (Claude API) \\u2014 procesa tu perfil de votante para generar recomendaciones.',
     'U.S. Census Bureau Geocoder \\u2014 receives your address to return district information.': 'Geocodificador del Censo de EE.UU. \\u2014 recibe tu direcci\u00F3n para devolver informaci\u00F3n de distritos.',
     'Cloudflare Workers \\u2014 our API proxy runs on Cloudflare. Requests are processed in memory and not stored.': 'Cloudflare Workers \\u2014 nuestro proxy API se ejecuta en Cloudflare. Las solicitudes se procesan en memoria y no se almacenan.',
     'Cloudflare Web Analytics \\u2014 collects anonymous page-view counts. No cookies, no personal data.': 'Cloudflare Web Analytics \\u2014 recopila conteos an\u00F3nimos de visitas. Sin cookies, sin datos personales.',
     'Data deletion': 'Eliminaci\u00F3n de datos',
-    'Click Start Over in the Profile tab to erase all local data at any time. Since we don\\'t store anything on our servers, there\\'s nothing else to delete.': 'Haz clic en "Empezar de Nuevo" en la pesta\u00F1a de Perfil para borrar todos los datos locales en cualquier momento. Como no almacenamos nada en nuestros servidores, no hay nada m\u00E1s que eliminar.',
-    'Children\\'s privacy': 'Privacidad de menores',
+    'Click Start Over in the Profile tab to erase all local data at any time. Since we don\'t store anything on our servers, there\'s nothing else to delete.': 'Haz clic en "Empezar de Nuevo" en la pesta\u00F1a de Perfil para borrar todos los datos locales en cualquier momento. Como no almacenamos nada en nuestros servidores, no hay nada m\u00E1s que eliminar.',
+    'Children\'s privacy': 'Privacidad de menores',
     'This site is not directed at children under 13 and does not knowingly collect information from children.': 'Este sitio no est\u00E1 dirigido a menores de 13 a\u00F1os y no recopila intencionalmente informaci\u00F3n de menores.',
     'Changes': 'Cambios',
-    'If this policy changes, we\\'ll update the date above and publish the new version at this URL.': 'Si esta pol\u00EDtica cambia, actualizaremos la fecha arriba y publicaremos la nueva versi\u00F3n en esta URL.',
+    'If this policy changes, we\'ll update the date above and publish the new version at this URL.': 'Si esta pol\u00EDtica cambia, actualizaremos la fecha arriba y publicaremos la nueva versi\u00F3n en esta URL.',
     'Contact': 'Contacto',
     'Questions? Email us': '\u00BFPreguntas? Env\u00EDanos un correo',
   })}
@@ -2767,7 +2767,7 @@ function handleOpenSource() {
     'Texas Votes is Open Source': 'Texas Votes es C\u00F3digo Abierto',
     'This app is built transparently. Every line of code, every AI prompt, every design decision is public.': 'Esta app est\u00E1 construida con transparencia. Cada l\u00EDnea de c\u00F3digo, cada prompt de IA, cada decisi\u00F3n de dise\u00F1o es p\u00FAblica.',
     'Why Open Source?': '\u00BFPor Qu\u00E9 C\u00F3digo Abierto?',
-    'Trust through transparency \\u2014 voters can verify there\\'s no hidden bias.': 'Confianza a trav\u00E9s de la transparencia \\u2014 los votantes pueden verificar que no hay sesgo oculto.',
+    'Trust through transparency \\u2014 voters can verify there\'s no hidden bias.': 'Confianza a trav\u00E9s de la transparencia \\u2014 los votantes pueden verificar que no hay sesgo oculto.',
     'Community contribution \\u2014 anyone can suggest improvements or report issues.': 'Contribuci\u00F3n comunitaria \\u2014 cualquiera puede sugerir mejoras o reportar problemas.',
     'Replicability \\u2014 other states and cities can fork this project for their own elections.': 'Replicabilidad \\u2014 otros estados y ciudades pueden bifurcar este proyecto para sus propias elecciones.',
     'The Code': 'El C\u00F3digo',
@@ -3224,7 +3224,7 @@ async function handleCandidateProfile(slug, env) {
   </div>
   ${pageI18n({
     'Candidate Not Found': 'Candidato No Encontrado',
-    'We couldn\\'t find a candidate matching this URL.': 'No pudimos encontrar un candidato que coincida con esta URL.',
+    'We couldn\'t find a candidate matching this URL.': 'No pudimos encontrar un candidato que coincida con esta URL.',
   })}
 </body>
 </html>`;
@@ -3396,7 +3396,7 @@ async function handleCandidateProfile(slug, env) {
     <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
   </div>
   ${pageI18n({
-    'See something wrong? Let us know and we\\'ll fix it.': '\u00BFVes algo incorrecto? D\u00EDnoslo y lo corregiremos.',
+    'See something wrong? Let us know and we\'ll fix it.': '\u00BFVes algo incorrecto? D\u00EDnoslo y lo corregiremos.',
     'Data last verified': 'Datos verificados por \u00FAltima vez',
     'About': 'Acerca de',
     'Education': 'Educaci\u00F3n',
@@ -3950,7 +3950,7 @@ async function handleDataQuality(env) {
     'Counties with voting info': 'Condados con info de votaci\u00F3n',
     'Republican local ballots': 'Boletas locales Republicanas',
     'Democrat local ballots': 'Boletas locales Dem\u00F3cratas',
-    'Today\\'s Update Activity': 'Actividad de Actualizaci\u00F3n de Hoy',
+    'Today\'s Update Activity': 'Actividad de Actualizaci\u00F3n de Hoy',
     'Browse all candidates with detailed information': 'Explora todos los candidatos con informaci\u00F3n detallada',
   })}
 </body>
