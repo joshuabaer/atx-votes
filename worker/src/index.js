@@ -47,6 +47,11 @@ li{font-size:1rem;color:var(--text);margin-bottom:0.75rem}
 .related-links{list-style:none;padding:0;margin:0}
 .related-links li{margin-bottom:0.75rem}
 .related-links a{font-weight:600;font-size:0.95rem}
+.cta-banner{text-align:center;margin:1.5rem 0 2rem;padding:1.25rem 1rem;background:rgba(33,89,143,.04);border-radius:var(--r)}
+@media(prefers-color-scheme:dark){.cta-banner{background:rgba(102,153,217,.06)}}
+.cta-banner a.cta-btn{background:var(--blue);color:#fff;font-weight:600;padding:0.75rem 1.5rem;border-radius:var(--rs);text-decoration:none;display:inline-block;font-size:1rem;transition:opacity .15s}
+.cta-banner a.cta-btn:hover{opacity:0.9}
+.cta-banner .cta-sub{font-size:0.85rem;color:var(--text2);margin-top:0.5rem}
 </style>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.svg">`;
@@ -585,6 +590,13 @@ function handleSampleBallot() {
     [data-party="democrat"]{display:none}
     body.party-dem [data-party="republican"]{display:none}
     body.party-dem [data-party="democrat"]{display:block}
+
+    /* ---- CTA Banner ---- */
+    .cta-banner{text-align:center;margin:12px 0 16px;padding:1.25rem 1rem;background:rgba(33,89,143,.04);border-radius:var(--r)}
+    @media(prefers-color-scheme:dark){.cta-banner{background:rgba(102,153,217,.06)}}
+    .cta-banner a.cta-btn{background:var(--blue);color:#fff;font-weight:600;padding:0.75rem 1.5rem;border-radius:var(--rs);text-decoration:none;display:inline-block;font-size:1rem;transition:opacity .15s}
+    .cta-banner a.cta-btn:hover{opacity:0.9}
+    .cta-banner .cta-sub{font-size:0.85rem;color:var(--text2);margin-top:0.5rem}
   </style>
 </head>
 <body>
@@ -619,6 +631,8 @@ function handleSampleBallot() {
         This page shows fictional candidates and AI-generated recommendations to demonstrate what your personalized ballot looks like. All names, positions, and match scores are examples only.
       </div>
     </div>
+
+    <div class="cta-banner"><a class="cta-btn" href="/app?start=1">Build My Voting Guide &rarr;</a><p class="cta-sub">5-minute personalized ballot</p></div>
 
     <!-- ==================== REPUBLICAN BALLOT ==================== -->
     <div data-party="republican">
@@ -1161,6 +1175,8 @@ function handleHowItWorks() {
     <h1>How It Works</h1>
     <p class="subtitle">Texas Votes is a free tool that helps you figure out which candidates on your ballot match your values. Here's how it works, in plain language.</p>
 
+    <div class="cta-banner"><a class="cta-btn" href="/app?start=1">Build My Voting Guide &rarr;</a><p class="cta-sub">5-minute personalized ballot</p></div>
+
     <h2>What Does This App Do?</h2>
     <p>Texas Votes asks you a few questions about what matters to you — things like education, public safety, the economy, or healthcare. Then it looks at the candidates running in your area and suggests which ones are the best fit based on your answers.</p>
     <p>Think of it like a matchmaker, but for elections. You tell it what you care about, and it connects you with candidates who share those priorities.</p>
@@ -1251,6 +1267,8 @@ function handleNonpartisan() {
     <a href="/" class="back-top">&larr; Texas Votes</a>
     <h1>Nonpartisan by Design</h1>
     <p class="subtitle">Texas Votes matches candidates to your values, not your party. Every design decision is made to keep the experience fair for all voters — regardless of where you fall on the political spectrum.</p>
+
+    <div class="cta-banner"><a class="cta-btn" href="/app?start=1">Build My Voting Guide &rarr;</a><p class="cta-sub">5-minute personalized ballot</p></div>
 
     <h2>Randomized Candidate Order</h2>
     <p>Candidates and answer options are shuffled every time so position on screen never creates bias.</p>
@@ -1464,6 +1482,8 @@ async function handleAuditPage(env) {
     <a href="/" class="back-top">&larr; Texas Votes</a>
     <h1 style="margin-top:1rem">AI Audit</h1>
     <p class="subtitle">Texas Votes uses AI to generate personalized voting guides. To prove our process is fair and nonpartisan, we publish our complete methodology and have submitted it to four independent AI systems for bias review.</p>
+
+    <div class="cta-banner"><a class="cta-btn" href="/app?start=1">Build My Voting Guide &rarr;</a><p class="cta-sub">5-minute personalized ballot</p></div>
 
     <h2 style="margin-top:1.5rem">Independent AI Audit Scores</h2>
     <p>We submitted our complete methodology to four independent AI systems. Each scored our process across five dimensions: partisan bias, factual accuracy, fairness of framing, balance of pros/cons, and transparency.</p>
@@ -2239,6 +2259,8 @@ function handleSupport() {
     <h1>Support</h1>
     <p class="subtitle">We're here to help.</p>
 
+    <div class="cta-banner"><a class="cta-btn" href="/app?start=1">Build My Voting Guide &rarr;</a><p class="cta-sub">5-minute personalized ballot</p></div>
+
     <a class="email-btn" href="mailto:howdy@txvotes.app">Email Us</a>
 
     <div class="faq">
@@ -2299,6 +2321,8 @@ function handlePrivacyPolicy() {
     <a href="/" class="back-top">&larr; Texas Votes</a>
     <h1>Privacy Policy</h1>
     <p class="updated">Last updated: February 22, 2026</p>
+
+    <div class="cta-banner"><a class="cta-btn" href="/app?start=1">Build My Voting Guide &rarr;</a><p class="cta-sub">5-minute personalized ballot</p></div>
 
     <p>Texas Votes (<a href="https://txvotes.app">txvotes.app</a>) is a free voting guide website for Texas elections. Your privacy matters — here's exactly what happens with your data.</p>
 
@@ -2393,6 +2417,8 @@ function handleOpenSource() {
     <a href="/" class="back-top">&larr; Texas Votes</a>
     <h1>Texas Votes is Open Source</h1>
     <p class="subtitle">This app is built transparently. Every line of code, every AI prompt, every design decision is public. We believe voting tools should be accountable to the voters who use them.</p>
+
+    <div class="cta-banner"><a class="cta-btn" href="/app?start=1">Build My Voting Guide &rarr;</a><p class="cta-sub">5-minute personalized ballot</p></div>
 
     <h2>Why Open Source?</h2>
     <ul>
@@ -3051,6 +3077,9 @@ async function handleCandidateProfile(slug, env) {
         <p class="subtitle" style="margin:0.25rem 0 0">${escapeHtml(entry.race)} &middot; ${escapeHtml(partyLabel)} Primary 2026</p>
       </div>
     </div>
+
+    <div class="cta-banner"><a class="cta-btn" href="/app?start=1">Build My Voting Guide &rarr;</a><p class="cta-sub">5-minute personalized ballot</p></div>
+
     ${sections.join("\n    ")}
     ${dataUpdatedAt ? `<p style="margin-top:2rem;font-size:0.85rem;color:var(--text2)">Data last verified: ${new Date(dataUpdatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}${c.sources && c.sources.length ? ` &middot; ${c.sources.length} source${c.sources.length === 1 ? "" : "s"} cited` : ""}</p>` : ""}
     <p style="margin-top:${dataUpdatedAt ? "0.5rem" : "2rem"};font-size:0.9rem;color:var(--text2)">See something wrong? <a href="mailto:howdy@txvotes.app?subject=Data correction: ${encodeURIComponent(c.name)}">Let us know</a> and we'll fix it.</p>
@@ -3147,6 +3176,9 @@ async function handleCandidatesIndex(env) {
     <a href="/" class="back-top">&larr; Texas Votes</a>
     <h1 style="margin-top:1rem">All Candidates</h1>
     <p class="subtitle">2026 Texas Primary Election — March 3, 2026</p>
+
+    <div class="cta-banner"><a class="cta-btn" href="/app?start=1">Build My Voting Guide &rarr;</a><p class="cta-sub">5-minute personalized ballot</p></div>
+
     ${raceSections}
     <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
@@ -3468,6 +3500,8 @@ async function handleDataQuality(env) {
     <a href="/" class="back-top">&larr; Texas Votes</a>
     <h1>Data Quality Dashboard</h1>
     <p class="subtitle">Live transparency report on the completeness and freshness of our election data. Updated daily via automated research pipeline.</p>
+
+    <div class="cta-banner"><a class="cta-btn" href="/app?start=1">Build My Voting Guide &rarr;</a><p class="cta-sub">5-minute personalized ballot</p></div>
 
     <div class="dq-checker-hero">
       <div class="dq-checker-title">Check Your County</div>

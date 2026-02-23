@@ -19,7 +19,7 @@
 - [ ] Create new txvotes repo in GitHub — fresh copy of the code without all the dev history
 
 ### Audit Score Improvements
-_Latest audit: ChatGPT 7.8, Gemini 7.7, Claude 7.6, Grok 7.8 (avg 7.7/10). Remaining:_
+_Latest audit: ChatGPT 7.5, Gemini 7.5, Claude 7.8, Grok 7.8 (avg 7.7/10). All dimensions identical: Bias 8, Accuracy 7, Framing 8, Pros/Cons 7, Transparency 9. Remaining:_
 
 - [ ] Add human spot-checking of AI-generated candidate data — manual review process for AI-generated summaries, pros/cons, and endorsements to catch errors
 - [x] Add automated balance checks for pros/cons — balance-check.js module, /api/balance-check endpoint, integrated into data quality dashboard (53 tests)

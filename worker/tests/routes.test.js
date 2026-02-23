@@ -485,9 +485,7 @@ describe("Back button links on subpages", () => {
     expect(indexSrc).toContain("function handleSupport");
     const supportBlock = indexSrc.slice(
       indexSrc.indexOf("function handleSupport"),
-      indexSrc.indexOf("function handleSampleBallot") > 0
-        ? indexSrc.indexOf("function handleSampleBallot")
-        : indexSrc.indexOf("function handlePrivacyPolicy")
+      indexSrc.indexOf("function handlePrivacyPolicy")
     );
     expect(supportBlock).toContain('href="/"');
   });
