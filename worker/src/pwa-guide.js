@@ -61,7 +61,9 @@ export async function handlePWA_Guide(request, env) {
       if (countyRaw) {
         try {
           var countyBallot = JSON.parse(countyRaw);
-          ballot.races = ballot.races.concat(countyBallot.races || []);
+          var seenRaces = new Set(ballot.races.map(r => `${r.office}|${r.district || ''}`));
+          var dedupedCounty = (countyBallot.races || []).filter(r => !seenRaces.has(`${r.office}|${r.district || ''}`));
+          ballot.races = ballot.races.concat(dedupedCounty);
           if (countyBallot.propositions) {
             ballot.propositions = (ballot.propositions || []).concat(countyBallot.propositions);
           }

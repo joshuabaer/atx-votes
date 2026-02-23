@@ -23,8 +23,19 @@ export function handlePWA_Clear(redirectUrl = '/', title = 'Texas Votes') {
   var html = '<!DOCTYPE html><html><head><meta charset="utf-8">' +
     '<meta name="viewport" content="width=device-width,initial-scale=1">' +
     '<title>' + title + '</title>' +
+    '<link rel="icon" href="/favicon.svg" type="image/svg+xml">' +
+    '<link rel="apple-touch-icon" href="/apple-touch-icon.svg">' +
     '<meta property="og:title" content="' + title + '">' +
-    '<meta property="og:description" content="Your personalized Texas voting guide">' +
+    '<meta property="og:description" content="Get a personalized, nonpartisan voting guide for Texas elections in 5 minutes.">' +
+    '<meta property="og:type" content="website">' +
+    '<meta property="og:site_name" content="Texas Votes">' +
+    '<meta property="og:image" content="https://txvotes.app/og-image.svg">' +
+    '<meta property="og:image:width" content="1200">' +
+    '<meta property="og:image:height" content="630">' +
+    '<meta name="twitter:card" content="summary_large_image">' +
+    '<meta name="twitter:title" content="' + title + '">' +
+    '<meta name="twitter:description" content="Get a personalized, nonpartisan voting guide for Texas elections in 5 minutes.">' +
+    '<meta name="twitter:image" content="https://txvotes.app/og-image.svg">' +
     '<style>body{font-family:-apple-system,system-ui,sans-serif;display:flex;' +
     'align-items:center;justify-content:center;min-height:100vh;margin:0;' +
     'background:#f5f5f5;color:#333;text-align:center}' +
@@ -63,7 +74,7 @@ export function handlePWA_Manifest() {
   return new Response(MANIFEST, {
     headers: {
       "Content-Type": "application/manifest+json",
-      "Cache-Control": "public, max-age=86400",
+      "Cache-Control": "public, max-age=3600",
     },
   });
 }
@@ -89,11 +100,17 @@ var SERVICE_WORKER = [
   "    return;",
   "  }",
   // Network-first for app shell: always fetch latest, cache for offline fallback
+  // Cached responses older than 1 hour are discarded
   "  e.respondWith(fetch(e.request).then(function(res){",
   "    var clone=res.clone();",
   "    caches.open(CACHE).then(function(c){c.put(e.request,clone)});",
   "    return res;",
-  "  }).catch(function(){return caches.match(e.request)}));",
+  "  }).catch(function(){return caches.match(e.request).then(function(cached){",
+  "    if(!cached)return cached;",
+  "    var d=cached.headers.get('date');",
+  "    if(d&&(Date.now()-new Date(d).getTime())>3600000)return undefined;",
+  "    return cached;",
+  "  })}));",
   "});",
 ].join("\n");
 
@@ -1212,6 +1229,7 @@ var APP_JS = [
     "'Local races for':'Carreras locales para'," +
     "'County are not yet available. Your ballot shows statewide and district races only.':'no est\\u00E1n disponibles a\\u00FAn. Tu boleta muestra solo las carreras estatales y de distrito.'," +
     "'Local races not yet available for this county.':'Carreras locales a\\u00FAn no disponibles para este condado.'," +
+    "'Your ballot data may be outdated. Tap to refresh.':'Tu informaci\\u00F3n de boleta puede estar desactualizada. Toca para actualizar.'," +
     "'Why this match?':'\\u00BFPor qu\\u00E9 esta recomendaci\\u00F3n?'," +
     // Report issue
     "'Flag this info':'Reportar esta informaci\\u00F3n'," +
@@ -1413,7 +1431,8 @@ var APP_JS = [
     "guideComplete:false,summary:null,districts:null," +
     "isLoading:false,loadPhase:0,loadMsg:'',error:null,geolocating:false," +
     "readingLevel:1," +
-    "expanded:{'vi-dates':true,'vi-bring':true},disclaimerDismissed:false,hasVoted:false" +
+    "expanded:{'vi-dates':true,'vi-bring':true},disclaimerDismissed:false,hasVoted:false," +
+    "staleBallot:false" +
     "};",
 
   // Shuffled arrays (set once per question display)
@@ -1427,6 +1446,18 @@ var APP_JS = [
 
   // ============ UTILS ============
   "function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;')}",
+
+  "function getInitials(name){" +
+    "if(!name)return'?';" +
+    "var s=name.replace(/[\"\\u201c\\u201d][^\"\\u201c\\u201d]*[\"\\u201c\\u201d]/g,' ').replace(/[\'\\u2018\\u2019][^\'\\u2018\\u2019]*[\'\\u2018\\u2019]/g,' ');" +
+    "var parts=s.split(/\\s+/).filter(function(w){return w.length>0});" +
+    "var suffixes={jr:1,sr:1,ii:1,iii:1,iv:1,v:1,vi:1,vii:1,viii:1};" +
+    "parts=parts.filter(function(w){return !suffixes[w.toLowerCase().replace(/\\./g,'')]});" +
+    "parts=parts.filter(function(w){return !(w.length<=2 && w.charAt(w.length-1)==='.')});" +
+    "if(parts.length===0)return'?';" +
+    "if(parts.length===1)return parts[0].charAt(0).toUpperCase();" +
+    "return parts[0].charAt(0).toUpperCase()+parts[parts.length-1].charAt(0).toUpperCase()" +
+  "}",
 
   "function fmtDate(iso){" +
     "if(!iso)return'';" +
@@ -1566,6 +1597,9 @@ var APP_JS = [
     "if(rdu)S.repDataUpdatedAt=rdu;" +
     "var ddu=localStorage.getItem('tx_votes_data_updated_democrat');" +
     "if(ddu)S.demDataUpdatedAt=ddu;" +
+    // Check if ballot data is older than 48 hours
+    "var _staleTs=rdu||ddu;" +
+    "if(_staleTs&&(Date.now()-new Date(_staleTs).getTime())>172800000){S.staleBallot=true}" +
     "var sp=localStorage.getItem('tx_votes_selected_party');" +
     "if(sp)S.selectedParty=sp;" +
     "S.hasVoted=!!localStorage.getItem('tx_votes_has_voted');" +
@@ -1945,6 +1979,13 @@ var APP_JS = [
     "var _dua=S.selectedParty==='democrat'?S.demDataUpdatedAt:S.repDataUpdatedAt;" +
     "if(_dua){h+='<div style=\"font-size:12px;color:var(--text2);margin-top:8px\">'+t('Data last verified')+': '+fmtDate(_dua)+'</div>'}" +
     "h+='</div>';" +
+    // Stale ballot data banner (shown when data is >48 hours old)
+    "if(S.staleBallot){" +
+      "h+='<div style=\"background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text2);cursor:pointer\" data-action=\"refresh-ballots\">';" +
+      "h+='<span style=\"font-size:18px;flex-shrink:0\">\u{1F504}</span>';" +
+      "h+='<span>'+t('Your ballot data may be outdated. Tap to refresh.')+'</span>';" +
+      "h+='</div>'" +
+    "}" +
     // County coverage info banner
     "if(S.countyBallotAvailable===false&&S.districts&&S.districts.countyFips){" +
       "var _cn=S.districts.countyName||'';" +
@@ -1995,7 +2036,7 @@ var APP_JS = [
         "h+='<div class=\"card\"><div style=\"display:flex;align-items:center;gap:12px\">';" +
         "if(c){" +
           "var slug=c.name.toLowerCase().replace(/[^a-z0-9 -]/g,'').replace(/\\s+/g,'-');" +
-          "var initial=c.name.charAt(0).toUpperCase();" +
+          "var initial=getInitials(c.name);" +
           "h+='<div style=\"width:40px;height:40px;border-radius:50%;background:#4A90D9;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;overflow:hidden;flex-shrink:0\">';" +
           "h+='<img src=\"/headshots/'+slug+'.jpg\" alt=\"\" style=\"width:100%;height:100%;object-fit:cover;border-radius:50%\" onerror=\"if(this.src.indexOf(\\'.jpg\\')>0){this.src=this.src.replace(\\'.jpg\\',\\'.png\\')}else{this.style.display=\\'none\\';this.nextSibling.style.display=\\'\\';}\">';" +
           "h+='<span style=\"display:none\">'+initial+'</span></div>'" +
@@ -2125,7 +2166,7 @@ var APP_JS = [
     "for(var j=0;j<activeCands.length;j++){" +
       "var c=activeCands[j];" +
       "var slug=c.name.toLowerCase().replace(/[^a-z0-9 -]/g,'').replace(/\\s+/g,'-');" +
-      "var initial=c.name.charAt(0).toUpperCase();" +
+      "var initial=getInitials(c.name);" +
       "var ac=colors[j%colors.length];" +
       "var bdr=c.isRecommended?'2px solid var(--blue)':'2px solid transparent';" +
       "h+='<div style=\"width:30px;height:30px;border-radius:50%;background:'+ac+';display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;overflow:hidden;border:'+bdr+';flex-shrink:0\">';" +
@@ -2252,7 +2293,7 @@ var APP_JS = [
       "var isOpen=S.expanded[eid];" +
       "var colors=['#4A90D9','#D95B43','#5B8C5A','#8E6BBF','#D4A843','#C75B8F','#5BBFC7','#7B8D6F','#D97B43','#6B8FBF'];" +
       "var avatarColor=colors[i%colors.length];" +
-      "var initial=c.name.charAt(0).toUpperCase();" +
+      "var initial=getInitials(c.name);" +
       "var slug=c.name.toLowerCase().replace(/[^a-z0-9 -]/g,'').replace(/\\s+/g,'-');" +
       "h+='<div class=\"cand-card'+(c.isRecommended?' recommended':'')+'\">';" +
       "h+='<div style=\"display:flex;gap:12px;align-items:center\">';" +
@@ -2864,6 +2905,7 @@ var APP_JS = [
       "}" +
     "}" +
     "else if(action==='dismiss-disclaimer'){S.disclaimerDismissed=true;render()}" +
+    "else if(action==='refresh-ballots'){S.staleBallot=false;refreshBallots();render()}" +
     "else if(action==='set-lang'){trk('lang_toggle',{d1:el.dataset.value});setLang(el.dataset.value)}" +
     "else if(action==='mark-voted'){S.hasVoted=true;trk('i_voted');save();render();launchConfetti();setTimeout(showSharePrompt,1500)}" +
     "else if(action==='unvote'){S.hasVoted=false;save();render()}" +
@@ -3403,7 +3445,14 @@ var APP_JS = [
             "changed=true" +
           "}" +
         "}" +
-        "if(changed){S[key]=current;save()}" +
+        // Merge new races from remote (e.g. county races added after guide generation)
+        "var seenRaces={};" +
+        "for(var si=0;si<current.races.length;si++){seenRaces[current.races[si].office+'|'+(current.races[si].district||'')]=true}" +
+        "for(var ni=0;ni<remote.races.length;ni++){" +
+          "var nr=remote.races[ni];" +
+          "if(!seenRaces[nr.office+'|'+(nr.district||'')]){current.races.push(nr);changed=true}" +
+        "}" +
+        "if(changed){S[key]=current;S.countyBallotAvailable=true;save();render()}" +
       "}).catch(function(){})" +
     "})" +
   "}",
@@ -3448,6 +3497,18 @@ var APP_HTML =
   '<meta name="apple-mobile-web-app-capable" content="yes">' +
   '<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">' +
   '<meta name="description" content="Your personalized voting guide for Texas elections.">' +
+  '<meta property="og:title" content="Texas Votes — Your Personalized Voting Guide">' +
+  '<meta property="og:description" content="Get a personalized, nonpartisan voting guide for Texas elections in 5 minutes.">' +
+  '<meta property="og:type" content="website">' +
+  '<meta property="og:url" content="https://txvotes.app/app">' +
+  '<meta property="og:site_name" content="Texas Votes">' +
+  '<meta property="og:image" content="https://txvotes.app/og-image.svg">' +
+  '<meta property="og:image:width" content="1200">' +
+  '<meta property="og:image:height" content="630">' +
+  '<meta name="twitter:card" content="summary_large_image">' +
+  '<meta name="twitter:title" content="Texas Votes — Your Personalized Voting Guide">' +
+  '<meta name="twitter:description" content="Get a personalized, nonpartisan voting guide for Texas elections in 5 minutes.">' +
+  '<meta name="twitter:image" content="https://txvotes.app/og-image.svg">' +
   "<style>" +
   CSS +
   "</style>" +

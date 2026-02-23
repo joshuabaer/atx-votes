@@ -90,7 +90,7 @@ IMPORTANT: Return ONLY valid JSON. Use null for any field you cannot verify.`;
   if (!result) return { error: "No response from Claude" };
 
   const key = `county_info:${countyFips}`;
-  await env.ELECTION_DATA.put(key, JSON.stringify(result));
+  await env.ELECTION_DATA.put(key, JSON.stringify(result), { expirationTtl: 604800 });
   return { success: true, countyFips, countyName };
 }
 
@@ -234,7 +234,7 @@ IMPORTANT:
   }
 
   const key = `precinct_map:${countyFips}`;
-  await env.ELECTION_DATA.put(key, JSON.stringify(result));
+  await env.ELECTION_DATA.put(key, JSON.stringify(result), { expirationTtl: 2592000 });
   return { success: true, countyFips, countyName, zipCount: Object.keys(result).length };
 }
 

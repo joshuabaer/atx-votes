@@ -119,7 +119,8 @@ describe("seedCountyInfo", () => {
     expect(result.countyName).toBe("Travis");
     expect(mockEnv.ELECTION_DATA.put).toHaveBeenCalledWith(
       "county_info:48453",
-      expect.any(String)
+      expect.any(String),
+      { expirationTtl: 604800 }
     );
   });
 
@@ -501,7 +502,8 @@ describe("seedPrecinctMap", () => {
     expect(result.zipCount).toBe(3);
     expect(mockEnv.ELECTION_DATA.put).toHaveBeenCalledWith(
       "precinct_map:48453",
-      expect.any(String)
+      expect.any(String),
+      { expirationTtl: 2592000 }
     );
   });
 

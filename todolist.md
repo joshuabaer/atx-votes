@@ -13,7 +13,7 @@
 
 ### Features
 - [ ] Design a candidate/community data submission system — allow candidates and others to submit data for races with limited info. Must be trusted, not spammable or gameable (needs verification/moderation design)
-- [ ] Add filter by county to candidates list
+- [x] Add filter by county to candidates list — dropdown with All Counties / Statewide Only / per-county options, race count indicator, statewide races always visible per county, Spanish translations
 - [ ] Make city/region support self-service — configuration-driven approach so any city/region can set up their own voting guide without code changes
 - [ ] Create versions for runoffs and general election — support multiple election cycles beyond the primary (detailed plan at docs/plans/plan_runoff_general_election.md, 4-phase timeline March-October)
 - [x] Add Related Links sections to transparency pages — add "Nonpartisan by Design" link to bottom of Data Quality page, and replicate the Data Quality page's Related Links section on AI Audit, Nonpartisan, and Open Source pages (cross-linking between all transparency pages)
@@ -50,8 +50,27 @@ _From automated code review of "Add automated AI audit runner" (interview-flow-t
 
 ### Daily Updater & Freshness
 - [ ] Add county ballots and voting info to daily updater refresh — currently only statewide races are auto-updated; county ballots, county_info, and precinct maps are seeded once and never refreshed
-- [ ] Design a post-Election Day site and have it ready to automatically switch when the polls close — currently the site shows stale "March 3, 2026" messaging with no post-election UX, no runoff messaging, no results
-- [ ] Put more accurate text for unseeded county polling hours — fallback shows Travis County hours for all unseeded counties, which is wrong for most of Texas
+- [ ] Design a post-Election Day site and have it ready to automatically switch when the polls close — currently the site shows stale "March 3, 2026" messaging with no post-election UX, no runoff messaging, no results. After election ends, app still shows "Vote Now" CTAs and generates guides for concluded races.
+- [x] Put more accurate text for unseeded county polling hours — replaced Travis County-specific fallback with generic statewide text ("Early voting hours vary by county")
+
+### Staleness & Caching (from audit)
+_Audit found 12 stale data risks across KV, service worker, localStorage, and daily updater._
+
+#### HIGH
+- [ ] **[H1]** Add TTL to `candidates_index` KV cache — currently written with no expiration, so stale data persists until manually deleted (we hit this bug). Fix: `expirationTtl: 3600` (1 hour)
+- [ ] **[H2]** PWA ballot refresh doesn't merge county races — `refreshBallots()` only updates statewide candidate fields; users who generated guides before county data was seeded never see local races even after background refresh
+- [ ] **[H3]** Deduplicate statewide + county race merge in guide generation — `pwa-guide.js` concatenates county races onto statewide without checking for duplicate office+district, causing duplicate candidate cards
+
+#### MEDIUM
+- [ ] **[M1]** Use manifest version for cache invalidation — manifest tracks `updatedAt` and `version` per party but nothing checks it; embed version in `candidates_index` cache key so new data auto-invalidates
+- [ ] **[M2]** Service worker caches API responses with no expiration — stale ballot data can persist in browser Cache API for hours/days after server updates; add expiration logic or respect Cache-Control headers
+- [ ] **[M3]** No post-election auto-transition for cached data — after Election Day, auto-invalidate all cached ballot data so browsers fetch fresh post-election content (overlaps with post-Election Day site design above)
+
+#### LOW
+- [ ] **[L1]** Add staleness warning to localStorage data — `tx_votes_data_updated_*` timestamps are displayed but never validated; show "Data is outdated, refresh?" if older than 24 hours
+- [ ] **[L2]** Add TTL to county_info KV writes — currently no expiration; if a county changes hours/addresses, stale data persists forever. Fix: `expirationTtl: 604800` (7 days)
+- [ ] **[L3]** Add TTL to precinct_map KV writes — seeded once, never refreshed; if redistricting occurs, users get routed to wrong commissioner race. Fix: `expirationTtl: 2592000` (30 days)
+- [ ] **[L4]** Reduce PWA manifest cache duration — currently cached for 24 hours (`max-age=86400`); consider reducing to 1 hour for faster update propagation
 
 ### Monitoring & Alerts
 - [ ] Design a way to get notified about app problems — error alerting, uptime monitoring, KV health checks, failed cron runs, etc.

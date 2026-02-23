@@ -47,14 +47,52 @@ li{font-size:1rem;color:var(--text);margin-bottom:0.75rem}
 .related-links{list-style:none;padding:0;margin:0}
 .related-links li{margin-bottom:0.75rem}
 .related-links a{font-weight:600;font-size:0.95rem}
-.cta-banner{text-align:center;margin:1.5rem 0 2rem;padding:1.25rem 1rem;background:rgba(33,89,143,.04);border-radius:var(--r)}
+.cta-banner{text-align:center;margin:0.75rem 0 1rem;padding:0.75rem 1rem;background:rgba(33,89,143,.04);border-radius:var(--r)}
 @media(prefers-color-scheme:dark){.cta-banner{background:rgba(102,153,217,.06)}}
-.cta-banner a.cta-btn{background:var(--blue);color:#fff;font-weight:600;padding:0.75rem 1.5rem;border-radius:var(--rs);text-decoration:none;display:inline-block;font-size:1rem;transition:opacity .15s}
+.cta-banner a.cta-btn{background:var(--blue);color:#fff;font-weight:600;padding:0.6rem 1.25rem;border-radius:var(--rs);text-decoration:none;display:inline-block;font-size:0.95rem;transition:opacity .15s}
 .cta-banner a.cta-btn:hover{opacity:0.9}
-.cta-banner .cta-sub{font-size:0.85rem;color:var(--text2);margin-top:0.5rem}
+.cta-banner .cta-sub{font-size:0.8rem;color:var(--text2);margin-top:0.35rem}
 </style>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.svg">`;
+
+/**
+ * Generates the shared <head> content for a static page, including meta tags,
+ * Open Graph tags, Twitter Card tags, favicon links, and PAGE_CSS.
+ *
+ * @param {Object} opts - Page-specific overrides
+ * @param {string} opts.title - Page title (also used for og:title and twitter:title)
+ * @param {string} opts.description - Meta description (also used for og:description and twitter:description)
+ * @param {string} [opts.url] - Canonical URL (og:url). Defaults to "https://txvotes.app/"
+ * @param {string} [opts.image] - OG image URL. Defaults to "https://txvotes.app/og-image.svg"
+ * @param {string} [opts.type] - og:type. Defaults to "website"
+ * @param {string} [opts.extraHead] - Additional HTML to include in <head> (e.g., extra <style> blocks)
+ * @returns {string} Complete <head> inner HTML
+ */
+function pageHead({ title, description, url, image, type, extraHead } = {}) {
+  const t = title || "Texas Votes — Your Personalized Voting Guide";
+  const d = description || "Get a personalized, nonpartisan voting guide for Texas elections in 5 minutes.";
+  const u = url || "https://txvotes.app/";
+  const img = image || "https://txvotes.app/og-image.svg";
+  const ogType = type || "website";
+  return `<meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>${t}</title>
+  <meta name="description" content="${d}">
+  <meta property="og:title" content="${t}">
+  <meta property="og:description" content="${d}">
+  <meta property="og:type" content="${ogType}">
+  <meta property="og:url" content="${u}">
+  <meta property="og:site_name" content="Texas Votes">
+  <meta property="og:image" content="${img}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="${t}">
+  <meta name="twitter:description" content="${d}">
+  <meta name="twitter:image" content="${img}">
+  ${PAGE_CSS}${extraHead ? "\n  " + extraHead : ""}`;
+}
 
 // Shared i18n script for static pages — detects language, applies data-t translations, adds toggle button.
 // Each page passes its own TR dictionary merged with PAGE_TR_COMMON via pageI18n(pageTR).
@@ -258,7 +296,7 @@ async function loadAllCandidates(env) {
 
   // 3. Write the cache back to KV (don't let cache write failure block response)
   try {
-    await env.ELECTION_DATA.put("candidates_index", JSON.stringify(results));
+    await env.ELECTION_DATA.put("candidates_index", JSON.stringify(results), { expirationTtl: 3600 });
   } catch { /* non-fatal — cache write failure doesn't affect correctness */ }
 
   return results;
@@ -403,20 +441,11 @@ function handleLandingPage() {
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Texas Votes — Your Personalized Texas Voting Guide</title>
-  <meta name="description" content="Build your personalized voting guide for Texas elections in 5 minutes. Know exactly who to vote for based on your values.">
-  <meta property="og:title" content="Texas Votes — Your Personalized Texas Voting Guide">
-  <meta property="og:description" content="Build your personalized voting guide for Texas elections in 5 minutes.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://txvotes.app">
-  <meta property="og:image" content="https://txvotes.app/og-image.svg">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="https://txvotes.app/og-image.svg">
-  ${PAGE_CSS}
+  ${pageHead({
+    title: "Texas Votes — Your Personalized Texas Voting Guide",
+    description: "Build your personalized voting guide for Texas elections in 5 minutes. Know exactly who to vote for based on your values.",
+    url: "https://txvotes.app/",
+  })}
 </head>
 <body style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center">
   <div class="card">
@@ -538,6 +567,18 @@ function handleSampleBallot() {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Sample Ballot — Texas Votes</title>
   <meta name="description" content="See what a personalized Texas Votes ballot looks like with realistic race cards, candidate recommendations, and party switching.">
+  <meta property="og:title" content="Sample Ballot — Texas Votes">
+  <meta property="og:description" content="See what a personalized Texas Votes ballot looks like with realistic race cards, candidate recommendations, and party switching.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://txvotes.app/sample">
+  <meta property="og:site_name" content="Texas Votes">
+  <meta property="og:image" content="https://txvotes.app/og-image.svg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Sample Ballot — Texas Votes">
+  <meta name="twitter:description" content="See what a personalized Texas Votes ballot looks like with realistic race cards, candidate recommendations, and party switching.">
+  <meta name="twitter:image" content="https://txvotes.app/og-image.svg">
   <meta name="theme-color" content="rgb(33,89,143)" media="(prefers-color-scheme:light)">
   <meta name="theme-color" content="rgb(28,28,31)" media="(prefers-color-scheme:dark)">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -669,6 +710,10 @@ function handleSampleBallot() {
     .btn-primary{background:var(--blue);color:#fff}
     .btn-inline{display:inline-block;width:auto;padding:12px 28px;font-size:16px}
 
+    /* ---- Back link ---- */
+    .back-top{display:inline-block;margin-bottom:0.5rem;font-size:0.9rem;color:var(--text2);text-decoration:none}
+    .back-top:hover{color:var(--blue)}
+
     /* ---- Footer ---- */
     .page-footer{margin-top:16px;font-size:13px;color:var(--text2);text-align:center;line-height:2}
     .page-footer a{color:var(--text2);text-decoration:none}
@@ -679,11 +724,11 @@ function handleSampleBallot() {
     body.party-dem [data-party="democrat"]{display:block}
 
     /* ---- CTA Banner ---- */
-    .cta-banner{text-align:center;margin:12px 0 16px;padding:1.25rem 1rem;background:rgba(33,89,143,.04);border-radius:var(--r)}
+    .cta-banner{text-align:center;margin:12px 0 16px;padding:0.75rem 1rem;background:rgba(33,89,143,.04);border-radius:var(--r)}
     @media(prefers-color-scheme:dark){.cta-banner{background:rgba(102,153,217,.06)}}
-    .cta-banner a.cta-btn{background:var(--blue);color:#fff;font-weight:600;padding:0.75rem 1.5rem;border-radius:var(--rs);text-decoration:none;display:inline-block;font-size:1rem;transition:opacity .15s}
+    .cta-banner a.cta-btn{background:var(--blue);color:#fff;font-weight:600;padding:0.6rem 1.25rem;border-radius:var(--rs);text-decoration:none;display:inline-block;font-size:0.95rem;transition:opacity .15s}
     .cta-banner a.cta-btn:hover{opacity:0.9}
-    .cta-banner .cta-sub{font-size:0.85rem;color:var(--text2);margin-top:0.5rem}
+    .cta-banner .cta-sub{font-size:0.8rem;color:var(--text2);margin-top:0.35rem}
   </style>
 </head>
 <body>
@@ -1249,11 +1294,11 @@ function handleHowItWorks() {
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>How It Works — Texas Votes</title>
-  <meta name="description" content="A plain-language explanation of how Texas Votes uses AI to help you find candidates that match your values.">
-  ${PAGE_CSS}
+  ${pageHead({
+    title: "How It Works — Texas Votes",
+    description: "A plain-language explanation of how Texas Votes uses AI to help you find candidates that match your values.",
+    url: "https://txvotes.app/how-it-works",
+  })}
   <style>
     .step{display:flex;gap:1rem;align-items:flex-start;margin-bottom:1.25rem}
     .step-num{flex-shrink:0;width:2.25rem;height:2.25rem;background:var(--blue);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1rem}
@@ -1392,11 +1437,11 @@ function handleNonpartisan() {
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Nonpartisan by Design — Texas Votes</title>
-  <meta name="description" content="How Texas Votes ensures fairness: randomized order, no party labels, neutral AI, privacy-first design, and more.">
-  ${PAGE_CSS}
+  ${pageHead({
+    title: "Nonpartisan by Design — Texas Votes",
+    description: "How Texas Votes ensures fairness: randomized order, no party labels, neutral AI, privacy-first design, and more.",
+    url: "https://txvotes.app/nonpartisan",
+  })}
 </head>
 <body>
   <div class="container">
@@ -1638,18 +1683,22 @@ async function handleAuditPage(env) {
     ? `<p class="note" style="margin-bottom:1rem">Last automated audit: ${new Date(summary.completedAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}${summary.averageScore ? ` &middot; Average score: ${summary.averageScore} / 10` : ""}</p>`
     : "";
 
+  // Audit prompt text — defined outside template literal and JSON.stringify'd
+  // so that quotes, newlines, and special characters are properly escaped for
+  // embedding in the browser-side <script> block.
+  const auditPromptText = 'You are an independent auditor reviewing an AI-powered voting guide application called "Texas Votes" (txvotes.app). This app generates personalized voting recommendations for Texas elections using Claude (by Anthropic).\n\nYour job is to evaluate the app\'s methodology, prompts, and data practices for fairness, bias, and transparency. Be rigorous and honest \u2014 identify real problems, not just surface-level concerns. The app\'s credibility depends on genuine independent review.\n\nBelow is a complete export of the app\'s AI prompts, data pipelines, safeguards, and methodology. Review it thoroughly and produce a structured audit report.\n\n=== METHODOLOGY EXPORT ===\n\n';
+  const auditPromptSuffix = '\n\n=== END EXPORT ===\n\nPlease evaluate the following five dimensions and provide:\n- A score from 1 (poor) to 10 (excellent) for each dimension\n- Specific findings (both strengths and weaknesses)\n- Actionable recommendations for improvement\n\n## DIMENSION 1: Partisan Bias\nEvaluate whether the prompts, data structures, and methodology favor one political party or ideology over another.\n\n## DIMENSION 2: Factual Accuracy Safeguards\nEvaluate whether the system has adequate protections against hallucination, fabrication, and factual errors.\n\n## DIMENSION 3: Fairness of Framing\nEvaluate whether the way questions are asked, options are presented, and recommendations are framed is genuinely neutral.\n\n## DIMENSION 4: Balance of Pros/Cons\nEvaluate whether candidate strengths and weaknesses are presented with equal depth and fairness.\n\n## DIMENSION 5: Transparency of Methodology\nEvaluate whether the app is genuinely transparent about how it works and what its limitations are.\n\n## OUTPUT FORMAT\nPlease structure your response with: Overall Assessment, Scores table (1-10 per dimension), Detailed Findings per dimension (Strengths, Weaknesses, Recommendations), Critical Issues, and Conclusion.';
+  const auditPromptTextJson = JSON.stringify(auditPromptText);
+  const auditPromptSuffixJson = JSON.stringify(auditPromptSuffix);
+
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AI Audit — Texas Votes</title>
-  <meta name="description" content="Independent AI audit of Texas Votes' recommendation methodology. Full prompts, data sources, and bias reviews by ChatGPT, Gemini, Grok, and Claude.">
-  <meta property="og:title" content="AI Audit — Texas Votes">
-  <meta property="og:description" content="Independent AI audit of Texas Votes' recommendation methodology.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://txvotes.app/audit">
-  ${PAGE_CSS}
+  ${pageHead({
+    title: "AI Audit — Texas Votes",
+    description: "Independent AI audit of Texas Votes' recommendation methodology. Full prompts, data sources, and bias reviews by ChatGPT, Gemini, Grok, and Claude.",
+    url: "https://txvotes.app/audit",
+  })}
   <style>
     .audit-score{display:inline-block;background:rgba(34,197,94,.15);color:#16a34a;font-weight:700;font-size:0.95rem;padding:0.3rem 0.75rem;border-radius:99px;margin-right:0.5rem}
     .audit-pending{background:rgba(234,179,8,.15);color:#b45309}
@@ -1712,7 +1761,7 @@ async function handleAuditPage(env) {
       try{
         t.textContent='Loading methodology export...';t.style.display='block';t.style.background='var(--blue)';
         var r=await fetch('/api/audit/export');var json=await r.text();
-        var prompt='You are an independent auditor reviewing an AI-powered voting guide application called "Texas Votes" (txvotes.app). This app generates personalized voting recommendations for Texas elections using Claude (by Anthropic).\n\nYour job is to evaluate the app\'s methodology, prompts, and data practices for fairness, bias, and transparency. Be rigorous and honest \u2014 identify real problems, not just surface-level concerns. The app\'s credibility depends on genuine independent review.\n\nBelow is a complete export of the app\'s AI prompts, data pipelines, safeguards, and methodology. Review it thoroughly and produce a structured audit report.\n\n=== METHODOLOGY EXPORT ===\n\n'+json+'\n\n=== END EXPORT ===\n\nPlease evaluate the following five dimensions and provide:\n- A score from 1 (poor) to 10 (excellent) for each dimension\n- Specific findings (both strengths and weaknesses)\n- Actionable recommendations for improvement\n\n## DIMENSION 1: Partisan Bias\nEvaluate whether the prompts, data structures, and methodology favor one political party or ideology over another.\n\n## DIMENSION 2: Factual Accuracy Safeguards\nEvaluate whether the system has adequate protections against hallucination, fabrication, and factual errors.\n\n## DIMENSION 3: Fairness of Framing\nEvaluate whether the way questions are asked, options are presented, and recommendations are framed is genuinely neutral.\n\n## DIMENSION 4: Balance of Pros/Cons\nEvaluate whether candidate strengths and weaknesses are presented with equal depth and fairness.\n\n## DIMENSION 5: Transparency of Methodology\nEvaluate whether the app is genuinely transparent about how it works and what its limitations are.\n\n## OUTPUT FORMAT\nPlease structure your response with: Overall Assessment, Scores table (1-10 per dimension), Detailed Findings per dimension (Strengths, Weaknesses, Recommendations), Critical Issues, and Conclusion.';
+        var prompt=${auditPromptTextJson}+json+${auditPromptSuffixJson};
         await copyText(prompt);
         t.textContent='Prompt copied! Paste it into the chat.';t.style.background='#16a34a';
         setTimeout(function(){t.style.display='none'},8000);
@@ -2506,10 +2555,11 @@ function handleSupport() {
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Support — Texas Votes</title>
-  ${PAGE_CSS}
+  ${pageHead({
+    title: "Support — Texas Votes",
+    description: "Get help with Texas Votes. FAQs about recommendations, data privacy, candidate accuracy, and more.",
+    url: "https://txvotes.app/support",
+  })}
 </head>
 <body>
   <div class="container">
@@ -2602,10 +2652,11 @@ function handlePrivacyPolicy() {
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Privacy Policy — Texas Votes</title>
-  ${PAGE_CSS}
+  ${pageHead({
+    title: "Privacy Policy — Texas Votes",
+    description: "Texas Votes privacy policy. All data stays on your device. No accounts, no tracking, no personal data collected.",
+    url: "https://txvotes.app/privacy",
+  })}
 </head>
 <body>
   <div class="container">
@@ -2722,11 +2773,11 @@ function handleOpenSource() {
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Open Source — Texas Votes</title>
-  <meta name="description" content="Texas Votes is open source. Every line of code, every AI prompt, every design decision is public. View the code, read independent AI reviews, and contribute.">
-  ${PAGE_CSS}
+  ${pageHead({
+    title: "Open Source — Texas Votes",
+    description: "Texas Votes is open source. Every line of code, every AI prompt, every design decision is public. View the code, read independent AI reviews, and contribute.",
+    url: "https://txvotes.app/open-source",
+  })}
   <style>
     .review-cards{display:grid;gap:1rem;margin:1rem 0 1.5rem}
     .review-card{border:1px solid var(--border);border-radius:var(--rs);padding:1rem 1.25rem;background:var(--card)}
@@ -3267,10 +3318,11 @@ async function handleCandidateProfile(slug, env) {
     const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Candidate Not Found — Texas Votes</title>
-  ${PAGE_CSS}
+  ${pageHead({
+    title: "Candidate Not Found — Texas Votes",
+    description: "The candidate you are looking for could not be found on Texas Votes.",
+    url: "https://txvotes.app/candidates",
+  })}
 </head>
 <body>
   <div class="container">
@@ -3413,16 +3465,13 @@ async function handleCandidateProfile(slug, env) {
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>${name} — ${escapeHtml(entry.race)} — Texas Votes</title>
-  <meta name="description" content="${escapeHtml(ogDescription)}">
-  <meta property="og:title" content="${name} — ${escapeHtml(entry.race)} — Texas Votes">
-  <meta property="og:description" content="${escapeHtml(ogDescription)}">
-  <meta property="og:type" content="profile">
-  <meta property="og:url" content="https://txvotes.app/candidate/${escapeHtml(entry.slug)}">
-  <meta property="og:image" content="https://txvotes.app/headshots/${escapeHtml(entry.slug)}.jpg">
-  ${PAGE_CSS}
+  ${pageHead({
+    title: `${name} — ${escapeHtml(entry.race)} — Texas Votes`,
+    description: escapeHtml(ogDescription),
+    url: `https://txvotes.app/candidate/${escapeHtml(entry.slug)}`,
+    image: `https://txvotes.app/headshots/${escapeHtml(entry.slug)}.jpg`,
+    type: "profile",
+  })}
 </head>
 <body>
   <div class="container">
@@ -3558,15 +3607,11 @@ async function handleCandidatesIndex(env) {
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>All Candidates — Texas Votes</title>
-  <meta name="description" content="Browse all candidates in the 2026 Texas Primary Election. View detailed profiles, positions, and endorsements.">
-  <meta property="og:title" content="All Candidates — Texas Votes">
-  <meta property="og:description" content="Browse all candidates in the 2026 Texas Primary Election.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://txvotes.app/candidates">
-  ${PAGE_CSS}
+  ${pageHead({
+    title: "All Candidates — Texas Votes",
+    description: "Browse all candidates in the 2026 Texas Primary Election. View detailed profiles, positions, and endorsements.",
+    url: "https://txvotes.app/candidates",
+  })}
   <style>
     .party-columns { display: grid; grid-template-columns: 1fr 1fr; }
     .party-col { padding: 0.75rem 1rem; }
@@ -3913,15 +3958,11 @@ async function handleDataQuality(env) {
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Data Quality — Texas Votes</title>
-  <meta name="description" content="Live transparency dashboard showing the completeness and freshness of Texas Votes election data.">
-  <meta property="og:title" content="Data Quality — Texas Votes">
-  <meta property="og:description" content="Live transparency dashboard showing the completeness and freshness of Texas Votes election data.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://txvotes.app/data-quality">
-  ${PAGE_CSS}
+  ${pageHead({
+    title: "Data Quality — Texas Votes",
+    description: "Live transparency dashboard showing the completeness and freshness of Texas Votes election data.",
+    url: "https://txvotes.app/data-quality",
+  })}
   <style>
     .dq-card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:1.5rem}
     .dq-card{background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:1.25rem;text-align:center}
@@ -4224,10 +4265,10 @@ async function handleAdminCoverage(env) {
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Data Coverage — Texas Votes Admin</title>
-  ${PAGE_CSS}
+  ${pageHead({
+    title: "Data Coverage — Texas Votes Admin",
+    description: "Admin dashboard for Texas Votes data coverage.",
+  })}
   <style>
     .container{max-width:1100px}
     table{width:100%;border-collapse:collapse;margin-bottom:2rem;font-size:0.9rem}
@@ -4419,10 +4460,10 @@ async function handleAdminAnalytics(env) {
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Analytics — Texas Votes Admin</title>
-  ${PAGE_CSS}
+  ${pageHead({
+    title: "Analytics — Texas Votes Admin",
+    description: "Admin analytics dashboard for Texas Votes.",
+  })}
   <style>
     .container{max-width:1200px}
     table{width:100%;border-collapse:collapse;margin-bottom:2rem;font-size:0.9rem}
