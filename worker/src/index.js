@@ -3593,14 +3593,14 @@ async function handleCandidatesIndex(env) {
   if (countyNames.length > 0) {
     const options = countyNames.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)} County</option>`).join("");
     countyFilter = `
-    <div style="margin-bottom:1.5rem">
-      <label for="county-filter" style="font-size:0.9rem;color:var(--text2);margin-right:0.5rem" data-t="Filter by county:">Filter by county:</label>
-      <select id="county-filter" style="font-size:1rem;padding:0.4rem 0.75rem;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text);font-family:inherit;cursor:pointer">
+    <div class="county-filter-bar">
+      <label for="county-filter" data-t="Filter by county:">Filter by county:</label>
+      <select id="county-filter">
         <option value="all" data-t="All Counties">All Counties</option>
         <option value="statewide" data-t="Statewide Only">Statewide Only</option>
         ${options}
       </select>
-      <span id="county-count" style="font-size:0.85rem;color:var(--text2);margin-left:0.75rem"></span>
+      <span id="county-count"></span>
     </div>`;
   }
 
@@ -3620,6 +3620,12 @@ async function handleCandidatesIndex(env) {
       .party-columns { grid-template-columns: 1fr; }
       .party-col + .party-col { border-left: none; border-top: 1px solid var(--border); }
     }
+    .county-filter-bar { display:flex; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:1.5rem; padding:0.75rem 1rem; background:var(--bg); border:1px solid var(--border); border-radius:var(--rs) }
+    .county-filter-bar label { font-size:0.9rem; color:var(--text2); white-space:nowrap }
+    .county-filter-bar select { font-size:0.95rem; padding:0.5rem 2rem 0.5rem 0.75rem; border-radius:8px; border:1px solid var(--border); background:var(--card); color:var(--text); font-family:inherit; cursor:pointer; -webkit-appearance:none; -moz-appearance:none; appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23999' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 0.6rem center; background-size:12px; min-width:0; flex:1; max-width:280px }
+    .county-filter-bar select:focus { outline:2px solid var(--blue); outline-offset:-1px; border-color:var(--blue) }
+    .county-filter-bar select:hover { border-color:var(--text2) }
+    #county-count { font-size:0.85rem; color:var(--text2); white-space:nowrap }
   </style>
 </head>
 <body>
@@ -3648,34 +3654,41 @@ async function handleCandidatesIndex(env) {
   </div>
   <script>
   (function(){
-    var sel = document.getElementById('county-filter');
-    if (!sel) return;
-    var countEl = document.getElementById('county-count');
-    var sections = document.querySelectorAll('.race-section');
-    function update() {
-      var v = sel.value;
-      var shown = 0;
-      for (var i = 0; i < sections.length; i++) {
-        var s = sections[i];
-        var county = s.getAttribute('data-county');
-        var show = false;
-        if (v === 'all') {
-          show = true;
-        } else if (v === 'statewide') {
-          show = (county === 'statewide');
-        } else {
-          // Show statewide + selected county
-          show = (county === 'statewide' || county === v);
+    function init() {
+      var sel = document.getElementById('county-filter');
+      if (!sel) return;
+      var countEl = document.getElementById('county-count');
+      function update() {
+        var sections = document.querySelectorAll('.race-section');
+        var v = sel.value;
+        var shown = 0;
+        for (var i = 0; i < sections.length; i++) {
+          var s = sections[i];
+          var county = s.getAttribute('data-county');
+          var show = false;
+          if (v === 'all') {
+            show = true;
+          } else if (v === 'statewide') {
+            show = (county === 'statewide');
+          } else {
+            show = (county === 'statewide' || county === v);
+          }
+          s.style.display = show ? '' : 'none';
+          if (show) shown++;
         }
-        s.style.display = show ? '' : 'none';
-        if (show) shown++;
+        if (countEl) {
+          countEl.textContent = shown + (shown === 1 ? ' race' : ' races');
+        }
       }
-      if (countEl) {
-        countEl.textContent = shown + (shown === 1 ? ' race' : ' races');
-      }
+      sel.addEventListener('change', update);
+      sel.addEventListener('input', update);
+      update();
     }
-    sel.addEventListener('change', update);
-    update();
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
   })();
   <\/script>
   ${pageI18n({

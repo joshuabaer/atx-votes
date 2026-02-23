@@ -298,6 +298,54 @@ describe("Static pages in index.js source", () => {
     expect(indexSrc).toContain("loadAllCandidates");
   });
 
+  it("candidates page includes county filter dropdown", () => {
+    // The county filter HTML should be built conditionally when county data exists
+    expect(indexSrc).toContain('id="county-filter"');
+    expect(indexSrc).toContain('class="county-filter-bar"');
+    expect(indexSrc).toContain('id="county-count"');
+    expect(indexSrc).toContain('value="all"');
+    expect(indexSrc).toContain('value="statewide"');
+  });
+
+  it("candidates page county filter script uses DOMContentLoaded guard", () => {
+    // The filter script should handle the case where DOM is still loading
+    expect(indexSrc).toContain("document.readyState === 'loading'");
+    expect(indexSrc).toContain("DOMContentLoaded");
+  });
+
+  it("candidates page county filter script listens for both change and input events", () => {
+    // Both events needed for cross-browser compatibility
+    expect(indexSrc).toContain("addEventListener('change', update)");
+    expect(indexSrc).toContain("addEventListener('input', update)");
+  });
+
+  it("candidates page county filter queries sections fresh on each update", () => {
+    // Sections should be queried inside update() for robustness
+    const candidatesBlock = indexSrc.slice(
+      indexSrc.indexOf("function init()"),
+      indexSrc.indexOf("<\\/script>", indexSrc.indexOf("function init()"))
+    );
+    // querySelectorAll should be inside update(), not cached outside it
+    expect(candidatesBlock).toContain("function update()");
+    const updateBody = candidatesBlock.slice(
+      candidatesBlock.indexOf("function update()"),
+      candidatesBlock.indexOf("sel.addEventListener")
+    );
+    expect(updateBody).toContain("querySelectorAll('.race-section')");
+  });
+
+  it("candidates page county filter handles statewide + county logic", () => {
+    // When a specific county is selected, both statewide and that county should show
+    expect(indexSrc).toContain("county === 'statewide' || county === v");
+  });
+
+  it("candidates page county filter has proper CSS styling", () => {
+    expect(indexSrc).toContain(".county-filter-bar");
+    expect(indexSrc).toContain("appearance:none");
+    expect(indexSrc).toContain("county-filter-bar select:focus");
+    expect(indexSrc).toContain("county-filter-bar select:hover");
+  });
+
   it("handleDistricts route exists", () => {
     expect(indexSrc).toContain("/app/api/districts");
     expect(indexSrc).toContain("handleDistricts");
