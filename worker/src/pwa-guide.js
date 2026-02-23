@@ -347,6 +347,7 @@ function buildUserPrompt(profile, ballotDesc, ballot, party, lang, readingLevel)
     '      "district": "district or null",\n' +
     '      "recommendedCandidate": "exact name from list",\n' +
     '      "reasoning": "1 sentence why this candidate fits the voter",\n' +
+    '      "matchFactors": ["2-3 short phrases citing specific voter priorities that drove this match, e.g. Aligns with your priority: public education funding"],\n' +
     '      "strategicNotes": null,\n' +
     '      "caveats": null,\n' +
     '      "confidence": "Strong Match|Good Match|Best Available|Symbolic Race"\n' +
@@ -640,6 +641,7 @@ function mergeRecommendations(guideResponse, ballot, lang) {
         candidateId: race.candidates[candIdx].id,
         candidateName: rec.recommendedCandidate,
         reasoning: rec.reasoning,
+        matchFactors: rec.matchFactors || [],
         strategicNotes: rec.strategicNotes || null,
         caveats: rec.caveats || null,
         confidence: rec.confidence || "Good Match",

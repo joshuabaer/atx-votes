@@ -219,7 +219,16 @@ async function callClaudeWithSearch(env, userPrompt) {
     system:
       "You are a nonpartisan election data researcher for Texas. " +
       "Use web_search to find verified, factual information about elections. " +
-      "Return ONLY valid JSON. Never fabricate information — if you cannot verify something, use null.",
+      "Return ONLY valid JSON. Never fabricate information — if you cannot verify something, use null.\n\n" +
+      "SOURCE PRIORITY: When evaluating web_search results, prefer sources in this order:\n" +
+      "1. Texas Secretary of State filings (sos.state.tx.us)\n" +
+      "2. County election offices ({county}.tx.us)\n" +
+      "3. Official campaign websites\n" +
+      "4. Nonpartisan references (ballotpedia.org, votesmart.org)\n" +
+      "5. Established Texas news outlets (texastribune.org, dallasnews.com)\n" +
+      "6. National wire services (apnews.com, reuters.com)\n" +
+      "7. AVOID: blogs, social media, opinion sites, unverified sources\n\n" +
+      "CONFLICT RESOLUTION: If sources disagree, trust official filings over campaign claims, and campaign claims over news reporting.",
     tools: [{ type: "web_search_20250305", name: "web_search", max_uses: 10 }],
     messages: [{ role: "user", content: userPrompt }],
   };

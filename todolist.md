@@ -8,49 +8,25 @@
 - [ ] Enrich county_info for remaining ~120 counties — elections websites, phone numbers, vote center status for smallest/rural counties
 - [ ] Seed county ballots for top 30 counties — local races for both parties via Claude + web_search (running now, script at docs/scripts/seed_county_ballots.js)
 - [ ] Fill sparse candidate data — endorsements (43% missing), Democrat polling (55% missing), Democrat fundraising (35% missing)
-- [x] Pre-generate candidate tone variants in KV — 259 tone variants generated for all 73 statewide candidates across 4 tones (1 JSON parse error on Lauren B. Pena cowboy tone)
 - [ ] Candidate contact outreach — for each candidate, identify the best contact name and email address for asking them to review their candidate info on our website (research done, see docs/plans/candidate_contacts.md)
-
-### Bugs
-- [x] Recommendation engine should not recommend withdrawn candidates — e.g. Andrew White (dropped out Jan 5, 2026). Guide generation and ballot display should filter out candidates marked as withdrawn.
-- [x] Candidates page throwing Error 1101 — `nameToSlug` crashing on null candidate name in KV data. Fixed with null guard.
 
 ### Features
 - [ ] Make city/region support self-service — configuration-driven approach so any city/region can set up their own voting guide without code changes
 - [ ] Create versions for runoffs and general election — support multiple election cycles beyond the primary (detailed plan at docs/plans/plan_runoff_general_election.md, 4-phase timeline March-October)
-- [x] LLM choice — let users choose which LLM and model to use for generating their ballot (Claude, GPT, Gemini, Grok)
-- [x] URL flags for alternate LLMs — `?gemini`, `?grok`, and `?chatgpt` query params that tell the app to use that LLM for generating recommendations instead of Claude. Routes to OpenAI gpt-4o, Gemini 2.5 Flash, or Grok 3. API keys already set from audit runner.
-- [x] Hidden LLM debug/comparison view — 5-tap version number in footer → `#/debug/compare`. Race-by-race and agreement summary views, cached in localStorage. Vanity URLs `/gemini`, `/grok`, `/chatgpt` with branded link previews. "Powered by" badge on loading screen and ballot header.
-- [x] Cowboy & Swedish Chef easter eggs — triple-tap "Reading Level" on profile unlocks Swedish Chef (tone 6), type "yeehaw" unlocks Cowboy (tone 7). Both trigger emoji burst, haptic feedback, and immediate guide recalculation.
-- [ ] Remove Candidates link from footer — simplify footer to just Texas Votes, Nonpartisan, Privacy, and contact email
-- [ ] Update data quality page footer to match new style — check all other static pages for footer consistency with the home page format
-- [ ] Make priority list removal more obvious — add a visible "−" button on selected items in the two-zone picker (issues & qualities) to complement the "+" on pool items, so it's clear you can click to remove
-- [ ] Change Swedish Chef easter egg trigger — switch from triple-tap "Reading Level" label to typing "bork" on the profile page (matches the "yeehaw" pattern for Cowboy)
-- [ ] Sample ballot on home page — "Show me a sample" button that instantly displays a pre-generated example ballot, clearly watermarked as a sample, skipping the full interview. Very fast first impression for new visitors.
+- [ ] Make easter egg emoji bursts bigger — double the size of the emojis that fly up when triggering the cowboy ("yeehaw") and Swedish Chef ("bork") easter eggs
+- [ ] Make "I Voted" animation look like fireworks — replace the current emoji burst with a fireworks-style animation when the user taps "I Voted"
+- [ ] Sample ballot on home page — "Show me a sample" button that instantly displays a pre-generated example ballot, clearly watermarked as a sample, skipping the full interview. Very fast first impression for new visitors. Should look like the real PWA ballot with R/D party switcher, fully filled out race cards, match percentages, and expandable candidate details.
 - [ ] Create new txvotes repo in GitHub — fresh copy of the code without all the dev history
 
 ### Audit Score Improvements
-_From AI audit synthesis (ChatGPT 6/10, Gemini 8.6/10, Claude 7.8/10). Ranked by impact x feasibility._
+_Latest audit: ChatGPT 7.5, Gemini 8.0, Claude 7.6 (avg 7.7/10). Remaining items:_
 
-#### Tier 1: High Impact, Low Effort
-- [ ] Add "limited data" badge for low-information candidates — check field completeness at render time, show a visible badge on candidate cards when pros/cons/endorsements are sparse. Prevents information asymmetry from looking like favoritism. (Flagged by: ChatGPT + Gemini, affects Balance of Pros/Cons score)
-- [ ] Normalize loaded interview option labels — editorial pass on deep dive answer wording to reduce rhetorical heat ("Don't overreact," "Second Amendment is non-negotiable," "Tax the wealthy more") while preserving meaning. Use strictly descriptive, symmetric language. (Flagged by: ChatGPT, affects Fairness of Framing score)
-- [ ] Add "Data Last Verified" timestamp per candidate — show when each candidate's data was last updated by the daily updater. Already tracked in the pipeline, just needs display. (Flagged by: Gemini, affects Factual Accuracy score)
-- [ ] Expand county coverage labeling — in-product indicator when local race data is incomplete for the user's county ("Local races not yet available for your county"). Sets honest expectations instead of silent omission. (Flagged by: ChatGPT + Gemini, affects Factual Accuracy + Balance scores)
-
-#### Tier 2: High Impact, More Effort
-- [ ] Add source citations per candidate field — require a `sources` array per candidate with URL + access date for key claims (endorsements, positions, polling). The single biggest trust improvement identified by both audits. (Flagged by: ChatGPT + Gemini, affects Factual Accuracy + Transparency scores)
-- [ ] Implement automated bias test suite — same voter profile with swapped party ballots, measure recommendation shifts and flag asymmetries. Publishable evidence of fairness. (Flagged by: ChatGPT + Gemini, affects Partisan Bias score)
-- [ ] Add "why this confidence level" explanations — show which specific voter answers drove each recommendation, not just a narrative summary. (Flagged by: Gemini, affects Transparency score)
-- [ ] Add endorsement context labels — short neutral descriptor for each endorsement (e.g., "industry group," "labor org," "editorial board") so users understand what each endorsement means. (Flagged by: ChatGPT, affects Balance of Pros/Cons score)
-
-#### Tier 3: Nice to Have
-- [ ] Publish a data quality dashboard (public) — last-updated per race, source counts, completeness indicators visible to voters. (Flagged by: ChatGPT, affects Transparency score)
-- [ ] Document and enforce a source ranking policy — official source priority rules (SOS filing > county office > campaign site > local news), allowlist/denylist for web_search results. (Flagged by: ChatGPT, affects Factual Accuracy score)
-- [ ] Add issue list completeness review — evaluate interview topics against politically salient issues not currently covered (election administration, energy/oil & gas, spending/debt, criminal justice specifics, LGBTQ policy). Publish rubric with public feedback intake. (Flagged by: ChatGPT + Gemini, affects Partisan Bias + Fairness scores)
+- [ ] Implement automated bias test suite — same voter profile with swapped party ballots, measure recommendation shifts and flag asymmetries. Publishable evidence of fairness.
+- [ ] Add "why this confidence level" explanations — show which specific voter answers drove each recommendation, not just a narrative summary.
+- [ ] Document and enforce a source ranking policy — official source priority rules (SOS filing > county office > campaign site > local news), allowlist/denylist for web_search results.
+- [ ] Add issue list completeness review — evaluate interview topics against politically salient issues not currently covered (criminal justice, energy/oil & gas, LGBTQ policy, voting & elections).
 
 ### Technical Debt
-- [x] AI audit execution — automated daily cron calls ChatGPT, Gemini, and Grok APIs; results on /audit page; stops after election day
 - [ ] Comprehensive memory management review — audit localStorage usage, service worker cache lifecycle, KV data retention, and state cleanup
 - [ ] Comprehensive Claude API usage review — analyze token usage across guide generation, county seeding, tone variants, and candidate research; identify optimization opportunities
 
@@ -174,8 +150,21 @@ _From AI audit synthesis (ChatGPT 6/10, Gemini 8.6/10, Claude 7.8/10). Ranked by
 </details>
 
 <details>
-<summary>Features (7 resolved)</summary>
+<summary>Features (18 resolved)</summary>
 
+- [x] LLM choice — URL flags for alternate LLMs (?gemini, ?grok, ?chatgpt) + hidden debug/comparison view
+- [x] Cowboy & Swedish Chef easter eggs — type "yeehaw" for Cowboy, "bork" for Swedish Chef on profile page
+- [x] Remove Candidates link from footer — contextual links per page (4-6 links, no self-links)
+- [x] Smart contextual footers — all 12 page footers redesigned with relevant cross-links
+- [x] Priority picker "−" button — visible minus on filled slots, complements "+" on pool items
+- [x] Sample ballot page — /sample with fictional races, SAMPLE watermark, R/D context
+- [x] Source citations — capture URLs from Claude web_search responses, display on profiles and ballot
+- [x] Endorsement context labels — structured {name, type} with 9-category taxonomy
+- [x] Data quality dashboard — /data-quality with freshness, coverage, completeness, county checker
+- [x] Limited data badges — isSparseCandidate() shows badge when pros/cons/endorsements sparse
+- [x] Normalized interview labels — editorial pass on all 16 deep dive options, symmetric language
+- [x] Data Last Verified timestamps — fmtDate() shows last-updated date on ballot page
+- [x] County coverage labeling — banner when local races unavailable for user's county
 - [x] Deploy to txvotes.app — separate Cloudflare Worker (`txvotes-api`) sharing KV with `atxvotes-api`. DNS active, worker deployed, secrets set. atxvotes.app redirects to txvotes.app.
 - [x] Change issues and candidate trait selection to "sort by priority" — drag-to-reorder lists with touch/mouse drag + arrow buttons. Priority dividers at position 5 (issues) and 3 (qualities). Ranked format in prompts. 71 tests passing.
 - [x] Analytics event tracking — 18 events via Cloudflare Analytics Engine (interview flow, guide gen, shares, I Voted, page views). Privacy-safe, sendBeacon, Do Not Track respected.

@@ -386,8 +386,15 @@ var CSS = [
   ".dot-done{background:var(--blue)}",
   ".dot-active{background:var(--blue);animation:pulse 1s ease-in-out infinite}",
   "@keyframes pulse{50%{transform:scale(1.3)}}",
-  "@keyframes confettiFall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}",
-  ".confetti-piece{position:fixed;top:-10px;width:10px;height:10px;z-index:9999;animation:confettiFall 3s ease-in forwards;pointer-events:none}",
+  "@keyframes fwLaunch{0%{transform:translateY(0);opacity:1}100%{transform:translateY(var(--fw-rise));opacity:1}}",
+  "@keyframes fwBurst{0%{transform:translate(0,0) scale(1);opacity:1}60%{opacity:1}100%{transform:translate(var(--fw-dx),var(--fw-dy)) scale(0);opacity:0}}",
+  "@keyframes fwTrail{0%{opacity:.8;transform:scale(1)}100%{opacity:0;transform:scale(.3)}}",
+  "@keyframes fwGlow{0%{transform:scale(0);opacity:1}30%{transform:scale(1.5);opacity:.8}100%{transform:scale(2.5);opacity:0}}",
+  ".fw-shell{position:fixed;width:4px;height:16px;border-radius:2px;z-index:9999;pointer-events:none;animation:fwLaunch var(--fw-dur) ease-out forwards}",
+  ".fw-spark{position:fixed;width:var(--fw-size);height:var(--fw-size);border-radius:50%;z-index:9999;pointer-events:none;animation:fwBurst var(--fw-burst-dur) ease-out forwards;box-shadow:0 0 6px var(--fw-color)}",
+  ".fw-trail{position:fixed;width:3px;height:3px;border-radius:50%;z-index:9998;pointer-events:none;animation:fwTrail .6s ease-out forwards}",
+  ".fw-glow{position:fixed;width:30px;height:30px;border-radius:50%;z-index:9997;pointer-events:none;animation:fwGlow .8s ease-out forwards}",
+  ".fw-emoji{position:fixed;z-index:9999;pointer-events:none;font-size:24px;animation:fwBurst var(--fw-burst-dur) ease-out forwards}",
   "@keyframes emojiFall{0%{transform:translateY(0) scale(0);opacity:1}20%{transform:translateY(-40vh) scale(1.2);opacity:1}100%{transform:translateY(-120vh) scale(0.6) rotate(360deg);opacity:0}}",
   ".share-prompt-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:10000;display:flex;align-items:center;justify-content:center;padding:24px;animation:fadeIn .3s ease}",
   ".share-prompt-card{background:var(--card);border-radius:16px;padding:28px 24px;max-width:340px;width:100%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.2)}",
@@ -521,6 +528,7 @@ var CSS = [
     ".spinner{animation:none}" +
     ".card-touch{transition:none}" +
     ".chip,.radio,.btn,.tab,.topnav-link,.party-btn,.acc-chev,.progress-fill,.sort-item{transition:none}" +
+    ".fw-shell,.fw-spark,.fw-trail,.fw-glow,.fw-emoji{animation:none!important;display:none!important}" +
   "}",
 
   // Accessibility: focus visible
@@ -965,6 +973,10 @@ var APP_JS = [
     "'Water & Land':'Agua y tierras'," +
     "'Agriculture & Rural':'Agricultura y zonas rurales'," +
     "'Faith & Religious Liberty':'Fe y libertad religiosa'," +
+    "'Criminal Justice':'Justicia penal'," +
+    "'Energy & Oil/Gas':'Energ\\u00EDa y petr\\u00F3leo/gas'," +
+    "'LGBTQ+ Rights':'Derechos LGBTQ+'," +
+    "'Voting & Elections':'Votaci\\u00F3n y elecciones'," +
     // Spectrum
     "'Progressive':'Progresista'," +
     "'Bold systemic change, social justice focused':'Cambio sist\\u00E9mico audaz, enfocado en la justicia social'," +
@@ -1139,10 +1151,51 @@ var APP_JS = [
     "'Keep religious doctrine out of public policy':'Mantener la doctrina religiosa fuera de las pol\\u00EDticas p\\u00FAblicas'," +
     "'Faith-informed lawmaking':'Legislaci\\u00F3n informada por la fe'," +
     "'Moral and religious values should influence legislation':'Los valores morales y religiosos deben influir en la legislaci\\u00F3n'," +
+    // Criminal Justice deep dive
+    "'What\\u2019s most important for criminal justice reform?':'\\u00BFQu\\u00E9 es lo m\\u00E1s importante para la reforma de justicia penal?'," +
+    "'Focus on rehabilitation':'Enfoque en la rehabilitaci\\u00F3n'," +
+    "'Invest in re-entry programs, reduce recidivism through support services':'Invertir en programas de reinserci\\u00F3n, reducir la reincidencia mediante servicios de apoyo'," +
+    "'Maintain current system':'Mantener el sistema actual'," +
+    "'Texas\\u2019s approach to law and order is working, keep sentences firm':'El enfoque de Texas sobre la ley y el orden funciona, mantener sentencias firmes'," +
+    "'Reform sentencing laws':'Reformar las leyes de sentencia'," +
+    "'Reduce mandatory minimums, address racial disparities in sentencing':'Reducir m\\u00EDnimos obligatorios, abordar disparidades raciales en las sentencias'," +
+    "'Rethink incarceration':'Repensar el encarcelamiento'," +
+    "'Shift resources from prisons to community-based alternatives':'Redirigir recursos de las prisiones a alternativas comunitarias'," +
+    // Energy & Oil/Gas deep dive
+    "'How should Texas manage its energy industry?':'\\u00BFC\\u00F3mo deber\\u00EDa Texas manejar su industria energ\\u00E9tica?'," +
+    "'Maximize production':'Maximizar la producci\\u00F3n'," +
+    "'Support oil and gas expansion, reduce regulations on producers':'Apoyar la expansi\\u00F3n de petr\\u00F3leo y gas, reducir regulaciones a los productores'," +
+    "'Balanced energy mix':'Mezcla energ\\u00E9tica equilibrada'," +
+    "'Maintain fossil fuels while investing in renewables and grid stability':'Mantener combustibles f\\u00F3siles mientras se invierte en renovables y estabilidad de la red'," +
+    "'Accelerate clean energy':'Acelerar la energ\\u00EDa limpia'," +
+    "'Transition away from fossil fuels toward wind, solar, and storage':'Transici\\u00F3n de combustibles f\\u00F3siles hacia e\\u00F3lica, solar y almacenamiento'," +
+    "'Let the market decide':'Dejar que el mercado decida'," +
+    "'Remove subsidies for all energy sources, let competition set the course':'Eliminar subsidios para todas las fuentes de energ\\u00EDa, dejar que la competencia defina el rumbo'," +
+    // LGBTQ+ Rights deep dive
+    "'What\\u2019s the right approach to LGBTQ+ rights?':'\\u00BFCu\\u00E1l es el enfoque correcto sobre los derechos LGBTQ+?'," +
+    "'Full equality protections':'Protecciones de igualdad plena'," +
+    "'Add sexual orientation and gender identity to anti-discrimination laws':'A\\u00F1adir orientaci\\u00F3n sexual e identidad de g\\u00E9nero a las leyes antidiscriminaci\\u00F3n'," +
+    "'Balance with religious liberty':'Equilibrar con la libertad religiosa'," +
+    "'Protect LGBTQ+ individuals while preserving faith-based exemptions':'Proteger a las personas LGBTQ+ mientras se preservan las exenciones basadas en la fe'," +
+    "'Current laws are sufficient':'Las leyes actuales son suficientes'," +
+    "'Existing legal protections are adequate, no new legislation needed':'Las protecciones legales existentes son adecuadas, no se necesita nueva legislaci\\u00F3n'," +
+    "'Parental rights focus':'Enfoque en los derechos de los padres'," +
+    "'Parents should direct decisions about children\\u2019s healthcare and education':'Los padres deben dirigir las decisiones sobre la salud y educaci\\u00F3n de sus hijos'," +
+    // Voting & Elections deep dive
+    "'What matters most for elections?':'\\u00BFQu\\u00E9 es lo m\\u00E1s importante para las elecciones?'," +
+    "'Expand voter access':'Ampliar el acceso al voto'," +
+    "'Make registration easier, extend early voting, allow mail-in ballots for all':'Facilitar el registro, extender la votaci\\u00F3n anticipada, permitir voto por correo para todos'," +
+    "'Strengthen ID requirements':'Fortalecer los requisitos de identificaci\\u00F3n'," +
+    "'Require photo ID, verify citizenship, secure the voter rolls':'Exigir identificaci\\u00F3n con foto, verificar ciudadan\\u00EDa, asegurar los padrones electorales'," +
+    "'Balanced election reforms':'Reformas electorales equilibradas'," +
+    "'Improve access and security together with bipartisan oversight':'Mejorar el acceso y la seguridad junto con supervisi\\u00F3n bipartidista'," +
+    "'Local control':'Control local'," +
+    "'Let counties and cities set their own election rules and procedures':'Permitir que los condados y ciudades establezcan sus propias reglas y procedimientos electorales'," +
     // County ballot coverage
     "'Local races for':'Carreras locales para'," +
     "'County are not yet available. Your ballot shows statewide and district races only.':'no est\\u00E1n disponibles a\\u00FAn. Tu boleta muestra solo las carreras estatales y de distrito.'," +
-    "'Local races not yet available for this county.':'Carreras locales a\\u00FAn no disponibles para este condado.'" +
+    "'Local races not yet available for this county.':'Carreras locales a\\u00FAn no disponibles para este condado.'," +
+    "'Why this match?':'\\u00BFPor qu\\u00E9 esta recomendaci\\u00F3n?'" +
   "};",
   "function t(s){return LANG==='es'&&TR[s]||s}",
 
@@ -1164,7 +1217,11 @@ var APP_JS = [
     '{v:"Abortion & Reproductive Rights",icon:"\u2695\u{FE0F}"},' +
     '{v:"Water & Land",icon:"\u{1F4A7}"},' +
     '{v:"Agriculture & Rural",icon:"\u{1F33E}"},' +
-    '{v:"Faith & Religious Liberty",icon:"\u{1F54A}\u{FE0F}"}' +
+    '{v:"Faith & Religious Liberty",icon:"\u{1F54A}\u{FE0F}"},' +
+    '{v:"Criminal Justice",icon:"\u2696\u{FE0F}"},' +
+    '{v:"Energy & Oil/Gas",icon:"\u{1F6E2}\u{FE0F}"},' +
+    '{v:"LGBTQ+ Rights",icon:"\u{1F3F3}\u{FE0F}"},' +
+    '{v:"Voting & Elections",icon:"\u{1F5F3}\u{FE0F}"}' +
     "];",
 
   'var SPECTRUM=[' +
@@ -1287,6 +1344,30 @@ var APP_JS = [
       '{l:"Balance rights",d:"Protect religious freedom without limiting others\\u2019 rights"},' +
       '{l:"Separate religion and government",d:"Keep religious doctrine out of public policy"},' +
       '{l:"Faith-informed lawmaking",d:"Moral and religious values should influence legislation"}' +
+    "]}," +
+    '"Criminal Justice":{q:"What\\u2019s most important for criminal justice reform?",opts:[' +
+      '{l:"Focus on rehabilitation",d:"Invest in re-entry programs, reduce recidivism through support services"},' +
+      '{l:"Maintain current system",d:"Texas\\u2019s approach to law and order is working, keep sentences firm"},' +
+      '{l:"Reform sentencing laws",d:"Reduce mandatory minimums, address racial disparities in sentencing"},' +
+      '{l:"Rethink incarceration",d:"Shift resources from prisons to community-based alternatives"}' +
+    "]}," +
+    '"Energy & Oil/Gas":{q:"How should Texas manage its energy industry?",opts:[' +
+      '{l:"Maximize production",d:"Support oil and gas expansion, reduce regulations on producers"},' +
+      '{l:"Balanced energy mix",d:"Maintain fossil fuels while investing in renewables and grid stability"},' +
+      '{l:"Accelerate clean energy",d:"Transition away from fossil fuels toward wind, solar, and storage"},' +
+      '{l:"Let the market decide",d:"Remove subsidies for all energy sources, let competition set the course"}' +
+    "]}," +
+    '"LGBTQ+ Rights":{q:"What\\u2019s the right approach to LGBTQ+ rights?",opts:[' +
+      '{l:"Full equality protections",d:"Add sexual orientation and gender identity to anti-discrimination laws"},' +
+      '{l:"Balance with religious liberty",d:"Protect LGBTQ+ individuals while preserving faith-based exemptions"},' +
+      '{l:"Current laws are sufficient",d:"Existing legal protections are adequate, no new legislation needed"},' +
+      '{l:"Parental rights focus",d:"Parents should direct decisions about children\\u2019s healthcare and education"}' +
+    "]}," +
+    '"Voting & Elections":{q:"What matters most for elections?",opts:[' +
+      '{l:"Expand voter access",d:"Make registration easier, extend early voting, allow mail-in ballots for all"},' +
+      '{l:"Strengthen ID requirements",d:"Require photo ID, verify citizenship, secure the voter rolls"},' +
+      '{l:"Balanced election reforms",d:"Improve access and security together with bipartisan oversight"},' +
+      '{l:"Local control",d:"Let counties and cities set their own election rules and procedures"}' +
     "]}" +
     "};",
 
@@ -2104,6 +2185,13 @@ var APP_JS = [
       "h+=confBadge(rec.confidence);" +
       "h+='</div>';" +
       "h+='<p>'+esc(rec.reasoning)+'</p>';" +
+      "if(rec.matchFactors&&rec.matchFactors.length){" +
+        "h+='<div style=\"margin-top:8px;padding:8px 10px;background:rgba(74,144,217,.08);border-radius:8px\">';" +
+        "h+='<div style=\"font-size:12px;font-weight:700;color:var(--text2);margin-bottom:4px\">'+t('Why this match?')+'</div>';" +
+        "h+='<ul style=\"margin:0;padding-left:18px;font-size:13px;color:var(--text);line-height:1.5\">';" +
+        "for(var mf=0;mf<rec.matchFactors.length;mf++){h+='<li>'+esc(rec.matchFactors[mf])+'</li>'}" +
+        "h+='</ul></div>'" +
+      "}" +
       "if(rec.strategicNotes)h+='<p style=\"margin-top:6px\"><b>'+t('Strategy:')+'</b> '+esc(rec.strategicNotes)+'</p>';" +
       "if(rec.caveats)h+='<p style=\"margin-top:6px\"><b>'+t('Note:')+'</b> '+esc(rec.caveats)+'</p>';" +
       "h+='</div>'" +
@@ -3064,23 +3152,78 @@ var APP_JS = [
 
   // ============ CONFETTI BURST ============
   "function launchConfetti(){" +
-    "var colors=['#CC1919','#fff','#0D2738','#B8860B','#22c55e','#3b82f6'];" +
-    "var shapes=['square','circle'];" +
-    "for(var i=0;i<60;i++){" +
-      "var el=document.createElement('div');" +
-      "el.className='confetti-piece';" +
-      "var c=colors[Math.floor(Math.random()*colors.length)];" +
-      "var s=shapes[Math.floor(Math.random()*shapes.length)];" +
-      "el.style.left=Math.random()*100+'vw';" +
-      "el.style.background=c;" +
-      "el.style.width=(6+Math.random()*8)+'px';" +
-      "el.style.height=(6+Math.random()*8)+'px';" +
-      "if(s==='circle')el.style.borderRadius='50%';" +
-      "el.style.animationDuration=(2+Math.random()*2)+'s';" +
-      "el.style.animationDelay=(Math.random()*0.5)+'s';" +
-      "document.body.appendChild(el);" +
-      "setTimeout(function(){el.remove()},5000)" +
+    "if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches)return;" +
+    "var colors=[['#CC1919','#FF4444','#FF6666'],['#FFFFFF','#E8E8E8','#FFD700'],['#0D2738','#3b82f6','#60A5FA'],['#FFD700','#FFA500','#FF6347'],['#22c55e','#4ADE80','#86EFAC']];" +
+    "var emojis=['\\u2B50','\\u2728','\\uD83C\\uDF1F','\\uD83C\\uDDFA\\uD83C\\uDDF8','\\uD83C\\uDF86','\\uD83C\\uDF87'];" +
+    "var vw=window.innerWidth;var vh=window.innerHeight;" +
+    "function rand(a,b){return a+Math.random()*(b-a)}" +
+    "function fireShell(delay,x,riseY,palette){" +
+      "setTimeout(function(){" +
+        "var shell=document.createElement('div');" +
+        "shell.className='fw-shell';" +
+        "shell.style.cssText='left:'+x+'px;bottom:0;background:'+palette[0]+';--fw-rise:-'+riseY+'px;--fw-dur:'+rand(0.6,0.9)+'s;';" +
+        "document.body.appendChild(shell);" +
+        "var trailCount=5;" +
+        "for(var t=0;t<trailCount;t++){" +
+          "(function(ti){setTimeout(function(){" +
+            "var tr=document.createElement('div');" +
+            "tr.className='fw-trail';" +
+            "tr.style.cssText='left:'+(x-1)+'px;bottom:'+(ti*(riseY/trailCount))+'px;background:'+palette[0]+';opacity:'+(0.5-ti*0.08)+';';" +
+            "document.body.appendChild(tr);" +
+            "setTimeout(function(){tr.remove()},800)" +
+          "},ti*80)})(t)" +
+        "}" +
+        "setTimeout(function(){" +
+          "shell.remove();" +
+          "var burstX=x;var burstY=vh-riseY;" +
+          "var glow=document.createElement('div');" +
+          "glow.className='fw-glow';" +
+          "glow.style.cssText='left:'+(burstX-15)+'px;top:'+(burstY-15)+'px;background:'+palette[0]+';';" +
+          "document.body.appendChild(glow);" +
+          "setTimeout(function(){glow.remove()},1000);" +
+          "var sparkCount=Math.floor(rand(28,42));" +
+          "for(var i=0;i<sparkCount;i++){" +
+            "var angle=Math.random()*Math.PI*2;" +
+            "var speed=rand(60,180);" +
+            "var dx=Math.cos(angle)*speed;" +
+            "var dy=Math.sin(angle)*speed+rand(30,80);" +
+            "var sz=rand(3,7);" +
+            "var dur=rand(0.8,1.6);" +
+            "var c=palette[Math.floor(Math.random()*palette.length)];" +
+            "var sp=document.createElement('div');" +
+            "sp.className='fw-spark';" +
+            "sp.style.cssText='left:'+burstX+'px;top:'+burstY+'px;background:'+c+';--fw-dx:'+dx+'px;--fw-dy:'+dy+'px;--fw-size:'+sz+'px;--fw-burst-dur:'+dur+'s;--fw-color:'+c+';';" +
+            "document.body.appendChild(sp);" +
+            "setTimeout(function(){sp.remove()},dur*1000+100)" +
+          "}" +
+          "var emojiCount=Math.floor(rand(3,6));" +
+          "for(var j=0;j<emojiCount;j++){" +
+            "var ea=Math.random()*Math.PI*2;" +
+            "var es=rand(80,160);" +
+            "var edx=Math.cos(ea)*es;" +
+            "var edy=Math.sin(ea)*es+rand(20,60);" +
+            "var edur=rand(1.0,1.8);" +
+            "var em=document.createElement('div');" +
+            "em.className='fw-emoji';" +
+            "em.textContent=emojis[Math.floor(Math.random()*emojis.length)];" +
+            "em.style.cssText='left:'+burstX+'px;top:'+burstY+'px;--fw-dx:'+edx+'px;--fw-dy:'+edy+'px;--fw-burst-dur:'+edur+'s;';" +
+            "document.body.appendChild(em);" +
+            "setTimeout(function(){em.remove()},edur*1000+100)" +
+          "}" +
+        "},rand(600,900))" +
+      "},delay)" +
     "}" +
+    "var shells=[" +
+      "{d:0,x:vw*0.5,r:vh*0.6,p:0}," +
+      "{d:300,x:vw*0.25,r:vh*0.55,p:1}," +
+      "{d:500,x:vw*0.75,r:vh*0.5,p:2}," +
+      "{d:900,x:vw*0.4,r:vh*0.65,p:3}," +
+      "{d:1200,x:vw*0.6,r:vh*0.55,p:4}," +
+      "{d:1600,x:vw*0.35,r:vh*0.5,p:0}," +
+      "{d:1900,x:vw*0.65,r:vh*0.6,p:2}," +
+      "{d:2200,x:vw*0.5,r:vh*0.7,p:1}" +
+    "];" +
+    "shells.forEach(function(s){fireShell(s.d,s.x,s.r,colors[s.p])})" +
   "}",
 
   // Emoji burst animation for easter egg unlocks
@@ -3088,7 +3231,7 @@ var APP_JS = [
     "for(var i=0;i<(count||20);i++){" +
       "var el=document.createElement('div');" +
       "el.textContent=emoji;" +
-      "el.style.cssText='position:fixed;font-size:'+(20+Math.random()*24)+'px;left:'+Math.random()*100+'vw;top:100vh;z-index:99999;pointer-events:none;animation:emojiFall '+(2+Math.random()*2)+'s ease-out '+(Math.random()*0.5)+'s forwards;';" +
+      "el.style.cssText='position:fixed;font-size:'+(40+Math.random()*48)+'px;left:'+Math.random()*100+'vw;top:100vh;z-index:99999;pointer-events:none;animation:emojiFall '+(2+Math.random()*2)+'s ease-out '+(Math.random()*0.5)+'s forwards;';" +
       "document.body.appendChild(el);" +
       "setTimeout(function(){el.remove()},5000)" +
     "}" +

@@ -179,9 +179,9 @@ describe("State initialization", () => {
     expect(S().issues).toHaveLength(0);
   });
 
-  it("issues populate to 17 when entering phase 2", () => {
+  it("issues populate to 21 when entering phase 2", () => {
     passTone(); // advance to phase 2
-    expect(S().issues).toHaveLength(17);
+    expect(S().issues).toHaveLength(21);
   });
 
   it("qualities are empty until phase 5 renders", () => {
@@ -491,7 +491,7 @@ describe("Round-trip back navigation", () => {
 
     clickAction("back");
     expect(S().phase).toBe(2);
-    expect(S().issues).toHaveLength(17);
+    expect(S().issues).toHaveLength(21);
 
     clickAction("back");
     expect(S().phase).toBe(1);
@@ -499,7 +499,7 @@ describe("Round-trip back navigation", () => {
 
     clickAction("next");
     expect(S().phase).toBe(2);
-    expect(S().issues).toHaveLength(17);
+    expect(S().issues).toHaveLength(21);
   });
 
   it("answers are preserved through multiple back-forward cycles", () => {

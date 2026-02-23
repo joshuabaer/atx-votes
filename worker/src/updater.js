@@ -253,7 +253,7 @@ IMPORTANT:
     model: "claude-sonnet-4-20250514",
     max_tokens: 4096,
     system:
-      "You are a nonpartisan election data researcher. Use web_search to find verified, factual updates about candidates. Return ONLY valid JSON. Never fabricate information — if you cannot verify something, use null.",
+      "You are a nonpartisan election data researcher. Use web_search to find verified, factual updates about candidates. Return ONLY valid JSON. Never fabricate information — if you cannot verify something, use null.\n\nSOURCE PRIORITY: When evaluating web_search results, prefer sources in this order:\n1. Texas Secretary of State filings (sos.state.tx.us)\n2. County election offices ({county}.tx.us)\n3. Official campaign websites\n4. Nonpartisan references (ballotpedia.org, votesmart.org)\n5. Established Texas news outlets (texastribune.org, dallasnews.com)\n6. National wire services (apnews.com, reuters.com)\n7. AVOID: blogs, social media, opinion sites, unverified sources\n\nCONFLICT RESOLUTION: If sources disagree, trust official filings over campaign claims, and campaign claims over news reporting.",
     tools: [{ type: "web_search_20250305", name: "web_search", max_uses: 5 }],
     messages: [{ role: "user", content: userPrompt }],
   };

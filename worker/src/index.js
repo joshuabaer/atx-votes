@@ -441,213 +441,662 @@ function handleSampleBallot() {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Sample Ballot — Texas Votes</title>
-  <meta name="description" content="See what a personalized Texas Votes ballot looks like. This is a sample with example candidates and recommendations.">
-  ${PAGE_CSS}
+  <meta name="description" content="See what a personalized Texas Votes ballot looks like with realistic race cards, candidate recommendations, and party switching.">
+  <meta name="theme-color" content="rgb(33,89,143)" media="(prefers-color-scheme:light)">
+  <meta name="theme-color" content="rgb(28,28,31)" media="(prefers-color-scheme:dark)">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.svg">
   <style>
+    /* ---- Design tokens (mirrors pwa.js) ---- */
+    :root{
+      --blue:rgb(33,89,143);--red:rgb(191,38,38);--gold:rgb(217,166,33);
+      --bg:#faf8f0;--card:#fff;
+      --text:rgb(31,31,36);--text2:rgb(115,115,128);
+      --ok:rgb(51,166,82);--warn:rgb(230,140,26);--bad:rgb(209,51,51);
+      --rep:rgb(217,38,38);--dem:rgb(38,77,191);
+      --border:rgba(128,128,128,.15);--border2:rgba(128,128,128,.25);
+      --fill3:rgba(128,128,128,.08);--shadow:rgba(0,0,0,.06);
+      --r:16px;--rs:10px;--pm:16px
+    }
+    @media(prefers-color-scheme:dark){:root{
+      --blue:rgb(102,153,217);--red:rgb(235,88,88);--gold:rgb(242,191,64);
+      --bg:rgb(28,28,31);--card:rgb(43,43,46);
+      --text:rgb(237,237,240);--text2:rgb(153,153,166);
+      --ok:rgb(77,199,107);--warn:rgb(255,166,51);--bad:rgb(255,89,89);
+      --rep:rgb(255,77,77);--dem:rgb(89,128,242);
+      --border:rgba(255,255,255,.15);--border2:rgba(255,255,255,.2);
+      --fill3:rgba(255,255,255,.08);--shadow:rgba(0,0,0,.3)
+    }}
+
+    /* ---- Base ---- */
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;border-top:3px solid var(--red)}
+
+    /* ---- Sample banner / watermark ---- */
     .sample-banner{background:var(--blue);color:#fff;text-align:center;padding:10px 16px;font-weight:700;font-size:0.95rem;letter-spacing:0.5px;position:sticky;top:0;z-index:100}
     .sample-watermark{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);font-size:6rem;font-weight:900;color:rgba(128,128,128,.07);pointer-events:none;z-index:0;white-space:nowrap;letter-spacing:8px}
-    .ballot-container{max-width:640px;margin:0 auto;position:relative;z-index:1}
-    .race{background:var(--card);border-radius:var(--r);padding:20px 16px;margin-bottom:16px;box-shadow:0 2px 8px var(--shadow)}
-    .race-title{font-size:1.1rem;font-weight:700;color:var(--text);margin-bottom:14px}
-    .cand{border:1.5px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;position:relative}
-    .cand.recommended{border-color:rgb(51,166,82)}
-    .cand-head{display:flex;align-items:center;gap:12px}
-    .cand-avatar{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;flex-shrink:0}
-    .cand-info{flex:1;min-width:0}
-    .cand-name{font-size:17px;font-weight:700;color:var(--text)}
-    .cand-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
-    .badge{display:inline-block;font-size:13px;font-weight:600;padding:3px 10px;border-radius:99px;white-space:nowrap}
-    .badge-ok{color:rgb(51,166,82);background:rgba(51,166,82,.12)}
-    .badge-warn{color:rgb(230,140,26);background:rgba(230,140,26,.12)}
+
+    /* ---- Layout ---- */
+    .ballot-container{max-width:480px;margin:0 auto;padding:var(--pm);position:relative;z-index:1}
+    @media(min-width:600px){.ballot-container{max-width:680px}}
+
+    /* ---- Card (matches PWA .card) ---- */
+    .card{background:var(--card);border-radius:var(--r);padding:var(--pm);box-shadow:0 2px 8px var(--shadow);margin-bottom:12px;overflow:hidden;word-break:break-word}
+
+    /* ---- Party switcher (matches PWA .party-row / .party-btn) ---- */
+    .party-row{display:flex;gap:10px;margin-bottom:16px}
+    .party-btn{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:6px;padding:12px 8px;border-radius:var(--rs);font-size:16px;font-weight:700;cursor:pointer;border:1.5px solid;transition:all .2s;font-family:inherit;background:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;box-sizing:border-box}
+    .party-rep{color:var(--rep);border-color:rgba(217,38,38,.3)}
+    .party-rep.on{background:var(--rep);color:#fff;border-color:var(--rep)}
+    .party-dem{color:var(--dem);border-color:rgba(38,77,191,.3)}
+    .party-dem.on{background:var(--dem);color:#fff;border-color:var(--dem)}
+
+    /* ---- Section headers (matches PWA .section-head) ---- */
+    .section-head{font-size:18px;font-weight:800;margin:24px 0 12px;display:flex;align-items:center;gap:8px}
+    .section-head::before{content:'\\2605';color:var(--red);font-size:14px}
+
+    /* ---- Badges (matches PWA) ---- */
+    .badge{display:inline-block;font-size:14px;font-weight:600;padding:3px 10px;border-radius:99px;white-space:nowrap}
+    .badge-ok{color:var(--ok);background:rgba(51,166,82,.12)}
+    .badge-warn{color:var(--warn);background:rgba(230,140,26,.12)}
+    .badge-bad{color:var(--bad);background:rgba(209,51,51,.12)}
     .badge-blue{color:var(--blue);background:rgba(33,89,143,.12)}
-    @media(prefers-color-scheme:dark){.badge-ok{background:rgba(77,199,107,.15)}.badge-warn{background:rgba(255,166,51,.15)}.badge-blue{background:rgba(102,153,217,.15)}}
+    @media(prefers-color-scheme:dark){.badge-ok{background:rgba(77,199,107,.15)}.badge-warn{background:rgba(255,166,51,.15)}.badge-bad{background:rgba(255,89,89,.15)}.badge-blue{background:rgba(102,153,217,.15)}}
+
+    /* ---- Disclaimer (matches PWA) ---- */
+    .disclaimer{display:flex;gap:10px;align-items:flex-start;padding:12px;background:rgba(230,140,26,.08);border:1px solid rgba(230,140,26,.3);border-radius:var(--rs);margin-bottom:16px;font-size:13px;line-height:1.5;color:var(--text2)}
+    .disclaimer b{color:var(--text);font-size:15px;display:block;margin-bottom:2px}
+
+    /* ---- Race card (matches PWA .card for race summary) ---- */
+    .race-card{cursor:default}
+    .race-office{flex:1;min-width:0;font-size:14px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .star{color:var(--gold);font-size:12px;margin-right:4px}
+    .race-rec-name{font-size:17px;font-weight:700;margin-top:4px}
+    .race-rec-reason{font-size:13px;color:var(--text2);margin-top:2px;line-height:1.4}
+    .race-cand-count{font-size:13px;color:var(--text2);margin-top:4px}
+
+    /* ---- Candidate avatars row ---- */
+    .avatar-row{display:flex;gap:4px;margin-top:6px}
+    .avatar-circle{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+    .avatar-circle.rec{border:2px solid var(--blue)}
+
+    /* ---- Candidate detail card (matches PWA .cand-card) ---- */
+    .cand-card{border:1.5px solid var(--border);border-radius:var(--rs);padding:14px;margin-bottom:10px}
+    .cand-card.recommended{border-color:var(--ok)}
+    .cand-avatar{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden}
+    .cand-name{font-size:17px;font-weight:700}
+    .cand-tags{display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;margin-top:2px}
     .cand-summary{font-size:14px;color:var(--text2);line-height:1.5;margin-top:8px}
-    .cand-detail{margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
-    .cand-detail h5{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
-    .cand-detail.pros h5{color:rgb(51,166,82)}
-    .cand-detail.cons h5{color:rgb(209,51,51)}
-    .cand-detail li{font-size:14px;line-height:1.5;margin-left:16px;margin-bottom:2px}
-    .pos-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
-    .pos-chip{font-size:12px;padding:3px 8px;border-radius:6px;background:rgba(128,128,128,.08);color:var(--text2)}
-    .section-header{font-size:0.85rem;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin:24px 0 12px;padding:0 4px}
-    .disclaimer{font-size:0.85rem;color:var(--text2);text-align:center;margin:20px 0;line-height:1.6}
-    .cta-bottom{text-align:center;margin:32px 0 16px}
-    .cta-bottom .cta{font-size:1.05rem;padding:14px 28px}
+    .cand-details{margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+    .cand-section{margin-bottom:10px}
+    .cand-section h5{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+    .cand-section.pros h5{color:var(--ok)}
+    .cand-section.cons h5{color:var(--bad)}
+    .cand-section li{font-size:14px;line-height:1.5;margin-left:16px;margin-bottom:2px}
+
+    /* ---- Positions chips (matches PWA) ---- */
+    .pos-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+    .pos-chip{font-size:13px;padding:4px 10px;border-radius:12px;background:rgba(33,89,143,.08);color:var(--blue)}
+    @media(prefers-color-scheme:dark){.pos-chip{background:rgba(102,153,217,.12)}}
+
+    /* ---- Expand toggle (matches PWA) ---- */
+    .expand-toggle{font-size:14px;color:var(--blue);cursor:pointer;background:none;border:none;padding:8px 0;font-weight:600;font-family:inherit}
+
+    /* ---- Recommendation box (matches PWA .rec-box) ---- */
+    .rec-box{padding:14px;border-radius:var(--rs);border:1.5px solid var(--ok);background:rgba(51,166,82,.06);margin-bottom:16px}
+    @media(prefers-color-scheme:dark){.rec-box{background:rgba(77,199,107,.08)}}
+    .rec-box h4{font-size:17px;margin-bottom:4px}
+    .rec-box p{font-size:14px;color:var(--text2);line-height:1.5}
+
+    /* ---- Proposition (matches PWA) ---- */
+    .prop-header{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;min-width:0}
+    .prop-title{font-size:16px;font-weight:700;min-width:0;flex:1}
+    .prop-desc{font-size:14px;color:var(--text2);line-height:1.5;margin-top:6px}
+    .prop-outcome{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border-radius:var(--rs);margin-bottom:6px;font-size:13px;line-height:1.5}
+    .prop-outcome.pass{background:rgba(51,166,82,.06);border:1px solid rgba(51,166,82,.2)}
+    .prop-outcome.fail{background:rgba(209,51,51,.06);border:1px solid rgba(209,51,51,.2)}
+    @media(prefers-color-scheme:dark){.prop-outcome.pass{background:rgba(77,199,107,.08)}.prop-outcome.fail{background:rgba(255,89,89,.08)}}
+    .prop-reasoning{display:flex;gap:8px;align-items:flex-start;padding:10px;border-radius:var(--rs);background:rgba(33,89,143,.04);margin-top:8px;font-size:13px;line-height:1.5;font-style:italic;color:var(--text2)}
+    @media(prefers-color-scheme:dark){.prop-reasoning{background:rgba(102,153,217,.06)}}
+
+    /* ---- Share CTA (matches PWA) ---- */
+    .share-cta{background:linear-gradient(135deg,rgba(33,89,143,.08),rgba(191,38,38,.08));border:2px dashed var(--border2);border-radius:var(--r);padding:20px;text-align:center;margin-bottom:16px}
+    .share-cta-title{font-size:18px;font-weight:800;margin-bottom:6px}
+    .share-cta-body{font-size:14px;color:var(--text2);line-height:1.5;margin-bottom:14px}
+
+    /* ---- CTA button ---- */
+    .btn{display:block;width:100%;padding:14px;border:none;border-radius:var(--rs);font-size:17px;font-weight:700;cursor:pointer;text-align:center;transition:opacity .15s;font-family:inherit;text-decoration:none;box-sizing:border-box}
+    .btn:active{opacity:.85}
+    .btn-primary{background:var(--blue);color:#fff}
+    .btn-inline{display:inline-block;width:auto;padding:12px 28px;font-size:16px}
+
+    /* ---- Footer ---- */
+    .page-footer{margin-top:16px;font-size:13px;color:var(--text2);text-align:center;line-height:2}
+    .page-footer a{color:var(--text2);text-decoration:none}
+
+    /* ---- Party-specific content toggling ---- */
+    [data-party="democrat"]{display:none}
+    body.party-dem [data-party="republican"]{display:none}
+    body.party-dem [data-party="democrat"]{display:block}
   </style>
 </head>
 <body>
-  <div class="sample-banner">SAMPLE BALLOT — This is an example with fictional recommendations</div>
+  <div class="sample-banner">SAMPLE BALLOT &mdash; Fictional candidates &amp; recommendations for demonstration</div>
   <div class="sample-watermark">SAMPLE</div>
 
-  <div class="ballot-container" style="padding-top:16px">
-    <div style="text-align:center;margin-bottom:20px">
-      <h1 style="font-size:1.5rem;margin-bottom:4px">Your Voting Guide</h1>
-      <p style="font-size:0.95rem;color:var(--text2);margin-bottom:0">Texas Primary — March 3, 2026</p>
+  <div class="ballot-container">
+
+    <!-- Party switcher -->
+    <div class="party-row">
+      <button class="party-btn party-rep on" id="btn-rep" onclick="setParty('republican')">&#x1F418; Republican</button>
+      <button class="party-btn party-dem" id="btn-dem" onclick="setParty('democrat')">&#x1FACF; Democrat</button>
     </div>
 
-    <div class="section-header">Statewide Races</div>
-
-    <!-- Race 1: Governor -->
-    <div class="race">
-      <div class="race-title">Governor of Texas</div>
-
-      <div class="cand recommended">
-        <div class="cand-head">
-          <div class="cand-avatar" style="background:rgb(33,89,143)">MR</div>
-          <div class="cand-info">
-            <div class="cand-name">Maria Rodriguez</div>
-            <div class="cand-tags">
-              <span class="badge badge-ok">Strong Match</span>
-              <span class="badge badge-blue">Recommended</span>
-            </div>
-          </div>
-        </div>
-        <div class="cand-summary">Strong advocate for public education funding and infrastructure investment. Background in municipal government with 12 years of experience in state policy.</div>
-        <div class="cand-detail pros">
-          <h5>Strengths</h5>
-          <ul>
-            <li>Comprehensive education reform plan backed by teacher organizations</li>
-            <li>Proven track record managing large municipal budgets</li>
-          </ul>
-        </div>
-        <div class="cand-detail cons">
-          <h5>Concerns</h5>
-          <ul>
-            <li>Limited experience with federal-level policy negotiations</li>
-          </ul>
-        </div>
-        <div class="pos-chips">
-          <span class="pos-chip">Education Reform</span>
-          <span class="pos-chip">Infrastructure</span>
-          <span class="pos-chip">Healthcare Access</span>
-        </div>
-      </div>
-
-      <div class="cand">
-        <div class="cand-head">
-          <div class="cand-avatar" style="background:rgb(140,100,60)">JT</div>
-          <div class="cand-info">
-            <div class="cand-name">James Thompson</div>
-            <div class="cand-tags">
-              <span class="badge badge-warn">Good Match</span>
-            </div>
-          </div>
-        </div>
-        <div class="cand-summary">Business-focused candidate emphasizing economic growth and deregulation. Former CEO of a Texas-based energy company with private-sector leadership experience.</div>
-        <div class="pos-chips">
-          <span class="pos-chip">Tax Reform</span>
-          <span class="pos-chip">Energy</span>
-          <span class="pos-chip">Business Growth</span>
-        </div>
+    <!-- Election info header -->
+    <div class="card" style="text-align:center">
+      <div style="font-size:18px;font-weight:800"><span style="color:var(--red)">&starf;</span> Texas <span id="party-label">Republican</span> Primary</div>
+      <div style="font-size:14px;color:var(--text2);margin-top:2px">Tuesday, March 3, 2026</div>
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px">
+        <span class="badge badge-blue">CD-21</span>
+        <span class="badge badge-blue">SD-14</span>
+        <span class="badge badge-blue">HD-46</span>
       </div>
     </div>
 
-    <!-- Race 2: Attorney General -->
-    <div class="race">
-      <div class="race-title">Attorney General</div>
-
-      <div class="cand recommended">
-        <div class="cand-head">
-          <div class="cand-avatar" style="background:rgb(166,82,51)">SP</div>
-          <div class="cand-info">
-            <div class="cand-name">Sarah Park</div>
-            <div class="cand-tags">
-              <span class="badge badge-ok">Strong Match</span>
-              <span class="badge badge-blue">Recommended</span>
-            </div>
-          </div>
-        </div>
-        <div class="cand-summary">Former federal prosecutor focused on consumer protection and government accountability. Known for bipartisan approach to criminal justice reform.</div>
-        <div class="cand-detail pros">
-          <h5>Strengths</h5>
-          <ul>
-            <li>15 years of federal prosecution experience</li>
-            <li>Endorsed by law enforcement and civil liberties groups</li>
-          </ul>
-        </div>
-        <div class="cand-detail cons">
-          <h5>Concerns</h5>
-          <ul>
-            <li>No prior elected office experience</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="cand">
-        <div class="cand-head">
-          <div class="cand-avatar" style="background:rgb(82,120,166)">DW</div>
-          <div class="cand-info">
-            <div class="cand-name">David Williams</div>
-            <div class="cand-tags">
-              <span class="badge badge-warn">Good Match</span>
-            </div>
-          </div>
-        </div>
-        <div class="cand-summary">Civil rights attorney specializing in constitutional law. Has argued cases before the Texas Supreme Court on property rights and individual freedoms.</div>
-        <div class="pos-chips">
-          <span class="pos-chip">Constitutional Law</span>
-          <span class="pos-chip">Property Rights</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="section-header">Local Races</div>
-
-    <!-- Race 3: County Commissioner -->
-    <div class="race">
-      <div class="race-title">County Commissioner, Precinct 2</div>
-
-      <div class="cand recommended">
-        <div class="cand-head">
-          <div class="cand-avatar" style="background:rgb(51,130,166)">LN</div>
-          <div class="cand-info">
-            <div class="cand-name">Lisa Nguyen</div>
-            <div class="cand-tags">
-              <span class="badge badge-ok">Good Match</span>
-              <span class="badge badge-blue">Recommended</span>
-            </div>
-          </div>
-        </div>
-        <div class="cand-summary">Transportation planner focused on county road improvements and responsible budgeting. Chaired the county transit advisory board for 4 years.</div>
-        <div class="pos-chips">
-          <span class="pos-chip">Transportation</span>
-          <span class="pos-chip">Budget</span>
-          <span class="pos-chip">Parks</span>
-        </div>
-      </div>
-
-      <div class="cand">
-        <div class="cand-head">
-          <div class="cand-avatar" style="background:rgb(166,140,51)">RH</div>
-          <div class="cand-info">
-            <div class="cand-name">Robert Hernandez</div>
-            <div class="cand-tags">
-              <span class="badge badge-warn">Best Available</span>
-            </div>
-          </div>
-        </div>
-        <div class="cand-summary">Local small business owner and neighborhood association president. Running on a platform of reduced county spending and property tax relief.</div>
-      </div>
-    </div>
-
+    <!-- Disclaimer -->
     <div class="disclaimer">
-      This is a <strong>sample ballot</strong> showing fictional candidates and recommendations.<br>
-      Real ballots are personalized based on your values, priorities, and location.<br>
-      Do your own research before voting.
+      <span style="font-size:20px">&#x26A0;&#xFE0F;</span>
+      <div>
+        <b>Sample Ballot &mdash; Not Real Recommendations</b>
+        This page shows fictional candidates and AI-generated recommendations to demonstrate what your personalized ballot looks like. All names, positions, and match scores are examples only.
+      </div>
     </div>
 
-    <div class="cta-bottom">
-      <a class="cta" href="/app?start=1">Build Your Own Personalized Guide</a>
+    <!-- ==================== REPUBLICAN BALLOT ==================== -->
+    <div data-party="republican">
+
+      <div class="section-head">Key Races</div>
+
+      <!-- R1: Governor -->
+      <div class="card race-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
+          <div class="race-office"><span class="star">&#x2B50;</span> Governor</div>
+          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+            <span class="badge badge-ok">Strong Match</span>
+            <span style="color:var(--text2);font-size:18px">&rsaquo;</span>
+          </div>
+        </div>
+        <div class="race-rec-name">Marcus Sullivan</div>
+        <div class="race-rec-reason">Fiscally conservative with strong property tax reform plan. Aligns with your emphasis on limited government and individual liberty.</div>
+        <div class="race-cand-count">3 candidates</div>
+        <div class="avatar-row">
+          <div class="avatar-circle rec" style="background:#4A90D9">M</div>
+          <div class="avatar-circle" style="background:#D95B43">R</div>
+          <div class="avatar-circle" style="background:#5B8C5A">T</div>
+        </div>
+      </div>
+
+      <!-- R1 detail: expanded race view -->
+      <div class="rec-box">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <h4>&#x2705; Marcus Sullivan</h4>
+          <span class="badge badge-ok">Strong Match</span>
+        </div>
+        <p>Sullivan's property tax reform plan directly addresses your top issue. His business background and city council tenure demonstrate fiscal restraint, while his education stance preserves local control.</p>
+      </div>
+
+      <div class="cand-card recommended">
+        <div style="display:flex;gap:12px;align-items:center">
+          <div class="cand-avatar" style="background:#4A90D9">M</div>
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div class="cand-name">Marcus Sullivan</div>
+              <div class="cand-tags">
+                <span class="badge badge-ok">Recommended</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="cand-summary">Former city council member and business owner. Strong advocate for property tax relief, school choice, and border security. Endorsed by multiple law enforcement organizations.</div>
+        <div class="cand-details">
+          <div class="cand-section">
+            <h5>Key Positions</h5>
+            <div class="pos-chips">
+              <span class="pos-chip">Property Tax Reform</span>
+              <span class="pos-chip">School Choice</span>
+              <span class="pos-chip">Border Security</span>
+              <span class="pos-chip">Energy Independence</span>
+            </div>
+          </div>
+          <div class="cand-section pros">
+            <h5>&#x2705; Strengths</h5>
+            <ul>
+              <li>Detailed 5-year property tax reduction plan with independent budget analysis</li>
+              <li>8 years city council experience with record of balanced budgets</li>
+              <li>Endorsed by Texas Farm Bureau and multiple sheriffs' associations</li>
+            </ul>
+          </div>
+          <div class="cand-section cons">
+            <h5>&#x26A0;&#xFE0F; Concerns</h5>
+            <ul>
+              <li>No statewide office experience; largest budget managed was $180M</li>
+              <li>Property tax plan may require offsetting revenue sources not yet identified</li>
+            </ul>
+          </div>
+        </div>
+        <button class="expand-toggle" style="pointer-events:none">Show Less</button>
+      </div>
+
+      <div class="cand-card">
+        <div style="display:flex;gap:12px;align-items:center">
+          <div class="cand-avatar" style="background:#D95B43">R</div>
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div class="cand-name">Rachel Whitfield</div>
+              <div class="cand-tags">
+                <span class="badge badge-warn">Good Match</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="cand-summary">State representative with 6 years of legislative experience. Focused on water infrastructure and rural broadband. More moderate on education policy.</div>
+        <button class="expand-toggle" style="pointer-events:none">Show Details</button>
+      </div>
+
+      <div class="cand-card">
+        <div style="display:flex;gap:12px;align-items:center">
+          <div class="cand-avatar" style="background:#5B8C5A">T</div>
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div class="cand-name">Tom Briscoe</div>
+              <div class="cand-tags">
+                <span class="badge badge-warn">Best Available</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="cand-summary">Rancher and former county judge. Running on a strict constitutionalist platform emphasizing 10th Amendment rights and federal land policy.</div>
+        <button class="expand-toggle" style="pointer-events:none">Show Details</button>
+      </div>
+
+      <!-- R2: Attorney General -->
+      <div class="card race-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
+          <div class="race-office"><span class="star">&#x2B50;</span> Attorney General</div>
+          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+            <span class="badge badge-ok">Strong Match</span>
+            <span style="color:var(--text2);font-size:18px">&rsaquo;</span>
+          </div>
+        </div>
+        <div class="race-rec-name">Priya Kapoor</div>
+        <div class="race-rec-reason">Former federal prosecutor with deep consumer protection experience. Her stance on government accountability aligns with your priorities.</div>
+        <div class="race-cand-count">2 candidates</div>
+        <div class="avatar-row">
+          <div class="avatar-circle rec" style="background:#4A90D9">P</div>
+          <div class="avatar-circle" style="background:#D95B43">J</div>
+        </div>
+      </div>
+
+      <!-- R3: Comptroller -->
+      <div class="card race-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
+          <div class="race-office">Comptroller of Public Accounts</div>
+          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+            <span class="badge badge-warn">Good Match</span>
+            <span style="color:var(--text2);font-size:18px">&rsaquo;</span>
+          </div>
+        </div>
+        <div class="race-rec-name">David Chen</div>
+        <div class="race-rec-reason">CPA with state budget experience. Pragmatic fiscal approach with emphasis on transparent accounting practices.</div>
+        <div class="race-cand-count">3 candidates</div>
+        <div class="avatar-row">
+          <div class="avatar-circle rec" style="background:#4A90D9">D</div>
+          <div class="avatar-circle" style="background:#D95B43">A</div>
+          <div class="avatar-circle" style="background:#5B8C5A">W</div>
+        </div>
+      </div>
+
+      <div class="section-head">Other Contested Races</div>
+
+      <!-- R4: Commissioner of Agriculture -->
+      <div class="card race-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
+          <div class="race-office">Commissioner of Agriculture</div>
+          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+            <span class="badge badge-warn">Best Available</span>
+            <span style="color:var(--text2);font-size:18px">&rsaquo;</span>
+          </div>
+        </div>
+        <div class="race-rec-name">Linda Morales</div>
+        <div class="race-rec-reason">Third-generation rancher with practical water management experience. Both candidates have limited policy platforms.</div>
+        <div class="race-cand-count">2 candidates</div>
+        <div class="avatar-row">
+          <div class="avatar-circle rec" style="background:#4A90D9">L</div>
+          <div class="avatar-circle" style="background:#D95B43">B</div>
+        </div>
+      </div>
+
+      <!-- R5: Railroad Commissioner -->
+      <div class="card race-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
+          <div class="race-office">Railroad Commissioner</div>
+          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+            <span class="badge badge-ok">Strong Match</span>
+            <span style="color:var(--text2);font-size:18px">&rsaquo;</span>
+          </div>
+        </div>
+        <div class="race-rec-name">James Okafor</div>
+        <div class="race-rec-reason">Petroleum engineer with 20 years of industry experience. Strong on grid reliability and responsible energy development.</div>
+        <div class="race-cand-count">4 candidates</div>
+        <div class="avatar-row">
+          <div class="avatar-circle rec" style="background:#4A90D9">J</div>
+          <div class="avatar-circle" style="background:#D95B43">K</div>
+          <div class="avatar-circle" style="background:#5B8C5A">M</div>
+          <div class="avatar-circle" style="background:#8E6BBF">S</div>
+        </div>
+      </div>
+
+      <div class="section-head">Local Races</div>
+
+      <!-- R6: County Commissioner -->
+      <div class="card race-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
+          <div class="race-office">County Commissioner &mdash; Precinct 3</div>
+          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+            <span class="badge badge-ok">Strong Match</span>
+            <span style="color:var(--text2);font-size:18px">&rsaquo;</span>
+          </div>
+        </div>
+        <div class="race-rec-name">Robert Tran</div>
+        <div class="race-rec-reason">Former county budget director. Focuses on road maintenance, property tax transparency, and keeping county spending in check.</div>
+        <div class="race-cand-count">2 candidates</div>
+        <div class="avatar-row">
+          <div class="avatar-circle rec" style="background:#4A90D9">R</div>
+          <div class="avatar-circle" style="background:#D95B43">C</div>
+        </div>
+      </div>
+
+      <!-- R Proposition -->
+      <div class="section-head">Propositions</div>
+
+      <div class="card">
+        <div class="prop-header">
+          <div class="prop-title">Prop 1: Property Tax Freeze for Seniors</div>
+          <span class="badge badge-ok">Lean Yes</span>
+        </div>
+        <div class="prop-desc">Shall the Texas Legislature freeze property tax assessments at current levels for homeowners aged 65 and older?</div>
+        <div style="margin-top:10px">
+          <div class="prop-outcome pass"><span style="flex-shrink:0">&#x2705;</span><div><b>If it passes:</b> Senior homeowners see property taxes frozen at current assessment, reducing displacement from rising valuations.</div></div>
+          <div class="prop-outcome fail"><span style="flex-shrink:0">&#x274C;</span><div><b>If it fails:</b> Senior property taxes continue adjusting with market valuations, maintaining current revenue trajectory for local services.</div></div>
+        </div>
+        <div class="prop-reasoning"><span style="flex-shrink:0">&#x1F9E0;</span><div>Based on your emphasis on property tax relief and support for fixed-income protections, this aligns with your stated priorities. However, revenue offsets would shift burden to non-senior taxpayers.</div></div>
+      </div>
+
+    </div><!-- /republican -->
+
+    <!-- ==================== DEMOCRAT BALLOT ==================== -->
+    <div data-party="democrat">
+
+      <div class="section-head">Key Races</div>
+
+      <!-- D1: Governor -->
+      <div class="card race-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
+          <div class="race-office"><span class="star">&#x2B50;</span> Governor</div>
+          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+            <span class="badge badge-ok">Strong Match</span>
+            <span style="color:var(--text2);font-size:18px">&rsaquo;</span>
+          </div>
+        </div>
+        <div class="race-rec-name">Angela Washington</div>
+        <div class="race-rec-reason">Former school superintendent with comprehensive public education plan. Her healthcare access expansion matches your top priorities.</div>
+        <div class="race-cand-count">4 candidates</div>
+        <div class="avatar-row">
+          <div class="avatar-circle rec" style="background:#4A90D9">A</div>
+          <div class="avatar-circle" style="background:#D95B43">C</div>
+          <div class="avatar-circle" style="background:#5B8C5A">M</div>
+          <div class="avatar-circle" style="background:#8E6BBF">J</div>
+        </div>
+      </div>
+
+      <!-- D1 detail: expanded race view -->
+      <div class="rec-box">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <h4>&#x2705; Angela Washington</h4>
+          <span class="badge badge-ok">Strong Match</span>
+        </div>
+        <p>Washington's education reform plan and Medicaid expansion proposal address your top two issues. Her 15 years as superintendent demonstrates executive leadership at scale.</p>
+      </div>
+
+      <div class="cand-card recommended">
+        <div style="display:flex;gap:12px;align-items:center">
+          <div class="cand-avatar" style="background:#4A90D9">A</div>
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div class="cand-name">Angela Washington</div>
+              <div class="cand-tags">
+                <span class="badge badge-ok">Recommended</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="cand-summary">Former school superintendent and education policy advocate. Running on expanding public school funding, Medicaid expansion, and renewable energy investment across rural Texas.</div>
+        <div class="cand-details">
+          <div class="cand-section">
+            <h5>Key Positions</h5>
+            <div class="pos-chips">
+              <span class="pos-chip">Public Education</span>
+              <span class="pos-chip">Healthcare Access</span>
+              <span class="pos-chip">Renewable Energy</span>
+              <span class="pos-chip">Voting Rights</span>
+            </div>
+          </div>
+          <div class="cand-section pros">
+            <h5>&#x2705; Strengths</h5>
+            <ul>
+              <li>15 years leading a 40,000-student school district with improved outcomes</li>
+              <li>Detailed Medicaid expansion plan with cost projections from state budget office</li>
+              <li>Endorsed by Texas State Teachers Association and Texas AFL-CIO</li>
+            </ul>
+          </div>
+          <div class="cand-section cons">
+            <h5>&#x26A0;&#xFE0F; Concerns</h5>
+            <ul>
+              <li>No prior elected office; transition from appointed to elected leadership untested</li>
+              <li>Renewable energy plan timeline may be ambitious given current grid infrastructure</li>
+            </ul>
+          </div>
+        </div>
+        <button class="expand-toggle" style="pointer-events:none">Show Less</button>
+      </div>
+
+      <div class="cand-card">
+        <div style="display:flex;gap:12px;align-items:center">
+          <div class="cand-avatar" style="background:#D95B43">C</div>
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div class="cand-name">Carlos Fuentes</div>
+              <div class="cand-tags">
+                <span class="badge badge-warn">Good Match</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="cand-summary">State senator with 10 years of legislative experience. Champion of workers' rights and criminal justice reform. Strong on immigration policy.</div>
+        <button class="expand-toggle" style="pointer-events:none">Show Details</button>
+      </div>
+
+      <div class="cand-card">
+        <div style="display:flex;gap:12px;align-items:center">
+          <div class="cand-avatar" style="background:#5B8C5A">M</div>
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div class="cand-name">Michelle Torres-Kim</div>
+              <div class="cand-tags">
+                <span class="badge badge-warn">Good Match</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="cand-summary">Environmental lawyer and former EPA regional counsel. Running on climate resilience, clean water, and environmental justice for underserved communities.</div>
+        <button class="expand-toggle" style="pointer-events:none">Show Details</button>
+      </div>
+
+      <div class="cand-card">
+        <div style="display:flex;gap:12px;align-items:center">
+          <div class="cand-avatar" style="background:#8E6BBF">J</div>
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div class="cand-name">Jerome Bradley</div>
+              <div class="cand-tags">
+                <span class="badge" style="color:var(--text2);background:rgba(128,128,128,.12);font-size:12px">Limited public info</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="cand-summary">Community organizer and small business owner. First-time candidate focused on affordable housing and local economic development.</div>
+        <button class="expand-toggle" style="pointer-events:none">Show Details</button>
+      </div>
+
+      <!-- D2: Attorney General -->
+      <div class="card race-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
+          <div class="race-office"><span class="star">&#x2B50;</span> Attorney General</div>
+          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+            <span class="badge badge-ok">Strong Match</span>
+            <span style="color:var(--text2);font-size:18px">&rsaquo;</span>
+          </div>
+        </div>
+        <div class="race-rec-name">Denise Obi</div>
+        <div class="race-rec-reason">Civil rights attorney focused on voting access and police accountability. Aligns with your emphasis on justice reform.</div>
+        <div class="race-cand-count">2 candidates</div>
+        <div class="avatar-row">
+          <div class="avatar-circle rec" style="background:#4A90D9">D</div>
+          <div class="avatar-circle" style="background:#D95B43">R</div>
+        </div>
+      </div>
+
+      <div class="section-head">Other Contested Races</div>
+
+      <!-- D3: Land Commissioner -->
+      <div class="card race-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
+          <div class="race-office">Land Commissioner</div>
+          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+            <span class="badge badge-warn">Good Match</span>
+            <span style="color:var(--text2);font-size:18px">&rsaquo;</span>
+          </div>
+        </div>
+        <div class="race-rec-name">Samuel Reyes</div>
+        <div class="race-rec-reason">Environmental scientist with coastal resilience expertise. Plans for veterans&rsquo; land program expansion align with your priorities.</div>
+        <div class="race-cand-count">3 candidates</div>
+        <div class="avatar-row">
+          <div class="avatar-circle rec" style="background:#4A90D9">S</div>
+          <div class="avatar-circle" style="background:#D95B43">F</div>
+          <div class="avatar-circle" style="background:#5B8C5A">N</div>
+        </div>
+      </div>
+
+      <!-- D4: State Senate -->
+      <div class="card race-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
+          <div class="race-office">State Senate &mdash; District 14</div>
+          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+            <span class="badge badge-ok">Strong Match</span>
+            <span style="color:var(--text2);font-size:18px">&rsaquo;</span>
+          </div>
+        </div>
+        <div class="race-rec-name">Aisha Patel</div>
+        <div class="race-rec-reason">Healthcare policy expert and former hospital administrator. Championing Medicaid expansion and maternal health funding.</div>
+        <div class="race-cand-count">2 candidates</div>
+        <div class="avatar-row">
+          <div class="avatar-circle rec" style="background:#4A90D9">A</div>
+          <div class="avatar-circle" style="background:#D95B43">G</div>
+        </div>
+      </div>
+
+      <div class="section-head">Local Races</div>
+
+      <!-- D5: County Judge -->
+      <div class="card race-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
+          <div class="race-office">County Judge</div>
+          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+            <span class="badge badge-warn">Good Match</span>
+            <span style="color:var(--text2);font-size:18px">&rsaquo;</span>
+          </div>
+        </div>
+        <div class="race-rec-name">Diana Okonkwo</div>
+        <div class="race-rec-reason">Public health official focused on county hospital funding and flood resilience. Good alignment on healthcare but less detail on budget specifics.</div>
+        <div class="race-cand-count">3 candidates</div>
+        <div class="avatar-row">
+          <div class="avatar-circle rec" style="background:#4A90D9">D</div>
+          <div class="avatar-circle" style="background:#D95B43">L</div>
+          <div class="avatar-circle" style="background:#5B8C5A">E</div>
+        </div>
+      </div>
+
+      <!-- D Proposition -->
+      <div class="section-head">Propositions</div>
+
+      <div class="card">
+        <div class="prop-header">
+          <div class="prop-title">Prop 3: Universal Pre-K Funding</div>
+          <span class="badge badge-ok">Lean Yes</span>
+        </div>
+        <div class="prop-desc">Shall the state allocate $2 billion annually to provide universal pre-kindergarten programs for all four-year-olds in Texas?</div>
+        <div style="margin-top:10px">
+          <div class="prop-outcome pass"><span style="flex-shrink:0">&#x2705;</span><div><b>If it passes:</b> Free pre-K available to all Texas four-year-olds regardless of income, with certified teacher requirements and small class sizes.</div></div>
+          <div class="prop-outcome fail"><span style="flex-shrink:0">&#x274C;</span><div><b>If it fails:</b> Pre-K remains income-qualified, with current waitlists in urban areas. Existing Head Start and private options continue unchanged.</div></div>
+        </div>
+        <div class="prop-reasoning"><span style="flex-shrink:0">&#x1F9E0;</span><div>Your emphasis on public education investment and early childhood development makes this a strong alignment. Research shows long-term economic returns from pre-K, though funding mechanism involves sales tax reallocation.</div></div>
+      </div>
+
+    </div><!-- /democrat -->
+
+    <!-- ==================== Shared footer content ==================== -->
+
+    <!-- Share CTA -->
+    <div class="share-cta">
+      <div style="font-size:32px;margin-bottom:8px">&#x1F4E3;</div>
+      <div class="share-cta-title">Build Your Own Guide</div>
+      <div class="share-cta-body">This sample shows what a personalized ballot looks like. Answer a few questions about your values and priorities, and Texas Votes will match you with candidates in your actual races.</div>
+      <a class="btn btn-primary btn-inline" href="/app?start=1">Get Your Personalized Ballot</a>
     </div>
 
-    <p class="page-footer">
+    <!-- Footer -->
+    <div class="page-footer">
       <a href="/">Texas Votes</a> &middot;
       <a href="/nonpartisan">Nonpartisan by Design</a> &middot;
       <a href="/candidates">Candidates</a> &middot;
-      <a href="/privacy">Privacy</a> &middot;
+      <a href="/privacy">Privacy</a>
+      <br>
+      <span style="color:var(--red)">&starf;</span> Built in Texas &middot;
       <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a>
-    </p>
-  </div>
+    </div>
+
+  </div><!-- /ballot-container -->
+
+  <script>
+  function setParty(p){
+    var body=document.body;
+    var btnR=document.getElementById('btn-rep');
+    var btnD=document.getElementById('btn-dem');
+    var label=document.getElementById('party-label');
+    if(p==='democrat'){
+      body.classList.add('party-dem');
+      btnR.classList.remove('on');
+      btnD.classList.add('on');
+      label.textContent='Democratic';
+    }else{
+      body.classList.remove('party-dem');
+      btnR.classList.add('on');
+      btnD.classList.remove('on');
+      label.textContent='Republican';
+    }
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  </script>
 </body>
 </html>`;
 
@@ -699,6 +1148,9 @@ function handleNonpartisan() {
     <p>All candidates are cross-referenced against official filings from the Texas Secretary of State, county clerks, and Ballotpedia. Candidate data includes positions, endorsements, strengths, and concerns — presented with equal depth for every candidate in a race.</p>
     <p>Endorsements include context labels identifying the type of each endorsing organization (e.g., labor union, editorial board, advocacy group, elected official). This helps voters understand who is behind each endorsement without having to research each organization separately.</p>
     <p>A daily automated updater re-verifies candidate data using AI-powered web research. Each ballot page and candidate profile displays a "Data last verified" timestamp so you can see exactly when the information was last checked.</p>
+
+    <h2>Source Priority Hierarchy</h2>
+    <p>All AI research prompts include an explicit 7-tier source ranking policy. When the AI uses web search to gather candidate data, it is instructed to prefer official government filings (Texas Secretary of State, county election offices) over campaign websites, nonpartisan references (Ballotpedia, VoteSmart) over news outlets, and to avoid blogs, social media, and opinion sites. When sources conflict, official filings override campaign claims, and campaign claims override news reporting. This hierarchy is documented in our <a href="/api/audit/export">methodology export</a>.</p>
 
     <h2>Limited Data Transparency</h2>
     <p>When a candidate has sparse public information — fewer than two of key positions, endorsements, strengths, or concerns populated — the app displays a "Limited public info" label. This prevents information asymmetry from looking like favoritism: if one candidate has a detailed profile and another doesn't, the label makes it clear the gap is a data limitation, not an editorial choice.</p>
@@ -967,12 +1419,34 @@ Return ONLY this JSON:
 
     <details>
       <summary>Candidate Research System Prompt (County Seeder)</summary>
-      <div class="prompt-box">You are a nonpartisan election data researcher for Texas. Use web_search to find verified, factual information about elections. Return ONLY valid JSON. Never fabricate information — if you cannot verify something, use null.</div>
+      <div class="prompt-box">You are a nonpartisan election data researcher for Texas. Use web_search to find verified, factual information about elections. Return ONLY valid JSON. Never fabricate information — if you cannot verify something, use null.
+
+SOURCE PRIORITY: When evaluating web_search results, prefer sources in this order:
+1. Texas Secretary of State filings (sos.state.tx.us)
+2. County election offices ({county}.tx.us)
+3. Official campaign websites
+4. Nonpartisan references (ballotpedia.org, votesmart.org)
+5. Established Texas news outlets (texastribune.org, dallasnews.com)
+6. National wire services (apnews.com, reuters.com)
+7. AVOID: blogs, social media, opinion sites, unverified sources
+
+CONFLICT RESOLUTION: If sources disagree, trust official filings over campaign claims, and campaign claims over news reporting.</div>
     </details>
 
     <details>
       <summary>Daily Updater System Prompt</summary>
-      <div class="prompt-box">You are a nonpartisan election data researcher. Use web_search to find verified, factual updates about candidates. Return ONLY valid JSON. Never fabricate information — if you cannot verify something, use null.</div>
+      <div class="prompt-box">You are a nonpartisan election data researcher. Use web_search to find verified, factual updates about candidates. Return ONLY valid JSON. Never fabricate information — if you cannot verify something, use null.
+
+SOURCE PRIORITY: When evaluating web_search results, prefer sources in this order:
+1. Texas Secretary of State filings (sos.state.tx.us)
+2. County election offices ({county}.tx.us)
+3. Official campaign websites
+4. Nonpartisan references (ballotpedia.org, votesmart.org)
+5. Established Texas news outlets (texastribune.org, dallasnews.com)
+6. National wire services (apnews.com, reuters.com)
+7. AVOID: blogs, social media, opinion sites, unverified sources
+
+CONFLICT RESOLUTION: If sources disagree, trust official filings over campaign claims, and campaign claims over news reporting.</div>
     </details>
 
     <h2>Data Sources</h2>
@@ -983,6 +1457,7 @@ Return ONLY this JSON:
       <li><strong>County voting info:</strong> County election office websites, verified via web search</li>
       <li><strong>Propositions:</strong> Official ballot language from the Texas Secretary of State, with background, fiscal impact, supporters, and opponents researched from nonpartisan sources</li>
     </ul>
+    <p class="note">All AI research prompts include a 7-tier source priority hierarchy: TX SOS filings &gt; county offices &gt; campaign sites &gt; nonpartisan references &gt; established news &gt; wire services &gt; avoid blogs/social. When sources conflict, official filings take precedence. See <a href="/api/audit/export">the methodology export</a> for full details.</p>
 
     <h2>Bias Safeguards</h2>
     <p>Every layer of the system includes explicit nonpartisan constraints:</p>
@@ -1025,6 +1500,7 @@ Return ONLY this JSON:
     <h2>Changes Made from Audit Findings</h2>
     <ul>
       <li><strong>County coverage labeling:</strong> Both ChatGPT and Gemini flagged that silently omitting local races when county data is unavailable could mislead voters about their ballot's completeness. We now display an in-product info banner — "Local races for [County] County are not yet available" — on both the ballot page and the printable cheat sheet whenever a voter's county lacks local race data. This ensures voters always understand the scope of their guide.</li>
+      <li><strong>Source ranking policy:</strong> ChatGPT's audit recommended documenting an explicit source priority hierarchy for AI web research. We now embed a 7-tier SOURCE PRIORITY block in every research prompt — ranking Texas SOS filings highest and blogs/social media lowest — along with a CONFLICT RESOLUTION rule: official filings override campaign claims, which override news reporting. Full details are in the <a href="/api/audit/export">methodology export</a> under <code>sourceRankingPolicy</code>.</li>
     </ul>
 
     <h2>Ongoing Commitment</h2>
@@ -1088,7 +1564,7 @@ function buildAuditExportData() {
 
     candidateResearch: {
       description: "County-level candidate data is populated using Claude with the web_search tool. The AI researches official filings and news sources to find candidates, their positions, endorsements, and backgrounds.",
-      systemPrompt: "You are a nonpartisan election data researcher for Texas. Use web_search to find verified, factual information about elections. Return ONLY valid JSON. Never fabricate information \u2014 if you cannot verify something, use null.",
+      systemPrompt: "You are a nonpartisan election data researcher for Texas. Use web_search to find verified, factual information about elections. Return ONLY valid JSON. Never fabricate information \u2014 if you cannot verify something, use null.\n\nSOURCE PRIORITY: When evaluating web_search results, prefer sources in this order:\n1. Texas Secretary of State filings (sos.state.tx.us)\n2. County election offices ({county}.tx.us)\n3. Official campaign websites\n4. Nonpartisan references (ballotpedia.org, votesmart.org)\n5. Established Texas news outlets (texastribune.org, dallasnews.com)\n6. National wire services (apnews.com, reuters.com)\n7. AVOID: blogs, social media, opinion sites, unverified sources\n\nCONFLICT RESOLUTION: If sources disagree, trust official filings over campaign claims, and campaign claims over news reporting.",
       dataSources: [
         "Texas Secretary of State candidate filings",
         "County clerk election offices",
@@ -1117,7 +1593,7 @@ function buildAuditExportData() {
     dailyUpdater: {
       description: "An automated daily cron job re-researches each contested race for new endorsements, polling, fundraising, and news. Updates are validated before being applied. Runs on the atxvotes-api worker; txvotes-api reads the same shared KV namespace.",
       model: "Claude Sonnet (claude-sonnet-4-20250514) with web_search tool (max 5 searches per race)",
-      systemPrompt: "You are a nonpartisan election data researcher. Use web_search to find verified, factual updates about candidates. Return ONLY valid JSON. Never fabricate information \u2014 if you cannot verify something, use null.",
+      systemPrompt: "You are a nonpartisan election data researcher. Use web_search to find verified, factual updates about candidates. Return ONLY valid JSON. Never fabricate information \u2014 if you cannot verify something, use null.\n\nSOURCE PRIORITY: When evaluating web_search results, prefer sources in this order:\n1. Texas Secretary of State filings (sos.state.tx.us)\n2. County election offices ({county}.tx.us)\n3. Official campaign websites\n4. Nonpartisan references (ballotpedia.org, votesmart.org)\n5. Established Texas news outlets (texastribune.org, dallasnews.com)\n6. National wire services (apnews.com, reuters.com)\n7. AVOID: blogs, social media, opinion sites, unverified sources\n\nCONFLICT RESOLUTION: If sources disagree, trust official filings over campaign claims, and campaign claims over news reporting.",
       raceResearchPromptTemplate: "Research the latest updates for this {party} primary race in the March 3, 2026 Texas Primary Election:\n\nRACE: {office} \u2014 {district}\n\nCURRENT DATA:\n  {candidateDescriptions}\n\nSearch for updates since February 15, 2026. Look for:\n1. New endorsements\n2. New polling data\n3. Updated fundraising numbers\n4. Significant news or position changes\n\nReturn a JSON object with this exact structure (use null for any field with no update):\n{\n  \"candidates\": [\n    {\n      \"name\": \"exact candidate name\",\n      \"polling\": \"updated polling string or null\",\n      \"fundraising\": \"updated fundraising string or null\",\n      \"endorsements\": [{\"name\": \"Endorser Name\", \"type\": \"type category\"}] or null,\n      \"keyPositions\": [\"full updated list\"] or null,\n      \"pros\": [\"full updated list\"] or null,\n      \"cons\": [\"full updated list\"] or null,\n      \"summary\": \"updated summary or null\",\n      \"background\": \"updated background or null\"\n    }\n  ]\n}\n\nIMPORTANT:\n- Return ONLY valid JSON, no markdown or explanation\n- Use null for any field where you found no new information\n- Candidate names must match exactly as provided\n- For arrays: return the FULL updated list (existing + new), not just additions\n- Only update fields where you found verifiable new information\n- Endorsement type must be one of: labor union, editorial board, advocacy group, business group, elected official, political organization, professional association, community organization, public figure",
       validationRules: [
         "Candidate count must remain the same (no additions or removals)",
@@ -1198,6 +1674,22 @@ function buildAuditExportData() {
         "Only the UI display layer is translated",
         "All translations reviewed for partisan bias",
       ],
+    },
+
+    sourceRankingPolicy: {
+      description: "All AI research prompts include an explicit source priority hierarchy to ensure web_search results are evaluated in order of reliability. This was added based on ChatGPT AI audit feedback recommending documented source preferences.",
+      hierarchy: [
+        { tier: 1, source: "Texas Secretary of State filings", examples: ["sos.state.tx.us"], trust: "Highest — official government filings" },
+        { tier: 2, source: "County election offices", examples: ["{county}.tx.us"], trust: "Official local government data" },
+        { tier: 3, source: "Official campaign websites", examples: ["candidate campaign sites"], trust: "Direct from candidates — verify claims against filings" },
+        { tier: 4, source: "Nonpartisan references", examples: ["ballotpedia.org", "votesmart.org"], trust: "Established nonpartisan voter information" },
+        { tier: 5, source: "Established Texas news outlets", examples: ["texastribune.org", "dallasnews.com"], trust: "Professional journalism with editorial standards" },
+        { tier: 6, source: "National wire services", examples: ["apnews.com", "reuters.com"], trust: "Factual reporting with editorial oversight" },
+        { tier: 7, source: "Blogs, social media, opinion sites", examples: [], trust: "Lowest — avoided unless no other source exists" },
+      ],
+      conflictResolution: "When sources disagree: official filings override campaign claims, and campaign claims override news reporting.",
+      enforcement: "SOURCE PRIORITY and CONFLICT RESOLUTION rules are embedded in the system prompts of both the daily updater (updater.js) and the county data seeder (county-seeder.js). The web_search tool is Claude's built-in tool — we cannot filter its results at the API level, so prompt-level preferences are the pragmatic enforcement mechanism.",
+      promptsIncludingPolicy: ["updater.js researchRace()", "county-seeder.js callClaudeWithSearch()"],
     },
 
     interviewQuestions: {
@@ -1435,7 +1927,7 @@ function buildAuditExportData() {
     countySeeder: {
       description: "County-level data is populated using Claude with web_search for each of Texas's top 30 counties by population (~75% of voters). Four data artifacts are generated per county: voting logistics, Republican ballot, Democratic ballot, and precinct map.",
       model: "Claude Sonnet (claude-sonnet-4-20250514) with web_search tool (max 10 searches per call)",
-      systemPrompt: "You are a nonpartisan election data researcher for Texas. Use web_search to find verified, factual information about elections. Return ONLY valid JSON. Never fabricate information — if you cannot verify something, use null.",
+      systemPrompt: "You are a nonpartisan election data researcher for Texas. Use web_search to find verified, factual information about elections. Return ONLY valid JSON. Never fabricate information — if you cannot verify something, use null.\n\nSOURCE PRIORITY: When evaluating web_search results, prefer sources in this order:\n1. Texas Secretary of State filings (sos.state.tx.us)\n2. County election offices ({county}.tx.us)\n3. Official campaign websites\n4. Nonpartisan references (ballotpedia.org, votesmart.org)\n5. Established Texas news outlets (texastribune.org, dallasnews.com)\n6. National wire services (apnews.com, reuters.com)\n7. AVOID: blogs, social media, opinion sites, unverified sources\n\nCONFLICT RESOLUTION: If sources disagree, trust official filings over campaign claims, and campaign claims over news reporting.",
       countyInfoPrompt: "Research the voting information for {countyName} County, Texas for the March 3, 2026 Texas Primary Election.\n\nFind:\n1. Does the county use Vote Centers (any location) or precinct-based voting?\n2. The county elections website URL\n3. The county elections office phone number\n4. Early voting dates and hours (early voting is Feb 17-27, 2026)\n5. Election Day hours (typically 7 AM - 7 PM)\n6. Election Day polling location finder URL\n7. Can voters use phones in the voting booth?\n8. Key local resources (election office website, local voter guide links)\n\nReturn ONLY this JSON:\n{\n  \"countyFips\": \"{fips}\",\n  \"countyName\": \"{countyName}\",\n  \"voteCenters\": true or false,\n  \"electionsWebsite\": \"URL\",\n  \"electionsPhone\": \"phone number\",\n  \"earlyVoting\": { \"periods\": [{ \"dates\": \"Feb 17-21\", \"hours\": \"7:00 AM - 7:00 PM\" }], \"note\": \"optional note\" },\n  \"electionDay\": { \"hours\": \"7:00 AM - 7:00 PM\", \"locationUrl\": \"URL to find locations\" },\n  \"phoneInBooth\": true or false or null if unknown,\n  \"resources\": [{ \"name\": \"Display Name\", \"url\": \"URL\" }]\n}",
       countyBallotPrompt: "Research ALL local {Party} primary races for {countyName} County, Texas in the March 3, 2026 Texas Primary Election.\n\nSearch the Texas Secretary of State candidate filings and local news sources.\n\nInclude ONLY county-level races such as:\n- County Judge\n- County Commissioner (by precinct)\n- County Clerk / District Clerk\n- County Treasurer / Sheriff / Attorney\n- Justice of the Peace / Constable (by precinct)\n- District Attorney / Tax Assessor-Collector\n- Any other county-level offices on the primary ballot\n\nFor each race, provide: Office name, district/precinct if applicable, whether contested, each candidate's name, background, key positions, endorsements, pros, cons.\n\nReturn ONLY valid JSON with the same candidate field structure as statewide races.",
       precinctMapPrompt: "Research the County Commissioner precinct boundaries for {countyName} County, Texas.\n\nI need a mapping of ZIP codes to County Commissioner precinct numbers.\n\nSearch for {countyName} County Commissioner precinct maps, GIS data, or official boundary descriptions.\n\nReturn ONLY this JSON:\n{ \"ZIP_CODE\": \"PRECINCT_NUMBER\", ... }\n\nOnly include ZIP codes primarily within {countyName} County. If mapping cannot be reliably determined, return {}.",

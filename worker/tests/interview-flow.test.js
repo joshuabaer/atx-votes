@@ -200,16 +200,16 @@ describe("Phase 2: Issues (two-zone picker)", () => {
     expect(html).toContain("pool-item");
     expect(html).toContain("Housing");
     expect(html).toContain("Healthcare");
-    // All 17 issues should be in the pool (none picked yet)
+    // All 21 issues should be in the pool (none picked yet)
     const poolItems = document.querySelectorAll(".pool-item");
-    expect(poolItems.length).toBe(17);
+    expect(poolItems.length).toBe(21);
     // 5 empty slots should be shown
     const emptySlots = document.querySelectorAll(".slot-empty");
     expect(emptySlots.length).toBe(5);
   });
 
-  it("populates S.issues with all 17 issues", () => {
-    expect(S().issues).toHaveLength(17);
+  it("populates S.issues with all 21 issues", () => {
+    expect(S().issues).toHaveLength(21);
   });
 
   it("Continue button is disabled until 5 issues are picked", () => {
@@ -358,8 +358,8 @@ describe("Phase 3: Spectrum", () => {
   it("back button returns to phase 2 with issues preserved", () => {
     clickAction("back");
     expect(S().phase).toBe(2);
-    // Issues should still be a full array of 17
-    expect(S().issues).toHaveLength(17);
+    // Issues should still be a full array of 21
+    expect(S().issues).toHaveLength(21);
   });
 });
 
@@ -444,7 +444,7 @@ describe("Phase 4: Skip when no deep dives", () => {
   it("builds ddQuestions only for top 5 issues that have deep dives", () => {
     passTone();
     passIssues();
-    // All 17 issues populated, top 5 checked for deep dives
+    // All 21 issues populated, top 5 checked for deep dives
     clickAction("select-spectrum", "Moderate");
     clickAction("next");
     // Should have deep dives for some of the top 5 issues
@@ -953,15 +953,15 @@ describe("Back navigation preserves state", () => {
 
     clickAction("back"); // → phase 2
     expect(S().phase).toBe(2);
-    // All 17 issues should be present
-    expect(S().issues).toHaveLength(17);
+    // All 21 issues should be present
+    expect(S().issues).toHaveLength(21);
 
     // 5 picked items should be rendered as filled slots
     const filledSlots = document.querySelectorAll(".sort-item.slot-filled");
     expect(filledSlots.length).toBe(5);
-    // 12 remaining should be in the pool
+    // 16 remaining should be in the pool
     const poolItems = document.querySelectorAll(".pool-item");
-    expect(poolItems.length).toBe(12);
+    expect(poolItems.length).toBe(16);
   });
 
   it("spectrum preserved when returning from phase 4", () => {
@@ -1041,7 +1041,7 @@ describe("Full interview happy path", () => {
     expect(S().phase).toBe(2);
 
     // Phase 2: Issues (pick 5 then continue)
-    expect(S().issues).toHaveLength(17);
+    expect(S().issues).toHaveLength(21);
     for (let i = 0; i < 5; i++) {
       document.querySelector('[data-action="pick-issue"]').click();
     }
@@ -1135,8 +1135,8 @@ describe("Backward compatibility", () => {
     document.documentElement.innerHTML = "<head></head><body></body>";
     bootApp();
 
-    // Issues should be padded to 17 with the old selections at the top
-    expect(S().issues).toHaveLength(17);
+    // Issues should be padded to 21 with the old selections at the top
+    expect(S().issues).toHaveLength(21);
     expect(S().issues[0]).toBe("Housing");
     expect(S().issues[1]).toBe("Healthcare");
     expect(S().issues[2]).toBe("Education");
@@ -1267,9 +1267,9 @@ describe("Phase 2: Pick/unpick issue gating", () => {
       document.querySelector('[data-action="pick-issue"]').click();
     }
     expect(S()._pickedIssues).toBe(5);
-    // Pool should have 12 remaining items
+    // Pool should have 16 remaining items
     const poolItems = document.querySelectorAll(".pool-item");
-    expect(poolItems.length).toBe(12);
+    expect(poolItems.length).toBe(16);
     // No more empty slots
     const emptySlots = document.querySelectorAll(".slot-empty");
     expect(emptySlots.length).toBe(0);

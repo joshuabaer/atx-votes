@@ -297,6 +297,7 @@ describe("mergeRecommendations", () => {
       candidateId: "sen-1",
       candidateName: "Alice Johnson",
       reasoning: "Strong healthcare record matches voter priorities.",
+      matchFactors: [],
       strategicNotes: null,
       caveats: null,
       confidence: "Strong Match",

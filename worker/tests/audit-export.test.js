@@ -426,6 +426,88 @@ describe("Audit export source: tone variants", () => {
 });
 
 // ---------------------------------------------------------------------------
+// Source ranking policy (NEW)
+// ---------------------------------------------------------------------------
+const seederSrc = readFileSync(join(__dirname, "../src/county-seeder.js"), "utf-8");
+
+describe("Audit export source: source ranking policy", () => {
+  it("has sourceRankingPolicy section in audit export", () => {
+    const exportBlock = getExportBlock();
+    expect(exportBlock).toContain("sourceRankingPolicy:");
+  });
+
+  it("documents all 7 tiers of source hierarchy", () => {
+    const exportBlock = getExportBlock();
+    expect(exportBlock).toContain("tier: 1");
+    expect(exportBlock).toContain("tier: 2");
+    expect(exportBlock).toContain("tier: 3");
+    expect(exportBlock).toContain("tier: 4");
+    expect(exportBlock).toContain("tier: 5");
+    expect(exportBlock).toContain("tier: 6");
+    expect(exportBlock).toContain("tier: 7");
+    expect(exportBlock).toContain("Texas Secretary of State filings");
+    expect(exportBlock).toContain("County election offices");
+    expect(exportBlock).toContain("Official campaign websites");
+    expect(exportBlock).toContain("Nonpartisan references");
+    expect(exportBlock).toContain("Established Texas news outlets");
+    expect(exportBlock).toContain("National wire services");
+    expect(exportBlock).toContain("Blogs, social media, opinion sites");
+  });
+
+  it("includes conflict resolution rule", () => {
+    const exportBlock = getExportBlock();
+    expect(exportBlock).toContain("conflictResolution");
+    expect(exportBlock).toContain("official filings override campaign claims");
+    expect(exportBlock).toContain("campaign claims override news reporting");
+  });
+
+  it("documents enforcement mechanism", () => {
+    const exportBlock = getExportBlock();
+    expect(exportBlock).toContain("enforcement");
+    expect(exportBlock).toContain("updater.js");
+    expect(exportBlock).toContain("county-seeder.js");
+  });
+});
+
+describe("Source ranking: prompt-level enforcement", () => {
+  it("updater.js system prompt contains SOURCE PRIORITY", () => {
+    expect(updaterSrc).toContain("SOURCE PRIORITY");
+  });
+
+  it("updater.js system prompt contains CONFLICT RESOLUTION", () => {
+    expect(updaterSrc).toContain("CONFLICT RESOLUTION");
+  });
+
+  it("updater.js system prompt lists all 7 tiers", () => {
+    expect(updaterSrc).toContain("Texas Secretary of State filings");
+    expect(updaterSrc).toContain("County election offices");
+    expect(updaterSrc).toContain("Official campaign websites");
+    expect(updaterSrc).toContain("ballotpedia.org");
+    expect(updaterSrc).toContain("texastribune.org");
+    expect(updaterSrc).toContain("apnews.com");
+    expect(updaterSrc).toContain("AVOID: blogs, social media");
+  });
+
+  it("county-seeder.js system prompt contains SOURCE PRIORITY", () => {
+    expect(seederSrc).toContain("SOURCE PRIORITY");
+  });
+
+  it("county-seeder.js system prompt contains CONFLICT RESOLUTION", () => {
+    expect(seederSrc).toContain("CONFLICT RESOLUTION");
+  });
+
+  it("county-seeder.js system prompt lists all 7 tiers", () => {
+    expect(seederSrc).toContain("Texas Secretary of State filings");
+    expect(seederSrc).toContain("County election offices");
+    expect(seederSrc).toContain("Official campaign websites");
+    expect(seederSrc).toContain("ballotpedia.org");
+    expect(seederSrc).toContain("texastribune.org");
+    expect(seederSrc).toContain("apnews.com");
+    expect(seederSrc).toContain("AVOID: blogs, social media");
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Completeness: export size
 // ---------------------------------------------------------------------------
 describe("Audit export source: completeness", () => {
@@ -436,19 +518,19 @@ describe("Audit export source: completeness", () => {
     expect(fnLength).toBeGreaterThan(15000);
   });
 
-  it("export has at least 10 top-level keys in the exportData object", () => {
+  it("export has at least 11 top-level keys in the exportData object", () => {
     const exportBlock = indexSrc.slice(
       indexSrc.indexOf("function buildAuditExportData()"),
       indexSrc.indexOf("function handleAuditExport()")
     );
     const topKeys = [
       "_meta", "guideGeneration", "profileSummary", "candidateResearch",
-      "dailyUpdater", "dataStructure", "nonpartisanSafeguards", "interviewQuestions",
-      "countySeeder", "toneVariants",
+      "dailyUpdater", "dataStructure", "nonpartisanSafeguards", "sourceRankingPolicy",
+      "interviewQuestions", "countySeeder", "toneVariants",
     ];
     for (const key of topKeys) {
       expect(exportBlock).toContain(key + ":");
     }
-    expect(topKeys).toHaveLength(10);
+    expect(topKeys).toHaveLength(11);
   });
 });
