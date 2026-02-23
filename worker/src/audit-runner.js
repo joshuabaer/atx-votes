@@ -177,6 +177,41 @@ IMPORTANT: Keep your response concise — aim for 1500 words or fewer. Use brief
 }
 
 // ---------------------------------------------------------------------------
+// Synthesis report — combines findings from all providers
+// ---------------------------------------------------------------------------
+
+function buildSynthesisPrompt(successfulResults) {
+  const providerSummaries = successfulResults.map(([name, result]) => {
+    const s = result.scores;
+    return `## ${result.displayName} (${result.model})
+Overall: ${s.overallScore}/10
+Dimensions: Partisan Bias ${s.dimensions.partisanBias}, Factual Accuracy ${s.dimensions.factualAccuracy}, Fairness of Framing ${s.dimensions.fairnessOfFraming}, Balance of Pros/Cons ${s.dimensions.balanceOfProsCons}, Transparency ${s.dimensions.transparency}
+Top Strength: ${s.topStrength || "N/A"}
+Top Weakness: ${s.topWeakness || "N/A"}
+
+Full response (abbreviated):
+${(result.responseText || "").slice(0, 3000)}`;
+  });
+
+  return `You are synthesizing the results of an independent AI bias audit of Texas Votes (txvotes.app), a nonpartisan AI-powered voting guide.
+
+${successfulResults.length} independent AI systems reviewed the same methodology export. Here are their individual results:
+
+${providerSummaries.join("\n\n---\n\n")}
+
+---
+
+Write a synthesis report (800-1200 words) that:
+1. **Average Scores** — compute and present the average score for each dimension and overall
+2. **Consensus Findings** — what do all/most providers agree on? (strengths and weaknesses)
+3. **Divergent Opinions** — where do providers disagree? Why might that be?
+4. **Top 5 Actionable Recommendations** — prioritized by consensus and impact
+5. **Credibility Assessment** — brief note on what the cross-provider agreement tells us about the audit's reliability
+
+Use markdown formatting. Be direct and specific. Do not pad with generic praise.`;
+}
+
+// ---------------------------------------------------------------------------
 // Score parsing — 3-tier extraction
 // ---------------------------------------------------------------------------
 
@@ -551,6 +586,39 @@ async function runAudit(env, options = {}) {
 
   await env.ELECTION_DATA.put("audit:summary", JSON.stringify(summary));
 
+  // Generate synthesis report if we have 2+ successful results
+  const successfulResults = Object.entries(results).filter(([, r]) => r.status === "success");
+  if (successfulResults.length >= 2 && env.ANTHROPIC_API_KEY) {
+    try {
+      const synthesisPrompt = buildSynthesisPrompt(successfulResults);
+      const synthesisResp = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": env.ANTHROPIC_API_KEY,
+          "anthropic-version": "2023-06-01",
+        },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 2048,
+          messages: [{ role: "user", content: synthesisPrompt }],
+        }),
+      });
+      if (synthesisResp.ok) {
+        const synthesisData = await synthesisResp.json();
+        const synthesisText = synthesisData.content?.[0]?.text || "";
+        const synthesisReport = {
+          text: synthesisText,
+          providersIncluded: successfulResults.map(([n]) => n),
+          generatedAt: new Date().toISOString(),
+          model: "claude-sonnet-4-20250514",
+        };
+        await env.ELECTION_DATA.put("audit:synthesis", JSON.stringify(synthesisReport));
+        summary.synthesis = synthesisReport;
+      }
+    } catch { /* non-fatal — synthesis is optional */ }
+  }
+
   // Write daily log
   const today = new Date().toISOString().slice(0, 10);
   const logEntry = {
@@ -571,4 +639,4 @@ async function runAudit(env, options = {}) {
   return { success: true, summary, results };
 }
 
-export { PROVIDERS, buildAuditPrompt, parseAuditScores, validateScores, repairTruncatedJson, callProvider, runAudit, DIMENSION_KEYS };
+export { PROVIDERS, buildAuditPrompt, buildSynthesisPrompt, parseAuditScores, validateScores, repairTruncatedJson, callProvider, runAudit, DIMENSION_KEYS };
