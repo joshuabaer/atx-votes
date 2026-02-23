@@ -14,14 +14,14 @@
 ### Features
 - [ ] Make city/region support self-service — configuration-driven approach so any city/region can set up their own voting guide without code changes
 - [ ] Create versions for runoffs and general election — support multiple election cycles beyond the primary (detailed plan at docs/plans/plan_runoff_general_election.md, 4-phase timeline March-October)
-- [ ] Add Related Links sections to transparency pages — add "Nonpartisan by Design" link to bottom of Data Quality page, and replicate the Data Quality page's Related Links section on AI Audit, Nonpartisan, and Open Source pages (cross-linking between all transparency pages)
+- [x] Add Related Links sections to transparency pages — add "Nonpartisan by Design" link to bottom of Data Quality page, and replicate the Data Quality page's Related Links section on AI Audit, Nonpartisan, and Open Source pages (cross-linking between all transparency pages)
 - [ ] Integrate DeepSeek model — add as another LLM option like Claude/GPT/Gemini/Grok for guide generation, vanity URL, audit provider. Must include a prominent persistent warning banner: "This is a Chinese open-source model, available for research/comparison purposes only. No personal information is shared with China — all processing runs through US-hosted API infrastructure."
 - [ ] Create new txvotes repo in GitHub — fresh copy of the code without all the dev history
 
 ### Audit Score Improvements
 _Latest audit: ChatGPT 7.5, Gemini 8.0, Claude 7.6, Grok 7.5 (avg 7.7/10). Remaining:_
 
-- [ ] Implement automated bias test suite — same voter profile with swapped party ballots, measure recommendation shifts and flag asymmetries. Publishable evidence of fairness.
+- [x] Implement automated bias test suite — same voter profile with swapped party ballots, measure recommendation shifts and flag asymmetries. Publishable evidence of fairness. (61 tests, 5 voter profiles, 4 reusable helpers — see docs/plans/plan_bias_test_suite.md)
 
 ### Code Review Findings (PR #2)
 
@@ -36,6 +36,9 @@ _From automated code review of "Add automated AI audit runner" (interview-flow-t
 - [ ] **[P2]** Remove dead code in `validateRaceUpdate` — duplicate-URL check and `sources.length > 20` check can never trigger because `mergeSources` already deduplicates and caps at 20 before validation runs
 - [ ] **[P2]** County seeder bypasses `validateRaceUpdate` — writes candidate data with sources directly to KV without malformed-URL or duplicate-URL validation that the updater path enforces
 - [ ] **[P3]** Election Day cache invalidation timing — `runDailyUpdate` invalidates `candidates_index` on every successful update, including Election Day when traffic peaks and cache rebuilds are most costly
+
+### PWA Bugs
+- [ ] Back button on first "Talk to Me" page doesn't work — back button on the initial interview screen (Phase 1, issues picker) is non-functional
 
 ### Technical Debt
 - [ ] Comprehensive memory management review — audit localStorage usage, service worker cache lifecycle, KV data retention, and state cleanup
