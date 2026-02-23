@@ -341,6 +341,7 @@ function handleLandingPage() {
     <div class="badge" data-t="Texas Primary — March 3, 2026">Texas Primary — March 3, 2026</div>
     <br>
     <a class="cta" href="/app?start=1" data-t="Build My Voting Guide">Build My Voting Guide</a>
+    <div style="margin-top:12px" data-t="See a Sample Ballot"><a href="/sample" style="font-size:0.95rem;color:var(--text2)">See a Sample Ballot</a></div>
     <div class="features">
       <div data-t="5-minute interview learns your values"><span>✅</span> 5-minute interview learns your values</div>
       <div data-t="Personalized ballot with recommendations"><span>📋</span> Personalized ballot with recommendations</div>
@@ -354,8 +355,10 @@ function handleLandingPage() {
     <button id="lang-toggle" style="font-size:14px;color:var(--text2);background:none;border:none;cursor:pointer;font-family:inherit"></button>
   </div>
   <p class="page-footer">
-    <a href="/candidates">Candidates</a> &middot;
     <a href="/nonpartisan" data-t="Nonpartisan by Design">Nonpartisan by Design</a> &middot;
+    <a href="/audit" data-t="AI Audit">AI Audit</a> &middot;
+    <a href="/data-quality" data-t="Data Quality">Data Quality</a> &middot;
+    <a href="/open-source" data-t="Open Source">Open Source</a> &middot;
     <a href="/privacy" data-t="Privacy">Privacy</a> &middot;
     <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a>
   </p>
@@ -373,7 +376,11 @@ function handleLandingPage() {
       'Nonpartisan and Open Source by design':'Apartidista y c\\u00F3digo abierto por dise\\u00F1o',
       'Works on any device \\u2014 phone, tablet, or computer. No app download needed.':'Funciona en cualquier dispositivo \\u2014 tel\\u00E9fono, tableta o computadora. No necesitas descargar una app.',
       'Nonpartisan by Design':'Apartidista por Dise\\u00F1o',
-      'Privacy':'Privacidad'
+      'AI Audit':'Auditor\\u00EDa de IA',
+      'Data Quality':'Calidad de Datos',
+      'Open Source':'C\\u00F3digo Abierto',
+      'Privacy':'Privacidad',
+      'See a Sample Ballot':'Ver una boleta de ejemplo'
     };
     var lang=localStorage.getItem('tx_votes_lang')||localStorage.getItem('atx_votes_lang')||((navigator.language||'').slice(0,2)==='es'?'es':'en');
     var features={'5-minute interview learns your values':'\\u2705','Personalized ballot with recommendations':'\\uD83D\\uDCCB','Print your cheat sheet for the booth':'\\uD83D\\uDDA8\\uFE0F','Find your polling location':'\\uD83D\\uDCCD','Nonpartisan and Open Source by design':'\\u2696\\uFE0F'};
@@ -419,6 +426,228 @@ function handleLandingPage() {
     apply();
   })();
   </script>
+</body>
+</html>`;
+
+  return new Response(html, {
+    headers: { "Content-Type": "text/html;charset=utf-8" },
+  });
+}
+
+function handleSampleBallot() {
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sample Ballot — Texas Votes</title>
+  <meta name="description" content="See what a personalized Texas Votes ballot looks like. This is a sample with example candidates and recommendations.">
+  ${PAGE_CSS}
+  <style>
+    .sample-banner{background:var(--blue);color:#fff;text-align:center;padding:10px 16px;font-weight:700;font-size:0.95rem;letter-spacing:0.5px;position:sticky;top:0;z-index:100}
+    .sample-watermark{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);font-size:6rem;font-weight:900;color:rgba(128,128,128,.07);pointer-events:none;z-index:0;white-space:nowrap;letter-spacing:8px}
+    .ballot-container{max-width:640px;margin:0 auto;position:relative;z-index:1}
+    .race{background:var(--card);border-radius:var(--r);padding:20px 16px;margin-bottom:16px;box-shadow:0 2px 8px var(--shadow)}
+    .race-title{font-size:1.1rem;font-weight:700;color:var(--text);margin-bottom:14px}
+    .cand{border:1.5px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;position:relative}
+    .cand.recommended{border-color:rgb(51,166,82)}
+    .cand-head{display:flex;align-items:center;gap:12px}
+    .cand-avatar{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;flex-shrink:0}
+    .cand-info{flex:1;min-width:0}
+    .cand-name{font-size:17px;font-weight:700;color:var(--text)}
+    .cand-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+    .badge{display:inline-block;font-size:13px;font-weight:600;padding:3px 10px;border-radius:99px;white-space:nowrap}
+    .badge-ok{color:rgb(51,166,82);background:rgba(51,166,82,.12)}
+    .badge-warn{color:rgb(230,140,26);background:rgba(230,140,26,.12)}
+    .badge-blue{color:var(--blue);background:rgba(33,89,143,.12)}
+    @media(prefers-color-scheme:dark){.badge-ok{background:rgba(77,199,107,.15)}.badge-warn{background:rgba(255,166,51,.15)}.badge-blue{background:rgba(102,153,217,.15)}}
+    .cand-summary{font-size:14px;color:var(--text2);line-height:1.5;margin-top:8px}
+    .cand-detail{margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+    .cand-detail h5{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+    .cand-detail.pros h5{color:rgb(51,166,82)}
+    .cand-detail.cons h5{color:rgb(209,51,51)}
+    .cand-detail li{font-size:14px;line-height:1.5;margin-left:16px;margin-bottom:2px}
+    .pos-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+    .pos-chip{font-size:12px;padding:3px 8px;border-radius:6px;background:rgba(128,128,128,.08);color:var(--text2)}
+    .section-header{font-size:0.85rem;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin:24px 0 12px;padding:0 4px}
+    .disclaimer{font-size:0.85rem;color:var(--text2);text-align:center;margin:20px 0;line-height:1.6}
+    .cta-bottom{text-align:center;margin:32px 0 16px}
+    .cta-bottom .cta{font-size:1.05rem;padding:14px 28px}
+  </style>
+</head>
+<body>
+  <div class="sample-banner">SAMPLE BALLOT — This is an example with fictional recommendations</div>
+  <div class="sample-watermark">SAMPLE</div>
+
+  <div class="ballot-container" style="padding-top:16px">
+    <div style="text-align:center;margin-bottom:20px">
+      <h1 style="font-size:1.5rem;margin-bottom:4px">Your Voting Guide</h1>
+      <p style="font-size:0.95rem;color:var(--text2);margin-bottom:0">Texas Primary — March 3, 2026</p>
+    </div>
+
+    <div class="section-header">Statewide Races</div>
+
+    <!-- Race 1: Governor -->
+    <div class="race">
+      <div class="race-title">Governor of Texas</div>
+
+      <div class="cand recommended">
+        <div class="cand-head">
+          <div class="cand-avatar" style="background:rgb(33,89,143)">MR</div>
+          <div class="cand-info">
+            <div class="cand-name">Maria Rodriguez</div>
+            <div class="cand-tags">
+              <span class="badge badge-ok">Strong Match</span>
+              <span class="badge badge-blue">Recommended</span>
+            </div>
+          </div>
+        </div>
+        <div class="cand-summary">Strong advocate for public education funding and infrastructure investment. Background in municipal government with 12 years of experience in state policy.</div>
+        <div class="cand-detail pros">
+          <h5>Strengths</h5>
+          <ul>
+            <li>Comprehensive education reform plan backed by teacher organizations</li>
+            <li>Proven track record managing large municipal budgets</li>
+          </ul>
+        </div>
+        <div class="cand-detail cons">
+          <h5>Concerns</h5>
+          <ul>
+            <li>Limited experience with federal-level policy negotiations</li>
+          </ul>
+        </div>
+        <div class="pos-chips">
+          <span class="pos-chip">Education Reform</span>
+          <span class="pos-chip">Infrastructure</span>
+          <span class="pos-chip">Healthcare Access</span>
+        </div>
+      </div>
+
+      <div class="cand">
+        <div class="cand-head">
+          <div class="cand-avatar" style="background:rgb(140,100,60)">JT</div>
+          <div class="cand-info">
+            <div class="cand-name">James Thompson</div>
+            <div class="cand-tags">
+              <span class="badge badge-warn">Good Match</span>
+            </div>
+          </div>
+        </div>
+        <div class="cand-summary">Business-focused candidate emphasizing economic growth and deregulation. Former CEO of a Texas-based energy company with private-sector leadership experience.</div>
+        <div class="pos-chips">
+          <span class="pos-chip">Tax Reform</span>
+          <span class="pos-chip">Energy</span>
+          <span class="pos-chip">Business Growth</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Race 2: Attorney General -->
+    <div class="race">
+      <div class="race-title">Attorney General</div>
+
+      <div class="cand recommended">
+        <div class="cand-head">
+          <div class="cand-avatar" style="background:rgb(166,82,51)">SP</div>
+          <div class="cand-info">
+            <div class="cand-name">Sarah Park</div>
+            <div class="cand-tags">
+              <span class="badge badge-ok">Strong Match</span>
+              <span class="badge badge-blue">Recommended</span>
+            </div>
+          </div>
+        </div>
+        <div class="cand-summary">Former federal prosecutor focused on consumer protection and government accountability. Known for bipartisan approach to criminal justice reform.</div>
+        <div class="cand-detail pros">
+          <h5>Strengths</h5>
+          <ul>
+            <li>15 years of federal prosecution experience</li>
+            <li>Endorsed by law enforcement and civil liberties groups</li>
+          </ul>
+        </div>
+        <div class="cand-detail cons">
+          <h5>Concerns</h5>
+          <ul>
+            <li>No prior elected office experience</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="cand">
+        <div class="cand-head">
+          <div class="cand-avatar" style="background:rgb(82,120,166)">DW</div>
+          <div class="cand-info">
+            <div class="cand-name">David Williams</div>
+            <div class="cand-tags">
+              <span class="badge badge-warn">Good Match</span>
+            </div>
+          </div>
+        </div>
+        <div class="cand-summary">Civil rights attorney specializing in constitutional law. Has argued cases before the Texas Supreme Court on property rights and individual freedoms.</div>
+        <div class="pos-chips">
+          <span class="pos-chip">Constitutional Law</span>
+          <span class="pos-chip">Property Rights</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-header">Local Races</div>
+
+    <!-- Race 3: County Commissioner -->
+    <div class="race">
+      <div class="race-title">County Commissioner, Precinct 2</div>
+
+      <div class="cand recommended">
+        <div class="cand-head">
+          <div class="cand-avatar" style="background:rgb(51,130,166)">LN</div>
+          <div class="cand-info">
+            <div class="cand-name">Lisa Nguyen</div>
+            <div class="cand-tags">
+              <span class="badge badge-ok">Good Match</span>
+              <span class="badge badge-blue">Recommended</span>
+            </div>
+          </div>
+        </div>
+        <div class="cand-summary">Transportation planner focused on county road improvements and responsible budgeting. Chaired the county transit advisory board for 4 years.</div>
+        <div class="pos-chips">
+          <span class="pos-chip">Transportation</span>
+          <span class="pos-chip">Budget</span>
+          <span class="pos-chip">Parks</span>
+        </div>
+      </div>
+
+      <div class="cand">
+        <div class="cand-head">
+          <div class="cand-avatar" style="background:rgb(166,140,51)">RH</div>
+          <div class="cand-info">
+            <div class="cand-name">Robert Hernandez</div>
+            <div class="cand-tags">
+              <span class="badge badge-warn">Best Available</span>
+            </div>
+          </div>
+        </div>
+        <div class="cand-summary">Local small business owner and neighborhood association president. Running on a platform of reduced county spending and property tax relief.</div>
+      </div>
+    </div>
+
+    <div class="disclaimer">
+      This is a <strong>sample ballot</strong> showing fictional candidates and recommendations.<br>
+      Real ballots are personalized based on your values, priorities, and location.<br>
+      Do your own research before voting.
+    </div>
+
+    <div class="cta-bottom">
+      <a class="cta" href="/app?start=1">Build Your Own Personalized Guide</a>
+    </div>
+
+    <p class="page-footer">
+      <a href="/">Texas Votes</a> &middot;
+      <a href="/nonpartisan">Nonpartisan by Design</a> &middot;
+      <a href="/candidates">Candidates</a> &middot;
+      <a href="/privacy">Privacy</a> &middot;
+      <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a>
+    </p>
+  </div>
 </body>
 </html>`;
 
@@ -495,7 +724,7 @@ function handleNonpartisan() {
     <h2>Data Transparency</h2>
     <p>Our <a href="/data-quality">Data Quality Dashboard</a> shows live metrics on ballot coverage, candidate completeness, and county data availability. See exactly how fresh and complete our election data is at any time.</p>
 
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/audit">AI Audit</a> &middot; <a href="/data-quality">Data Quality</a> &middot; <a href="/open-source">Open Source</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
 </body>
 </html>`;
@@ -803,7 +1032,7 @@ Return ONLY this JSON:
 
     <p style="margin-top:1.5rem">See our <a href="/data-quality">Data Quality Dashboard</a> for live metrics on ballot coverage, candidate completeness, and county data availability.</p>
 
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/data-quality">Data Quality</a> &middot; <a href="/open-source">Open Source</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
 </body>
 </html>`;
@@ -1304,7 +1533,7 @@ function handleSupport() {
       <p>Please <a href="mailto:howdy@txvotes.app">email us</a> with details and we'll correct it as quickly as possible.</p>
     </div>
 
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
 </body>
 </html>`;
@@ -1377,7 +1606,7 @@ function handlePrivacyPolicy() {
     <h2>Contact</h2>
     <p>Questions? Email <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
 
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/open-source">Open Source</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
 </body>
 </html>`;
@@ -1474,7 +1703,7 @@ function handleOpenSource() {
     <p>Texas Votes is released under the <strong>MIT License</strong>. This means you're free to use, modify, and distribute the code for any purpose — including building your own voting guide for another state or city. The only requirement is that you include the original license notice.</p>
     <p style="font-size:0.9rem;color:var(--text2)">We chose MIT because civic tech should have the fewest possible barriers to reuse. If this code helps more people vote informed, it's doing its job.</p>
 
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/audit">AI Audit</a> &middot; <a href="/data-quality">Data Quality</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
 </body>
 </html>`;
@@ -2032,7 +2261,7 @@ async function handleCandidateProfile(slug, env) {
     ${sections.join("\n    ")}
     ${dataUpdatedAt ? `<p style="margin-top:2rem;font-size:0.85rem;color:var(--text2)">Data last verified: ${new Date(dataUpdatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}${c.sources && c.sources.length ? ` &middot; ${c.sources.length} source${c.sources.length === 1 ? "" : "s"} cited` : ""}</p>` : ""}
     <p style="margin-top:${dataUpdatedAt ? "0.5rem" : "2rem"};font-size:0.9rem;color:var(--text2)">See something wrong? <a href="mailto:howdy@txvotes.app?subject=Data correction: ${encodeURIComponent(c.name)}">Let us know</a> and we'll fix it.</p>
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/data-quality">Data Quality</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
 </body>
 </html>`;
@@ -2126,7 +2355,7 @@ async function handleCandidatesIndex(env) {
     <h1 style="margin-top:1rem">All Candidates</h1>
     <p class="subtitle">2026 Texas Primary Election — March 3, 2026</p>
     ${raceSections}
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/data-quality">Data Quality</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
 </body>
 </html>`;
@@ -2417,7 +2646,7 @@ async function handleDataQuality(env) {
       <li><a href="/candidates">Candidate Profiles</a> — Browse all candidates with detailed information</li>
     </ul>
 
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/audit">AI Audit</a> &middot; <a href="/open-source">Open Source</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
   <script>
   (function(){
@@ -2678,7 +2907,7 @@ async function handleAdminCoverage(env) {
     </table>
     </div>
 
-    <p class="page-footer"><a href="/">Texas Votes</a></p>
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/data-quality">Data Quality</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
 </body>
 </html>`;
@@ -2834,6 +3063,9 @@ export default {
         const raw = await env.ELECTION_DATA.get(`audit:result:${provider}`);
         if (!raw) return jsonResponse({ error: "No results for provider: " + provider }, 404);
         return jsonResponse(JSON.parse(raw));
+      }
+      if (url.pathname === "/sample") {
+        return handleSampleBallot();
       }
       if (url.pathname === "/open-source") {
         return handleOpenSource();

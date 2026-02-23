@@ -232,6 +232,8 @@ var CSS = [
   ".slot-empty .rank{min-width:24px;height:24px;border-radius:50%;background:var(--border2);color:var(--text2);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}",
   ".slot-filled{cursor:pointer}",
   ".slot-filled:active{opacity:.8}",
+  ".slot-filled .slot-remove{color:var(--text2);font-size:18px;font-weight:700;flex-shrink:0;margin-left:4px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background .15s,color .15s}",
+  ".slot-filled:hover .slot-remove,.slot-filled .slot-remove:active{color:#e74c3c;background:rgba(231,76,60,.1)}",
   ".pool-zone{margin-top:4px}",
   ".pool-item{display:flex;align-items:center;gap:8px;padding:10px 12px;margin-bottom:4px;border-radius:var(--rs);border:1.5px solid var(--border2);background:var(--fill3);font-size:15px;cursor:pointer;user-select:none;transition:transform .1s,opacity .15s}",
   ".pool-item:active{transform:scale(.97);opacity:.85}",
@@ -1308,7 +1310,7 @@ var APP_JS = [
   // Easter egg unlocks (persisted in localStorage)
   "var eeChef=!!localStorage.getItem('tx_votes_ee_chef');",
   "var eeCowboy=!!localStorage.getItem('tx_votes_ee_cowboy');",
-  "var profileChefTaps=0;var profileChefTimer=null;",
+  "var borkBuf='';var borkTimer=null;",
   "var yeehawBuf='';var yeehawTimer=null;",
 
   // ============ UTILS ============
@@ -1598,7 +1600,9 @@ var APP_JS = [
           "'<span class=\"sort-arrows\">'+" +
           "'<button data-action=\"sort-up\" data-key=\"issues\" data-idx=\"'+i+'\" aria-label=\"Move up\"'+(i===0?' disabled':'')+'>&blacktriangle;</button>'+" +
           "'<button data-action=\"sort-down\" data-key=\"issues\" data-idx=\"'+i+'\" aria-label=\"Move down\"'+(i>=n-1?' disabled':'')+'>&blacktriangledown;</button>'+" +
-          "'</span></div>'" +
+          "'</span>'+" +
+          "'<span class=\"slot-remove\" aria-hidden=\"true\">&minus;</span>'+" +
+          "'</div>'" +
       "}else{" +
         "h+='<div class=\"slot-empty\"><span class=\"rank\">'+(i+1)+'</span><span>'+t('Tap to add')+'</span></div>'" +
       "}" +
@@ -1673,7 +1677,9 @@ var APP_JS = [
           "'<span class=\"sort-arrows\">'+" +
           "'<button data-action=\"sort-up\" data-key=\"qualities\" data-idx=\"'+i+'\" aria-label=\"Move up\"'+(i===0?' disabled':'')+'>&blacktriangle;</button>'+" +
           "'<button data-action=\"sort-down\" data-key=\"qualities\" data-idx=\"'+i+'\" aria-label=\"Move down\"'+(i>=n-1?' disabled':'')+'>&blacktriangledown;</button>'+" +
-          "'</span></div>'" +
+          "'</span>'+" +
+          "'<span class=\"slot-remove\" aria-hidden=\"true\">&minus;</span>'+" +
+          "'</div>'" +
       "}else{" +
         "h+='<div class=\"slot-empty\"><span class=\"rank\">'+(i+1)+'</span><span>'+t('Tap to add')+'</span></div>'" +
       "}" +
@@ -2211,7 +2217,7 @@ var APP_JS = [
     "h+='</div></div>';" +
     // Reading level slider (extends with easter eggs)
     "h+='<div class=\"card\" style=\"margin-top:16px\">';" +
-    "h+='<div data-action=\"chef-tap-profile\" style=\"font-size:15px;font-weight:600;margin-bottom:12px;cursor:default;-webkit-user-select:none;user-select:none\">\u{1F4D6} '+t('Reading Level')+'</div>';" +
+    "h+='<div style=\"font-size:15px;font-weight:600;margin-bottom:12px\">\u{1F4D6} '+t('Reading Level')+'</div>';" +
     "var rlMap=[1,3,4];if(eeChef)rlMap.push(6);if(eeCowboy)rlMap.push(7);" +
     "var rlNames={1:t('Simple'),3:t('Standard'),4:t('Detailed'),6:'\\uD83E\\uDD7C Bork Bork Bork!',7:'\\uD83E\\uDD20 Howdy Partner!'};" +
     "var rlIdx=rlMap.indexOf(S.readingLevel);if(rlIdx<0)rlIdx=1;" +
@@ -2687,17 +2693,7 @@ var APP_JS = [
       "if(idx<n){var item=S.qualities.splice(idx,1)[0];S.qualities.splice(n-1,0,item);S._pickedQuals=n-1;render()}" +
     "}" +
     "else if(action==='chef-tap'){chefTaps++;if(chefTaps===5)render()}" +
-    "else if(action==='chef-tap-profile'){" +
-      "clearTimeout(profileChefTimer);" +
-      "profileChefTaps++;" +
-      "profileChefTimer=setTimeout(function(){profileChefTaps=0},800);" +
-      "if(profileChefTaps>=3&&!eeChef){" +
-        "eeChef=true;localStorage.setItem('tx_votes_ee_chef','1');" +
-        "profileChefTaps=0;emojiBurst('\\uD83E\\uDD7C',25);" +
-        "if(navigator.vibrate)navigator.vibrate([50,30,50,30,100]);" +
-        "S.readingLevel=6;save();reprocessGuide()" +
-      "}" +
-    "}" +
+    "" +
     "else if(action==='select-tone'){S.readingLevel=parseInt(el.dataset.value)||1;trk('tone_select',{d1:''+S.readingLevel,v:S.readingLevel});render()}" +
     "else if(action==='select-spectrum'){S.spectrum=el.dataset.value;render()}" +
     "else if(action==='select-dd'){" +
@@ -2772,6 +2768,22 @@ var APP_JS = [
     "if(e.key==='Enter'||e.key===' '){" +
       "var el=e.target.closest('[data-action]');if(!el||el.tagName==='BUTTON'||el.tagName==='A'||el.tagName==='INPUT')return;" +
       "e.preventDefault();el.click()" +
+    "}" +
+  "});",
+
+  // Easter egg: type 'bork' on profile page to unlock Swedish Chef (tone 6)
+  "document.addEventListener('keydown',function(e){" +
+    "if(eeChef)return;" +
+    "if(location.hash!=='#/profile')return;" +
+    "if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;" +
+    "clearTimeout(borkTimer);" +
+    "borkBuf+=e.key.toLowerCase();" +
+    "borkTimer=setTimeout(function(){borkBuf=''},2000);" +
+    "if(borkBuf.indexOf('bork')!==-1){" +
+      "eeChef=true;localStorage.setItem('tx_votes_ee_chef','1');" +
+      "borkBuf='';emojiBurst('\\uD83E\\uDD7C',25);" +
+      "if(navigator.vibrate)navigator.vibrate([50,30,50,30,100]);" +
+      "S.readingLevel=6;save();reprocessGuide()" +
     "}" +
   "});",
 
