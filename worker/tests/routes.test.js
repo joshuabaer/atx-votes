@@ -356,4 +356,325 @@ describe("Worker routing patterns", () => {
   it("cron stops after election day", () => {
     expect(indexSrc).toContain("2026-03-04");
   });
+
+  it("returns 404 for unknown POST routes", () => {
+    expect(indexSrc).toContain('return new Response("Not found", { status: 404 })');
+  });
+
+  it("falls through to landing page for unknown GET paths", () => {
+    // At end of GET routes, handleLandingPage() is the fallback
+    expect(indexSrc).toContain("return handleLandingPage()");
+  });
+
+  it("redirects /candidate (no slug) to /candidates index", () => {
+    expect(indexSrc).toContain('url.pathname === "/candidate"');
+    expect(indexSrc).toContain('Response.redirect');
+    expect(indexSrc).toContain("/candidates");
+  });
+
+  it("extracts slug from /candidate/ path", () => {
+    expect(indexSrc).toContain('url.pathname.startsWith("/candidate/")');
+    expect(indexSrc).toContain('url.pathname.slice("/candidate/".length)');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// /how-it-works page content
+// ---------------------------------------------------------------------------
+describe("/how-it-works page content", () => {
+  it("has handleHowItWorks function", () => {
+    expect(indexSrc).toContain("function handleHowItWorks()");
+  });
+
+  it("has the correct page title", () => {
+    expect(indexSrc).toContain("How It Works — Texas Votes");
+  });
+
+  it("explains the 4-step process with numbered steps", () => {
+    expect(indexSrc).toContain("You answer a short interview");
+    expect(indexSrc).toContain("The AI reads candidate profiles");
+    expect(indexSrc).toContain("It finds your best matches");
+    expect(indexSrc).toContain("You get a personalized ballot");
+  });
+
+  it("explains where candidate information comes from", () => {
+    expect(indexSrc).toContain("Where Does the Candidate Information Come From");
+    expect(indexSrc).toContain("Official government records");
+    expect(indexSrc).toContain("Nonpartisan references");
+    expect(indexSrc).toContain("News coverage");
+    expect(indexSrc).toContain("Campaign materials");
+  });
+
+  it("explains what the app does NOT do", () => {
+    expect(indexSrc).toContain("What This App Does NOT Do");
+    expect(indexSrc).toContain("does not tell you who to vote for");
+    expect(indexSrc).toContain("does not store your personal information");
+    expect(indexSrc).toContain("does not track you");
+    expect(indexSrc).toContain("does not favor any political party");
+    expect(indexSrc).toContain("does not replace your own research");
+  });
+
+  it("includes trust section with transparency points", () => {
+    expect(indexSrc).toContain("How Can I Trust It");
+    expect(indexSrc).toContain("source code is public");
+    expect(indexSrc).toContain("Four independent AI systems");
+  });
+
+  it("mentions the Flag this info feature", () => {
+    const howBlock = indexSrc.slice(
+      indexSrc.indexOf("function handleHowItWorks"),
+      indexSrc.indexOf("function handleNonpartisan")
+    );
+    expect(howBlock).toContain("Flag this info");
+  });
+
+  it("includes related links section", () => {
+    const howBlock = indexSrc.slice(
+      indexSrc.indexOf("function handleHowItWorks"),
+      indexSrc.indexOf("function handleNonpartisan")
+    );
+    expect(howBlock).toContain("/nonpartisan");
+    expect(howBlock).toContain("/audit");
+    expect(howBlock).toContain("/data-quality");
+    expect(howBlock).toContain("/open-source");
+    expect(howBlock).toContain("/privacy");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Back button links on subpages
+// ---------------------------------------------------------------------------
+describe("Back button links on subpages", () => {
+  it("how-it-works page has back link to home", () => {
+    const howBlock = indexSrc.slice(
+      indexSrc.indexOf("function handleHowItWorks"),
+      indexSrc.indexOf("function handleNonpartisan")
+    );
+    expect(howBlock).toContain('class="back-top"');
+    expect(howBlock).toContain('href="/"');
+    expect(howBlock).toContain("Texas Votes");
+  });
+
+  it("nonpartisan page has back link to home", () => {
+    const nonpartBlock = indexSrc.slice(
+      indexSrc.indexOf("function handleNonpartisan"),
+      indexSrc.indexOf("async function handleAuditPage")
+    );
+    expect(nonpartBlock).toContain('class="back-top"');
+    expect(nonpartBlock).toContain('href="/"');
+  });
+
+  it("candidate profile page has back link to candidates index", () => {
+    const profileBlock = indexSrc.slice(
+      indexSrc.indexOf("async function handleCandidateProfile"),
+      indexSrc.indexOf("async function handleCandidatesIndex")
+    );
+    expect(profileBlock).toContain("/candidates");
+    expect(profileBlock).toContain("back");
+  });
+
+  it("data quality page has back link to home", () => {
+    const dqBlock = indexSrc.slice(
+      indexSrc.indexOf("async function handleDataQuality"),
+      indexSrc.indexOf("// MARK: - Admin Coverage")
+    );
+    expect(dqBlock).toContain('href="/"');
+  });
+
+  it("support page has back link to home", () => {
+    expect(indexSrc).toContain("function handleSupport");
+    const supportBlock = indexSrc.slice(
+      indexSrc.indexOf("function handleSupport"),
+      indexSrc.indexOf("function handleSampleBallot") > 0
+        ? indexSrc.indexOf("function handleSampleBallot")
+        : indexSrc.indexOf("function handlePrivacyPolicy")
+    );
+    expect(supportBlock).toContain('href="/"');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Page footer consistency
+// ---------------------------------------------------------------------------
+describe("Page footer consistency", () => {
+  it("how-it-works page has standard footer with home, privacy, and contact", () => {
+    const howBlock = indexSrc.slice(
+      indexSrc.indexOf("function handleHowItWorks"),
+      indexSrc.indexOf("function handleNonpartisan")
+    );
+    expect(howBlock).toContain("page-footer");
+    expect(howBlock).toContain("howdy@txvotes.app");
+    expect(howBlock).toContain("/privacy");
+  });
+
+  it("nonpartisan page has standard footer", () => {
+    const nonpartBlock = indexSrc.slice(
+      indexSrc.indexOf("function handleNonpartisan"),
+      indexSrc.indexOf("async function handleAuditPage")
+    );
+    expect(nonpartBlock).toContain("page-footer");
+    expect(nonpartBlock).toContain("howdy@txvotes.app");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Bias reporting (Flag this info) in nonpartisan page
+// ---------------------------------------------------------------------------
+describe("Bias reporting in nonpartisan page", () => {
+  it("has Flag This Info section", () => {
+    const nonpartBlock = indexSrc.slice(
+      indexSrc.indexOf("function handleNonpartisan"),
+      indexSrc.indexOf("async function handleAuditPage")
+    );
+    expect(nonpartBlock).toContain("Flag This Info");
+    expect(nonpartBlock).toContain("Flag this info");
+  });
+
+  it("mentions flagged@txvotes.app email", () => {
+    const nonpartBlock = indexSrc.slice(
+      indexSrc.indexOf("function handleNonpartisan"),
+      indexSrc.indexOf("async function handleAuditPage")
+    );
+    expect(nonpartBlock).toContain("flagged@txvotes.app");
+  });
+
+  it("describes the reporting workflow", () => {
+    const nonpartBlock = indexSrc.slice(
+      indexSrc.indexOf("function handleNonpartisan"),
+      indexSrc.indexOf("async function handleAuditPage")
+    );
+    expect(nonpartBlock).toContain("biased");
+    expect(nonpartBlock).toContain("inaccurate");
+    expect(nonpartBlock).toContain("report it directly");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Automated balance checks section in nonpartisan page
+// ---------------------------------------------------------------------------
+describe("Automated balance checks in nonpartisan page", () => {
+  it("has Automated Balance Checks section", () => {
+    const nonpartBlock = indexSrc.slice(
+      indexSrc.indexOf("function handleNonpartisan"),
+      indexSrc.indexOf("async function handleAuditPage")
+    );
+    expect(nonpartBlock).toContain("Automated Balance Checks");
+  });
+
+  it("links to data quality dashboard and balance-check API", () => {
+    const nonpartBlock = indexSrc.slice(
+      indexSrc.indexOf("function handleNonpartisan"),
+      indexSrc.indexOf("async function handleAuditPage")
+    );
+    expect(nonpartBlock).toContain("/data-quality");
+    expect(nonpartBlock).toContain("/api/balance-check");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Audit page rendering
+// ---------------------------------------------------------------------------
+describe("Audit page rendering", () => {
+  it("has handleAuditPage function that reads from KV", () => {
+    const auditBlock = indexSrc.slice(
+      indexSrc.indexOf("async function handleAuditPage"),
+      indexSrc.indexOf("async function handleBalanceCheck")
+    );
+    expect(auditBlock).toContain("audit:summary");
+    expect(auditBlock).toContain("audit:result:chatgpt");
+    expect(auditBlock).toContain("audit:result:gemini");
+    expect(auditBlock).toContain("audit:result:grok");
+    expect(auditBlock).toContain("audit:result:claude");
+  });
+
+  it("renders audit cards for each provider", () => {
+    const auditBlock = indexSrc.slice(
+      indexSrc.indexOf("async function handleAuditPage"),
+      indexSrc.indexOf("async function handleBalanceCheck")
+    );
+    expect(auditBlock).toContain("renderAuditCard");
+    expect(auditBlock).toContain("audit-card");
+    expect(auditBlock).toContain("audit-score");
+  });
+
+  it("shows Pending state for providers not yet run", () => {
+    const auditBlock = indexSrc.slice(
+      indexSrc.indexOf("async function handleAuditPage"),
+      indexSrc.indexOf("async function handleBalanceCheck")
+    );
+    expect(auditBlock).toContain("Pending");
+    expect(auditBlock).toContain("audit-pending");
+  });
+
+  it("shows dimension scores for successful results", () => {
+    const auditBlock = indexSrc.slice(
+      indexSrc.indexOf("async function handleAuditPage"),
+      indexSrc.indexOf("async function handleBalanceCheck")
+    );
+    expect(auditBlock).toContain("partisanBias");
+    expect(auditBlock).toContain("Partisan Bias");
+    expect(auditBlock).toContain("Factual Accuracy");
+    expect(auditBlock).toContain("Fairness of Framing");
+    expect(auditBlock).toContain("Balance of Pros/Cons");
+    expect(auditBlock).toContain("Transparency");
+  });
+
+  it("links to methodology export and results API", () => {
+    const auditBlock = indexSrc.slice(
+      indexSrc.indexOf("async function handleAuditPage"),
+      indexSrc.indexOf("async function handleBalanceCheck")
+    );
+    expect(auditBlock).toContain("/api/audit/export");
+    expect(auditBlock).toContain("/api/audit/results");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Cron scheduled handler
+// ---------------------------------------------------------------------------
+describe("Cron scheduled handler", () => {
+  it("runs daily update via ctx.waitUntil", () => {
+    expect(indexSrc).toContain("ctx.waitUntil(runDailyUpdate(env))");
+  });
+
+  it("runs AI audit daily until election day", () => {
+    expect(indexSrc).toContain("ctx.waitUntil(");
+    expect(indexSrc).toContain("runAudit(env");
+    expect(indexSrc).toContain('triggeredBy: "cron"');
+  });
+
+  it("passes exportData to audit via buildAuditExportData", () => {
+    expect(indexSrc).toContain("exportData: buildAuditExportData()");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Vanity entry points
+// ---------------------------------------------------------------------------
+describe("Vanity entry points", () => {
+  it("cowboy entry point clears data and sets tone=7", () => {
+    expect(indexSrc).toContain('"/cowboy"');
+    expect(indexSrc).toContain("handlePWA_Clear");
+    expect(indexSrc).toContain("tone=7");
+  });
+
+  it("chef entry point clears data and sets tone=6", () => {
+    expect(indexSrc).toContain('"/chef"');
+    expect(indexSrc).toContain("tone=6");
+  });
+
+  it("gemini entry point clears data", () => {
+    expect(indexSrc).toContain('"/gemini"');
+    expect(indexSrc).toContain("Powered by Gemini");
+  });
+
+  it("grok entry point clears data", () => {
+    expect(indexSrc).toContain('"/grok"');
+    expect(indexSrc).toContain("Powered by Grok");
+  });
+
+  it("chatgpt entry point clears data", () => {
+    expect(indexSrc).toContain('"/chatgpt"');
+    expect(indexSrc).toContain("Powered by ChatGPT");
+  });
 });

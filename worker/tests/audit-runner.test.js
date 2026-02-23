@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
   PROVIDERS,
   buildAuditPrompt,
+  buildSynthesisPrompt,
   parseAuditScores,
   validateScores,
   repairTruncatedJson,
@@ -726,5 +727,351 @@ describe("DIMENSION_KEYS", () => {
     expect(DIMENSION_KEYS).toContain("fairnessOfFraming");
     expect(DIMENSION_KEYS).toContain("balanceOfProsCons");
     expect(DIMENSION_KEYS).toContain("transparency");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// buildSynthesisPrompt tests
+// ---------------------------------------------------------------------------
+describe("buildSynthesisPrompt", () => {
+  const mockResults = [
+    ["chatgpt", {
+      displayName: "ChatGPT (OpenAI)",
+      model: "gpt-4o",
+      scores: {
+        overallScore: 7.5,
+        dimensions: { partisanBias: 8, factualAccuracy: 7, fairnessOfFraming: 8, balanceOfProsCons: 7, transparency: 9 },
+        topStrength: "Great transparency",
+        topWeakness: "Missing citations",
+      },
+      responseText: "Full report text from ChatGPT...",
+    }],
+    ["gemini", {
+      displayName: "Gemini (Google)",
+      model: "gemini-2.5-flash",
+      scores: {
+        overallScore: 8.6,
+        dimensions: { partisanBias: 9, factualAccuracy: 8, fairnessOfFraming: 8, balanceOfProsCons: 8, transparency: 10 },
+        topStrength: "Excellent design",
+        topWeakness: "Needs more sources",
+      },
+      responseText: "Full report text from Gemini...",
+    }],
+  ];
+
+  it("includes provider names and models in the prompt", () => {
+    const prompt = buildSynthesisPrompt(mockResults);
+    expect(prompt).toContain("ChatGPT (OpenAI)");
+    expect(prompt).toContain("gpt-4o");
+    expect(prompt).toContain("Gemini (Google)");
+    expect(prompt).toContain("gemini-2.5-flash");
+  });
+
+  it("includes overall scores from each provider", () => {
+    const prompt = buildSynthesisPrompt(mockResults);
+    expect(prompt).toContain("Overall: 7.5/10");
+    expect(prompt).toContain("Overall: 8.6/10");
+  });
+
+  it("includes dimension scores from each provider", () => {
+    const prompt = buildSynthesisPrompt(mockResults);
+    expect(prompt).toContain("Partisan Bias 8");
+    expect(prompt).toContain("Partisan Bias 9");
+    expect(prompt).toContain("Transparency 9");
+    expect(prompt).toContain("Transparency 10");
+  });
+
+  it("includes top strengths and weaknesses", () => {
+    const prompt = buildSynthesisPrompt(mockResults);
+    expect(prompt).toContain("Great transparency");
+    expect(prompt).toContain("Missing citations");
+    expect(prompt).toContain("Excellent design");
+    expect(prompt).toContain("Needs more sources");
+  });
+
+  it("includes response text (abbreviated to 3000 chars)", () => {
+    const prompt = buildSynthesisPrompt(mockResults);
+    expect(prompt).toContain("Full report text from ChatGPT...");
+    expect(prompt).toContain("Full report text from Gemini...");
+  });
+
+  it("truncates long response text at 3000 characters", () => {
+    const longResults = [
+      ["chatgpt", {
+        displayName: "ChatGPT (OpenAI)",
+        model: "gpt-4o",
+        scores: {
+          overallScore: 7,
+          dimensions: { partisanBias: 7 },
+          topStrength: "OK",
+          topWeakness: "OK",
+        },
+        responseText: "A".repeat(5000),
+      }],
+      ["gemini", {
+        displayName: "Gemini (Google)",
+        model: "gemini-2.5-flash",
+        scores: {
+          overallScore: 8,
+          dimensions: { partisanBias: 8 },
+          topStrength: "OK",
+          topWeakness: "OK",
+        },
+        responseText: "Short text",
+      }],
+    ];
+    const prompt = buildSynthesisPrompt(longResults);
+    // The long text should be truncated, so the full 5000 A's should not appear
+    expect(prompt).not.toContain("A".repeat(5000));
+    // But the first 3000 should appear
+    expect(prompt).toContain("A".repeat(3000));
+  });
+
+  it("includes synthesis instructions requesting 5 sections", () => {
+    const prompt = buildSynthesisPrompt(mockResults);
+    expect(prompt).toContain("Average Scores");
+    expect(prompt).toContain("Consensus Findings");
+    expect(prompt).toContain("Divergent Opinions");
+    expect(prompt).toContain("Top 5 Actionable Recommendations");
+    expect(prompt).toContain("Credibility Assessment");
+  });
+
+  it("mentions the correct provider count", () => {
+    const prompt = buildSynthesisPrompt(mockResults);
+    expect(prompt).toContain("2 independent AI systems");
+  });
+
+  it("handles N/A for missing topStrength and topWeakness", () => {
+    const resultsWithMissing = [
+      ["chatgpt", {
+        displayName: "ChatGPT",
+        model: "gpt-4o",
+        scores: {
+          overallScore: 7,
+          dimensions: { partisanBias: 7 },
+          topStrength: null,
+          topWeakness: null,
+        },
+        responseText: "Report",
+      }],
+      ["gemini", {
+        displayName: "Gemini",
+        model: "gemini-2.5-flash",
+        scores: {
+          overallScore: 8,
+          dimensions: { partisanBias: 8 },
+          topStrength: "Good",
+          topWeakness: undefined,
+        },
+        responseText: "Report",
+      }],
+    ];
+    const prompt = buildSynthesisPrompt(resultsWithMissing);
+    expect(prompt).toContain("N/A");
+  });
+
+  it("handles missing responseText gracefully", () => {
+    const resultsNoText = [
+      ["chatgpt", {
+        displayName: "ChatGPT",
+        model: "gpt-4o",
+        scores: { overallScore: 7, dimensions: { partisanBias: 7 } },
+        responseText: undefined,
+      }],
+      ["gemini", {
+        displayName: "Gemini",
+        model: "gemini-2.5-flash",
+        scores: { overallScore: 8, dimensions: { partisanBias: 8 } },
+        responseText: null,
+      }],
+    ];
+    // Should not throw
+    const prompt = buildSynthesisPrompt(resultsNoText);
+    expect(prompt).toBeDefined();
+    expect(prompt.length).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Provider extractUsage edge cases
+// ---------------------------------------------------------------------------
+describe("Provider extractUsage edge cases", () => {
+  it("chatgpt returns null when usage is missing", () => {
+    expect(PROVIDERS.chatgpt.extractUsage({})).toBeNull();
+  });
+
+  it("gemini returns null when usageMetadata is missing", () => {
+    expect(PROVIDERS.gemini.extractUsage({})).toBeNull();
+  });
+
+  it("grok returns null when usage is missing", () => {
+    expect(PROVIDERS.grok.extractUsage({})).toBeNull();
+  });
+
+  it("claude returns null when usage is missing", () => {
+    expect(PROVIDERS.claude.extractUsage({})).toBeNull();
+  });
+
+  it("grok extracts usage from OpenAI-compatible format", () => {
+    const data = { usage: { prompt_tokens: 50, completion_tokens: 100, total_tokens: 150 } };
+    const usage = PROVIDERS.grok.extractUsage(data);
+    expect(usage.promptTokens).toBe(50);
+    expect(usage.completionTokens).toBe(100);
+    expect(usage.totalTokens).toBe(150);
+  });
+
+  it("claude handles zero token counts", () => {
+    const data = { usage: { input_tokens: 0, output_tokens: 0 } };
+    const usage = PROVIDERS.claude.extractUsage(data);
+    expect(usage.totalTokens).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// runAudit — synthesis generation
+// ---------------------------------------------------------------------------
+describe("runAudit — synthesis generation", () => {
+  let mockEnv;
+  let kvStore;
+
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    kvStore = {};
+    mockEnv = {
+      OPENAI_API_KEY: "sk-test",
+      GEMINI_API_KEY: "gem-test",
+      GROK_API_KEY: "xai-test",
+      ANTHROPIC_API_KEY: "sk-ant-test",
+      ADMIN_SECRET: "secret",
+      ELECTION_DATA: {
+        get: vi.fn((key) => Promise.resolve(kvStore[key] || null)),
+        put: vi.fn((key, value) => {
+          kvStore[key] = value;
+          return Promise.resolve();
+        }),
+      },
+    };
+  });
+
+  it("generates synthesis report when 2+ providers succeed", async () => {
+    // Mock both chatgpt and gemini to succeed, then claude for synthesis
+    let fetchCallCount = 0;
+    const mockFetch = vi.fn(() => {
+      fetchCallCount++;
+      if (fetchCallCount <= 2) {
+        // Provider audit calls (chatgpt and gemini)
+        return Promise.resolve({
+          status: 200,
+          json: () => Promise.resolve({
+            choices: [{ message: { content: '```json\n{"overallScore":8,"dimensions":{"partisanBias":8,"factualAccuracy":7,"fairnessOfFraming":8,"balanceOfProsCons":7,"transparency":9},"topStrength":"Good","topWeakness":"Bad"}\n```' } }],
+            usage: { prompt_tokens: 10, completion_tokens: 20, total_tokens: 30 },
+          }),
+        });
+      }
+      // Synthesis call via Anthropic
+      return Promise.resolve({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({
+          content: [{ type: "text", text: "# Synthesis Report\n\nAll providers agree..." }],
+        }),
+      });
+    });
+    vi.stubGlobal("fetch", mockFetch);
+
+    const result = await runAudit(mockEnv, {
+      providers: ["chatgpt", "grok"],
+      force: true,
+      exportData: { test: true },
+    });
+
+    expect(result.success).toBe(true);
+    // With 2 successful results and ANTHROPIC_API_KEY present, synthesis should be attempted
+    expect(mockFetch.mock.calls.length).toBeGreaterThanOrEqual(2);
+  }, 30000);
+
+  it("skips synthesis when fewer than 2 providers succeed", async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      status: 200,
+      json: () => Promise.resolve({
+        choices: [{ message: { content: '```json\n{"overallScore":8,"dimensions":{"partisanBias":8},"topStrength":"Good","topWeakness":"Bad"}\n```' } }],
+      }),
+    });
+    vi.stubGlobal("fetch", mockFetch);
+
+    const result = await runAudit(mockEnv, {
+      providers: ["chatgpt"],
+      force: true,
+      exportData: { test: true },
+    });
+
+    expect(result.success).toBe(true);
+    // Only 1 provider, so synthesis call should not happen
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+  });
+
+  it("computes average score across successful providers", async () => {
+    let callIdx = 0;
+    const mockFetch = vi.fn(() => {
+      callIdx++;
+      const score = callIdx === 1 ? 7 : 9;
+      return Promise.resolve({
+        status: 200,
+        json: () => Promise.resolve({
+          choices: [{ message: { content: `\`\`\`json\n{"overallScore":${score},"dimensions":{"partisanBias":${score}},"topStrength":"OK","topWeakness":"OK"}\n\`\`\`` } }],
+        }),
+      });
+    });
+    vi.stubGlobal("fetch", mockFetch);
+
+    const result = await runAudit(mockEnv, {
+      providers: ["chatgpt", "grok"],
+      force: true,
+      exportData: { test: true },
+    });
+
+    const summary = JSON.parse(kvStore["audit:summary"]);
+    expect(summary.averageScore).toBe(8.0);
+  }, 30000);
+
+  it("writes daily log with correct date key", async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      status: 200,
+      json: () => Promise.resolve({
+        choices: [{ message: { content: '```json\n{"overallScore":7,"dimensions":{"partisanBias":7},"topStrength":"OK","topWeakness":"OK"}\n```' } }],
+      }),
+    });
+    vi.stubGlobal("fetch", mockFetch);
+
+    await runAudit(mockEnv, {
+      providers: ["chatgpt"],
+      force: true,
+      exportData: { test: true },
+    });
+
+    const putCalls = mockEnv.ELECTION_DATA.put.mock.calls.map((c) => c[0]);
+    const logKey = putCalls.find((k) => k.startsWith("audit:log:"));
+    expect(logKey).toBeDefined();
+    expect(logKey).toMatch(/^audit:log:\d{4}-\d{2}-\d{2}$/);
+  });
+
+  it("stores parse_failed status when score parsing fails", async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      status: 200,
+      json: () => Promise.resolve({
+        choices: [{ message: { content: "I cannot provide a structured audit at this time." } }],
+      }),
+    });
+    vi.stubGlobal("fetch", mockFetch);
+
+    const result = await runAudit(mockEnv, {
+      providers: ["chatgpt"],
+      force: true,
+      exportData: { test: true },
+    });
+
+    expect(result.results.chatgpt.status).toBe("parse_failed");
+    expect(result.results.chatgpt.parseError).toBeTruthy();
+    expect(result.results.chatgpt.scores).toBeNull();
   });
 });

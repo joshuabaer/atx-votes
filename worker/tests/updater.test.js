@@ -1287,3 +1287,185 @@ describe("source validation in updates", () => {
     vi.useRealTimers();
   });
 });
+
+// ---------------------------------------------------------------------------
+// validateRaceUpdate — direct unit tests
+// ---------------------------------------------------------------------------
+describe("validateRaceUpdate", () => {
+  it("returns null for matching races", () => {
+    const original = {
+      candidates: [
+        { name: "Alice", summary: "Test", endorsements: ["A"] },
+        { name: "Bob", summary: "Test", endorsements: ["B"] },
+      ],
+    };
+    const updated = {
+      candidates: [
+        { name: "Alice", summary: "Test updated", endorsements: ["A", "C"] },
+        { name: "Bob", summary: "Test", endorsements: ["B"] },
+      ],
+    };
+    expect(validateRaceUpdate(original, updated)).toBeNull();
+  });
+
+  it("returns error when original is null", () => {
+    expect(validateRaceUpdate(null, { candidates: [] })).toBe("missing race data");
+  });
+
+  it("returns error when updated is null", () => {
+    expect(validateRaceUpdate({ candidates: [] }, null)).toBe("missing race data");
+  });
+
+  it("returns error when candidate count changes", () => {
+    const original = {
+      candidates: [{ name: "Alice" }, { name: "Bob" }],
+    };
+    const updated = {
+      candidates: [{ name: "Alice" }],
+    };
+    const err = validateRaceUpdate(original, updated);
+    expect(err).toContain("candidate count changed");
+    expect(err).toContain("2");
+    expect(err).toContain("1");
+  });
+
+  it("returns error when candidate names change", () => {
+    const original = {
+      candidates: [{ name: "Alice" }, { name: "Bob" }],
+    };
+    const updated = {
+      candidates: [{ name: "Alice" }, { name: "Charlie" }],
+    };
+    const err = validateRaceUpdate(original, updated);
+    expect(err).toContain("candidate names changed");
+  });
+
+  it("returns error when endorsements shrink by more than 50%", () => {
+    const original = {
+      candidates: [
+        { name: "Alice", endorsements: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"] },
+      ],
+    };
+    const updated = {
+      candidates: [
+        { name: "Alice", endorsements: ["A", "B", "C"] },
+      ],
+    };
+    const err = validateRaceUpdate(original, updated);
+    expect(err).toContain("endorsements shrank");
+    expect(err).toContain("50%");
+  });
+
+  it("allows endorsements to shrink by less than 50%", () => {
+    const original = {
+      candidates: [
+        { name: "Alice", endorsements: ["A", "B", "C", "D"] },
+      ],
+    };
+    const updated = {
+      candidates: [
+        { name: "Alice", endorsements: ["A", "B", "C"] },
+      ],
+    };
+    expect(validateRaceUpdate(original, updated)).toBeNull();
+  });
+
+  it("skips endorsement check when original has no endorsements", () => {
+    const original = {
+      candidates: [{ name: "Alice", endorsements: [] }],
+    };
+    const updated = {
+      candidates: [{ name: "Alice", endorsements: ["New"] }],
+    };
+    expect(validateRaceUpdate(original, updated)).toBeNull();
+  });
+
+  it("skips endorsement check when updated has no endorsements", () => {
+    const original = {
+      candidates: [{ name: "Alice", endorsements: ["A", "B"] }],
+    };
+    const updated = {
+      candidates: [{ name: "Alice", endorsements: [] }],
+    };
+    // Empty endorsements = falsy length, so optional chaining skips the check
+    expect(validateRaceUpdate(original, updated)).toBeNull();
+  });
+
+  it("returns error for empty candidate name", () => {
+    const original = { candidates: [{ name: "Alice" }] };
+    const updated = { candidates: [{ name: "" }] };
+    // Name mismatch detected first
+    const err = validateRaceUpdate(original, updated);
+    expect(err).toBeTruthy();
+  });
+
+  it("returns error for empty summary in updated candidate", () => {
+    const original = { candidates: [{ name: "Alice", summary: "Test" }] };
+    const updated = { candidates: [{ name: "Alice", summary: "" }] };
+    const err = validateRaceUpdate(original, updated);
+    expect(err).toContain("empty summary");
+  });
+
+  it("validates source URLs when present", () => {
+    const original = { candidates: [{ name: "Alice" }] };
+    const updated = {
+      candidates: [
+        {
+          name: "Alice",
+          summary: "Test",
+          sources: [{ url: "not-a-url", title: "Bad" }],
+        },
+      ],
+    };
+    const err = validateRaceUpdate(original, updated);
+    expect(err).toContain("malformed URL");
+  });
+
+  it("accepts valid source URLs", () => {
+    const original = { candidates: [{ name: "Alice" }] };
+    const updated = {
+      candidates: [
+        {
+          name: "Alice",
+          summary: "Test",
+          sources: [
+            { url: "https://texastribune.org/article", title: "Good" },
+            { url: "https://ballotpedia.org/test", title: "Also Good" },
+          ],
+        },
+      ],
+    };
+    expect(validateRaceUpdate(original, updated)).toBeNull();
+  });
+
+  it("returns error for source with missing URL", () => {
+    const original = { candidates: [{ name: "Alice" }] };
+    const updated = {
+      candidates: [
+        {
+          name: "Alice",
+          summary: "Test",
+          sources: [{ url: "", title: "No URL" }],
+        },
+      ],
+    };
+    const err = validateRaceUpdate(original, updated);
+    expect(err).toContain("invalid URL");
+  });
+
+  it("allows candidates without sources field", () => {
+    const original = { candidates: [{ name: "Alice" }] };
+    const updated = { candidates: [{ name: "Alice", summary: "Test" }] };
+    expect(validateRaceUpdate(original, updated)).toBeNull();
+  });
+
+  it("handles unsorted candidate names (compares sorted)", () => {
+    const original = {
+      candidates: [{ name: "Bob" }, { name: "Alice" }],
+    };
+    const updated = {
+      candidates: [{ name: "Alice", summary: "Test" }, { name: "Bob", summary: "Test" }],
+    };
+    expect(validateRaceUpdate(original, updated)).toBeNull();
+  });
+});
