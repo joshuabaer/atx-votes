@@ -16,6 +16,7 @@
 - [ ] Make easter egg emoji bursts bigger — double the size of the emojis that fly up when triggering the cowboy ("yeehaw") and Swedish Chef ("bork") easter eggs
 - [ ] Make "I Voted" animation look like fireworks — replace the current emoji burst with a fireworks-style animation when the user taps "I Voted"
 - [ ] Sample ballot on home page — "Show me a sample" button that instantly displays a pre-generated example ballot, clearly watermarked as a sample, skipping the full interview. Very fast first impression for new visitors. Should look like the real PWA ballot with R/D party switcher, fully filled out race cards, match percentages, and expandable candidate details.
+- [ ] Integrate DeepSeek model — add as another LLM option like Claude/GPT/Gemini/Grok for guide generation, vanity URL, audit provider. Must include a prominent persistent warning banner: "This is a Chinese open-source model, available for research/comparison purposes only. No personal information is shared with China — all processing runs through US-hosted API infrastructure."
 - [ ] Create new txvotes repo in GitHub — fresh copy of the code without all the dev history
 
 ### Audit Score Improvements
