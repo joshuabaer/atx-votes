@@ -228,6 +228,19 @@ var CSS = [
   ".sort-divider{text-align:center;font-size:12px;color:var(--text2);padding:6px 0;margin:4px 0;border-top:1.5px dashed var(--border2);letter-spacing:.3px}",
   ".sort-item-low{opacity:.55}",
   "@media(prefers-color-scheme:dark){.sort-item .rank-low{background:var(--fill3);color:var(--text2)}}",
+  ".slot-empty{display:flex;align-items:center;gap:8px;padding:10px 12px;margin-bottom:4px;border-radius:var(--rs);border:2px dashed var(--border2);background:transparent;font-size:14px;color:var(--text2);min-height:48px;cursor:default;transition:background .15s}",
+  ".slot-empty .rank{min-width:24px;height:24px;border-radius:50%;background:var(--border2);color:var(--text2);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}",
+  ".slot-filled{cursor:pointer}",
+  ".slot-filled:active{opacity:.8}",
+  ".pool-zone{margin-top:4px}",
+  ".pool-item{display:flex;align-items:center;gap:8px;padding:10px 12px;margin-bottom:4px;border-radius:var(--rs);border:1.5px solid var(--border2);background:var(--fill3);font-size:15px;cursor:pointer;user-select:none;transition:transform .1s,opacity .15s}",
+  ".pool-item:active{transform:scale(.97);opacity:.85}",
+  ".pool-item .pool-icon{font-size:16px;flex-shrink:0}",
+  ".pool-item .pool-label{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}",
+  ".pool-item .pool-add{color:var(--blue);font-size:18px;font-weight:700;flex-shrink:0;margin-left:auto}",
+  ".zone-label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);margin:12px 0 6px;padding:0 4px}",
+  ".zone-label:first-child{margin-top:0}",
+  ".pick-hint{text-align:center;font-size:13px;color:var(--text2);padding:8px 0}",
 
   // Radio options
   ".radio{padding:14px 16px;border-radius:var(--rs);border:1.5px solid var(--border2);background:var(--fill3);cursor:pointer;transition:all .15s;margin-bottom:10px}",
@@ -600,6 +613,19 @@ var APP_JS = [
     "'Drag to reorder or use arrows. #1 = most important.':'Arrastra para reordenar o usa las flechas. #1 = m\\u00E1s importante.'," +
     "'your top priorities are above this line':'tus principales prioridades est\\u00E1n arriba de esta l\\u00EDnea'," +
     "'Rank the qualities you value in a candidate':'Ordena las cualidades que valoras en un candidato'," +
+    "'Pick your top 5 issues':'Elige tus 5 temas principales'," +
+    "'Tap an issue below to add it to your priorities.':'Toca un tema abajo para a\\u00F1adirlo a tus prioridades.'," +
+    "'Your Top Priorities':'Tus Principales Prioridades'," +
+    "'All Issues':'Todos los Temas'," +
+    "'Tap to add':'Toca para a\\u00F1adir'," +
+    "'Select your top 5 to continue':'Selecciona tus 5 principales para continuar'," +
+    "'Pick your top 3 qualities':'Elige tus 3 cualidades principales'," +
+    "'Tap a quality below to add it.':'Toca una cualidad abajo para a\\u00F1adirla.'," +
+    "'Your Top Qualities':'Tus Principales Cualidades'," +
+    "'All Qualities':'Todas las Cualidades'," +
+    "'Select your top 3 to continue':'Selecciona tus 3 principales para continuar'," +
+    "'Remaining issues below':'Temas restantes abajo'," +
+    "'Remaining qualities below':'Cualidades restantes abajo'," +
     "'Top Issues (ranked)':'Temas principales (por prioridad)'," +
     "'Candidate Qualities (ranked)':'Cualidades del candidato (por prioridad)'," +
     "'Continue':'Continuar'," +
@@ -1263,7 +1289,7 @@ var APP_JS = [
 
   // ============ STATE ============
   "var S={" +
-    "phase:0,issues:[],spectrum:null,policyViews:{},qualities:[],freeform:''," +
+    "phase:0,issues:[],_pickedIssues:0,spectrum:null,policyViews:{},qualities:[],_pickedQuals:0,freeform:''," +
     "address:{street:'',city:'',state:'TX',zip:''}," +
     "ddIndex:0,ddQuestions:[]," +
     "countyInfo:null," +
@@ -1409,7 +1435,9 @@ var APP_JS = [
     "if(p){p=JSON.parse(p);S.issues=p.topIssues||[];S.spectrum=p.politicalSpectrum||null;" +
     "S.policyViews=p.policyViews||{};S.qualities=p.candidateQualities||[];S.freeform=p.freeform||'';" +
     "var allIV=ISSUES.map(function(x){return x.v});if(S.issues.length>0&&S.issues.length<allIV.length){S.issues=S.issues.concat(allIV.filter(function(v){return S.issues.indexOf(v)===-1}))}" +
+    "if(S.issues.length>0)S._pickedIssues=Math.min(5,S.issues.length);" +
     "if(S.qualities.length>0&&S.qualities.length<QUALITIES.length){S.qualities=S.qualities.concat(QUALITIES.filter(function(v){return S.qualities.indexOf(v)===-1}))}" +
+    "if(S.qualities.length>0)S._pickedQuals=Math.min(3,S.qualities.length);" +
     "S.address=p.address||{street:'',city:'',state:'TX',zip:''};" +
     "S.summary=p.summaryText||null;S.districts=p.districts||null;" +
     "S.readingLevel=p.readingLevel||1}" +
@@ -1547,31 +1575,48 @@ var APP_JS = [
     "return h;" +
   "}",
 
-  // Issues (sortable priority list)
+  // Issues (two-zone pick-your-top-5)
   "function renderIssues(){" +
     "if(S.issues.length<ISSUES.length){" +
       "var existing=S.issues.slice();" +
       "var rest=shuffle(ISSUES.filter(function(x){return existing.indexOf(x.v)===-1})).map(function(x){return x.v});" +
       "S.issues=existing.concat(rest)" +
     "}" +
-    "var h='<div class=\"phase-header\"><h2>'+t('Rank your issues by priority')+'</h2><p>'+t('Drag to reorder or use arrows. #1 = most important.')+'</p></div>';" +
+    "var n=S._pickedIssues||0;" +
+    "var h='<div class=\"phase-header\"><h2>'+t('Pick your top 5 issues')+'</h2><p>'+t('Tap an issue below to add it to your priorities.')+'</p></div>';" +
+    "h+='<div class=\"zone-label\">'+t('Your Top Priorities')+'</div>';" +
     "h+='<div id=\"sort-issues\" class=\"sort-list\">';" +
-    "for(var i=0;i<S.issues.length;i++){" +
-      "var issue=ISSUES.find(function(x){return x.v===S.issues[i]});" +
-      "var icon=issue?issue.icon:'';" +
-      "var isLow=i>=5;" +
-      "if(i===5)h+='<div class=\"sort-divider\">&mdash; '+t('your top priorities are above this line')+' &mdash;</div>';" +
-      "h+='<div class=\"sort-item'+(isLow?' sort-item-low':'')+'\" data-index=\"'+i+'\" role=\"listitem\" aria-label=\"'+(i+1)+'. '+esc(S.issues[i])+'\">'+" +
-        "'<span class=\"drag-handle\" aria-hidden=\"true\">&#9776;</span>'+" +
-        "'<span class=\"rank'+(isLow?' rank-low':'')+'\">'+(i+1)+'</span>'+" +
-        "'<span class=\"sort-label\">'+icon+' '+t(S.issues[i])+'</span>'+" +
-        "'<span class=\"sort-arrows\">'+" +
-        "'<button data-action=\"sort-up\" data-key=\"issues\" data-idx=\"'+i+'\" aria-label=\"Move up\"'+(i===0?' disabled':'')+'>&blacktriangle;</button>'+" +
-        "'<button data-action=\"sort-down\" data-key=\"issues\" data-idx=\"'+i+'\" aria-label=\"Move down\"'+(i===S.issues.length-1?' disabled':'')+'>&blacktriangledown;</button>'+" +
-        "'</span></div>'" +
+    "for(var i=0;i<5;i++){" +
+      "if(i<n){" +
+        "var issue=ISSUES.find(function(x){return x.v===S.issues[i]});" +
+        "var icon=issue?issue.icon:'';" +
+        "h+='<div class=\"sort-item slot-filled\" data-action=\"unpick-issue\" data-idx=\"'+i+'\" data-index=\"'+i+'\" role=\"listitem\" aria-label=\"'+(i+1)+'. '+esc(S.issues[i])+'\">'+" +
+          "'<span class=\"drag-handle\" aria-hidden=\"true\">&#9776;</span>'+" +
+          "'<span class=\"rank\">'+(i+1)+'</span>'+" +
+          "'<span class=\"sort-label\">'+icon+' '+t(S.issues[i])+'</span>'+" +
+          "'<span class=\"sort-arrows\">'+" +
+          "'<button data-action=\"sort-up\" data-key=\"issues\" data-idx=\"'+i+'\" aria-label=\"Move up\"'+(i===0?' disabled':'')+'>&blacktriangle;</button>'+" +
+          "'<button data-action=\"sort-down\" data-key=\"issues\" data-idx=\"'+i+'\" aria-label=\"Move down\"'+(i>=n-1?' disabled':'')+'>&blacktriangledown;</button>'+" +
+          "'</span></div>'" +
+      "}else{" +
+        "h+='<div class=\"slot-empty\"><span class=\"rank\">'+(i+1)+'</span><span>'+t('Tap to add')+'</span></div>'" +
+      "}" +
     "}" +
     "h+='</div>';" +
-    "h+='<button class=\"btn btn-primary mt-md\" data-action=\"next\">'+t('Continue')+'</button>';" +
+    "h+='<div class=\"sort-divider\">&mdash; '+t('Remaining issues below')+' &mdash;</div>';" +
+    "h+='<div class=\"pool-zone\">';" +
+    "for(var i=n;i<S.issues.length;i++){" +
+      "var issue=ISSUES.find(function(x){return x.v===S.issues[i]});" +
+      "var icon=issue?issue.icon:'';" +
+      "h+='<div class=\"pool-item\" data-action=\"pick-issue\" data-idx=\"'+i+'\">'+" +
+        "'<span class=\"pool-icon\">'+icon+'</span>'+" +
+        "'<span class=\"pool-label\">'+t(S.issues[i])+'</span>'+" +
+        "'<span class=\"pool-add\">+</span>'+" +
+        "'</div>'" +
+    "}" +
+    "h+='</div>';" +
+    "if(n<5){h+='<p class=\"pick-hint\">'+t('Select your top 5 to continue')+'</p>'}" +
+    "h+='<button class=\"btn btn-primary mt-md\" data-action=\"next\"'+(n<5?' disabled':'')+'>'+t('Continue')+'</button>';" +
     "return h;" +
   "}",
 
@@ -1605,31 +1650,48 @@ var APP_JS = [
     "return h;" +
   "}",
 
-  // Qualities (sortable priority list)
+  // Qualities (two-zone pick-your-top-3)
   "function renderQualities(){" +
     "if(S.qualities.length<QUALITIES.length){" +
       "var existing=S.qualities.slice();" +
       "var rest=shuffle(QUALITIES.filter(function(x){return existing.indexOf(x)===-1}));" +
       "S.qualities=existing.concat(rest)" +
     "}" +
-    "var h='<div class=\"phase-header\"><h2>'+t('Rank the qualities you value in a candidate')+'</h2><p>'+t('Drag to reorder or use arrows. #1 = most important.')+'</p></div>';" +
+    "var n=S._pickedQuals||0;" +
+    "var h='<div class=\"phase-header\"><h2>'+t('Pick your top 3 qualities')+'</h2><p>'+t('Tap a quality below to add it.')+'</p></div>';" +
+    "h+='<div class=\"zone-label\">'+t('Your Top Qualities')+'</div>';" +
     "h+='<div id=\"sort-qualities\" class=\"sort-list\">';" +
-    "for(var i=0;i<S.qualities.length;i++){" +
-      "var q=S.qualities[i];" +
-      "var icon=QUAL_ICONS[q]||'';" +
-      "var isLow=i>=3;" +
-      "if(i===3)h+='<div class=\"sort-divider\">&mdash; '+t('your top priorities are above this line')+' &mdash;</div>';" +
-      "h+='<div class=\"sort-item'+(isLow?' sort-item-low':'')+'\" data-index=\"'+i+'\" role=\"listitem\" aria-label=\"'+(i+1)+'. '+esc(q)+'\">'+" +
-        "'<span class=\"drag-handle\" aria-hidden=\"true\">&#9776;</span>'+" +
-        "'<span class=\"rank'+(isLow?' rank-low':'')+'\">'+(i+1)+'</span>'+" +
-        "'<span class=\"sort-label\">'+icon+' '+t(q)+'</span>'+" +
-        "'<span class=\"sort-arrows\">'+" +
-        "'<button data-action=\"sort-up\" data-key=\"qualities\" data-idx=\"'+i+'\" aria-label=\"Move up\"'+(i===0?' disabled':'')+'>&blacktriangle;</button>'+" +
-        "'<button data-action=\"sort-down\" data-key=\"qualities\" data-idx=\"'+i+'\" aria-label=\"Move down\"'+(i===S.qualities.length-1?' disabled':'')+'>&blacktriangledown;</button>'+" +
-        "'</span></div>'" +
+    "for(var i=0;i<3;i++){" +
+      "if(i<n){" +
+        "var q=S.qualities[i];" +
+        "var icon=QUAL_ICONS[q]||'';" +
+        "h+='<div class=\"sort-item slot-filled\" data-action=\"unpick-quality\" data-idx=\"'+i+'\" data-index=\"'+i+'\" role=\"listitem\" aria-label=\"'+(i+1)+'. '+esc(q)+'\">'+" +
+          "'<span class=\"drag-handle\" aria-hidden=\"true\">&#9776;</span>'+" +
+          "'<span class=\"rank\">'+(i+1)+'</span>'+" +
+          "'<span class=\"sort-label\">'+icon+' '+t(q)+'</span>'+" +
+          "'<span class=\"sort-arrows\">'+" +
+          "'<button data-action=\"sort-up\" data-key=\"qualities\" data-idx=\"'+i+'\" aria-label=\"Move up\"'+(i===0?' disabled':'')+'>&blacktriangle;</button>'+" +
+          "'<button data-action=\"sort-down\" data-key=\"qualities\" data-idx=\"'+i+'\" aria-label=\"Move down\"'+(i>=n-1?' disabled':'')+'>&blacktriangledown;</button>'+" +
+          "'</span></div>'" +
+      "}else{" +
+        "h+='<div class=\"slot-empty\"><span class=\"rank\">'+(i+1)+'</span><span>'+t('Tap to add')+'</span></div>'" +
+      "}" +
     "}" +
     "h+='</div>';" +
-    "h+='<button class=\"btn btn-primary mt-md\" data-action=\"next\">'+t('Continue')+'</button>';" +
+    "h+='<div class=\"sort-divider\">&mdash; '+t('Remaining qualities below')+' &mdash;</div>';" +
+    "h+='<div class=\"pool-zone\">';" +
+    "for(var i=n;i<S.qualities.length;i++){" +
+      "var q=S.qualities[i];" +
+      "var icon=QUAL_ICONS[q]||'';" +
+      "h+='<div class=\"pool-item\" data-action=\"pick-quality\" data-idx=\"'+i+'\">'+" +
+        "'<span class=\"pool-icon\">'+icon+'</span>'+" +
+        "'<span class=\"pool-label\">'+t(q)+'</span>'+" +
+        "'<span class=\"pool-add\">+</span>'+" +
+        "'</div>'" +
+    "}" +
+    "h+='</div>';" +
+    "if(n<3){h+='<p class=\"pick-hint\">'+t('Select your top 3 to continue')+'</p>'}" +
+    "h+='<button class=\"btn btn-primary mt-md\" data-action=\"next\"'+(n<3?' disabled':'')+'>'+t('Continue')+'</button>';" +
     "return h;" +
   "}",
 
@@ -2070,7 +2132,7 @@ var APP_JS = [
         "if(c.keyPositions&&c.keyPositions.length){h+='<div class=\"cand-section\"><h5>'+t('Key Positions')+'</h5><div class=\"pos-chips\">';for(var j=0;j<c.keyPositions.length;j++)h+='<span class=\"pos-chip\">'+esc(c.keyPositions[j])+'</span>';h+='</div></div>'}" +
         "if(c.pros&&c.pros.length){h+='<div class=\"cand-section pros\"><h5>\u2705 '+t('Strengths')+'</h5><ul>';for(var j=0;j<c.pros.length;j++)h+='<li>'+esc(tp(c.pros[j]))+'</li>';h+='</ul></div>'}" +
         "if(c.cons&&c.cons.length){h+='<div class=\"cand-section cons\"><h5>\u26A0\u{FE0F} '+t('Concerns')+'</h5><ul>';for(var j=0;j<c.cons.length;j++)h+='<li>'+esc(tp(c.cons[j]))+'</li>';h+='</ul></div>'}" +
-        "if(c.endorsements&&c.endorsements.length){h+='<div class=\"cand-section\"><h5>'+t('Endorsements')+'</h5><ul>';for(var j=0;j<c.endorsements.length;j++)h+='<li>'+esc(c.endorsements[j])+'</li>';h+='</ul></div>'}" +
+        "if(c.endorsements&&c.endorsements.length){h+='<div class=\"cand-section\"><h5>'+t('Endorsements')+'</h5><ul>';for(var j=0;j<c.endorsements.length;j++){var en=c.endorsements[j];var eName=typeof en==='string'?en:(en.name||'');var eType=typeof en==='object'&&en.type?' <span style=\"color:var(--text2);font-size:0.85em\">('+esc(en.type)+')</span>':'';h+='<li>'+esc(eName)+eType+'</li>';}h+='</ul></div>'}" +
         "if(c.fundraising){h+='<div class=\"cand-section\"><h5>'+t('Fundraising')+'</h5><p>'+esc(c.fundraising)+'</p></div>'}" +
         "if(c.polling){h+='<div class=\"cand-section\"><h5>'+t('Polling')+'</h5><p>'+esc(c.polling)+'</p></div>'}" +
         "h+='</div>'" +
@@ -2597,7 +2659,24 @@ var APP_JS = [
     "}" +
     "else if(action==='sort-down'){" +
       "var key=el.dataset.key;var idx=parseInt(el.dataset.idx);" +
-      "if(idx<S[key].length-1){var tmp=S[key][idx+1];S[key][idx+1]=S[key][idx];S[key][idx]=tmp;render()}" +
+      "var maxIdx=key==='issues'?(S._pickedIssues||0)-1:key==='qualities'?(S._pickedQuals||0)-1:S[key].length-1;" +
+      "if(idx<maxIdx){var tmp=S[key][idx+1];S[key][idx+1]=S[key][idx];S[key][idx]=tmp;render()}" +
+    "}" +
+    "else if(action==='pick-issue'){" +
+      "var idx=parseInt(el.dataset.idx);var n=S._pickedIssues||0;" +
+      "if(n<5){var item=S.issues.splice(idx,1)[0];S.issues.splice(n,0,item);S._pickedIssues=n+1;render()}" +
+    "}" +
+    "else if(action==='unpick-issue'){" +
+      "var idx=parseInt(el.dataset.idx);var n=S._pickedIssues||0;" +
+      "if(idx<n){var item=S.issues.splice(idx,1)[0];S.issues.splice(n-1,0,item);S._pickedIssues=n-1;render()}" +
+    "}" +
+    "else if(action==='pick-quality'){" +
+      "var idx=parseInt(el.dataset.idx);var n=S._pickedQuals||0;" +
+      "if(n<3){var item=S.qualities.splice(idx,1)[0];S.qualities.splice(n,0,item);S._pickedQuals=n+1;render()}" +
+    "}" +
+    "else if(action==='unpick-quality'){" +
+      "var idx=parseInt(el.dataset.idx);var n=S._pickedQuals||0;" +
+      "if(idx<n){var item=S.qualities.splice(idx,1)[0];S.qualities.splice(n-1,0,item);S._pickedQuals=n-1;render()}" +
     "}" +
     "else if(action==='chef-tap'){chefTaps++;if(chefTaps===5)render()}" +
     "else if(action==='chef-tap-profile'){" +
@@ -2631,7 +2710,7 @@ var APP_JS = [
     "else if(action==='nav'){location.hash=el.dataset.to}" +
     "else if(action==='reset'){" +
       "if(confirm(t('Start over? This will erase your profile and recommendations.'))){" +
-        "S.phase=0;S.issues=[];S.spectrum=null;S.policyViews={};S.qualities=[];S.freeform='';S.readingLevel=1;" +
+        "S.phase=0;S.issues=[];S._pickedIssues=0;S.spectrum=null;S.policyViews={};S.qualities=[];S._pickedQuals=0;S.freeform='';S.readingLevel=1;" +
         "S.address={street:'',city:'',state:'TX',zip:''};S.ddIndex=0;S.ddQuestions=[];S.countyInfo=null;S.countyBallotAvailable=null;" +
         "S.repBallot=null;S.demBallot=null;S.selectedParty='republican';" +
         "S.guideComplete=false;S.summary=null;S.districts=null;S.expanded={};S.addressError=null;S.verifyingAddress=false;" +

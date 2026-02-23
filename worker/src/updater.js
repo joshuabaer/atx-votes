@@ -2,6 +2,65 @@
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+/**
+ * Extracts source URLs from Claude API response content blocks.
+ * Collects from both web_search_tool_result blocks and citations on text blocks.
+ * Returns an array of { url, title, accessDate } objects, deduplicated by URL.
+ */
+export function extractSourcesFromResponse(contentBlocks) {
+  const seen = new Set();
+  const sources = [];
+  const today = new Date().toISOString().slice(0, 10);
+
+  for (const block of contentBlocks || []) {
+    // Extract from web_search_tool_result blocks
+    if (block.type === "web_search_tool_result" && Array.isArray(block.content)) {
+      for (const item of block.content) {
+        if (item.type === "web_search_result" && item.url && !seen.has(item.url)) {
+          seen.add(item.url);
+          sources.push({
+            url: item.url,
+            title: item.title || item.url,
+            accessDate: today,
+          });
+        }
+      }
+    }
+    // Extract citations from text blocks
+    if (block.type === "text" && Array.isArray(block.citations)) {
+      for (const cite of block.citations) {
+        if (cite.url && !seen.has(cite.url)) {
+          seen.add(cite.url);
+          sources.push({
+            url: cite.url,
+            title: cite.title || cite.url,
+            accessDate: today,
+          });
+        }
+      }
+    }
+  }
+
+  return sources;
+}
+
+/**
+ * Merges new sources into existing sources array, deduplicating by URL.
+ * Limits to max 20 sources per candidate.
+ */
+export function mergeSources(existing, incoming) {
+  if (!incoming || !incoming.length) return existing || [];
+  const merged = [...(existing || [])];
+  const seen = new Set(merged.map((s) => s.url));
+  for (const src of incoming) {
+    if (src.url && !seen.has(src.url)) {
+      seen.add(src.url);
+      merged.push(src);
+    }
+  }
+  return merged.slice(0, 20);
+}
+
 const PARTIES = ["republican", "democrat"];
 const BALLOT_KEYS = {
   republican: "ballot:statewide:republican_primary_2026",
@@ -139,7 +198,7 @@ async function researchRace(race, party, env) {
       if (c.polling) parts.push(`Polling: ${c.polling}`);
       if (c.fundraising) parts.push(`Fundraising: ${c.fundraising}`);
       if (c.endorsements?.length)
-        parts.push(`Endorsements: ${c.endorsements.join("; ")}`);
+        parts.push(`Endorsements: ${c.endorsements.map(e => typeof e === "string" ? e : (e.type ? `${e.name} (${e.type})` : e.name)).join("; ")}`);
       if (c.keyPositions?.length)
         parts.push(`Key positions: ${c.keyPositions.join("; ")}`);
       return parts.join("\n    ");
@@ -175,7 +234,8 @@ Return a JSON object with this exact structure (use null for any field with no u
       "pros": ["full updated list"] or null,
       "cons": ["full updated list"] or null,
       "summary": "updated summary or null",
-      "background": "updated background or null"
+      "background": "updated background or null",
+      "sources": [{"url": "https://...", "title": "Article title"}] or null
     }
   ]
 }
@@ -185,7 +245,8 @@ IMPORTANT:
 - Use null for any field where you found no new information
 - Candidate names must match exactly as provided
 - For endorsements, keyPositions, pros, and cons: return the FULL updated list (existing + new), not just additions
-- Only update fields where you found verifiable new information`;
+- Only update fields where you found verifiable new information
+- For sources: include URLs of articles and official pages you referenced for THIS candidate`;
 
   const body = {
     model: "claude-sonnet-4-20250514",
@@ -227,6 +288,9 @@ IMPORTANT:
     throw new Error("Claude API returned 429 after 3 retries");
   }
 
+  // Extract source URLs from raw API response before filtering to text blocks
+  const apiSources = extractSourcesFromResponse(result.content);
+
   // Extract text from response content blocks — web_search responses have
   // multiple text blocks interspersed with search results. Concatenate all
   // text blocks, then extract the JSON object.
@@ -252,7 +316,12 @@ IMPORTANT:
   }
 
   try {
-    return JSON.parse(cleaned);
+    const parsed = JSON.parse(cleaned);
+    // Attach API-level sources as fallback for candidates that don't have their own
+    if (parsed.candidates && apiSources.length > 0) {
+      parsed._apiSources = apiSources;
+    }
+    return parsed;
   } catch {
     throw new Error(
       `Failed to parse Claude response as JSON (${cleaned.slice(0, 100)}...)`
@@ -268,6 +337,9 @@ function mergeRaceUpdates(race, updates) {
   const merged = JSON.parse(JSON.stringify(race)); // deep copy
 
   if (!updates?.candidates) return merged;
+
+  // API-level sources (from web_search_tool_result blocks) — fallback for all candidates
+  const apiSources = updates._apiSources || [];
 
   for (const update of updates.candidates) {
     const candidate = merged.candidates.find((c) => c.name === update.name);
@@ -293,6 +365,19 @@ function mergeRaceUpdates(race, updates) {
           continue;
         candidate[field] = update[field];
       }
+    }
+
+    // Merge sources: combine candidate-level sources from Claude's JSON with API-level sources
+    const candidateSources = Array.isArray(update.sources) ? update.sources : [];
+    const today = new Date().toISOString().slice(0, 10);
+    const normalizedCandSources = candidateSources
+      .filter((s) => s && s.url)
+      .map((s) => ({ url: s.url, title: s.title || s.url, accessDate: s.accessDate || today }));
+    // Combine candidate-specific + API-level, dedup, and limit
+    const allIncoming = [...normalizedCandSources, ...apiSources];
+    if (allIncoming.length > 0) {
+      candidate.sources = mergeSources(candidate.sources, allIncoming);
+      candidate.sourcesUpdatedAt = new Date().toISOString();
     }
   }
 
@@ -338,6 +423,28 @@ function validateRaceUpdate(original, updated) {
   for (const cand of updated.candidates) {
     if (cand.name === "") return "empty candidate name";
     if (cand.summary === "") return `${cand.name} has empty summary`;
+
+    // Validate sources if present
+    if (cand.sources && Array.isArray(cand.sources)) {
+      if (cand.sources.length > 20) {
+        return `${cand.name} has too many sources (${cand.sources.length}, max 20)`;
+      }
+      const urls = new Set();
+      for (const src of cand.sources) {
+        if (!src.url || typeof src.url !== "string") {
+          return `${cand.name} has a source with invalid URL`;
+        }
+        try {
+          new URL(src.url);
+        } catch {
+          return `${cand.name} has a source with malformed URL: ${src.url}`;
+        }
+        if (urls.has(src.url)) {
+          return `${cand.name} has duplicate source URL: ${src.url}`;
+        }
+        urls.add(src.url);
+      }
+    }
   }
 
   return null;

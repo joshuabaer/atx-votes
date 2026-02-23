@@ -8,6 +8,7 @@ import {
   buildUserPrompt,
   mergeRecommendations,
   buildCondensedBallotDescription,
+  VALID_LLMS,
 } from "../src/pwa-guide.js";
 
 const ballot = JSON.parse(
@@ -435,5 +436,331 @@ describe("buildCondensedBallotDescription", () => {
     expect(desc).toContain("$500M in bonds");
     expect(desc).toContain("Supporters: AURA");
     expect(desc).toContain("Opponents: Taxpayers Union");
+  });
+
+  it("excludes withdrawn candidates from description", () => {
+    const ballotWithWithdrawn = JSON.parse(JSON.stringify(ballot));
+    // Mark Bob Martinez as withdrawn
+    ballotWithWithdrawn.races[0].candidates[1].withdrawn = true;
+    const desc = buildCondensedBallotDescription(ballotWithWithdrawn);
+    // Bob should not appear
+    expect(desc).not.toContain("Bob Martinez");
+    // Alice should still appear
+    expect(desc).toContain("Alice Johnson");
+    // Senator race should now be UNCONTESTED (only 1 active candidate)
+    expect(desc).toMatch(/U\.S\. Senator.*\[UNCONTESTED\]/);
+  });
+
+  it("handles ballot with no propositions", () => {
+    const ballotNoProps = { ...ballot, propositions: [] };
+    const desc = buildCondensedBallotDescription(ballotNoProps);
+    expect(desc).toContain("ELECTION:");
+    expect(desc).not.toContain("PROPOSITION");
+  });
+
+  it("handles ballot with null propositions", () => {
+    const ballotNullProps = { ...ballot, propositions: null };
+    const desc = buildCondensedBallotDescription(ballotNullProps);
+    expect(desc).toContain("ELECTION:");
+    expect(desc).not.toContain("PROPOSITION");
+  });
+
+  it("handles candidate with no endorsements or positions", () => {
+    const sparseCandidate = {
+      id: "test-1",
+      name: "Jane Doe",
+      isIncumbent: false,
+      summary: "A candidate",
+      keyPositions: [],
+      endorsements: [],
+      pros: [],
+      cons: [],
+    };
+    const sparseRace = {
+      office: "Test Office",
+      district: null,
+      isContested: false,
+      candidates: [sparseCandidate],
+    };
+    const testBallot = {
+      ...ballot,
+      races: [sparseRace],
+      propositions: [],
+    };
+    const desc = buildCondensedBallotDescription(testBallot);
+    expect(desc).toContain("Jane Doe");
+    // Should not have Positions, Endorsements, Pros, or Cons lines for this candidate
+    const janeSection = desc.slice(desc.indexOf("Jane Doe"));
+    expect(janeSection).not.toContain("Positions:");
+    expect(janeSection).not.toContain("Endorsements:");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// buildCondensedBallotDescription — withdrawn candidates in county merge
+// ---------------------------------------------------------------------------
+describe("buildCondensedBallotDescription — withdrawn handling", () => {
+  it("all candidates withdrawn makes race uncontested", () => {
+    const ballotAllWithdrawn = JSON.parse(JSON.stringify(ballot));
+    // Withdraw all candidates except one in a contested race
+    for (const c of ballotAllWithdrawn.races[0].candidates) {
+      c.withdrawn = true;
+    }
+    const desc = buildCondensedBallotDescription(ballotAllWithdrawn);
+    // Senator race should show UNCONTESTED with no candidates listed
+    expect(desc).toMatch(/U\.S\. Senator.*\[UNCONTESTED\]/);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// buildUserPrompt — additional coverage
+// ---------------------------------------------------------------------------
+describe("buildUserPrompt — reading level tones", () => {
+  const profile = {
+    politicalSpectrum: "Moderate",
+    topIssues: ["Healthcare"],
+    candidateQualities: ["Experience"],
+    policyViews: {},
+  };
+
+  it("includes simple tone instruction for reading level 1", () => {
+    const prompt = buildUserPrompt(profile, "desc", ballot, "democrat", "en", 1);
+    expect(prompt).toContain("high school reading level");
+  });
+
+  it("includes casual tone instruction for reading level 2", () => {
+    const prompt = buildUserPrompt(profile, "desc", ballot, "democrat", "en", 2);
+    expect(prompt).toContain("explaining politics to a friend");
+  });
+
+  it("includes no tone instruction for reading level 3 (default)", () => {
+    const prompt = buildUserPrompt(profile, "desc", ballot, "democrat", "en", 3);
+    // Level 3 is empty string — should not contain other level markers
+    expect(prompt).not.toContain("high school reading level");
+    expect(prompt).not.toContain("explaining politics to a friend");
+    expect(prompt).not.toContain("expert level");
+  });
+
+  it("includes detailed tone instruction for reading level 4", () => {
+    const prompt = buildUserPrompt(profile, "desc", ballot, "democrat", "en", 4);
+    expect(prompt).toContain("more depth and nuance");
+  });
+
+  it("includes expert tone instruction for reading level 5", () => {
+    const prompt = buildUserPrompt(profile, "desc", ballot, "democrat", "en", 5);
+    expect(prompt).toContain("expert level");
+  });
+
+  it("includes Swedish Chef tone for reading level 6", () => {
+    const prompt = buildUserPrompt(profile, "desc", ballot, "democrat", "en", 6);
+    expect(prompt).toContain("Swedish Chef");
+    expect(prompt).toContain("bork");
+  });
+
+  it("includes Texas Cowboy tone for reading level 7", () => {
+    const prompt = buildUserPrompt(profile, "desc", ballot, "democrat", "en", 7);
+    expect(prompt).toContain("Texas cowboy");
+    expect(prompt).toContain("y'all");
+  });
+
+  it("handles undefined reading level gracefully", () => {
+    const prompt = buildUserPrompt(profile, "desc", ballot, "democrat", "en", undefined);
+    // Should not crash, just no tone instruction
+    expect(prompt).toContain("Recommend ONE candidate per race");
+  });
+});
+
+describe("buildUserPrompt — withdrawn candidates", () => {
+  it("excludes withdrawn candidates from valid candidates list", () => {
+    const ballotWithWithdrawn = JSON.parse(JSON.stringify(ballot));
+    ballotWithWithdrawn.races[0].candidates[1].withdrawn = true;
+    const profile = {
+      politicalSpectrum: "Progressive",
+      topIssues: ["Healthcare"],
+      candidateQualities: ["Experience"],
+      policyViews: {},
+    };
+    const prompt = buildUserPrompt(profile, "desc", ballotWithWithdrawn, "democrat", "en");
+    // Valid candidates list should NOT include Bob Martinez (withdrawn)
+    expect(prompt).toContain("Alice Johnson");
+    // Bob should not appear in the VALID CANDIDATES section
+    const validSection = prompt.slice(prompt.indexOf("VALID CANDIDATES"));
+    expect(validSection).not.toContain("Bob Martinez");
+  });
+});
+
+describe("buildUserPrompt — edge cases", () => {
+  it("handles profile with many issues (top 7 + overflow)", () => {
+    const profile = {
+      politicalSpectrum: "Moderate",
+      topIssues: [
+        "Healthcare",
+        "Education",
+        "Housing",
+        "Economy",
+        "Climate",
+        "Immigration",
+        "Taxes",
+        "Gun Policy",
+        "Transportation",
+      ],
+      candidateQualities: ["Experience"],
+      policyViews: {},
+    };
+    const prompt = buildUserPrompt(profile, "desc", ballot, "democrat", "en");
+    // Top 7 should be numbered
+    expect(prompt).toContain("1. Healthcare");
+    expect(prompt).toContain("7. Taxes");
+    // Overflow should appear as "also:"
+    expect(prompt).toContain("also: Gun Policy, Transportation");
+  });
+
+  it("handles empty policyViews", () => {
+    const profile = {
+      politicalSpectrum: "Moderate",
+      topIssues: ["Healthcare"],
+      candidateQualities: ["Experience"],
+      policyViews: {},
+    };
+    const prompt = buildUserPrompt(profile, "desc", ballot, "democrat", "en");
+    expect(prompt).toContain("Stances:");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// mergeRecommendations — additional tests
+// ---------------------------------------------------------------------------
+describe("mergeRecommendations — withdrawn candidate handling", () => {
+  it("does not recommend a withdrawn candidate", () => {
+    const ballotWithWithdrawn = JSON.parse(JSON.stringify(ballot));
+    ballotWithWithdrawn.races[0].candidates[0].withdrawn = true; // Alice withdrawn
+
+    const guideResponse = {
+      races: [
+        {
+          office: "U.S. Senator",
+          district: null,
+          recommendedCandidate: "Alice Johnson", // Guide recommends withdrawn candidate
+          reasoning: "test",
+          confidence: "Good Match",
+        },
+      ],
+      propositions: [],
+    };
+
+    const merged = mergeRecommendations(guideResponse, ballotWithWithdrawn, "en");
+    const senRace = merged.races.find((r) => r.office === "U.S. Senator");
+    // Alice is withdrawn, so recommendation should be null
+    expect(senRace.recommendation).toBeNull();
+    for (const c of senRace.candidates) {
+      expect(c.isRecommended).toBe(false);
+    }
+  });
+});
+
+describe("mergeRecommendations — proposition edge cases", () => {
+  it("handles guide with no propositions key", () => {
+    const guideResponse = {
+      races: [],
+    };
+    const merged = mergeRecommendations(guideResponse, ballot, "en");
+    // Propositions should remain unchanged from ballot
+    expect(merged.propositions).toHaveLength(1);
+    expect(merged.propositions[0].title).toBe("Austin Transit Expansion Bond");
+    // No recommendation should be set
+    expect(merged.propositions[0].recommendation).toBeUndefined();
+  });
+
+  it("handles proposition number mismatch gracefully", () => {
+    const guideResponse = {
+      races: [],
+      propositions: [
+        {
+          number: 99, // doesn't match ballot's prop 1
+          recommendation: "Lean Yes",
+          reasoning: "test",
+          confidence: "Clear Call",
+        },
+      ],
+    };
+    const merged = mergeRecommendations(guideResponse, ballot, "en");
+    // Prop 1 should not get a recommendation since guide had prop 99
+    expect(merged.propositions[0].recommendation).toBeUndefined();
+  });
+
+  it("sets 'Your Call' as default recommendation", () => {
+    const guideResponse = {
+      races: [],
+      propositions: [
+        {
+          number: 1,
+          recommendation: null,
+          reasoning: "Close call",
+          confidence: "Genuinely Contested",
+        },
+      ],
+    };
+    const merged = mergeRecommendations(guideResponse, ballot, "en");
+    // null recommendation should default to "Your Call"
+    expect(merged.propositions[0].recommendation).toBe("Your Call");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// VALID_LLMS
+// ---------------------------------------------------------------------------
+describe("VALID_LLMS", () => {
+  it("contains exactly 4 LLM options", () => {
+    expect(VALID_LLMS).toHaveLength(4);
+  });
+
+  it("includes claude, chatgpt, gemini, and grok", () => {
+    expect(VALID_LLMS).toContain("claude");
+    expect(VALID_LLMS).toContain("chatgpt");
+    expect(VALID_LLMS).toContain("gemini");
+    expect(VALID_LLMS).toContain("grok");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// sortOrder — additional offices
+// ---------------------------------------------------------------------------
+describe("sortOrder — additional offices", () => {
+  it("ranks Lt. Governor at 10 (matches Governor first)", () => {
+    // Note: "Lt. Governor" contains "Governor", so it matches the Governor
+    // rule first and returns 10. "Lieutenant Governor" would also match Governor.
+    expect(sortOrder({ office: "Lt. Governor" })).toBe(10);
+  });
+
+  it("ranks Attorney General at 12", () => {
+    expect(sortOrder({ office: "Attorney General" })).toBe(12);
+  });
+
+  it("ranks Comptroller at 13", () => {
+    expect(sortOrder({ office: "Comptroller of Public Accounts" })).toBe(13);
+  });
+
+  it("ranks Agriculture Commissioner at 14", () => {
+    expect(sortOrder({ office: "Commissioner of Agriculture" })).toBe(14);
+  });
+
+  it("ranks Land Commissioner at 15", () => {
+    expect(sortOrder({ office: "General Land Office" })).toBe(15);
+  });
+
+  it("ranks Railroad Commissioner at 16", () => {
+    expect(sortOrder({ office: "Railroad Commissioner" })).toBe(16);
+  });
+
+  it("ranks Supreme Court at 30", () => {
+    expect(sortOrder({ office: "Supreme Court Justice, Place 3" })).toBe(30);
+  });
+
+  it("ranks Criminal Appeals at 31", () => {
+    expect(sortOrder({ office: "Court of Criminal Appeals" })).toBe(31);
+  });
+
+  it("ranks Court of Appeals at 32", () => {
+    expect(sortOrder({ office: "Court of Appeals, 3rd District" })).toBe(32);
   });
 });

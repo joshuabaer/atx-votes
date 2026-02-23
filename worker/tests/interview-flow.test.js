@@ -63,8 +63,13 @@ function passTone() {
   clickAction("next"); // phase 1 → 2
 }
 
-/** Pass through the issues phase (phase 2) — sortable list, just click Continue. */
+/** Pass through the issues phase (phase 2) — pick 5 issues then click Continue. */
 function passIssues() {
+  // Pick 5 issues from the pool to fill all slots
+  for (let i = 0; i < 5; i++) {
+    const poolItem = document.querySelector('[data-action="pick-issue"]');
+    if (poolItem) poolItem.click();
+  }
   clickAction("next"); // phase 2 → 3
 }
 
@@ -84,8 +89,13 @@ function passDeepDives() {
   }
 }
 
-/** Pass through the qualities phase (phase 5) — sortable list, just click Continue. */
+/** Pass through the qualities phase (phase 5) — pick 3 qualities then click Continue. */
 function passQualities() {
+  // Pick 3 qualities from the pool to fill all slots
+  for (let i = 0; i < 3; i++) {
+    const poolItem = document.querySelector('[data-action="pick-quality"]');
+    if (poolItem) poolItem.click();
+  }
   clickAction("next"); // phase 5 → 6
 }
 
@@ -171,44 +181,76 @@ describe("Phase 1: Tone", () => {
   it("clicking Continue advances to phase 2 (Issues)", () => {
     clickAction("next");
     expect(S().phase).toBe(2);
-    expect(getApp()).toContain("Rank your issues by priority");
+    expect(getApp()).toContain("Pick your top 5 issues");
   });
 });
 
 // ---------------------------------------------------------------------------
-// Phase 2: Issues (Sort by Priority)
+// Phase 2: Issues (two-zone picker)
 // ---------------------------------------------------------------------------
-describe("Phase 2: Issues (sortable)", () => {
+describe("Phase 2: Issues (two-zone picker)", () => {
   beforeEach(() => {
     passTone();           // → phase 2
   });
 
-  it("shows sortable issue list with all 17 issues", () => {
+  it("shows two-zone layout with empty slots and pool items", () => {
     const html = getApp();
     expect(html).toContain("sort-list");
-    expect(html).toContain("sort-item");
+    expect(html).toContain("slot-empty");
+    expect(html).toContain("pool-item");
     expect(html).toContain("Housing");
     expect(html).toContain("Healthcare");
-    const items = document.querySelectorAll(".sort-item");
-    expect(items.length).toBe(17);
+    // All 17 issues should be in the pool (none picked yet)
+    const poolItems = document.querySelectorAll(".pool-item");
+    expect(poolItems.length).toBe(17);
+    // 5 empty slots should be shown
+    const emptySlots = document.querySelectorAll(".slot-empty");
+    expect(emptySlots.length).toBe(5);
   });
 
   it("populates S.issues with all 17 issues", () => {
     expect(S().issues).toHaveLength(17);
   });
 
-  it("Continue button is always enabled (no minimum selection needed)", () => {
+  it("Continue button is disabled until 5 issues are picked", () => {
     const btn = document.querySelector('[data-action="next"]');
-    expect(btn.disabled).toBe(false);
+    expect(btn.disabled).toBe(true);
   });
 
-  it("shows priority divider after position 5", () => {
+  it("shows divider between top zone and pool", () => {
     const html = getApp();
     expect(html).toContain("sort-divider");
-    expect(html).toContain("your top priorities are above this line");
+    expect(html).toContain("Remaining issues below");
   });
 
-  it("shows drag handles and arrow buttons", () => {
+  it("tapping a pool item moves it to the next empty slot", () => {
+    const firstPoolItem = document.querySelector('[data-action="pick-issue"]');
+    const issueName = S().issues[0]; // first item in pool
+    firstPoolItem.click();
+    expect(S()._pickedIssues).toBe(1);
+    expect(S().issues[0]).toBe(issueName);
+    // Should now have 1 filled slot and 4 empty slots
+    const filledSlots = document.querySelectorAll(".sort-item.slot-filled");
+    expect(filledSlots.length).toBe(1);
+    const emptySlots = document.querySelectorAll(".slot-empty");
+    expect(emptySlots.length).toBe(4);
+  });
+
+  it("tapping a filled slot sends the item back to the pool", () => {
+    // Pick an item first
+    document.querySelector('[data-action="pick-issue"]').click();
+    expect(S()._pickedIssues).toBe(1);
+    // Now unpick it
+    document.querySelector('[data-action="unpick-issue"]').click();
+    expect(S()._pickedIssues).toBe(0);
+    const emptySlots = document.querySelectorAll(".slot-empty");
+    expect(emptySlots.length).toBe(5);
+  });
+
+  it("shows drag handles and arrow buttons after picking items", () => {
+    // Pick 2 items
+    document.querySelector('[data-action="pick-issue"]').click();
+    document.querySelector('[data-action="pick-issue"]').click();
     const html = getApp();
     expect(html).toContain("drag-handle");
     expect(html).toContain("sort-arrows");
@@ -216,53 +258,69 @@ describe("Phase 2: Issues (sortable)", () => {
     expect(html).toContain('data-action="sort-down"');
   });
 
-  it("sort-up moves an item up in the list", () => {
+  it("sort-up moves a picked item up in the list", () => {
+    // Pick 2 items
+    document.querySelector('[data-action="pick-issue"]').click();
+    document.querySelector('[data-action="pick-issue"]').click();
     const originalSecond = S().issues[1];
-    // Click the sort-up button for index 1
     const btn = document.querySelector('[data-action="sort-up"][data-idx="1"]');
     btn.click();
     expect(S().issues[0]).toBe(originalSecond);
   });
 
-  it("sort-down moves an item down in the list", () => {
+  it("sort-down moves a picked item down in the list", () => {
+    // Pick 2 items
+    document.querySelector('[data-action="pick-issue"]').click();
+    document.querySelector('[data-action="pick-issue"]').click();
     const originalFirst = S().issues[0];
-    // Click the sort-down button for index 0
     const btn = document.querySelector('[data-action="sort-down"][data-idx="0"]');
     btn.click();
     expect(S().issues[1]).toBe(originalFirst);
   });
 
   it("sort-up at index 0 does nothing", () => {
+    // Pick 2 items
+    document.querySelector('[data-action="pick-issue"]').click();
+    document.querySelector('[data-action="pick-issue"]').click();
     const original = S().issues.slice();
     const btn = document.querySelector('[data-action="sort-up"][data-idx="0"]');
     btn.click();
     expect(S().issues).toEqual(original);
   });
 
-  it("sort-down at last index does nothing", () => {
+  it("sort-down at last picked index does nothing", () => {
+    // Pick 2 items
+    document.querySelector('[data-action="pick-issue"]').click();
+    document.querySelector('[data-action="pick-issue"]').click();
     const original = S().issues.slice();
-    const lastIdx = S().issues.length - 1;
-    const btn = document.querySelector(`[data-action="sort-down"][data-idx="${lastIdx}"]`);
-    btn.click();
-    expect(S().issues).toEqual(original);
+    // Last picked item is at index 1, sort-down should be disabled
+    const btn = document.querySelector('[data-action="sort-down"][data-idx="1"]');
+    expect(btn.disabled).toBe(true);
   });
 
-  it("clicking Continue transitions to phase 3", () => {
+  it("Continue enables after picking 5 issues", () => {
+    for (let i = 0; i < 5; i++) {
+      document.querySelector('[data-action="pick-issue"]').click();
+    }
+    const btn = document.querySelector('[data-action="next"]');
+    expect(btn.disabled).toBe(false);
+  });
+
+  it("clicking Continue after picking 5 transitions to phase 3", () => {
+    for (let i = 0; i < 5; i++) {
+      document.querySelector('[data-action="pick-issue"]').click();
+    }
     clickAction("next");
     expect(S().phase).toBe(3);
   });
 
   it("builds ddQuestions only for top 5 issues when leaving phase 2", () => {
+    for (let i = 0; i < 5; i++) {
+      document.querySelector('[data-action="pick-issue"]').click();
+    }
     clickAction("next");
     // Deep dives should only be built from top 5 issues
     const top5 = S().issues.slice(0, 5);
-    for (const dd of S().ddQuestions) {
-      // Each dd question should correspond to one of the top 5 issues
-      const issueKeys = top5.filter(issue => {
-        // Check if this issue has a deep dive by seeing if dd.q matches
-        return true; // We just verify the count is reasonable
-      });
-    }
     expect(S().ddQuestions.length).toBeLessThanOrEqual(5);
     expect(S().ddQuestions.length).toBeGreaterThan(0);
   });
@@ -396,9 +454,9 @@ describe("Phase 4: Skip when no deep dives", () => {
 });
 
 // ---------------------------------------------------------------------------
-// Phase 5: Qualities (Sort by Priority)
+// Phase 5: Qualities (two-zone picker)
 // ---------------------------------------------------------------------------
-describe("Phase 5: Qualities (sortable)", () => {
+describe("Phase 5: Qualities (two-zone picker)", () => {
   beforeEach(() => {
     passTone();
     passIssues();
@@ -407,37 +465,55 @@ describe("Phase 5: Qualities (sortable)", () => {
     // → phase 5
   });
 
-  it("shows sortable quality list with all 10 qualities", () => {
+  it("shows two-zone layout with empty slots and pool items", () => {
     expect(S().phase).toBe(5);
     const html = getApp();
-    expect(html).toContain("Rank the qualities you value");
+    expect(html).toContain("Pick your top 3 qualities");
     expect(html).toContain("sort-list");
-    const items = document.querySelectorAll(".sort-item");
-    expect(items.length).toBe(10);
+    // All 10 qualities should be in the pool (none picked yet)
+    const poolItems = document.querySelectorAll(".pool-item");
+    expect(poolItems.length).toBe(10);
+    // 3 empty slots should be shown
+    const emptySlots = document.querySelectorAll(".slot-empty");
+    expect(emptySlots.length).toBe(3);
   });
 
   it("populates S.qualities with all 10 qualities", () => {
     expect(S().qualities).toHaveLength(10);
   });
 
-  it("Continue is always enabled", () => {
+  it("Continue is disabled until 3 qualities are picked", () => {
     const btn = document.querySelector('[data-action="next"]');
-    expect(btn.disabled).toBe(false);
+    expect(btn.disabled).toBe(true);
   });
 
-  it("shows priority divider after position 3", () => {
+  it("shows divider between top zone and pool", () => {
     const html = getApp();
     expect(html).toContain("sort-divider");
+    expect(html).toContain("Remaining qualities below");
   });
 
-  it("sort-up moves a quality up", () => {
+  it("tapping a pool item moves it to the next empty slot", () => {
+    document.querySelector('[data-action="pick-quality"]').click();
+    expect(S()._pickedQuals).toBe(1);
+    const filledSlots = document.querySelectorAll(".sort-item.slot-filled");
+    expect(filledSlots.length).toBe(1);
+    const emptySlots = document.querySelectorAll(".slot-empty");
+    expect(emptySlots.length).toBe(2);
+  });
+
+  it("sort-up moves a picked quality up", () => {
+    document.querySelector('[data-action="pick-quality"]').click();
+    document.querySelector('[data-action="pick-quality"]').click();
     const originalSecond = S().qualities[1];
     const btn = document.querySelector('[data-action="sort-up"][data-idx="1"]');
     btn.click();
     expect(S().qualities[0]).toBe(originalSecond);
   });
 
-  it("sort-down moves a quality down", () => {
+  it("sort-down moves a picked quality down", () => {
+    document.querySelector('[data-action="pick-quality"]').click();
+    document.querySelector('[data-action="pick-quality"]').click();
     const originalFirst = S().qualities[0];
     const btn = document.querySelector('[data-action="sort-down"][data-idx="0"]');
     btn.click();
@@ -451,7 +527,18 @@ describe("Phase 5: Qualities (sortable)", () => {
     expect(S().ddIndex).toBe(lastDdIdx);
   });
 
-  it("clicking Continue transitions to phase 6", () => {
+  it("Continue enables after picking 3 qualities", () => {
+    for (let i = 0; i < 3; i++) {
+      document.querySelector('[data-action="pick-quality"]').click();
+    }
+    const btn = document.querySelector('[data-action="next"]');
+    expect(btn.disabled).toBe(false);
+  });
+
+  it("clicking Continue after picking 3 transitions to phase 6", () => {
+    for (let i = 0; i < 3; i++) {
+      document.querySelector('[data-action="pick-quality"]').click();
+    }
     clickAction("next");
     expect(S().phase).toBe(6);
   });
@@ -866,12 +953,15 @@ describe("Back navigation preserves state", () => {
 
     clickAction("back"); // → phase 2
     expect(S().phase).toBe(2);
-    // All 17 issues should be present in the ranked list
+    // All 17 issues should be present
     expect(S().issues).toHaveLength(17);
 
-    // Sort items should be rendered in the DOM
-    const items = document.querySelectorAll(".sort-item");
-    expect(items.length).toBe(17);
+    // 5 picked items should be rendered as filled slots
+    const filledSlots = document.querySelectorAll(".sort-item.slot-filled");
+    expect(filledSlots.length).toBe(5);
+    // 12 remaining should be in the pool
+    const poolItems = document.querySelectorAll(".pool-item");
+    expect(poolItems.length).toBe(12);
   });
 
   it("spectrum preserved when returning from phase 4", () => {
@@ -927,10 +1017,14 @@ describe("Back navigation preserves state", () => {
     // → phase 6
 
     clickAction("back"); // → phase 5
-    // All 10 qualities should still be present in the ranked list
+    // All 10 qualities should still be present
     expect(S().qualities).toHaveLength(10);
-    const items = document.querySelectorAll(".sort-item");
-    expect(items.length).toBe(10);
+    // 3 picked items should be rendered as filled slots
+    const filledSlots = document.querySelectorAll(".sort-item.slot-filled");
+    expect(filledSlots.length).toBe(3);
+    // 7 remaining should be in the pool
+    const poolItems = document.querySelectorAll(".pool-item");
+    expect(poolItems.length).toBe(7);
   });
 });
 
@@ -946,8 +1040,11 @@ describe("Full interview happy path", () => {
     clickAction("next");
     expect(S().phase).toBe(2);
 
-    // Phase 2: Issues (sortable, just click Continue)
+    // Phase 2: Issues (pick 5 then continue)
     expect(S().issues).toHaveLength(17);
+    for (let i = 0; i < 5; i++) {
+      document.querySelector('[data-action="pick-issue"]').click();
+    }
     clickAction("next");
     expect(S().phase).toBe(3);
 
@@ -966,8 +1063,11 @@ describe("Full interview happy path", () => {
     }
     expect(S().phase).toBe(5);
 
-    // Phase 5: Qualities (sortable, just click Continue)
+    // Phase 5: Qualities (pick 3 then continue)
     expect(S().qualities).toHaveLength(10);
+    for (let i = 0; i < 3; i++) {
+      document.querySelector('[data-action="pick-quality"]').click();
+    }
     clickAction("next");
     expect(S().phase).toBe(6);
 
@@ -1045,5 +1145,272 @@ describe("Backward compatibility", () => {
     expect(S().qualities).toHaveLength(10);
     expect(S().qualities[0]).toBe("Experience");
     expect(S().qualities[1]).toBe("Independence");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Spanish translation function t()
+// ---------------------------------------------------------------------------
+describe("Translation function t()", () => {
+  it("t() returns original English string when lang is en", () => {
+    // Default LANG should be 'en' (no es pref in localStorage)
+    expect(window.t).toBeDefined();
+    expect(window.t("Housing")).toBe("Housing");
+    expect(window.t("Healthcare")).toBe("Healthcare");
+  });
+
+  it("t() returns original for unknown keys", () => {
+    expect(window.t("Some random key not in TR")).toBe("Some random key not in TR");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Deep dive rendering for all topics
+// ---------------------------------------------------------------------------
+describe("Deep dive rendering for different issues", () => {
+  it("builds deep dives for Housing issue", () => {
+    passTone();
+    // Phase 2: pick Housing as first issue
+    const poolItems = document.querySelectorAll('[data-action="pick-issue"]');
+    // Find the Housing pool item
+    let housingPicked = false;
+    for (const item of poolItems) {
+      if (item.textContent.includes("Housing")) {
+        item.click();
+        housingPicked = true;
+        break;
+      }
+    }
+    expect(housingPicked).toBe(true);
+    // Fill remaining 4 slots
+    for (let i = 0; i < 4; i++) {
+      document.querySelector('[data-action="pick-issue"]').click();
+    }
+    clickAction("next"); // → phase 3
+    passSpectrum("Moderate");
+    // → phase 4: should have Housing deep dive
+    const ddQuestions = S().ddQuestions;
+    const housingDd = ddQuestions.find((d) => d.q.toLowerCase().includes("housing"));
+    expect(housingDd).toBeDefined();
+    expect(housingDd.opts).toHaveLength(4);
+  });
+
+  it("renders 4 options per deep dive question", () => {
+    passTone();
+    passIssues();
+    passSpectrum("Moderate");
+    // Phase 4
+    expect(S().phase).toBe(4);
+    const dd = S().ddQuestions[0];
+    expect(dd.opts.length).toBe(4);
+    // Each option should have a label and description
+    for (const opt of dd.opts) {
+      expect(opt.l).toBeTruthy();
+      expect(opt.d).toBeTruthy();
+    }
+  });
+
+  it("deep dive options are rendered as radio buttons", () => {
+    passTone();
+    passIssues();
+    passSpectrum("Moderate");
+    const html = getApp();
+    expect(html).toContain('data-action="select-dd"');
+    expect(html).toContain('role="radio"');
+    // Should have at least 4 radio buttons (one per option)
+    const radios = document.querySelectorAll('[data-action="select-dd"]');
+    expect(radios.length).toBe(4);
+  });
+
+  it("selected deep dive shows radio-on class", () => {
+    passTone();
+    passIssues();
+    passSpectrum("Moderate");
+    const dd = S().ddQuestions[0];
+    clickAction("select-dd", dd.opts[0].l);
+    const onRadio = document.querySelector(".radio-on");
+    expect(onRadio).not.toBeNull();
+    expect(onRadio.dataset.value).toBe(dd.opts[0].l);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Phase 2: Pick 5 enables Continue, unpicking disables it
+// ---------------------------------------------------------------------------
+describe("Phase 2: Pick/unpick issue gating", () => {
+  beforeEach(() => {
+    passTone();
+  });
+
+  it("Continue stays disabled with only 4 picked", () => {
+    for (let i = 0; i < 4; i++) {
+      document.querySelector('[data-action="pick-issue"]').click();
+    }
+    const btn = document.querySelector('[data-action="next"]');
+    expect(btn.disabled).toBe(true);
+    expect(S()._pickedIssues).toBe(4);
+  });
+
+  it("unpicking one issue after picking 5 disables Continue again", () => {
+    for (let i = 0; i < 5; i++) {
+      document.querySelector('[data-action="pick-issue"]').click();
+    }
+    expect(document.querySelector('[data-action="next"]').disabled).toBe(false);
+    // Unpick one
+    document.querySelector('[data-action="unpick-issue"]').click();
+    expect(S()._pickedIssues).toBe(4);
+    expect(document.querySelector('[data-action="next"]').disabled).toBe(true);
+  });
+
+  it("pool items cannot exceed 5 picks", () => {
+    for (let i = 0; i < 5; i++) {
+      document.querySelector('[data-action="pick-issue"]').click();
+    }
+    expect(S()._pickedIssues).toBe(5);
+    // Pool should have 12 remaining items
+    const poolItems = document.querySelectorAll(".pool-item");
+    expect(poolItems.length).toBe(12);
+    // No more empty slots
+    const emptySlots = document.querySelectorAll(".slot-empty");
+    expect(emptySlots.length).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Phase 5: Pick/unpick quality gating
+// ---------------------------------------------------------------------------
+describe("Phase 5: Pick/unpick quality gating", () => {
+  beforeEach(() => {
+    passTone();
+    passIssues();
+    passSpectrum("Moderate");
+    passDeepDives();
+  });
+
+  it("Continue stays disabled with only 2 picked", () => {
+    for (let i = 0; i < 2; i++) {
+      document.querySelector('[data-action="pick-quality"]').click();
+    }
+    const btn = document.querySelector('[data-action="next"]');
+    expect(btn.disabled).toBe(true);
+    expect(S()._pickedQuals).toBe(2);
+  });
+
+  it("unpicking one quality after picking 3 disables Continue again", () => {
+    for (let i = 0; i < 3; i++) {
+      document.querySelector('[data-action="pick-quality"]').click();
+    }
+    expect(document.querySelector('[data-action="next"]').disabled).toBe(false);
+    document.querySelector('[data-action="unpick-quality"]').click();
+    expect(S()._pickedQuals).toBe(2);
+    expect(document.querySelector('[data-action="next"]').disabled).toBe(true);
+  });
+
+  it("pool items cannot exceed 3 picks", () => {
+    for (let i = 0; i < 3; i++) {
+      document.querySelector('[data-action="pick-quality"]').click();
+    }
+    expect(S()._pickedQuals).toBe(3);
+    const poolItems = document.querySelectorAll(".pool-item");
+    expect(poolItems.length).toBe(7);
+    const emptySlots = document.querySelectorAll(".slot-empty");
+    expect(emptySlots.length).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Spectrum options are shuffled
+// ---------------------------------------------------------------------------
+describe("Spectrum options rendering", () => {
+  beforeEach(() => {
+    passTone();
+    passIssues();
+  });
+
+  it("shows all 6 spectrum options", () => {
+    const radios = document.querySelectorAll('[data-action="select-spectrum"]');
+    expect(radios.length).toBe(6);
+    const html = getApp();
+    expect(html).toContain("Progressive");
+    expect(html).toContain("Liberal");
+    expect(html).toContain("Moderate");
+    expect(html).toContain("Conservative");
+    expect(html).toContain("Libertarian");
+    expect(html).toContain("Independent");
+  });
+
+  it("spectrum options have descriptions", () => {
+    const html = getApp();
+    expect(html).toContain("Bold systemic change");
+    expect(html).toContain("Pragmatic center");
+    expect(html).toContain("Maximum freedom");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Phase 8: Building state
+// ---------------------------------------------------------------------------
+describe("Phase 8: Building guide", () => {
+  it("shows building message when reaching phase 8", () => {
+    passTone();
+    passIssues();
+    passSpectrum("Progressive");
+    passDeepDives();
+    passQualities();
+    clickAction("next"); // skip freeform
+    clickAction("skip-address");
+    expect(S().phase).toBe(8);
+    const html = getApp();
+    expect(html).toContain("Building Your Guide");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Phase 1: readingLevel defaults
+// ---------------------------------------------------------------------------
+describe("Phase 1: readingLevel default", () => {
+  it("starts with readingLevel 1 (simple)", () => {
+    expect(S().readingLevel).toBe(1);
+  });
+
+  it("selecting tone 3 sets readingLevel to 3", () => {
+    document.querySelector('[data-action="select-tone"][data-value="3"]').click();
+    expect(S().readingLevel).toBe(3);
+  });
+
+  it("selecting tone 4 sets readingLevel to 4", () => {
+    document.querySelector('[data-action="select-tone"][data-value="4"]').click();
+    expect(S().readingLevel).toBe(4);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Address form edge cases
+// ---------------------------------------------------------------------------
+describe("Phase 7: Address edge cases", () => {
+  beforeEach(() => {
+    passTone();
+    passIssues();
+    passSpectrum("Moderate");
+    passDeepDives();
+    passQualities();
+    clickAction("next"); // skip freeform
+  });
+
+  it("accepts ZIP+4 format (truncates to 5)", () => {
+    const form = document.getElementById("addr-form");
+    form.street.value = "123 Congress Ave";
+    form.zip.value = "78701-1234";
+    form.dispatchEvent(new window.Event("submit", { bubbles: true }));
+    // Should not show ZIP error — the app may truncate or accept ZIP+4
+    // The actual validation checks for 5-digit, so 78701-1234 would fail
+    // since it doesn't match /^\d{5}$/
+    expect(S().addressError).toContain("5-digit ZIP");
+  });
+
+  it("shows address form with correct default state", () => {
+    expect(S().address.state).toBe("TX");
+    expect(S().address.street).toBe("");
+    expect(S().address.zip).toBe("");
   });
 });

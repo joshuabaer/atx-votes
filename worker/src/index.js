@@ -47,6 +47,15 @@ li{font-size:1rem;color:var(--text);margin-bottom:0.75rem}
 
 // MARK: - Candidate Profile Helpers
 
+/**
+ * Normalizes an endorsement entry to { name, type } format.
+ * Handles both legacy string format and new structured object format.
+ */
+function normalizeEndorsement(e) {
+  if (typeof e === "string") return { name: e, type: null };
+  return { name: e.name || String(e), type: e.type || null };
+}
+
 function nameToSlug(name) {
   if (!name) return "";
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -347,6 +356,7 @@ function handleLandingPage() {
   <p class="page-footer">
     <a href="/candidates">Candidates</a> &middot;
     <a href="/nonpartisan" data-t="Nonpartisan by Design">Nonpartisan by Design</a> &middot;
+    <a href="/data-quality" data-t="Data Quality">Data Quality</a> &middot;
     <a href="/privacy" data-t="Privacy">Privacy</a> &middot;
     <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a>
   </p>
@@ -482,7 +492,7 @@ function handleNonpartisan() {
     <h2>Independent AI Audit</h2>
     <p>We've submitted our full AI prompts, data pipeline, and methodology to four independent AI systems (ChatGPT, Gemini, Grok, and Claude) for bias review. Audit findings directly informed improvements, including normalizing all deep-dive answer labels to use neutral, descriptive language with symmetric phrasing across opposing positions. <a href="/audit">Read the full audit results and methodology export.</a></p>
 
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/open-source">Open Source</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/open-source">Open Source</a> &middot; <a href="/data-quality">Data Quality</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
 </body>
 </html>`;
@@ -788,7 +798,9 @@ Return ONLY this JSON:
     <h2>Ongoing Commitment</h2>
     <p>This audit is not a one-time event. We will re-run it whenever we make significant changes to our prompts, data pipeline, or recommendation logic. The methodology export at <a href="/api/audit/export">/api/audit/export</a> always reflects the current production code.</p>
 
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <p style="margin-top:1.5rem">See our <a href="/data-quality">Data Quality Dashboard</a> for live metrics on ballot coverage, candidate completeness, and county data availability.</p>
+
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/data-quality">Data Quality</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
 </body>
 </html>`;
@@ -1281,7 +1293,7 @@ function handleSupport() {
       <p>Please <a href="mailto:howdy@txvotes.app">email us</a> with details and we'll correct it as quickly as possible.</p>
     </div>
 
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/open-source">Open Source</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/open-source">Open Source</a> &middot; <a href="/data-quality">Data Quality</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
 </body>
 </html>`;
@@ -1354,7 +1366,7 @@ function handlePrivacyPolicy() {
     <h2>Contact</h2>
     <p>Questions? Email <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
 
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/open-source">Open Source</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/open-source">Open Source</a> &middot; <a href="/data-quality">Data Quality</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
 </body>
 </html>`;
@@ -1451,7 +1463,7 @@ function handleOpenSource() {
     <p>Texas Votes is released under the <strong>MIT License</strong>. This means you're free to use, modify, and distribute the code for any purpose — including building your own voting guide for another state or city. The only requirement is that you include the original license notice.</p>
     <p style="font-size:0.9rem;color:var(--text2)">We chose MIT because civic tech should have the fewest possible barriers to reuse. If this code helps more people vote informed, it's doing its job.</p>
 
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/data-quality">Data Quality</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
 </body>
 </html>`;
@@ -1853,7 +1865,7 @@ async function handleCandidateProfile(slug, env) {
     <h1>Candidate Not Found</h1>
     <p class="subtitle">We couldn't find a candidate matching "${escapeHtml(slug)}". The candidate may not be in our database yet, or the URL may be incorrect.</p>
     <a class="back" href="/candidates">&larr; Browse all candidates</a>
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/open-source">Open Source</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/open-source">Open Source</a> &middot; <a href="/data-quality">Data Quality</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
 </body>
 </html>`;
@@ -1944,7 +1956,11 @@ async function handleCandidateProfile(slug, env) {
   if (c.endorsements) {
     const endorsements = Array.isArray(c.endorsements) ? c.endorsements : [c.endorsements];
     if (endorsements.length && endorsements[0]) {
-      sections.push(`<h2>Endorsements</h2><ul>${endorsements.map(e => `<li>${escapeHtml(String(e))}</li>`).join("")}</ul>`);
+      sections.push(`<h2>Endorsements</h2><ul>${endorsements.map(e => {
+        const ne = normalizeEndorsement(e);
+        const typeLabel = ne.type ? ` <span style="color:#666;font-size:0.85em">(${escapeHtml(ne.type)})</span>` : "";
+        return `<li>${escapeHtml(ne.name)}${typeLabel}</li>`;
+      }).join("")}</ul>`);
     }
   }
 
@@ -1991,7 +2007,7 @@ async function handleCandidateProfile(slug, env) {
     ${sections.join("\n    ")}
     ${dataUpdatedAt ? `<p style="margin-top:2rem;font-size:0.85rem;color:var(--text2)">Data last verified: ${new Date(dataUpdatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</p>` : ""}
     <p style="margin-top:${dataUpdatedAt ? "0.5rem" : "2rem"};font-size:0.9rem;color:var(--text2)">See something wrong? <a href="mailto:howdy@txvotes.app?subject=Data correction: ${encodeURIComponent(c.name)}">Let us know</a> and we'll fix it.</p>
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/open-source">Open Source</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/open-source">Open Source</a> &middot; <a href="/data-quality">Data Quality</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
 </body>
 </html>`;
@@ -2085,7 +2101,7 @@ async function handleCandidatesIndex(env) {
     <h1 style="margin-top:1rem">All Candidates</h1>
     <p class="subtitle">2026 Texas Primary Election — March 3, 2026</p>
     ${raceSections}
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/open-source">Open Source</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/open-source">Open Source</a> &middot; <a href="/data-quality">Data Quality</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
 </body>
 </html>`;
@@ -2098,11 +2114,334 @@ async function handleCandidatesIndex(env) {
   });
 }
 
-// MARK: - Admin Coverage Dashboard
+// MARK: - Data Quality Dashboard (Public)
 
 // All 254 Texas county FIPS codes (48001 to 48507, odd numbers only)
 const TX_FIPS = [];
 for (let i = 1; i <= 507; i += 2) TX_FIPS.push(`48${String(i).padStart(3, "0")}`);
+
+// Texas county FIPS to name mapping (all 254 counties)
+const TX_COUNTY_NAMES = {
+  "48001":"Anderson","48003":"Andrews","48005":"Angelina","48007":"Aransas","48009":"Archer",
+  "48011":"Armstrong","48013":"Atascosa","48015":"Austin","48017":"Bailey","48019":"Bandera",
+  "48021":"Bastrop","48023":"Baylor","48025":"Bee","48027":"Bell","48029":"Bexar",
+  "48031":"Blanco","48033":"Borden","48035":"Bosque","48037":"Bowie","48039":"Brazoria",
+  "48041":"Brazos","48043":"Brewster","48045":"Briscoe","48047":"Brooks","48049":"Brown",
+  "48051":"Burleson","48053":"Burnet","48055":"Caldwell","48057":"Calhoun","48059":"Callahan",
+  "48061":"Cameron","48063":"Camp","48065":"Carson","48067":"Cass","48069":"Castro",
+  "48071":"Chambers","48073":"Cherokee","48075":"Childress","48077":"Clay","48079":"Cochran",
+  "48081":"Coke","48083":"Coleman","48085":"Collin","48087":"Collingsworth","48089":"Colorado",
+  "48091":"Comal","48093":"Comanche","48095":"Concho","48097":"Cooke","48099":"Coryell",
+  "48101":"Cottle","48103":"Crane","48105":"Crockett","48107":"Crosby","48109":"Culberson",
+  "48111":"Dallam","48113":"Dallas","48115":"Dawson","48117":"Deaf Smith","48119":"Delta",
+  "48121":"Denton","48123":"DeWitt","48125":"Dickens","48127":"Dimmit","48129":"Donley",
+  "48131":"Duval","48133":"Eastland","48135":"Ector","48137":"Edwards","48139":"Ellis",
+  "48141":"El Paso","48143":"Erath","48145":"Falls","48147":"Fannin","48149":"Fayette",
+  "48151":"Fisher","48153":"Floyd","48155":"Foard","48157":"Fort Bend","48159":"Franklin",
+  "48161":"Freestone","48163":"Frio","48165":"Gaines","48167":"Galveston","48169":"Garza",
+  "48171":"Gillespie","48173":"Glasscock","48175":"Goliad","48177":"Gonzales","48179":"Gray",
+  "48181":"Grayson","48183":"Gregg","48185":"Grimes","48187":"Guadalupe","48189":"Hale",
+  "48191":"Hall","48193":"Hamilton","48195":"Hansford","48197":"Hardeman","48199":"Hardin",
+  "48201":"Harris","48203":"Harrison","48205":"Hartley","48207":"Haskell","48209":"Hays",
+  "48211":"Hemphill","48213":"Henderson","48215":"Hidalgo","48217":"Hill","48219":"Hockley",
+  "48221":"Hood","48223":"Hopkins","48225":"Houston","48227":"Howard","48229":"Hudspeth",
+  "48231":"Hunt","48233":"Hutchinson","48235":"Irion","48237":"Jack","48239":"Jackson",
+  "48241":"Jasper","48243":"Jeff Davis","48245":"Jefferson","48247":"Jim Hogg","48249":"Jim Wells",
+  "48251":"Johnson","48253":"Jones","48255":"Karnes","48257":"Kaufman","48259":"Kendall",
+  "48261":"Kenedy","48263":"Kent","48265":"Kerr","48267":"Kimble","48269":"King",
+  "48271":"Kinney","48273":"Kleberg","48275":"Knox","48277":"Lamar","48279":"Lamb",
+  "48281":"Lampasas","48283":"La Salle","48285":"Lavaca","48287":"Lee","48289":"Leon",
+  "48291":"Liberty","48293":"Limestone","48295":"Lipscomb","48297":"Live Oak","48299":"Llano",
+  "48301":"Loving","48303":"Lubbock","48305":"Lynn","48307":"McCulloch","48309":"McLennan",
+  "48311":"McMullen","48313":"Madison","48315":"Marion","48317":"Martin","48319":"Mason",
+  "48321":"Matagorda","48323":"Maverick","48325":"Medina","48327":"Menard","48329":"Midland",
+  "48331":"Milam","48333":"Mills","48335":"Mitchell","48337":"Montague","48339":"Montgomery",
+  "48341":"Moore","48343":"Morris","48345":"Motley","48347":"Nacogdoches","48349":"Navarro",
+  "48351":"Newton","48353":"Nolan","48355":"Nueces","48357":"Ochiltree","48359":"Oldham",
+  "48361":"Orange","48363":"Palo Pinto","48365":"Panola","48367":"Parker","48369":"Parmer",
+  "48371":"Pecos","48373":"Polk","48375":"Presidio","48377":"Rains","48379":"Randall",
+  "48381":"Reagan","48383":"Real","48385":"Red River","48387":"Reeves","48389":"Refugio",
+  "48391":"Roberts","48393":"Robertson","48395":"Rockwall","48397":"Runnels","48399":"Rusk",
+  "48401":"Sabine","48403":"San Augustine","48405":"San Jacinto","48407":"San Patricio","48409":"San Saba",
+  "48411":"Schleicher","48413":"Scurry","48415":"Shackelford","48417":"Shelby","48419":"Sherman",
+  "48421":"Smith","48423":"Somervell","48425":"Starr","48427":"Stephens","48429":"Sterling",
+  "48431":"Stonewall","48433":"Sutton","48435":"Swisher","48437":"Tarrant","48439":"Taylor",
+  "48441":"Terrell","48443":"Terry","48445":"Throckmorton","48447":"Titus","48449":"Tom Green",
+  "48451":"Travis","48453":"Trinity","48455":"Tyler","48457":"Upshur","48459":"Upton",
+  "48461":"Uvalde","48463":"Val Verde","48465":"Van Zandt","48467":"Victoria","48469":"Walker",
+  "48471":"Waller","48473":"Ward","48475":"Washington","48477":"Webb","48479":"Wharton",
+  "48481":"Wheeler","48483":"Wichita","48485":"Wilbarger","48487":"Willacy","48489":"Williamson",
+  "48491":"Wilson","48493":"Winkler","48495":"Wise","48497":"Wood","48499":"Yoakum",
+  "48501":"Young","48503":"Zapata","48505":"Zavala","48507":"Zablocki"
+};
+
+async function handleDataQuality(env) {
+  const parties = ["republican", "democrat"];
+  const ballots = {};
+
+  // Load statewide ballots (with legacy fallback)
+  for (const party of parties) {
+    let raw = await env.ELECTION_DATA.get(`ballot:statewide:${party}_primary_2026`);
+    if (!raw) raw = await env.ELECTION_DATA.get(`ballot:${party}_primary_2026`);
+    ballots[party] = raw ? JSON.parse(raw) : null;
+  }
+
+  // Load manifest for freshness
+  const manifestRaw = await env.ELECTION_DATA.get("manifest");
+  const manifest = manifestRaw ? JSON.parse(manifestRaw) : {};
+
+  // Load today's update log
+  const today = new Date().toISOString().slice(0, 10);
+  const updateLogRaw = await env.ELECTION_DATA.get(`update_log:${today}`);
+  const updateLog = updateLogRaw ? JSON.parse(updateLogRaw) : null;
+
+  // --- Data Freshness ---
+  let freshnessCards = "";
+  for (const party of parties) {
+    const m = manifest[party];
+    const label = party === "republican" ? "Republican" : "Democrat";
+    if (m && m.updatedAt) {
+      const d = new Date(m.updatedAt);
+      const dateStr = d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+      const timeStr = d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+      freshnessCards += `<div class="dq-card"><div class="dq-card-label">${label} Ballot</div><div class="dq-card-value">${dateStr}</div><div class="dq-card-detail">${timeStr}${m.version ? ` &middot; Version ${m.version}` : ""}</div></div>`;
+    } else {
+      freshnessCards += `<div class="dq-card"><div class="dq-card-label">${label} Ballot</div><div class="dq-card-value" style="color:var(--text2)">Not yet available</div></div>`;
+    }
+  }
+
+  // --- Ballot Coverage ---
+  let coverageCards = "";
+  for (const party of parties) {
+    const b = ballots[party];
+    const label = party === "republican" ? "Republican" : "Democrat";
+    const raceCount = b ? (b.races || []).length : 0;
+    const candidateCount = b ? (b.races || []).reduce((s, r) => s + (r.candidates || []).length, 0) : 0;
+    const propCount = b ? (b.propositions || []).length : 0;
+    coverageCards += `<div class="dq-card"><div class="dq-card-label">${label}</div><div class="dq-card-value">${raceCount} <span class="dq-unit">races</span></div><div class="dq-card-detail">${candidateCount} candidates &middot; ${propCount} propositions</div></div>`;
+  }
+
+  // --- Candidate Data Completeness ---
+  const completenessFields = ["summary", "background", "keyPositions", "endorsements", "pros", "cons"];
+  let totalCandidates = 0;
+  let fullProfileCount = 0;
+  let sparseCount = 0;
+  let totalFieldsFilled = 0;
+  let totalFieldsPossible = 0;
+
+  for (const party of parties) {
+    const b = ballots[party];
+    if (!b) continue;
+    for (const race of (b.races || [])) {
+      for (const c of (race.candidates || [])) {
+        totalCandidates++;
+        let filledFields = 0;
+        for (const f of completenessFields) {
+          totalFieldsPossible++;
+          const val = c[f];
+          const has = val !== undefined && val !== null && val !== "" && !(Array.isArray(val) && val.length === 0);
+          if (has) { filledFields++; totalFieldsFilled++; }
+        }
+        if (filledFields === completenessFields.length) fullProfileCount++;
+        if (isSparseCandidate(c)) sparseCount++;
+      }
+    }
+  }
+
+  const completenessPercent = totalFieldsPossible > 0 ? Math.round((totalFieldsFilled / totalFieldsPossible) * 100) : 0;
+
+  // --- County Coverage ---
+  const BATCH = 50;
+  const countyInfoResults = {};
+  const countyBallotResults = {};
+
+  for (let i = 0; i < TX_FIPS.length; i += BATCH) {
+    const batch = TX_FIPS.slice(i, i + BATCH);
+    const reads = batch.flatMap(fips => [
+      env.ELECTION_DATA.get(`county_info:${fips}`).then(v => ({ type: "info", fips, has: !!v })),
+      env.ELECTION_DATA.get(`ballot:county:${fips}:republican_primary_2026`).then(v => ({ type: "rep", fips, has: !!v })),
+      env.ELECTION_DATA.get(`ballot:county:${fips}:democrat_primary_2026`).then(v => ({ type: "dem", fips, has: !!v })),
+    ]);
+    const results = await Promise.all(reads);
+    for (const r of results) {
+      if (r.type === "info") countyInfoResults[r.fips] = r.has;
+      else if (r.type === "rep") {
+        if (!countyBallotResults[r.fips]) countyBallotResults[r.fips] = {};
+        countyBallotResults[r.fips].republican = r.has;
+      } else {
+        if (!countyBallotResults[r.fips]) countyBallotResults[r.fips] = {};
+        countyBallotResults[r.fips].democrat = r.has;
+      }
+    }
+  }
+
+  const infoPresent = Object.values(countyInfoResults).filter(Boolean).length;
+  const repPresent = Object.values(countyBallotResults).filter(v => v.republican).length;
+  const demPresent = Object.values(countyBallotResults).filter(v => v.democrat).length;
+
+  // Build county checker data (name to coverage) for inline JS
+  const countyCheckerData = {};
+  for (const fips of TX_FIPS) {
+    const name = TX_COUNTY_NAMES[fips];
+    if (!name) continue;
+    countyCheckerData[name.toLowerCase()] = {
+      info: !!countyInfoResults[fips],
+      rep: !!(countyBallotResults[fips]?.republican),
+      dem: !!(countyBallotResults[fips]?.democrat),
+    };
+  }
+
+  // --- Today's Update Activity ---
+  let updateHtml = "";
+  if (updateLog) {
+    const checkedCount = updateLog.log ? (updateLog.log.match(/Checking /g) || []).length : 0;
+    const updatedCount = updateLog.updated || 0;
+    const errorCount = updateLog.errors || 0;
+    updateHtml = `<div class="dq-card-grid"><div class="dq-card"><div class="dq-card-value">${checkedCount}</div><div class="dq-card-label">Races checked</div></div><div class="dq-card"><div class="dq-card-value">${updatedCount}</div><div class="dq-card-label">Updates applied</div></div><div class="dq-card"><div class="dq-card-value">${errorCount}</div><div class="dq-card-label">Errors</div></div></div>`;
+    if (updateLog.timestamp) {
+      const logTime = new Date(updateLog.timestamp);
+      updateHtml += `<p class="dq-note">Last check: ${logTime.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })} CT</p>`;
+    }
+  } else {
+    updateHtml = `<p style="color:var(--text2)">No updates yet today. Data is checked and refreshed daily.</p>`;
+  }
+
+  const checkerDataJson = JSON.stringify(countyCheckerData);
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Data Quality — Texas Votes</title>
+  <meta name="description" content="Live transparency dashboard showing the completeness and freshness of Texas Votes election data.">
+  <meta property="og:title" content="Data Quality — Texas Votes">
+  <meta property="og:description" content="Live transparency dashboard showing the completeness and freshness of Texas Votes election data.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://txvotes.app/data-quality">
+  ${PAGE_CSS}
+  <style>
+    .dq-card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:1.5rem}
+    .dq-card{background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:1.25rem;text-align:center}
+    .dq-card-label{font-size:0.85rem;color:var(--text2);margin-bottom:0.25rem;font-weight:600}
+    .dq-card-value{font-size:1.5rem;font-weight:800;color:var(--blue)}
+    .dq-card-detail{font-size:0.82rem;color:var(--text2);margin-top:0.25rem}
+    .dq-unit{font-size:0.9rem;font-weight:600}
+    .dq-note{font-size:0.85rem;color:var(--text2);margin-top:0.5rem}
+    .dq-progress{background:var(--border);border-radius:99px;height:12px;overflow:hidden;margin:0.75rem 0}
+    .dq-progress-bar{height:100%;border-radius:99px;background:var(--blue);transition:width .3s}
+    .dq-checker{margin-top:1rem}
+    .dq-checker input{width:100%;padding:0.75rem 1rem;border:1px solid var(--border);border-radius:var(--rs);font-size:1rem;background:var(--card);color:var(--text);font-family:inherit}
+    .dq-checker input::placeholder{color:var(--text2)}
+    .dq-checker-result{margin-top:0.75rem;padding:1rem;border-radius:var(--rs);display:none;font-size:0.95rem}
+    .dq-checker-result.visible{display:block}
+    .dq-checker-result.found{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3)}
+    .dq-checker-result.partial{background:rgba(234,179,8,.1);border:1px solid rgba(234,179,8,.3)}
+    .dq-checker-result.notfound{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2)}
+    .dq-links{list-style:none;padding:0;margin:0}
+    .dq-links li{margin-bottom:0.75rem}
+    .dq-links a{font-weight:600;font-size:0.95rem}
+  </style>
+</head>
+<body>
+  <div class="container" style="max-width:720px">
+    <h1>Data Quality Dashboard</h1>
+    <p class="subtitle">Live transparency report on the completeness and freshness of our election data. Updated daily via automated research pipeline.</p>
+
+    <h2>Data Freshness</h2>
+    <div class="dq-card-grid">
+      ${freshnessCards}
+    </div>
+
+    <h2>Ballot Coverage</h2>
+    <div class="dq-card-grid">
+      ${coverageCards}
+    </div>
+
+    <h2>Candidate Data Completeness</h2>
+    <div class="dq-card" style="text-align:left;margin-bottom:1.5rem">
+      <div style="display:flex;align-items:baseline;gap:0.75rem;margin-bottom:0.25rem">
+        <span style="font-size:2rem;font-weight:800;color:var(--blue)">${completenessPercent}%</span>
+        <span style="font-size:0.95rem;color:var(--text2)">overall completeness</span>
+      </div>
+      <div class="dq-progress"><div class="dq-progress-bar" style="width:${completenessPercent}%"></div></div>
+      <p style="font-size:0.9rem;color:var(--text);margin:0.5rem 0">${fullProfileCount} of ${totalCandidates} candidates have full profiles. ${sparseCount > 0 ? `${sparseCount} candidate${sparseCount === 1 ? " has" : "s have"} limited public information.` : "All candidates have sufficient data."}</p>
+      <p class="dq-note">Candidates with limited public information are clearly labeled throughout the app.</p>
+    </div>
+
+    <h2>County Coverage</h2>
+    <div class="dq-card-grid">
+      <div class="dq-card"><div class="dq-card-value">${infoPresent}<span class="dq-unit"> / 254</span></div><div class="dq-card-label">Counties with voting info</div></div>
+      <div class="dq-card"><div class="dq-card-value">${repPresent}<span class="dq-unit"> / 254</span></div><div class="dq-card-label">Republican local ballots</div></div>
+      <div class="dq-card"><div class="dq-card-value">${demPresent}<span class="dq-unit"> / 254</span></div><div class="dq-card-label">Democrat local ballots</div></div>
+    </div>
+    <div class="dq-checker">
+      <label for="county-input" style="font-size:0.9rem;font-weight:600;display:block;margin-bottom:0.5rem">Check your county</label>
+      <input type="text" id="county-input" placeholder="Type a county name (e.g., Travis, Harris, Bexar)..." autocomplete="off">
+      <div id="county-result" class="dq-checker-result"></div>
+    </div>
+
+    <h2 style="margin-top:2rem">Today's Update Activity</h2>
+    ${updateHtml}
+
+    <h2>Related</h2>
+    <ul class="dq-links">
+      <li><a href="/audit">AI Bias Audit</a> — Independent review by four AI systems</li>
+      <li><a href="/api/audit/export">Methodology Export</a> — Full transparency of all AI prompts and data pipelines</li>
+      <li><a href="/open-source">Open Source</a> — Source code, architecture, and independent code reviews</li>
+      <li><a href="/candidates">Candidate Profiles</a> — Browse all candidates with detailed information</li>
+    </ul>
+
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/open-source">Open Source</a> &middot; <a href="/data-quality">Data Quality</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+  </div>
+  <script>
+  (function(){
+    var data=${checkerDataJson};
+    var input=document.getElementById("county-input");
+    var result=document.getElementById("county-result");
+    input.addEventListener("input",function(){
+      var v=input.value.trim().toLowerCase();
+      result.className="dq-checker-result";
+      result.textContent="";
+      if(!v)return;
+      var matches=Object.keys(data).filter(function(k){return k.indexOf(v)===0||k===v;});
+      if(matches.length===0){
+        result.className="dq-checker-result visible notfound";
+        result.textContent="No matching county found. Check your spelling and try again.";
+        return;
+      }
+      var county=matches[0];
+      var d=data[county];
+      var name=county.charAt(0).toUpperCase()+county.slice(1);
+      var parts=[];
+      if(d.info)parts.push("voting info");
+      if(d.rep)parts.push("Republican ballot");
+      if(d.dem)parts.push("Democrat ballot");
+      if(parts.length===3){
+        result.className="dq-checker-result visible found";
+        result.textContent=name+" County has full coverage: "+parts.join(", ")+".";
+      }else if(parts.length>0){
+        result.className="dq-checker-result visible partial";
+        result.textContent=name+" County has partial coverage: "+parts.join(", ")+". More data is being added.";
+      }else{
+        result.className="dq-checker-result visible notfound";
+        result.textContent=name+" County does not have local data yet. Statewide and district races are still available.";
+      }
+    });
+  })();
+  </script>
+</body>
+</html>`;
+
+  return new Response(html, {
+    headers: {
+      "Content-Type": "text/html;charset=utf-8",
+      "Cache-Control": "public, max-age=3600",
+    },
+  });
+}
+
+// MARK: - Admin Coverage Dashboard
 
 async function handleAdminCoverage(env) {
   const parties = ["republican", "democrat"];
@@ -2473,6 +2812,9 @@ export default {
       }
       if (url.pathname === "/open-source") {
         return handleOpenSource();
+      }
+      if (url.pathname === "/data-quality") {
+        return handleDataQuality(env);
       }
       if (url.pathname === "/candidates") {
         return handleCandidatesIndex(env);
