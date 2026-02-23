@@ -368,7 +368,6 @@ function handleLandingPage() {
   <p class="page-footer">
     <a href="/" data-t="Texas Votes">Texas Votes</a> &middot;
     <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot;
-    <a href="/candidates" data-t="All Candidates">All Candidates</a> &middot;
     <a href="/privacy" data-t="Privacy">Privacy</a> &middot;
     <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a>
   </p>
@@ -1116,7 +1115,6 @@ function handleSampleBallot() {
     <div class="page-footer">
       <a href="/">Texas Votes</a> &middot;
       <a href="/how-it-works">How It Works</a> &middot;
-      <a href="/candidates">All Candidates</a> &middot;
       <a href="/privacy">Privacy</a>
       <br>
       <span style="color:var(--red)">&starf;</span> Built in Texas &middot;
@@ -3098,6 +3096,16 @@ async function handleCandidateProfile(slug, env) {
     ${sections.join("\n    ")}
     ${dataUpdatedAt ? `<p style="margin-top:2rem;font-size:0.85rem;color:var(--text2)">Data last verified: ${new Date(dataUpdatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}${c.sources && c.sources.length ? ` &middot; ${c.sources.length} source${c.sources.length === 1 ? "" : "s"} cited` : ""}</p>` : ""}
     <p style="margin-top:${dataUpdatedAt ? "0.5rem" : "2rem"};font-size:0.9rem;color:var(--text2)">See something wrong? <a href="mailto:howdy@txvotes.app?subject=Data correction: ${encodeURIComponent(c.name)}">Let us know</a> and we'll fix it.</p>
+
+    <h2>Related</h2>
+    <ul class="related-links">
+      <li><a href="/candidates">All Candidates</a> — Browse every candidate with detailed profiles</li>
+      <li><a href="/how-it-works">How It Works</a> — Plain-language explanation of the app and AI</li>
+      <li><a href="/sample-ballot">Sample Ballot</a> — See what a personalized ballot looks like</li>
+      <li><a href="/data-quality">Data Quality Dashboard</a> — Live metrics on ballot coverage and candidate completeness</li>
+      <li><a href="/nonpartisan">Nonpartisan by Design</a> — How we keep the app fair for all voters</li>
+    </ul>
+
     <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
 </body>
@@ -3195,6 +3203,17 @@ async function handleCandidatesIndex(env) {
     <div class="cta-banner"><a class="cta-btn" href="/app?start=1">Build My Voting Guide &rarr;</a><p class="cta-sub">5-minute personalized ballot</p></div>
 
     ${raceSections}
+
+    <h2>Related</h2>
+    <ul class="related-links">
+      <li><a href="/how-it-works">How It Works</a> — Plain-language explanation of the app and AI</li>
+      <li><a href="/sample-ballot">Sample Ballot</a> — See what a personalized ballot looks like</li>
+      <li><a href="/data-quality">Data Quality Dashboard</a> — Live metrics on ballot coverage and candidate completeness</li>
+      <li><a href="/nonpartisan">Nonpartisan by Design</a> — How we keep the app fair for all voters</li>
+      <li><a href="/audit">AI Bias Audit</a> — Independent review of our AI by four different systems</li>
+      <li><a href="/open-source">Open Source</a> — Source code, architecture, and independent code reviews</li>
+    </ul>
+
     <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
 </body>
