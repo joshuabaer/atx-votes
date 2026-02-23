@@ -42,7 +42,7 @@ li{font-size:1rem;color:var(--text);margin-bottom:0.75rem}
 .back{display:inline-block;margin-top:1.5rem;font-size:0.95rem}
 .back-top{display:inline-block;margin-bottom:0.5rem;font-size:0.9rem;color:var(--text2);text-decoration:none}
 .back-top:hover{color:var(--link)}
-.page-footer{margin-top:2rem;font-size:0.85rem;color:var(--text2);text-align:center}
+.page-footer{margin-top:2rem;font-size:0.85rem;color:var(--text2);text-align:center;line-height:2}
 .page-footer a{color:var(--text2);text-decoration:none}
 .related-links{list-style:none;padding:0;margin:0}
 .related-links li{margin-bottom:0.75rem}
@@ -365,12 +365,14 @@ function handleLandingPage() {
   <div style="text-align:center;margin-top:16px">
     <button id="lang-toggle" style="font-size:14px;color:var(--text2);background:none;border:none;cursor:pointer;font-family:inherit"></button>
   </div>
-  <p class="page-footer">
+  <div class="page-footer">
     <a href="/" data-t="Texas Votes">Texas Votes</a> &middot;
     <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot;
-    <a href="/privacy" data-t="Privacy">Privacy</a> &middot;
+    <a href="/privacy" data-t="Privacy">Privacy</a>
+    <br>
+    <span style="color:var(--red)">&starf;</span> Built in Texas &middot;
     <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a>
-  </p>
+  </div>
   <script>
   (function(){
     var TR={
@@ -1244,7 +1246,7 @@ function handleHowItWorks() {
       <li><a href="/candidates">All Candidates</a> — Browse every candidate with detailed profiles</li>
     </ul>
 
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <div class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> Built in Texas &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
   </div>
 </body>
 </html>`;
@@ -1349,7 +1351,7 @@ function handleNonpartisan() {
       <li><a href="/candidates">All Candidates</a> — Browse every candidate with detailed profiles</li>
     </ul>
 
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <div class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> Built in Texas &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
   </div>
 </body>
 </html>`;
@@ -1696,7 +1698,7 @@ CONFLICT RESOLUTION: If sources disagree, trust official filings over campaign c
       <li><a href="/candidates">All Candidates</a> — Browse every candidate with detailed profiles</li>
     </ul>
 
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <div class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> Built in Texas &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
   </div>
 </body>
 </html>`;
@@ -2308,7 +2310,7 @@ function handleSupport() {
       <li><a href="/candidates">All Candidates</a> — Browse every candidate with detailed profiles</li>
     </ul>
 
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <div class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> Built in Texas &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
   </div>
 </body>
 </html>`;
@@ -2394,7 +2396,7 @@ function handlePrivacyPolicy() {
       <li><a href="/candidates">All Candidates</a> — Browse every candidate with detailed profiles</li>
     </ul>
 
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <div class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> Built in Texas &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
   </div>
 </body>
 </html>`;
@@ -2506,7 +2508,7 @@ function handleOpenSource() {
       <li><a href="/candidates">All Candidates</a> — Browse every candidate with detailed profiles</li>
     </ul>
 
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <div class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> Built in Texas &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
   </div>
 </body>
 </html>`;
@@ -2937,7 +2939,7 @@ async function handleCandidateProfile(slug, env) {
     <a href="/candidates" class="back-top">&larr; All Candidates</a>
     <h1>Candidate Not Found</h1>
     <p class="subtitle">We couldn't find a candidate matching "${escapeHtml(slug)}". The candidate may not be in our database yet, or the URL may be incorrect.</p>
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <div class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> Built in Texas &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
   </div>
 </body>
 </html>`;
@@ -3106,7 +3108,7 @@ async function handleCandidateProfile(slug, env) {
       <li><a href="/nonpartisan">Nonpartisan by Design</a> — How we keep the app fair for all voters</li>
     </ul>
 
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <div class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> Built in Texas &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
   </div>
 </body>
 </html>`;
@@ -3214,7 +3216,7 @@ async function handleCandidatesIndex(env) {
       <li><a href="/open-source">Open Source</a> — Source code, architecture, and independent code reviews</li>
     </ul>
 
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <div class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> Built in Texas &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
   </div>
 </body>
 </html>`;
@@ -3596,7 +3598,7 @@ async function handleDataQuality(env) {
       <li><a href="/candidates">Candidate Profiles</a> — Browse all candidates with detailed information</li>
     </ul>
 
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <div class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> Built in Texas &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
   </div>
   <script>
   (function(){
@@ -3858,7 +3860,7 @@ async function handleAdminCoverage(env) {
     </table>
     </div>
 
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <div class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> Built in Texas &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
   </div>
 </body>
 </html>`;
