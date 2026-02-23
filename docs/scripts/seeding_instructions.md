@@ -2,12 +2,13 @@
 
 ## Overview
 
-Two scripts populate the Texas Votes app with county-level election data:
+Three scripts populate the Texas Votes app with county-level election data:
 
 1. **seed_county_ballots.js** — Researches and writes county ballot data, voting info, and precinct maps
+1b. **enrich_remaining_county_info.js** — Enriches county_info for ~120 remaining counties with template data
 2. **seed_candidate_tones.js** — Generates tone variants (cowboy, chef, formal, casual) for candidate text
 
-Both scripts:
+All scripts:
 - Use the Anthropic API with `web_search` tool
 - Write to Cloudflare KV via `wrangler` CLI
 - Track progress in JSON files so they can resume after interruption
@@ -121,6 +122,68 @@ npx wrangler kv:key get "precinct_map:48201" --binding=ELECTION_DATA | python3 -
 Or visit the admin coverage dashboard (requires ADMIN_SECRET):
 ```bash
 curl -H "Authorization: Bearer YOUR_ADMIN_SECRET" https://txvotes.app/admin/coverage
+```
+
+---
+
+## Script 1b: enrich_remaining_county_info.js
+
+### What it does
+
+Enriches county_info for the ~120 remaining Texas counties that still have template/generic data. The top 30 counties and counties 31-130 were already enriched using the county ballot seeder. This script targets the remaining smallest/rural counties.
+
+For each county needing enrichment, it:
+1. Reads existing county_info from KV to check if it's template data
+2. Uses Claude + web_search to research the county elections office
+3. Writes enriched data back to KV
+
+### How it detects template data
+
+A county is considered "template" if any of these are true:
+- No `electionsWebsite` or it points to `votertexas.gov` / `sos.state.tx.us`
+- No `electionsPhone` or it's the TX SOS main number `(512) 463-5650`
+- The early voting note says "Hours vary by county"
+
+### Running it
+
+**Check which counties need enrichment (reads KV, no API calls):**
+```bash
+bash docs/scripts/enrich_remaining_county_info.sh --check-only
+```
+
+**Dry run (API calls but no KV writes):**
+```bash
+bash docs/scripts/enrich_remaining_county_info.sh --dry-run --batch=5
+```
+
+**Single county test:**
+```bash
+bash docs/scripts/enrich_remaining_county_info.sh --county=48001
+```
+
+**Process 20 counties at a time:**
+```bash
+bash docs/scripts/enrich_remaining_county_info.sh --batch=20
+```
+
+**Run all remaining counties:**
+```bash
+bash docs/scripts/enrich_remaining_county_info.sh
+```
+
+### Time and cost estimates
+
+- **Per county**: ~12-15 seconds (5 web searches), ~$0.08
+- **All ~120 remaining counties**: ~$10, ~30 minutes
+- **KV writes**: 1 per county = ~120 total (well within 1M/month limit)
+
+### Resuming after interruption
+
+Progress is saved to `/tmp/enrich_county_info_progress.json`. Re-run to continue.
+
+To start fresh:
+```bash
+bash docs/scripts/enrich_remaining_county_info.sh --reset
 ```
 
 ---

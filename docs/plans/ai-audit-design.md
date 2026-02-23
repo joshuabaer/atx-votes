@@ -562,6 +562,11 @@ After making fixes based on audit results:
 2. Compare scores before and after
 3. Document which findings were accepted, rejected (with reasoning), or deferred
 4. Store audit results in a `audits/` directory in the repo for historical tracking
+5. **Update the open source page audit quotes** — every time an audit is run, update the hardcoded quotes displayed on the open source transparency page:
+   - In `worker/src/index.js`, search for `class="quote"` to find the four audit quote lines (ChatGPT, Gemini, Claude, Grok)
+   - Replace each quote excerpt and score with the latest audit results
+   - Deploy the changes: `cd worker && npx wrangler deploy -c wrangler.txvotes.toml`
+   - Verify the updated quotes appear at `https://txvotes.app/open-source`
 
 ### 4d. Reporting
 
