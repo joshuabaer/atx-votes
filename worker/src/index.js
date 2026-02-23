@@ -1,9 +1,10 @@
-import { runDailyUpdate } from "./updater.js";
+import { runDailyUpdate, ERROR_LOG_PREFIX, seedBaseline, BASELINE_KEY_PREFIX, BASELINE_LOG_KEY } from "./updater.js";
 import { handlePWA, handlePWA_SW, handlePWA_Manifest, handlePWA_Clear } from "./pwa.js";
-import { handlePWA_Guide, handlePWA_Summary } from "./pwa-guide.js";
-import { seedFullCounty, seedCountyInfo, seedCountyBallot, seedPrecinctMap } from "./county-seeder.js";
+import { handlePWA_Guide, handlePWA_Summary, handleSeedTranslations } from "./pwa-guide.js";
+import { seedFullCounty, seedCountyInfo, seedCountyBallot, seedPrecinctMap, resetProgress as resetSeedProgress } from "./county-seeder.js";
 import { runAudit } from "./audit-runner.js";
 import { checkBallotBalance, formatBalanceSummary } from "./balance-check.js";
+import { getUsageLog, estimateCost } from "./usage-logger.js";
 
 // Shared CSS for static pages — matches app design tokens from pwa.js
 const PAGE_CSS = `<meta name="theme-color" content="rgb(33,89,143)" media="(prefers-color-scheme:light)"><meta name="theme-color" content="rgb(28,28,31)" media="(prefers-color-scheme:dark)">
@@ -52,9 +53,17 @@ li{font-size:1rem;color:var(--text);margin-bottom:0.75rem}
 .cta-banner a.cta-btn{background:var(--blue);color:#fff;font-weight:600;padding:0.6rem 1.25rem;border-radius:var(--rs);text-decoration:none;display:inline-block;font-size:0.95rem;transition:opacity .15s}
 .cta-banner a.cta-btn:hover{opacity:0.9}
 .cta-banner .cta-sub{font-size:0.8rem;color:var(--text2);margin-top:0.35rem}
+.conf-badge{display:inline-block;font-size:0.7rem;font-weight:600;padding:0.15rem 0.5rem;border-radius:99px;vertical-align:middle;margin-left:0.4rem;letter-spacing:0.02em;cursor:help}
+.conf-verified{background:rgba(34,139,34,.12);color:#1a7a1a}
+.conf-inferred{background:rgba(128,128,128,.12);color:#666}
+@media(prefers-color-scheme:dark){.conf-verified{background:rgba(34,139,34,.2);color:#5cb85c}.conf-inferred{background:rgba(200,200,200,.15);color:#aaa}}
+.conf-legend{margin-top:1.5rem;padding:0.75rem 1rem;background:rgba(128,128,128,.06);border:1px solid var(--border);border-radius:8px;font-size:0.85rem;color:var(--text2);line-height:1.8}
+.conf-legend strong{color:var(--text);font-size:0.85rem}
 </style>
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="/apple-touch-icon.svg">`;
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">`;
 
 /**
  * Generates the shared <head> content for a static page, including meta tags,
@@ -64,7 +73,7 @@ li{font-size:1rem;color:var(--text);margin-bottom:0.75rem}
  * @param {string} opts.title - Page title (also used for og:title and twitter:title)
  * @param {string} opts.description - Meta description (also used for og:description and twitter:description)
  * @param {string} [opts.url] - Canonical URL (og:url). Defaults to "https://txvotes.app/"
- * @param {string} [opts.image] - OG image URL. Defaults to "https://txvotes.app/og-image.svg"
+ * @param {string} [opts.image] - OG image URL. Defaults to "https://txvotes.app/og-image.png"
  * @param {string} [opts.type] - og:type. Defaults to "website"
  * @param {string} [opts.extraHead] - Additional HTML to include in <head> (e.g., extra <style> blocks)
  * @returns {string} Complete <head> inner HTML
@@ -73,7 +82,7 @@ function pageHead({ title, description, url, image, type, extraHead } = {}) {
   const t = title || "Texas Votes — Your Personalized Voting Guide";
   const d = description || "Get a personalized, nonpartisan voting guide for Texas elections in 5 minutes.";
   const u = url || "https://txvotes.app/";
-  const img = image || "https://txvotes.app/og-image.svg";
+  const img = image || "https://txvotes.app/og-image.png";
   const ogType = type || "website";
   return `<meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -87,6 +96,7 @@ function pageHead({ title, description, url, image, type, extraHead } = {}) {
   <meta property="og:image" content="${img}">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/png">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${t}">
   <meta name="twitter:description" content="${d}">
@@ -227,8 +237,7 @@ async function loadAllCandidates(env) {
   // Load statewide ballots — both parties in parallel
   const parties = ["republican", "democrat"];
   const statewideRaws = await Promise.all(parties.map(async (party) => {
-    let raw = await env.ELECTION_DATA.get(`ballot:statewide:${party}_primary_2026`);
-    if (!raw) raw = await env.ELECTION_DATA.get(`ballot:${party}_primary_2026`);
+    const raw = await env.ELECTION_DATA.get(`ballot:statewide:${party}_primary_2026`);
     return { party, raw };
   }));
 
@@ -270,7 +279,12 @@ async function loadAllCandidates(env) {
     let ballot;
     try { ballot = JSON.parse(raw); } catch { continue; }
     const party = keyName.includes("republican") ? "republican" : "democrat";
-    const countyName = ballot.countyName || "";
+    // Extract county name: prefer ballot field, fall back to FIPS from KV key
+    let countyName = ballot.countyName || "";
+    if (!countyName) {
+      const fipsMatch = keyName.match(/^ballot:county:(\d+):/);
+      if (fipsMatch) countyName = TX_COUNTY_NAMES[fipsMatch[1]] || "";
+    }
 
     for (const race of (ballot.races || [])) {
       for (const candidate of (race.candidates || [])) {
@@ -472,9 +486,10 @@ function handleLandingPage() {
       <div data-t="Print your cheat sheet for the booth"><span>🖨️</span> Print your cheat sheet for the booth</div>
       <div data-t="Find your polling location"><span>📍</span> Find your polling location</div>
       <div data-t="Nonpartisan and Open Source by design"><span>⚖️</span> <a href="/nonpartisan">Nonpartisan</a> and <a href="/open-source">Open Source</a> by design</div>
-      <div data-t="No personal data collected — everything stays on your device"><span>🔒</span> <strong>No personal data collected</strong> — everything stays on your device</div>
+      <div data-t="No personal data collected"><span>🔒</span> <strong>No personal data collected</strong></div>
     </div>
-    <p class="note" data-t="Works on any device — phone, tablet, or computer. No app download needed.">Works on any device — phone, tablet, or computer. No app download needed.</p>
+    <p class="note" data-t="Works on any device — phone, tablet, or computer.">Works on any device — phone, tablet, or computer.</p>
+    <p class="note" style="margin-top:0" data-t="No app download needed.">No app download needed.</p>
   </div>
   <div style="text-align:center;margin-top:16px">
     <button id="lang-toggle" style="font-size:14px;color:var(--text2);background:none;border:none;cursor:pointer;font-family:inherit"></button>
@@ -484,7 +499,7 @@ function handleLandingPage() {
     <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot;
     <a href="/privacy" data-t="Privacy">Privacy</a>
     <br>
-    <span style="color:var(--red)">&starf;</span> Built in Texas &middot;
+    <span style="color:#fff">&starf;</span> Built in Texas &middot;
     <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a>
   </div>
   <script>
@@ -498,8 +513,9 @@ function handleLandingPage() {
       'Print your cheat sheet for the booth':'Imprime tu gu\\u00EDa r\\u00E1pida para la casilla',
       'Find your polling location':'Encuentra tu lugar de votaci\\u00F3n',
       'Nonpartisan and Open Source by design':'Apartidista y c\\u00F3digo abierto por dise\\u00F1o',
-      'No personal data collected \\u2014 everything stays on your device':'No se recopilan datos personales \\u2014 todo permanece en tu dispositivo',
-      'Works on any device \\u2014 phone, tablet, or computer. No app download needed.':'Funciona en cualquier dispositivo \\u2014 tel\\u00E9fono, tableta o computadora. No necesitas descargar una app.',
+      'No personal data collected':'No se recopilan datos personales',
+      'Works on any device \\u2014 phone, tablet, or computer.':'Funciona en cualquier dispositivo \\u2014 tel\\u00E9fono, tableta o computadora.',
+      'No app download needed.':'No necesitas descargar una app.',
       'How It Works':'C\\u00F3mo Funciona',
       'Nonpartisan by Design':'Apartidista por Dise\\u00F1o',
       'AI Audit':'Auditor\\u00EDa de IA',
@@ -574,17 +590,20 @@ function handleSampleBallot() {
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://txvotes.app/sample">
   <meta property="og:site_name" content="Texas Votes">
-  <meta property="og:image" content="https://txvotes.app/og-image.svg">
+  <meta property="og:image" content="https://txvotes.app/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/png">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Sample Ballot — Texas Votes">
   <meta name="twitter:description" content="See what a personalized Texas Votes ballot looks like with realistic race cards, candidate recommendations, and party switching.">
-  <meta name="twitter:image" content="https://txvotes.app/og-image.svg">
+  <meta name="twitter:image" content="https://txvotes.app/og-image.png">
   <meta name="theme-color" content="rgb(33,89,143)" media="(prefers-color-scheme:light)">
   <meta name="theme-color" content="rgb(28,28,31)" media="(prefers-color-scheme:dark)">
-  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="/apple-touch-icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <style>
     /* ---- Design tokens (mirrors pwa.js) ---- */
     :root{
@@ -735,21 +754,21 @@ function handleSampleBallot() {
 </head>
 <body>
   <div class="sample-banner" data-t="SAMPLE BALLOT — Fictional candidates and recommendations for demonstration">SAMPLE BALLOT &mdash; Fictional candidates &amp; recommendations for demonstration</div>
-  <div class="sample-watermark">SAMPLE</div>
+  <div class="sample-watermark" data-t="SAMPLE">SAMPLE</div>
 
   <div class="ballot-container">
     <a href="/" class="back-top">&larr; Texas Votes</a>
 
     <!-- Party switcher -->
     <div class="party-row">
-      <button class="party-btn party-rep on" id="btn-rep" onclick="setParty('republican')" data-t="Republican">&#x1F418; Republican</button>
-      <button class="party-btn party-dem" id="btn-dem" onclick="setParty('democrat')" data-t="Democrat">&#x1FACF; Democrat</button>
+      <button class="party-btn party-rep on" id="btn-rep" onclick="setParty('republican')" >&#x1F418; <span data-t="Republican">Republican</span></button>
+      <button class="party-btn party-dem" id="btn-dem" onclick="setParty('democrat')" >&#x1FACF; <span data-t="Democrat">Democrat</span></button>
     </div>
 
     <!-- Election info header -->
     <div class="card" style="text-align:center">
-      <div style="font-size:18px;font-weight:800"><span style="color:var(--red)">&starf;</span> Texas <span id="party-label">Republican</span> Primary</div>
-      <div style="font-size:14px;color:var(--text2);margin-top:2px">Tuesday, March 3, 2026</div>
+      <div style="font-size:18px;font-weight:800"><span style="color:#fff">&starf;</span> <span id="election-title">Texas <span id="party-label">Republican</span> Primary</span></div>
+      <div style="font-size:14px;color:var(--text2);margin-top:2px" data-t="Tuesday, March 3, 2026">Tuesday, March 3, 2026</div>
       <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px">
         <span class="badge badge-blue">CD-21</span>
         <span class="badge badge-blue">SD-14</span>
@@ -761,8 +780,8 @@ function handleSampleBallot() {
     <div class="disclaimer">
       <span style="font-size:20px">&#x26A0;&#xFE0F;</span>
       <div>
-        <b>Sample Ballot &mdash; Not Real Recommendations</b>
-        This page shows fictional candidates and AI-generated recommendations to demonstrate what your personalized ballot looks like. All names, positions, and match scores are examples only.
+        <b data-t="Sample Ballot — Not Real Recommendations">Sample Ballot &mdash; Not Real Recommendations</b>
+        <span data-t="This page shows fictional candidates and AI-generated recommendations to demonstrate what your personalized ballot looks like. All names, positions, and match scores are examples only.">This page shows fictional candidates and AI-generated recommendations to demonstrate what your personalized ballot looks like. All names, positions, and match scores are examples only.</span>
       </div>
     </div>
 
@@ -771,20 +790,20 @@ function handleSampleBallot() {
     <!-- ==================== REPUBLICAN BALLOT ==================== -->
     <div data-party="republican">
 
-      <div class="section-head">Key Races</div>
+      <div class="section-head" data-t="Key Races">Key Races</div>
 
       <!-- R1: Governor -->
       <div class="card race-card">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
-          <div class="race-office"><span class="star">&#x2B50;</span> Governor</div>
+          <div class="race-office"><span class="star">&#x2B50;</span> <span data-t="Governor">Governor</span></div>
           <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-            <span class="badge badge-ok">Strong Match</span>
+            <span class="badge badge-ok" data-t="Strong Match">Strong Match</span>
             <span style="color:var(--text2);font-size:18px">&rsaquo;</span>
           </div>
         </div>
         <div class="race-rec-name">Marcus Sullivan</div>
-        <div class="race-rec-reason">Fiscally conservative with strong property tax reform plan. Aligns with your emphasis on limited government and individual liberty.</div>
-        <div class="race-cand-count">3 candidates</div>
+        <div class="race-rec-reason" data-t="Fiscally conservative with strong property tax reform plan. Aligns with your emphasis on limited government and individual liberty.">Fiscally conservative with strong property tax reform plan. Aligns with your emphasis on limited government and individual liberty.</div>
+        <div class="race-cand-count" data-t="3 candidates">3 candidates</div>
         <div class="avatar-row">
           <div class="avatar-circle rec" style="background:#4A90D9">M</div>
           <div class="avatar-circle" style="background:#D95B43">R</div>
@@ -796,9 +815,9 @@ function handleSampleBallot() {
       <div class="rec-box">
         <div style="display:flex;justify-content:space-between;align-items:center">
           <h4>&#x2705; Marcus Sullivan</h4>
-          <span class="badge badge-ok">Strong Match</span>
+          <span class="badge badge-ok" data-t="Strong Match">Strong Match</span>
         </div>
-        <p>Sullivan's property tax reform plan directly addresses your top issue. His business background and city council tenure demonstrate fiscal restraint, while his education stance preserves local control.</p>
+        <p data-t="Sullivan's property tax reform plan directly addresses your top issue. His business background and city council tenure demonstrate fiscal restraint, while his education stance preserves local control.">Sullivan's property tax reform plan directly addresses your top issue. His business background and city council tenure demonstrate fiscal restraint, while his education stance preserves local control.</p>
       </div>
 
       <div class="cand-card recommended">
@@ -808,63 +827,63 @@ function handleSampleBallot() {
             <div style="display:flex;justify-content:space-between;align-items:flex-start">
               <div class="cand-name">Marcus Sullivan</div>
               <div class="cand-tags">
-                <span class="badge badge-ok">Recommended</span>
+                <span class="badge badge-ok" data-t="Recommended">Recommended</span>
               </div>
             </div>
           </div>
         </div>
-        <div class="cand-summary">Former city council member and business owner. Strong advocate for property tax relief, school choice, and border security. Endorsed by multiple law enforcement organizations.</div>
+        <div class="cand-summary" data-t="Former city council member and business owner. Strong advocate for property tax relief, school choice, and border security. Endorsed by multiple law enforcement organizations.">Former city council member and business owner. Strong advocate for property tax relief, school choice, and border security. Endorsed by multiple law enforcement organizations.</div>
         <div class="cand-details">
           <div class="cand-section">
-            <h5>Key Positions</h5>
+            <h5 data-t="Key Positions">Key Positions</h5>
             <div class="pos-chips">
-              <span class="pos-chip">Property Tax Reform</span>
-              <span class="pos-chip">School Choice</span>
-              <span class="pos-chip">Border Security</span>
-              <span class="pos-chip">Energy Independence</span>
+              <span class="pos-chip" data-t="Property Tax Reform">Property Tax Reform</span>
+              <span class="pos-chip" data-t="School Choice">School Choice</span>
+              <span class="pos-chip" data-t="Border Security">Border Security</span>
+              <span class="pos-chip" data-t="Energy Independence">Energy Independence</span>
             </div>
           </div>
           <div class="cand-section">
-            <h5>Endorsements</h5>
+            <h5 data-t="Endorsements">Endorsements</h5>
             <ul>
-              <li>Texas Farm Bureau <span style="font-size:12px;color:var(--text2)">(business group)</span></li>
-              <li>Travis County Sheriff&rsquo;s Association <span style="font-size:12px;color:var(--text2)">(professional association)</span></li>
-              <li>Rep. Dan Harmon <span style="font-size:12px;color:var(--text2)">(elected official)</span></li>
+              <li>Texas Farm Bureau <span style="font-size:12px;color:var(--text2)" data-t="(business group)">(business group)</span></li>
+              <li>Travis County Sheriff&rsquo;s Association <span style="font-size:12px;color:var(--text2)" data-t="(professional association)">(professional association)</span></li>
+              <li>Rep. Dan Harmon <span style="font-size:12px;color:var(--text2)" data-t="(elected official)">(elected official)</span></li>
             </ul>
           </div>
           <div class="cand-section pros">
-            <h5>&#x2705; Strengths</h5>
+            <h5>&#x2705; <span data-t="Strengths">Strengths</span></h5>
             <ul>
-              <li>Detailed 5-year property tax reduction plan with independent budget analysis</li>
-              <li>8 years city council experience with record of balanced budgets</li>
-              <li>Endorsed by Texas Farm Bureau and multiple sheriffs' associations</li>
+              <li data-t="Detailed 5-year property tax reduction plan with independent budget analysis">Detailed 5-year property tax reduction plan with independent budget analysis</li>
+              <li data-t="8 years city council experience with record of balanced budgets">8 years city council experience with record of balanced budgets</li>
+              <li data-t="Endorsed by Texas Farm Bureau and multiple sheriffs' associations">Endorsed by Texas Farm Bureau and multiple sheriffs' associations</li>
             </ul>
           </div>
           <div class="cand-section cons">
-            <h5>&#x26A0;&#xFE0F; Concerns</h5>
+            <h5>&#x26A0;&#xFE0F; <span data-t="Concerns">Concerns</span></h5>
             <ul>
-              <li>No statewide office experience; largest budget managed was $180M</li>
-              <li>Property tax plan may require offsetting revenue sources not yet identified</li>
+              <li data-t="No statewide office experience; largest budget managed was $180M">No statewide office experience; largest budget managed was $180M</li>
+              <li data-t="Property tax plan may require offsetting revenue sources not yet identified">Property tax plan may require offsetting revenue sources not yet identified</li>
             </ul>
           </div>
           <div style="margin-top:12px;padding:10px;border-radius:var(--rs);background:rgba(33,89,143,.04);border:1px solid var(--border)">
-            <div style="font-size:13px;font-weight:700;margin-bottom:4px">Why this match?</div>
+            <div style="font-size:13px;font-weight:700;margin-bottom:4px" data-t="Why this match?">Why this match?</div>
             <ul style="font-size:13px;color:var(--text2);line-height:1.6;margin-left:16px">
-              <li>Aligns with your priority: property tax reform</li>
-              <li>Matches your value: fiscal discipline and limited government</li>
-              <li>Supports your stance: local control of education</li>
+              <li data-t="Aligns with your priority: property tax reform">Aligns with your priority: property tax reform</li>
+              <li data-t="Matches your value: fiscal discipline and limited government">Matches your value: fiscal discipline and limited government</li>
+              <li data-t="Supports your stance: local control of education">Supports your stance: local control of education</li>
             </ul>
           </div>
           <div style="margin-top:10px">
-            <div style="font-size:13px;font-weight:700;margin-bottom:4px">Sources</div>
+            <div style="font-size:13px;font-weight:700;margin-bottom:4px" data-t="Sources">Sources</div>
             <ul style="font-size:12px;color:var(--text2);line-height:1.6;margin-left:16px">
-              <li><a href="#" style="font-size:12px" onclick="return false">Sullivan for Governor &mdash; Official Campaign Site</a></li>
-              <li><a href="#" style="font-size:12px" onclick="return false">Texas Tribune: Sullivan enters governor&rsquo;s race</a></li>
-              <li><a href="#" style="font-size:12px" onclick="return false">Ballotpedia &mdash; Marcus Sullivan</a></li>
+              <li><a href="#" style="font-size:12px" onclick="return false" data-t="Sullivan for Governor — Official Campaign Site">Sullivan for Governor &mdash; Official Campaign Site</a></li>
+              <li><a href="#" style="font-size:12px" onclick="return false" data-t="Texas Tribune: Sullivan enters governor's race">Texas Tribune: Sullivan enters governor&rsquo;s race</a></li>
+              <li><a href="#" style="font-size:12px" onclick="return false" data-t="Ballotpedia — Marcus Sullivan">Ballotpedia &mdash; Marcus Sullivan</a></li>
             </ul>
           </div>
         </div>
-        <button class="expand-toggle" style="pointer-events:none">Show Less</button>
+        <button class="expand-toggle" style="pointer-events:none" data-t="Show Less">Show Less</button>
       </div>
 
       <div class="cand-card">
@@ -874,13 +893,13 @@ function handleSampleBallot() {
             <div style="display:flex;justify-content:space-between;align-items:flex-start">
               <div class="cand-name">Rachel Whitfield</div>
               <div class="cand-tags">
-                <span class="badge badge-warn">Good Match</span>
+                <span class="badge badge-warn" data-t="Good Match">Good Match</span>
               </div>
             </div>
           </div>
         </div>
-        <div class="cand-summary">State representative with 6 years of legislative experience. Focused on water infrastructure and rural broadband. More moderate on education policy.</div>
-        <button class="expand-toggle" style="pointer-events:none">Show Details</button>
+        <div class="cand-summary" data-t="State representative with 6 years of legislative experience. Focused on water infrastructure and rural broadband. More moderate on education policy.">State representative with 6 years of legislative experience. Focused on water infrastructure and rural broadband. More moderate on education policy.</div>
+        <button class="expand-toggle" style="pointer-events:none" data-t="Show Details">Show Details</button>
       </div>
 
       <div class="cand-card">
@@ -890,27 +909,27 @@ function handleSampleBallot() {
             <div style="display:flex;justify-content:space-between;align-items:flex-start">
               <div class="cand-name">Tom Briscoe</div>
               <div class="cand-tags">
-                <span class="badge badge-warn">Best Available</span>
+                <span class="badge badge-warn" data-t="Best Available">Best Available</span>
               </div>
             </div>
           </div>
         </div>
-        <div class="cand-summary">Rancher and former county judge. Running on a strict constitutionalist platform emphasizing 10th Amendment rights and federal land policy.</div>
-        <button class="expand-toggle" style="pointer-events:none">Show Details</button>
+        <div class="cand-summary" data-t="Rancher and former county judge. Running on a strict constitutionalist platform emphasizing 10th Amendment rights and federal land policy.">Rancher and former county judge. Running on a strict constitutionalist platform emphasizing 10th Amendment rights and federal land policy.</div>
+        <button class="expand-toggle" style="pointer-events:none" data-t="Show Details">Show Details</button>
       </div>
 
       <!-- R2: Attorney General -->
       <div class="card race-card">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
-          <div class="race-office"><span class="star">&#x2B50;</span> Attorney General</div>
+          <div class="race-office"><span class="star">&#x2B50;</span> <span data-t="Attorney General">Attorney General</span></div>
           <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-            <span class="badge badge-ok">Strong Match</span>
+            <span class="badge badge-ok" data-t="Strong Match">Strong Match</span>
             <span style="color:var(--text2);font-size:18px">&rsaquo;</span>
           </div>
         </div>
         <div class="race-rec-name">Priya Kapoor</div>
-        <div class="race-rec-reason">Former federal prosecutor with deep consumer protection experience. Her stance on government accountability aligns with your priorities.</div>
-        <div class="race-cand-count">2 candidates</div>
+        <div class="race-rec-reason" data-t="Former federal prosecutor with deep consumer protection experience. Her stance on government accountability aligns with your priorities.">Former federal prosecutor with deep consumer protection experience. Her stance on government accountability aligns with your priorities.</div>
+        <div class="race-cand-count" data-t="2 candidates">2 candidates</div>
         <div class="avatar-row">
           <div class="avatar-circle rec" style="background:#4A90D9">P</div>
           <div class="avatar-circle" style="background:#D95B43">J</div>
@@ -920,15 +939,15 @@ function handleSampleBallot() {
       <!-- R3: Comptroller -->
       <div class="card race-card">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
-          <div class="race-office">Comptroller of Public Accounts</div>
+          <div class="race-office" data-t="Comptroller of Public Accounts">Comptroller of Public Accounts</div>
           <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-            <span class="badge badge-warn">Good Match</span>
+            <span class="badge badge-warn" data-t="Good Match">Good Match</span>
             <span style="color:var(--text2);font-size:18px">&rsaquo;</span>
           </div>
         </div>
         <div class="race-rec-name">David Chen</div>
-        <div class="race-rec-reason">CPA with state budget experience. Pragmatic fiscal approach with emphasis on transparent accounting practices.</div>
-        <div class="race-cand-count">3 candidates</div>
+        <div class="race-rec-reason" data-t="CPA with state budget experience. Pragmatic fiscal approach with emphasis on transparent accounting practices.">CPA with state budget experience. Pragmatic fiscal approach with emphasis on transparent accounting practices.</div>
+        <div class="race-cand-count" data-t="3 candidates">3 candidates</div>
         <div class="avatar-row">
           <div class="avatar-circle rec" style="background:#4A90D9">D</div>
           <div class="avatar-circle" style="background:#D95B43">A</div>
@@ -936,20 +955,20 @@ function handleSampleBallot() {
         </div>
       </div>
 
-      <div class="section-head">Other Contested Races</div>
+      <div class="section-head" data-t="Other Contested Races">Other Contested Races</div>
 
       <!-- R4: Commissioner of Agriculture -->
       <div class="card race-card">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
-          <div class="race-office">Commissioner of Agriculture</div>
+          <div class="race-office" data-t="Commissioner of Agriculture">Commissioner of Agriculture</div>
           <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-            <span class="badge badge-warn">Best Available</span>
+            <span class="badge badge-warn" data-t="Best Available">Best Available</span>
             <span style="color:var(--text2);font-size:18px">&rsaquo;</span>
           </div>
         </div>
         <div class="race-rec-name">Linda Morales</div>
-        <div class="race-rec-reason">Third-generation rancher with practical water management experience. Both candidates have limited policy platforms.</div>
-        <div class="race-cand-count">2 candidates</div>
+        <div class="race-rec-reason" data-t="Third-generation rancher with practical water management experience. Both candidates have limited policy platforms.">Third-generation rancher with practical water management experience. Both candidates have limited policy platforms.</div>
+        <div class="race-cand-count" data-t="2 candidates">2 candidates</div>
         <div class="avatar-row">
           <div class="avatar-circle rec" style="background:#4A90D9">L</div>
           <div class="avatar-circle" style="background:#D95B43">B</div>
@@ -959,15 +978,15 @@ function handleSampleBallot() {
       <!-- R5: Railroad Commissioner -->
       <div class="card race-card">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
-          <div class="race-office">Railroad Commissioner</div>
+          <div class="race-office" data-t="Railroad Commissioner">Railroad Commissioner</div>
           <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-            <span class="badge badge-ok">Strong Match</span>
+            <span class="badge badge-ok" data-t="Strong Match">Strong Match</span>
             <span style="color:var(--text2);font-size:18px">&rsaquo;</span>
           </div>
         </div>
         <div class="race-rec-name">James Okafor</div>
-        <div class="race-rec-reason">Petroleum engineer with 20 years of industry experience. Strong on grid reliability and responsible energy development.</div>
-        <div class="race-cand-count">4 candidates</div>
+        <div class="race-rec-reason" data-t="Petroleum engineer with 20 years of industry experience. Strong on grid reliability and responsible energy development.">Petroleum engineer with 20 years of industry experience. Strong on grid reliability and responsible energy development.</div>
+        <div class="race-cand-count" data-t="4 candidates">4 candidates</div>
         <div class="avatar-row">
           <div class="avatar-circle rec" style="background:#4A90D9">J</div>
           <div class="avatar-circle" style="background:#D95B43">K</div>
@@ -976,20 +995,20 @@ function handleSampleBallot() {
         </div>
       </div>
 
-      <div class="section-head">Local Races</div>
+      <div class="section-head" data-t="Local Races">Local Races</div>
 
       <!-- R6: County Commissioner -->
       <div class="card race-card">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
-          <div class="race-office">County Commissioner &mdash; Precinct 3</div>
+          <div class="race-office" data-t="County Commissioner — Precinct 3">County Commissioner &mdash; Precinct 3</div>
           <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-            <span class="badge badge-ok">Strong Match</span>
+            <span class="badge badge-ok" data-t="Strong Match">Strong Match</span>
             <span style="color:var(--text2);font-size:18px">&rsaquo;</span>
           </div>
         </div>
         <div class="race-rec-name">Robert Tran</div>
-        <div class="race-rec-reason">Former county budget director. Focuses on road maintenance, property tax transparency, and keeping county spending in check.</div>
-        <div class="race-cand-count">2 candidates</div>
+        <div class="race-rec-reason" data-t="Former county budget director. Focuses on road maintenance, property tax transparency, and keeping county spending in check.">Former county budget director. Focuses on road maintenance, property tax transparency, and keeping county spending in check.</div>
+        <div class="race-cand-count" data-t="2 candidates">2 candidates</div>
         <div class="avatar-row">
           <div class="avatar-circle rec" style="background:#4A90D9">R</div>
           <div class="avatar-circle" style="background:#D95B43">C</div>
@@ -997,19 +1016,19 @@ function handleSampleBallot() {
       </div>
 
       <!-- R Proposition -->
-      <div class="section-head">Propositions</div>
+      <div class="section-head" data-t="Propositions">Propositions</div>
 
       <div class="card">
         <div class="prop-header">
-          <div class="prop-title">Prop 1: Property Tax Freeze for Seniors</div>
-          <span class="badge badge-ok">Lean Yes</span>
+          <div class="prop-title" data-t="Prop 1: Property Tax Freeze for Seniors">Prop 1: Property Tax Freeze for Seniors</div>
+          <span class="badge badge-ok" data-t="Lean Yes">Lean Yes</span>
         </div>
-        <div class="prop-desc">Shall the Texas Legislature freeze property tax assessments at current levels for homeowners aged 65 and older?</div>
+        <div class="prop-desc" data-t="Shall the Texas Legislature freeze property tax assessments at current levels for homeowners aged 65 and older?">Shall the Texas Legislature freeze property tax assessments at current levels for homeowners aged 65 and older?</div>
         <div style="margin-top:10px">
-          <div class="prop-outcome pass"><span style="flex-shrink:0">&#x2705;</span><div><b>If it passes:</b> Senior homeowners see property taxes frozen at current assessment, reducing displacement from rising valuations.</div></div>
-          <div class="prop-outcome fail"><span style="flex-shrink:0">&#x274C;</span><div><b>If it fails:</b> Senior property taxes continue adjusting with market valuations, maintaining current revenue trajectory for local services.</div></div>
+          <div class="prop-outcome pass"><span style="flex-shrink:0">&#x2705;</span><div><b data-t="If it passes:">If it passes:</b> <span data-t="Senior homeowners see property taxes frozen at current assessment, reducing displacement from rising valuations.">Senior homeowners see property taxes frozen at current assessment, reducing displacement from rising valuations.</span></div></div>
+          <div class="prop-outcome fail"><span style="flex-shrink:0">&#x274C;</span><div><b data-t="If it fails:">If it fails:</b> <span data-t="Senior property taxes continue adjusting with market valuations, maintaining current revenue trajectory for local services.">Senior property taxes continue adjusting with market valuations, maintaining current revenue trajectory for local services.</span></div></div>
         </div>
-        <div class="prop-reasoning"><span style="flex-shrink:0">&#x1F9E0;</span><div>Based on your emphasis on property tax relief and support for fixed-income protections, this aligns with your stated priorities. However, revenue offsets would shift burden to non-senior taxpayers.</div></div>
+        <div class="prop-reasoning"><span style="flex-shrink:0">&#x1F9E0;</span><div data-t="Based on your emphasis on property tax relief and support for fixed-income protections, this aligns with your stated priorities. However, revenue offsets would shift burden to non-senior taxpayers.">Based on your emphasis on property tax relief and support for fixed-income protections, this aligns with your stated priorities. However, revenue offsets would shift burden to non-senior taxpayers.</div></div>
       </div>
 
     </div><!-- /republican -->
@@ -1017,20 +1036,20 @@ function handleSampleBallot() {
     <!-- ==================== DEMOCRAT BALLOT ==================== -->
     <div data-party="democrat">
 
-      <div class="section-head">Key Races</div>
+      <div class="section-head" data-t="Key Races">Key Races</div>
 
       <!-- D1: Governor -->
       <div class="card race-card">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
-          <div class="race-office"><span class="star">&#x2B50;</span> Governor</div>
+          <div class="race-office"><span class="star">&#x2B50;</span> <span data-t="Governor">Governor</span></div>
           <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-            <span class="badge badge-ok">Strong Match</span>
+            <span class="badge badge-ok" data-t="Strong Match">Strong Match</span>
             <span style="color:var(--text2);font-size:18px">&rsaquo;</span>
           </div>
         </div>
         <div class="race-rec-name">Angela Washington</div>
-        <div class="race-rec-reason">Former school superintendent with comprehensive public education plan. Her healthcare access expansion matches your top priorities.</div>
-        <div class="race-cand-count">4 candidates</div>
+        <div class="race-rec-reason" data-t="Former school superintendent with comprehensive public education plan. Her healthcare access expansion matches your top priorities.">Former school superintendent with comprehensive public education plan. Her healthcare access expansion matches your top priorities.</div>
+        <div class="race-cand-count" data-t="4 candidates">4 candidates</div>
         <div class="avatar-row">
           <div class="avatar-circle rec" style="background:#4A90D9">A</div>
           <div class="avatar-circle" style="background:#D95B43">C</div>
@@ -1043,9 +1062,9 @@ function handleSampleBallot() {
       <div class="rec-box">
         <div style="display:flex;justify-content:space-between;align-items:center">
           <h4>&#x2705; Angela Washington</h4>
-          <span class="badge badge-ok">Strong Match</span>
+          <span class="badge badge-ok" data-t="Strong Match">Strong Match</span>
         </div>
-        <p>Washington's education reform plan and Medicaid expansion proposal address your top two issues. Her 15 years as superintendent demonstrates executive leadership at scale.</p>
+        <p data-t="Washington's education reform plan and Medicaid expansion proposal address your top two issues. Her 15 years as superintendent demonstrates executive leadership at scale.">Washington's education reform plan and Medicaid expansion proposal address your top two issues. Her 15 years as superintendent demonstrates executive leadership at scale.</p>
       </div>
 
       <div class="cand-card recommended">
@@ -1055,39 +1074,39 @@ function handleSampleBallot() {
             <div style="display:flex;justify-content:space-between;align-items:flex-start">
               <div class="cand-name">Angela Washington</div>
               <div class="cand-tags">
-                <span class="badge badge-ok">Recommended</span>
+                <span class="badge badge-ok" data-t="Recommended">Recommended</span>
               </div>
             </div>
           </div>
         </div>
-        <div class="cand-summary">Former school superintendent and education policy advocate. Running on expanding public school funding, Medicaid expansion, and renewable energy investment across rural Texas.</div>
+        <div class="cand-summary" data-t="Former school superintendent and education policy advocate. Running on expanding public school funding, Medicaid expansion, and renewable energy investment across rural Texas.">Former school superintendent and education policy advocate. Running on expanding public school funding, Medicaid expansion, and renewable energy investment across rural Texas.</div>
         <div class="cand-details">
           <div class="cand-section">
-            <h5>Key Positions</h5>
+            <h5 data-t="Key Positions">Key Positions</h5>
             <div class="pos-chips">
-              <span class="pos-chip">Public Education</span>
-              <span class="pos-chip">Healthcare Access</span>
-              <span class="pos-chip">Renewable Energy</span>
-              <span class="pos-chip">Voting Rights</span>
+              <span class="pos-chip" data-t="Public Education">Public Education</span>
+              <span class="pos-chip" data-t="Healthcare Access">Healthcare Access</span>
+              <span class="pos-chip" data-t="Renewable Energy">Renewable Energy</span>
+              <span class="pos-chip" data-t="Voting Rights">Voting Rights</span>
             </div>
           </div>
           <div class="cand-section pros">
-            <h5>&#x2705; Strengths</h5>
+            <h5>&#x2705; <span data-t="Strengths">Strengths</span></h5>
             <ul>
-              <li>15 years leading a 40,000-student school district with improved outcomes</li>
-              <li>Detailed Medicaid expansion plan with cost projections from state budget office</li>
-              <li>Endorsed by Texas State Teachers Association and Texas AFL-CIO</li>
+              <li data-t="15 years leading a 40,000-student school district with improved outcomes">15 years leading a 40,000-student school district with improved outcomes</li>
+              <li data-t="Detailed Medicaid expansion plan with cost projections from state budget office">Detailed Medicaid expansion plan with cost projections from state budget office</li>
+              <li data-t="Endorsed by Texas State Teachers Association and Texas AFL-CIO">Endorsed by Texas State Teachers Association and Texas AFL-CIO</li>
             </ul>
           </div>
           <div class="cand-section cons">
-            <h5>&#x26A0;&#xFE0F; Concerns</h5>
+            <h5>&#x26A0;&#xFE0F; <span data-t="Concerns">Concerns</span></h5>
             <ul>
-              <li>No prior elected office; transition from appointed to elected leadership untested</li>
-              <li>Renewable energy plan timeline may be ambitious given current grid infrastructure</li>
+              <li data-t="No prior elected office; transition from appointed to elected leadership untested">No prior elected office; transition from appointed to elected leadership untested</li>
+              <li data-t="Renewable energy plan timeline may be ambitious given current grid infrastructure">Renewable energy plan timeline may be ambitious given current grid infrastructure</li>
             </ul>
           </div>
         </div>
-        <button class="expand-toggle" style="pointer-events:none">Show Less</button>
+        <button class="expand-toggle" style="pointer-events:none" data-t="Show Less">Show Less</button>
       </div>
 
       <div class="cand-card">
@@ -1097,13 +1116,13 @@ function handleSampleBallot() {
             <div style="display:flex;justify-content:space-between;align-items:flex-start">
               <div class="cand-name">Carlos Fuentes</div>
               <div class="cand-tags">
-                <span class="badge badge-warn">Good Match</span>
+                <span class="badge badge-warn" data-t="Good Match">Good Match</span>
               </div>
             </div>
           </div>
         </div>
-        <div class="cand-summary">State senator with 10 years of legislative experience. Champion of workers' rights and criminal justice reform. Strong on immigration policy.</div>
-        <button class="expand-toggle" style="pointer-events:none">Show Details</button>
+        <div class="cand-summary" data-t="State senator with 10 years of legislative experience. Champion of workers' rights and criminal justice reform. Strong on immigration policy.">State senator with 10 years of legislative experience. Champion of workers' rights and criminal justice reform. Strong on immigration policy.</div>
+        <button class="expand-toggle" style="pointer-events:none" data-t="Show Details">Show Details</button>
       </div>
 
       <div class="cand-card">
@@ -1113,13 +1132,13 @@ function handleSampleBallot() {
             <div style="display:flex;justify-content:space-between;align-items:flex-start">
               <div class="cand-name">Michelle Torres-Kim</div>
               <div class="cand-tags">
-                <span class="badge badge-warn">Good Match</span>
+                <span class="badge badge-warn" data-t="Good Match">Good Match</span>
               </div>
             </div>
           </div>
         </div>
-        <div class="cand-summary">Environmental lawyer and former EPA regional counsel. Running on climate resilience, clean water, and environmental justice for underserved communities.</div>
-        <button class="expand-toggle" style="pointer-events:none">Show Details</button>
+        <div class="cand-summary" data-t="Environmental lawyer and former EPA regional counsel. Running on climate resilience, clean water, and environmental justice for underserved communities.">Environmental lawyer and former EPA regional counsel. Running on climate resilience, clean water, and environmental justice for underserved communities.</div>
+        <button class="expand-toggle" style="pointer-events:none" data-t="Show Details">Show Details</button>
       </div>
 
       <div class="cand-card">
@@ -1129,47 +1148,47 @@ function handleSampleBallot() {
             <div style="display:flex;justify-content:space-between;align-items:flex-start">
               <div class="cand-name">Jerome Bradley</div>
               <div class="cand-tags">
-                <span class="badge" style="color:var(--text2);background:rgba(128,128,128,.12);font-size:12px">Limited public info</span>
+                <span class="badge" style="color:var(--text2);background:rgba(128,128,128,.12);font-size:12px" data-t="Limited public info">Limited public info</span>
               </div>
             </div>
           </div>
         </div>
-        <div class="cand-summary">Community organizer and small business owner. First-time candidate focused on affordable housing and local economic development.</div>
-        <button class="expand-toggle" style="pointer-events:none">Show Details</button>
+        <div class="cand-summary" data-t="Community organizer and small business owner. First-time candidate focused on affordable housing and local economic development.">Community organizer and small business owner. First-time candidate focused on affordable housing and local economic development.</div>
+        <button class="expand-toggle" style="pointer-events:none" data-t="Show Details">Show Details</button>
       </div>
 
       <!-- D2: Attorney General -->
       <div class="card race-card">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
-          <div class="race-office"><span class="star">&#x2B50;</span> Attorney General</div>
+          <div class="race-office"><span class="star">&#x2B50;</span> <span data-t="Attorney General">Attorney General</span></div>
           <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-            <span class="badge badge-ok">Strong Match</span>
+            <span class="badge badge-ok" data-t="Strong Match">Strong Match</span>
             <span style="color:var(--text2);font-size:18px">&rsaquo;</span>
           </div>
         </div>
         <div class="race-rec-name">Denise Obi</div>
-        <div class="race-rec-reason">Civil rights attorney focused on voting access and police accountability. Aligns with your emphasis on justice reform.</div>
-        <div class="race-cand-count">2 candidates</div>
+        <div class="race-rec-reason" data-t="Civil rights attorney focused on voting access and police accountability. Aligns with your emphasis on justice reform.">Civil rights attorney focused on voting access and police accountability. Aligns with your emphasis on justice reform.</div>
+        <div class="race-cand-count" data-t="2 candidates">2 candidates</div>
         <div class="avatar-row">
           <div class="avatar-circle rec" style="background:#4A90D9">D</div>
           <div class="avatar-circle" style="background:#D95B43">R</div>
         </div>
       </div>
 
-      <div class="section-head">Other Contested Races</div>
+      <div class="section-head" data-t="Other Contested Races">Other Contested Races</div>
 
       <!-- D3: Land Commissioner -->
       <div class="card race-card">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
-          <div class="race-office">Land Commissioner</div>
+          <div class="race-office" data-t="Land Commissioner">Land Commissioner</div>
           <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-            <span class="badge badge-warn">Good Match</span>
+            <span class="badge badge-warn" data-t="Good Match">Good Match</span>
             <span style="color:var(--text2);font-size:18px">&rsaquo;</span>
           </div>
         </div>
         <div class="race-rec-name">Samuel Reyes</div>
-        <div class="race-rec-reason">Environmental scientist with coastal resilience expertise. Plans for veterans&rsquo; land program expansion align with your priorities.</div>
-        <div class="race-cand-count">3 candidates</div>
+        <div class="race-rec-reason" data-t="Environmental scientist with coastal resilience expertise. Plans for veterans' land program expansion align with your priorities.">Environmental scientist with coastal resilience expertise. Plans for veterans&rsquo; land program expansion align with your priorities.</div>
+        <div class="race-cand-count" data-t="3 candidates">3 candidates</div>
         <div class="avatar-row">
           <div class="avatar-circle rec" style="background:#4A90D9">S</div>
           <div class="avatar-circle" style="background:#D95B43">F</div>
@@ -1180,35 +1199,35 @@ function handleSampleBallot() {
       <!-- D4: State Senate -->
       <div class="card race-card">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
-          <div class="race-office">State Senate &mdash; District 14</div>
+          <div class="race-office" data-t="State Senate — District 14">State Senate &mdash; District 14</div>
           <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-            <span class="badge badge-ok">Strong Match</span>
+            <span class="badge badge-ok" data-t="Strong Match">Strong Match</span>
             <span style="color:var(--text2);font-size:18px">&rsaquo;</span>
           </div>
         </div>
         <div class="race-rec-name">Aisha Patel</div>
-        <div class="race-rec-reason">Healthcare policy expert and former hospital administrator. Championing Medicaid expansion and maternal health funding.</div>
-        <div class="race-cand-count">2 candidates</div>
+        <div class="race-rec-reason" data-t="Healthcare policy expert and former hospital administrator. Championing Medicaid expansion and maternal health funding.">Healthcare policy expert and former hospital administrator. Championing Medicaid expansion and maternal health funding.</div>
+        <div class="race-cand-count" data-t="2 candidates">2 candidates</div>
         <div class="avatar-row">
           <div class="avatar-circle rec" style="background:#4A90D9">A</div>
           <div class="avatar-circle" style="background:#D95B43">G</div>
         </div>
       </div>
 
-      <div class="section-head">Local Races</div>
+      <div class="section-head" data-t="Local Races">Local Races</div>
 
       <!-- D5: County Judge -->
       <div class="card race-card">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
-          <div class="race-office">County Judge</div>
+          <div class="race-office" data-t="County Judge">County Judge</div>
           <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-            <span class="badge badge-warn">Good Match</span>
+            <span class="badge badge-warn" data-t="Good Match">Good Match</span>
             <span style="color:var(--text2);font-size:18px">&rsaquo;</span>
           </div>
         </div>
         <div class="race-rec-name">Diana Okonkwo</div>
-        <div class="race-rec-reason">Public health official focused on county hospital funding and flood resilience. Good alignment on healthcare but less detail on budget specifics.</div>
-        <div class="race-cand-count">3 candidates</div>
+        <div class="race-rec-reason" data-t="Public health official focused on county hospital funding and flood resilience. Good alignment on healthcare but less detail on budget specifics.">Public health official focused on county hospital funding and flood resilience. Good alignment on healthcare but less detail on budget specifics.</div>
+        <div class="race-cand-count" data-t="3 candidates">3 candidates</div>
         <div class="avatar-row">
           <div class="avatar-circle rec" style="background:#4A90D9">D</div>
           <div class="avatar-circle" style="background:#D95B43">L</div>
@@ -1217,19 +1236,19 @@ function handleSampleBallot() {
       </div>
 
       <!-- D Proposition -->
-      <div class="section-head">Propositions</div>
+      <div class="section-head" data-t="Propositions">Propositions</div>
 
       <div class="card">
         <div class="prop-header">
-          <div class="prop-title">Prop 3: Universal Pre-K Funding</div>
-          <span class="badge badge-ok">Lean Yes</span>
+          <div class="prop-title" data-t="Prop 3: Universal Pre-K Funding">Prop 3: Universal Pre-K Funding</div>
+          <span class="badge badge-ok" data-t="Lean Yes">Lean Yes</span>
         </div>
-        <div class="prop-desc">Shall the state allocate $2 billion annually to provide universal pre-kindergarten programs for all four-year-olds in Texas?</div>
+        <div class="prop-desc" data-t="Shall the state allocate $2 billion annually to provide universal pre-kindergarten programs for all four-year-olds in Texas?">Shall the state allocate $2 billion annually to provide universal pre-kindergarten programs for all four-year-olds in Texas?</div>
         <div style="margin-top:10px">
-          <div class="prop-outcome pass"><span style="flex-shrink:0">&#x2705;</span><div><b>If it passes:</b> Free pre-K available to all Texas four-year-olds regardless of income, with certified teacher requirements and small class sizes.</div></div>
-          <div class="prop-outcome fail"><span style="flex-shrink:0">&#x274C;</span><div><b>If it fails:</b> Pre-K remains income-qualified, with current waitlists in urban areas. Existing Head Start and private options continue unchanged.</div></div>
+          <div class="prop-outcome pass"><span style="flex-shrink:0">&#x2705;</span><div><b data-t="If it passes:">If it passes:</b> <span data-t="Free pre-K available to all Texas four-year-olds regardless of income, with certified teacher requirements and small class sizes.">Free pre-K available to all Texas four-year-olds regardless of income, with certified teacher requirements and small class sizes.</span></div></div>
+          <div class="prop-outcome fail"><span style="flex-shrink:0">&#x274C;</span><div><b data-t="If it fails:">If it fails:</b> <span data-t="Pre-K remains income-qualified, with current waitlists in urban areas. Existing Head Start and private options continue unchanged.">Pre-K remains income-qualified, with current waitlists in urban areas. Existing Head Start and private options continue unchanged.</span></div></div>
         </div>
-        <div class="prop-reasoning"><span style="flex-shrink:0">&#x1F9E0;</span><div>Your emphasis on public education investment and early childhood development makes this a strong alignment. Research shows long-term economic returns from pre-K, though funding mechanism involves sales tax reallocation.</div></div>
+        <div class="prop-reasoning"><span style="flex-shrink:0">&#x1F9E0;</span><div data-t="Your emphasis on public education investment and early childhood development makes this a strong alignment. Research shows long-term economic returns from pre-K, though funding mechanism involves sales tax reallocation.">Your emphasis on public education investment and early childhood development makes this a strong alignment. Research shows long-term economic returns from pre-K, though funding mechanism involves sales tax reallocation.</div></div>
       </div>
 
     </div><!-- /democrat -->
@@ -1250,36 +1269,141 @@ function handleSampleBallot() {
       <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot;
       <a href="/privacy" data-t="Privacy">Privacy</a>
       <br>
-      <span style="color:var(--red)">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot;
+      <span style="color:#fff">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot;
       <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a>
     </div>
 
   </div><!-- /ballot-container -->
 
   <script>
+  var _partyLabels={en:{republican:'Republican',democrat:'Democratic'},es:{republican:'Republicana',democrat:'Dem\u00F3crata'}};
+  function _getLang(){return document.documentElement.lang==='es'?'es':'en'}
   function setParty(p){
     var body=document.body;
     var btnR=document.getElementById('btn-rep');
     var btnD=document.getElementById('btn-dem');
     var label=document.getElementById('party-label');
+    var title=document.getElementById('election-title');
+    var lang=_getLang();
     if(p==='democrat'){
       body.classList.add('party-dem');
       btnR.classList.remove('on');
       btnD.classList.add('on');
-      label.textContent='Democratic';
+      if(title)title.innerHTML=(lang==='es'?'Primaria ':'Texas ')+'<span id="party-label">'+_partyLabels[lang].democrat+'</span>'+(lang==='es'?' de Texas':' Primary');
     }else{
       body.classList.remove('party-dem');
       btnR.classList.add('on');
       btnD.classList.remove('on');
-      label.textContent='Republican';
+      if(title)title.innerHTML=(lang==='es'?'Primaria ':'Texas ')+'<span id="party-label">'+_partyLabels[lang].republican+'</span>'+(lang==='es'?' de Texas':' Primary');
     }
     window.scrollTo({top:0,behavior:'smooth'});
   }
+  // Set initial election title for Spanish
+  (function(){
+    var lang=localStorage.getItem('tx_votes_lang')||localStorage.getItem('atx_votes_lang')||((navigator.language||'').slice(0,2)==='es'?'es':'en');
+    if(lang==='es'){
+      var t=document.getElementById('election-title');
+      if(t)t.innerHTML='Primaria <span id="party-label">Republicana</span> de Texas';
+    }
+  })();
   </script>
   ${pageI18n({
-    'SAMPLE BALLOT \\u2014 Fictional candidates and recommendations for demonstration': 'BOLETA DE EJEMPLO \\u2014 Candidatos ficticios y recomendaciones para demostraci\u00F3n',
+    'SAMPLE BALLOT \u2014 Fictional candidates and recommendations for demonstration': 'BOLETA DE EJEMPLO \u2014 Candidatos ficticios y recomendaciones de demostraci\u00F3n',
+    'SAMPLE': 'EJEMPLO',
     'Republican': 'Republicano',
     'Democrat': 'Dem\u00F3crata',
+    'Tuesday, March 3, 2026': 'Martes, 3 de marzo de 2026',
+    'Sample Ballot \u2014 Not Real Recommendations': 'Boleta de Ejemplo \u2014 No Son Recomendaciones Reales',
+    'This page shows fictional candidates and AI-generated recommendations to demonstrate what your personalized ballot looks like. All names, positions, and match scores are examples only.': 'Esta p\u00E1gina muestra candidatos ficticios y recomendaciones generadas por IA para demostrar c\u00F3mo se ve tu boleta personalizada. Todos los nombres, posturas y puntajes son solo ejemplos.',
+    'Key Races': 'Carreras Clave',
+    'Other Contested Races': 'Otras Carreras Disputadas',
+    'Local Races': 'Carreras Locales',
+    'Propositions': 'Proposiciones',
+    'Governor': 'Gobernador/a',
+    'Attorney General': 'Fiscal General',
+    'Comptroller of Public Accounts': 'Contralor/a de Cuentas P\u00FAblicas',
+    'Commissioner of Agriculture': 'Comisionado/a de Agricultura',
+    'Railroad Commissioner': 'Comisionado/a de Ferrocarriles',
+    'County Commissioner \u2014 Precinct 3': 'Comisionado/a del Condado \u2014 Precinto 3',
+    'Land Commissioner': 'Comisionado/a de Tierras',
+    'State Senate \u2014 District 14': 'Senado Estatal \u2014 Distrito 14',
+    'County Judge': 'Juez del Condado',
+    'Strong Match': 'Alta Compatibilidad',
+    'Good Match': 'Buena Compatibilidad',
+    'Best Available': 'Mejor Disponible',
+    'Recommended': 'Recomendado/a',
+    'Lean Yes': 'Inclinaci\u00F3n: S\u00ED',
+    'Limited public info': 'Informaci\u00F3n p\u00FAblica limitada',
+    'Show Details': 'Ver Detalles',
+    'Show Less': 'Ver Menos',
+    'Key Positions': 'POSTURAS CLAVE',
+    'Endorsements': 'RESPALDOS',
+    'Strengths': 'Fortalezas',
+    'Concerns': 'Advertencias',
+    'Why this match?': '\u00BFPor qu\u00E9 esta recomendaci\u00F3n?',
+    'Sources': 'Fuentes',
+    'If it passes:': 'Si se aprueba:',
+    'If it fails:': 'Si no se aprueba:',
+    '3 candidates': '3 candidatos',
+    '2 candidates': '2 candidatos',
+    '4 candidates': '4 candidatos',
+    'Property Tax Reform': 'Reforma Fiscal',
+    'School Choice': 'Opciones Escolares',
+    'Border Security': 'Seguridad Fronteriza',
+    'Energy Independence': 'Independencia Energ\u00E9tica',
+    'Public Education': 'Educaci\u00F3n P\u00FAblica',
+    'Healthcare Access': 'Acceso a Salud',
+    'Renewable Energy': 'Energ\u00EDa Renovable',
+    'Voting Rights': 'Derechos de Voto',
+    '(business group)': '(grupo empresarial)',
+    '(professional association)': '(asociaci\u00F3n profesional)',
+    '(elected official)': '(funcionario electo)',
+    'Fiscally conservative with strong property tax reform plan. Aligns with your emphasis on limited government and individual liberty.': 'Conservador fiscal con un fuerte plan de reforma de impuestos a la propiedad. Se alinea con tu \u00E9nfasis en gobierno limitado y libertad individual.',
+    "Sullivan's property tax reform plan directly addresses your top issue. His business background and city council tenure demonstrate fiscal restraint, while his education stance preserves local control.": 'El plan de reforma fiscal de Sullivan aborda directamente tu tema principal. Su experiencia empresarial y su tiempo en el concejo municipal demuestran disciplina fiscal, mientras que su postura educativa preserva el control local.',
+    'Former city council member and business owner. Strong advocate for property tax relief, school choice, and border security. Endorsed by multiple law enforcement organizations.': 'Exmiembro del concejo municipal y empresario. Firme defensor del alivio de impuestos a la propiedad, opciones escolares y seguridad fronteriza. Respaldado por m\u00FAltiples organizaciones de seguridad p\u00FAblica.',
+    'Detailed 5-year property tax reduction plan with independent budget analysis': 'Plan detallado de reducci\u00F3n de impuestos a la propiedad a 5 a\u00F1os con an\u00E1lisis presupuestario independiente',
+    '8 years city council experience with record of balanced budgets': '8 a\u00F1os de experiencia en el concejo municipal con historial de presupuestos equilibrados',
+    "Endorsed by Texas Farm Bureau and multiple sheriffs' associations": 'Respaldado por Texas Farm Bureau y varias asociaciones de alguaciles',
+    'No statewide office experience; largest budget managed was $180M': 'Sin experiencia en cargos estatales; el mayor presupuesto que manej\u00F3 fue de $180M',
+    'Property tax plan may require offsetting revenue sources not yet identified': 'El plan de impuestos a la propiedad podr\u00EDa requerir fuentes de ingreso compensatorias a\u00FAn no identificadas',
+    'Aligns with your priority: property tax reform': 'Se alinea con tu prioridad: reforma de impuestos a la propiedad',
+    'Matches your value: fiscal discipline and limited government': 'Coincide con tu valor: disciplina fiscal y gobierno limitado',
+    'Supports your stance: local control of education': 'Apoya tu postura: control local de la educaci\u00F3n',
+    'Sullivan for Governor \u2014 Official Campaign Site': 'Sullivan para Gobernador \u2014 Sitio Oficial de Campa\u00F1a',
+    "Texas Tribune: Sullivan enters governor's race": 'Texas Tribune: Sullivan entra a la carrera por la gubernatura',
+    'Ballotpedia \u2014 Marcus Sullivan': 'Ballotpedia \u2014 Marcus Sullivan',
+    'State representative with 6 years of legislative experience. Focused on water infrastructure and rural broadband. More moderate on education policy.': 'Representante estatal con 6 a\u00F1os de experiencia legislativa. Enfocada en infraestructura h\u00EDdrica e internet rural. M\u00E1s moderada en pol\u00EDtica educativa.',
+    'Rancher and former county judge. Running on a strict constitutionalist platform emphasizing 10th Amendment rights and federal land policy.': 'Ranchero y exjuez del condado. Candidato con plataforma constitucionalista estricta, enfatizando los derechos de la D\u00E9cima Enmienda y la pol\u00EDtica de tierras federales.',
+    'Former federal prosecutor with deep consumer protection experience. Her stance on government accountability aligns with your priorities.': 'Exfiscal federal con amplia experiencia en protecci\u00F3n al consumidor. Su postura sobre la rendici\u00F3n de cuentas del gobierno se alinea con tus prioridades.',
+    'CPA with state budget experience. Pragmatic fiscal approach with emphasis on transparent accounting practices.': 'Contador p\u00FAblico con experiencia en presupuesto estatal. Enfoque fiscal pragm\u00E1tico con \u00E9nfasis en pr\u00E1cticas contables transparentes.',
+    'Third-generation rancher with practical water management experience. Both candidates have limited policy platforms.': 'Ranchera de tercera generaci\u00F3n con experiencia pr\u00E1ctica en manejo del agua. Ambos candidatos tienen plataformas pol\u00EDticas limitadas.',
+    'Petroleum engineer with 20 years of industry experience. Strong on grid reliability and responsible energy development.': 'Ingeniero petrolero con 20 a\u00F1os de experiencia en la industria. Fuerte en confiabilidad de la red el\u00E9ctrica y desarrollo energ\u00E9tico responsable.',
+    'Former county budget director. Focuses on road maintenance, property tax transparency, and keeping county spending in check.': 'Exdirector del presupuesto del condado. Se enfoca en mantenimiento de caminos, transparencia en impuestos a la propiedad y control del gasto del condado.',
+    'Prop 1: Property Tax Freeze for Seniors': 'Prop 1: Congelar Impuestos a la Propiedad para Adultos Mayores',
+    'Shall the Texas Legislature freeze property tax assessments at current levels for homeowners aged 65 and older?': '\u00BFDeber\u00EDa la Legislatura de Texas congelar las valuaciones de impuestos a la propiedad en los niveles actuales para propietarios de 65 a\u00F1os o m\u00E1s?',
+    'Senior homeowners see property taxes frozen at current assessment, reducing displacement from rising valuations.': 'Los propietarios mayores ver\u00E1n sus impuestos a la propiedad congelados en la valuaci\u00F3n actual, reduciendo el desplazamiento por valuaciones en aumento.',
+    'Senior property taxes continue adjusting with market valuations, maintaining current revenue trajectory for local services.': 'Los impuestos a la propiedad de adultos mayores seguir\u00E1n ajust\u00E1ndose con las valuaciones del mercado, manteniendo la trayectoria actual de ingresos para servicios locales.',
+    'Based on your emphasis on property tax relief and support for fixed-income protections, this aligns with your stated priorities. However, revenue offsets would shift burden to non-senior taxpayers.': 'Seg\u00FAn tu \u00E9nfasis en alivio de impuestos a la propiedad y apoyo a protecciones para personas con ingreso fijo, esto se alinea con tus prioridades. Sin embargo, las compensaciones de ingresos trasladar\u00EDan la carga a contribuyentes m\u00E1s j\u00F3venes.',
+    'Former school superintendent with comprehensive public education plan. Her healthcare access expansion matches your top priorities.': 'Exsuperintendente escolar con un plan integral de educaci\u00F3n p\u00FAblica. Su expansi\u00F3n del acceso a salud coincide con tus principales prioridades.',
+    "Washington's education reform plan and Medicaid expansion proposal address your top two issues. Her 15 years as superintendent demonstrates executive leadership at scale.": 'El plan de reforma educativa de Washington y su propuesta de expansi\u00F3n de Medicaid abordan tus dos temas principales. Sus 15 a\u00F1os como superintendente demuestran liderazgo ejecutivo a gran escala.',
+    'Former school superintendent and education policy advocate. Running on expanding public school funding, Medicaid expansion, and renewable energy investment across rural Texas.': 'Exsuperintendente escolar y defensora de pol\u00EDticas educativas. Candidata por la expansi\u00F3n del financiamiento a escuelas p\u00FAblicas, expansi\u00F3n de Medicaid e inversi\u00F3n en energ\u00EDa renovable en el Texas rural.',
+    '15 years leading a 40,000-student school district with improved outcomes': '15 a\u00F1os liderando un distrito escolar de 40,000 estudiantes con resultados mejorados',
+    'Detailed Medicaid expansion plan with cost projections from state budget office': 'Plan detallado de expansi\u00F3n de Medicaid con proyecciones de costo de la oficina de presupuesto estatal',
+    'Endorsed by Texas State Teachers Association and Texas AFL-CIO': 'Respaldada por la Asociaci\u00F3n de Maestros del Estado de Texas y Texas AFL-CIO',
+    'No prior elected office; transition from appointed to elected leadership untested': 'Sin cargo electo previo; la transici\u00F3n de puesto designado a electo no ha sido probada',
+    'Renewable energy plan timeline may be ambitious given current grid infrastructure': 'El cronograma del plan de energ\u00EDa renovable podr\u00EDa ser ambicioso dada la infraestructura actual de la red',
+    "State senator with 10 years of legislative experience. Champion of workers' rights and criminal justice reform. Strong on immigration policy.": 'Senador estatal con 10 a\u00F1os de experiencia legislativa. Defensor de los derechos de los trabajadores y la reforma de justicia penal. Fuerte en pol\u00EDtica migratoria.',
+    'Environmental lawyer and former EPA regional counsel. Running on climate resilience, clean water, and environmental justice for underserved communities.': 'Abogada ambiental y exconsejera regional de la EPA. Candidata por la resiliencia clim\u00E1tica, agua limpia y justicia ambiental para comunidades desatendidas.',
+    'Community organizer and small business owner. First-time candidate focused on affordable housing and local economic development.': 'Organizador comunitario y due\u00F1o de peque\u00F1o negocio. Candidato por primera vez, enfocado en vivienda asequible y desarrollo econ\u00F3mico local.',
+    'Civil rights attorney focused on voting access and police accountability. Aligns with your emphasis on justice reform.': 'Abogada de derechos civiles enfocada en acceso al voto y rendici\u00F3n de cuentas policial. Se alinea con tu \u00E9nfasis en reforma de justicia.',
+    "Environmental scientist with coastal resilience expertise. Plans for veterans' land program expansion align with your priorities.": 'Cient\u00EDfico ambiental con experiencia en resiliencia costera. Sus planes para expandir el programa de tierras para veteranos se alinean con tus prioridades.',
+    'Healthcare policy expert and former hospital administrator. Championing Medicaid expansion and maternal health funding.': 'Experta en pol\u00EDtica de salud y exadministradora de hospital. Impulsa la expansi\u00F3n de Medicaid y el financiamiento de salud materna.',
+    'Public health official focused on county hospital funding and flood resilience. Good alignment on healthcare but less detail on budget specifics.': 'Funcionaria de salud p\u00FAblica enfocada en financiamiento del hospital del condado y resiliencia ante inundaciones. Buena alineaci\u00F3n en salud pero menos detalle en el presupuesto.',
+    'Prop 3: Universal Pre-K Funding': 'Prop 3: Financiamiento Universal de Pre-K\u00EDnder',
+    'Shall the state allocate $2 billion annually to provide universal pre-kindergarten programs for all four-year-olds in Texas?': '\u00BFDeber\u00EDa el estado asignar $2 mil millones al a\u00F1o para ofrecer programas universales de pre-k\u00EDnder para todos los ni\u00F1os de cuatro a\u00F1os en Texas?',
+    'Free pre-K available to all Texas four-year-olds regardless of income, with certified teacher requirements and small class sizes.': 'Pre-k\u00EDnder gratuito disponible para todos los ni\u00F1os de cuatro a\u00F1os en Texas sin importar el ingreso, con requisitos de maestros certificados y grupos peque\u00F1os.',
+    'Pre-K remains income-qualified, with current waitlists in urban areas. Existing Head Start and private options continue unchanged.': 'El pre-k\u00EDnder seguir\u00E1 condicionado al ingreso, con las listas de espera actuales en \u00E1reas urbanas. Las opciones de Head Start y privadas contin\u00FAan sin cambios.',
+    'Your emphasis on public education investment and early childhood development makes this a strong alignment. Research shows long-term economic returns from pre-K, though funding mechanism involves sales tax reallocation.': 'Tu \u00E9nfasis en inversi\u00F3n en educaci\u00F3n p\u00FAblica y desarrollo infantil temprano hace que esto sea altamente compatible. La investigaci\u00F3n muestra retornos econ\u00F3micos a largo plazo del pre-k\u00EDnder, aunque el mecanismo de financiamiento implica reasignaci\u00F3n de impuestos sobre ventas.',
     'Build Your Own Guide': 'Crea Tu Propia Gu\u00EDa',
     'This sample shows what a personalized ballot looks like. Answer a few questions about your values and priorities, and Texas Votes will match you with candidates in your actual races.': 'Este ejemplo muestra c\u00F3mo se ve una boleta personalizada. Responde algunas preguntas sobre tus valores y prioridades, y Texas Votes te emparejar\u00E1 con candidatos en tus carreras reales.',
     'Get Your Personalized Ballot': 'Obt\u00E9n Tu Boleta Personalizada',
@@ -1385,7 +1509,7 @@ function handleHowItWorks() {
       <li><a href="/candidates" data-t="All Candidates">All Candidates</a> — <span data-t="Browse every candidate with detailed profiles">Browse every candidate with detailed profiles</span></li>
     </ul>
 
-    <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
+    <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:#fff">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
   </div>
   ${pageI18n({
     'Texas Votes is a free tool that helps you figure out which candidates on your ballot match your values. Here\'s how it works, in plain language.': 'Texas Votes es una herramienta gratuita que te ayuda a descubrir qu\u00E9 candidatos en tu boleta coinciden con tus valores. As\u00ED funciona, en palabras sencillas.',
@@ -1530,7 +1654,7 @@ function handleNonpartisan() {
       <li><a href="/candidates" data-t="All Candidates">All Candidates</a> — <span data-t="Browse every candidate with detailed profiles">Browse every candidate with detailed profiles</span></li>
     </ul>
 
-    <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
+    <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:#fff">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
   </div>
   ${pageI18n({
     'Texas Votes matches candidates to your values, not your party. Every design decision is made to keep the experience fair for all voters.': 'Texas Votes empareja candidatos con tus valores, no con tu partido. Cada decisi\u00F3n de dise\u00F1o se toma para mantener la experiencia justa para todos los votantes.',
@@ -1934,7 +2058,7 @@ CONFLICT RESOLUTION: If sources disagree, trust official filings over campaign c
       <li><a href="/candidates" data-t="All Candidates">All Candidates</a> — <span data-t="Browse every candidate with detailed profiles">Browse every candidate with detailed profiles</span></li>
     </ul>
 
-    <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
+    <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:#fff">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
   </div>
   ${pageI18n({
     'AI Audit': 'Auditor\u00EDa de IA',
@@ -2109,7 +2233,6 @@ function buildAuditExportData() {
       mergeStrategy: "Non-null fields from Claude's response overwrite existing values. Null fields are skipped (existing data preserved). Each race is updated independently with 5-second delays between API calls to avoid rate limits. Source citations are captured from Claude web_search API response blocks and merged with deduplication.",
       kvKeys: {
         statewide: "ballot:statewide:{party}_primary_2026",
-        legacy: "ballot:{party}_primary_2026 (fallback during migration)",
         manifest: "manifest (version tracking per party)",
         updateLog: "update_log:{YYYY-MM-DD} (daily log of all changes and errors)",
       },
@@ -2557,6 +2680,390 @@ function handleAuditExport() {
   });
 }
 
+function handleRunAuditNow() {
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  ${pageHead({
+    title: "Run AI Audit — Texas Votes",
+    description: "Trigger an on-demand AI bias audit of Texas Votes using ChatGPT, Gemini, Grok, and Claude.",
+    url: "https://txvotes.app/run-audit-now",
+    extraHead: `<style>
+    .provider-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin:1rem 0}
+    .provider-btn{display:flex;align-items:center;justify-content:center;gap:0.5rem;background:var(--card);border:2px solid var(--border);border-radius:var(--rs);padding:0.75rem 1rem;font-size:0.95rem;font-weight:600;color:var(--text);cursor:pointer;transition:border-color .15s,background .15s;font-family:inherit}
+    .provider-btn:hover{border-color:var(--blue);background:rgba(33,89,143,.05)}
+    .provider-btn.selected{border-color:var(--blue);background:rgba(33,89,143,.1)}
+    .provider-btn.running{border-color:#eab308;background:rgba(234,179,8,.1);cursor:default}
+    .provider-btn.done{border-color:#16a34a;background:rgba(34,197,94,.1)}
+    .provider-btn.error{border-color:#ef4444;background:rgba(239,68,68,.1)}
+    .run-all-btn{display:block;width:100%;background:var(--blue);color:#fff;font-weight:700;font-size:1.1rem;padding:1rem;border:none;border-radius:var(--rs);cursor:pointer;transition:opacity .15s;font-family:inherit;margin-top:0.5rem}
+    .run-all-btn:hover{opacity:0.9}
+    .run-all-btn:disabled{opacity:0.5;cursor:not-allowed}
+    .secret-row{display:flex;gap:0.5rem;margin:1rem 0}
+    .secret-row input{flex:1;padding:0.6rem 0.75rem;border:1px solid var(--border);border-radius:var(--rs);font-size:0.95rem;background:var(--card);color:var(--text);font-family:inherit}
+    .secret-row button{padding:0.6rem 1rem;background:var(--blue);color:#fff;border:none;border-radius:var(--rs);font-weight:600;cursor:pointer;white-space:nowrap;font-family:inherit}
+    .status-area{background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:1rem;margin:1rem 0;min-height:60px;max-height:300px;overflow-y:auto;font-size:0.9rem;line-height:1.6}
+    .status-area .status-line{margin-bottom:0.25rem}
+    .status-area .status-line.ok{color:#16a34a}
+    .status-area .status-line.err{color:#ef4444}
+    .status-area .status-line.wait{color:#eab308}
+    .status-area .status-line.info{color:var(--text2)}
+    .score-badge{display:inline-block;background:rgba(34,197,94,.15);color:#16a34a;font-weight:700;padding:0.15rem 0.5rem;border-radius:99px;font-size:0.85rem}
+    .score-badge.warn{background:rgba(234,179,8,.15);color:#b45309}
+    .score-badge.err{background:rgba(239,68,68,.15);color:#ef4444}
+    .last-results{margin-top:1.5rem}
+    .result-card{background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:1rem;margin-bottom:0.75rem}
+    .result-card h4{font-size:0.95rem;font-weight:700;margin-bottom:0.25rem;display:flex;align-items:center;gap:0.5rem}
+    .result-card .meta{font-size:0.8rem;color:var(--text2);margin-bottom:0.5rem}
+    .result-card .dims{font-size:0.85rem;line-height:1.8}
+    .result-card .dims span{display:inline-block;margin-right:1rem}
+    .rate-limit-banner{background:rgba(234,179,8,.12);border:1px solid rgba(234,179,8,.4);border-radius:var(--rs);padding:0.75rem 1rem;margin:0.75rem 0;font-size:0.95rem;color:#92400e;display:none}
+    .rate-limit-banner .countdown{font-weight:700;font-variant-numeric:tabular-nums}
+    </style>`,
+  })}
+</head>
+<body>
+  <div class="container">
+    <a href="/" class="back-top">&larr; Texas Votes</a>
+    <h1>Run AI Audit</h1>
+    <p class="subtitle">Trigger an on-demand AI bias audit. Four independent AI systems review our methodology and score it across five fairness dimensions.</p>
+
+    <h2>Admin Secret</h2>
+    <p style="font-size:0.9rem;color:var(--text2)">Enter the admin secret to unlock audit controls. Stored in your browser session only.</p>
+    <div class="secret-row">
+      <input type="password" id="secret-input" placeholder="ADMIN_SECRET" autocomplete="off">
+      <button id="secret-save-btn" onclick="saveSecret()">Unlock</button>
+    </div>
+    <div id="secret-status" style="font-size:0.85rem;margin-bottom:1rem"></div>
+
+    <div id="locked-overlay" style="text-align:center;padding:2rem 1rem;color:var(--text2)">
+      <p>Enter the admin secret above to enable audit controls.</p>
+    </div>
+
+    <div id="audit-controls" style="display:none">
+      <h2>Select Providers</h2>
+      <div class="provider-grid">
+        <button class="provider-btn selected" data-provider="chatgpt" onclick="toggleProvider(this)">ChatGPT</button>
+        <button class="provider-btn selected" data-provider="gemini" onclick="toggleProvider(this)">Gemini</button>
+        <button class="provider-btn selected" data-provider="grok" onclick="toggleProvider(this)">Grok</button>
+        <button class="provider-btn selected" data-provider="claude" onclick="toggleProvider(this)">Claude</button>
+      </div>
+      <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.9rem;color:var(--text2);margin:0.5rem 0">
+        <input type="checkbox" id="force-checkbox"> Force re-run (ignore 1-hour cooldown)
+      </label>
+      <div class="rate-limit-banner" id="rate-limit-banner">Next audit available in <span class="countdown" id="rate-countdown">0:00</span></div>
+      <button class="run-all-btn" id="run-btn" onclick="runAudit()">Run AI Audit Now</button>
+
+      <h2 style="margin-top:1.5rem">Status</h2>
+      <div class="status-area" id="status-area">
+        <div class="status-line info">Ready. Select providers and click Run.</div>
+      </div>
+    </div>
+
+    <div class="last-results" id="last-results">
+      <h2>Last Audit Results</h2>
+      <div id="results-loading" style="color:var(--text2);font-size:0.9rem">Loading last audit results...</div>
+      <div id="results-container"></div>
+    </div>
+
+    <div class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/audit">AI Bias Audit</a> &middot; <a href="/privacy">Privacy</a><br><span style="color:#fff">&starf;</span> Built in Texas &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
+  </div>
+  <script>
+  (function(){
+    var secret = sessionStorage.getItem('audit_admin_secret') || '';
+    var secretInput = document.getElementById('secret-input');
+    var secretStatus = document.getElementById('secret-status');
+    var lockedOverlay = document.getElementById('locked-overlay');
+    var auditControls = document.getElementById('audit-controls');
+    var RATE_LIMIT_MS = 10 * 60 * 1000;
+    var countdownTimer = null;
+
+    if (secret) {
+      secretInput.value = '\\u2022\\u2022\\u2022\\u2022\\u2022\\u2022\\u2022\\u2022';
+      unlockUI();
+    }
+
+    window.saveSecret = function() {
+      var val = secretInput.value.trim();
+      if (!val || val === '\\u2022\\u2022\\u2022\\u2022\\u2022\\u2022\\u2022\\u2022') return;
+      secret = val;
+      sessionStorage.setItem('audit_admin_secret', secret);
+      secretInput.value = '\\u2022\\u2022\\u2022\\u2022\\u2022\\u2022\\u2022\\u2022';
+      unlockUI();
+      secretStatus.innerHTML = '<span style="color:#16a34a">Secret saved for this session.</span>';
+    };
+
+    secretInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') window.saveSecret();
+    });
+
+    function unlockUI() {
+      lockedOverlay.style.display = 'none';
+      auditControls.style.display = 'block';
+    }
+
+    window.toggleProvider = function(btn) {
+      btn.classList.toggle('selected');
+    };
+
+    function getSelectedProviders() {
+      return Array.from(document.querySelectorAll('.provider-btn.selected')).map(function(b){ return b.dataset.provider; });
+    }
+
+    var statusArea = document.getElementById('status-area');
+    function addStatus(msg, cls) {
+      var div = document.createElement('div');
+      div.className = 'status-line ' + (cls || 'info');
+      div.textContent = msg;
+      statusArea.appendChild(div);
+      statusArea.scrollTop = statusArea.scrollHeight;
+    }
+    function clearStatus() { statusArea.innerHTML = ''; }
+
+    // --- Rate limit countdown ---
+    function formatCountdown(ms) {
+      var totalSec = Math.ceil(ms / 1000);
+      var min = Math.floor(totalSec / 60);
+      var sec = totalSec % 60;
+      return min + ':' + (sec < 10 ? '0' : '') + sec;
+    }
+
+    function startCountdown(remainingMs) {
+      var banner = document.getElementById('rate-limit-banner');
+      var countdownEl = document.getElementById('rate-countdown');
+      var runBtn = document.getElementById('run-btn');
+      if (countdownTimer) clearInterval(countdownTimer);
+      banner.style.display = 'block';
+      runBtn.disabled = true;
+      runBtn.textContent = 'Rate Limited';
+      var endTime = Date.now() + remainingMs;
+      function tick() {
+        var left = endTime - Date.now();
+        if (left <= 0) {
+          clearInterval(countdownTimer);
+          countdownTimer = null;
+          banner.style.display = 'none';
+          runBtn.disabled = false;
+          runBtn.textContent = 'Run AI Audit Now';
+          return;
+        }
+        countdownEl.textContent = formatCountdown(left);
+      }
+      tick();
+      countdownTimer = setInterval(tick, 1000);
+    }
+
+    function checkLocalRateLimit() {
+      var lastRun = localStorage.getItem('audit_last_run');
+      if (lastRun) {
+        var elapsed = Date.now() - parseInt(lastRun, 10);
+        if (elapsed < RATE_LIMIT_MS) {
+          startCountdown(RATE_LIMIT_MS - elapsed);
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function recordLocalRateLimit() {
+      localStorage.setItem('audit_last_run', String(Date.now()));
+      startCountdown(RATE_LIMIT_MS);
+    }
+
+    // Check on page load
+    checkLocalRateLimit();
+
+    var running = false;
+    window.runAudit = async function() {
+      if (running) return;
+      // Re-check client-side rate limit
+      if (checkLocalRateLimit()) {
+        addStatus('Rate limited \\u2014 please wait for the countdown to finish.', 'err');
+        return;
+      }
+      var providers = getSelectedProviders();
+      if (providers.length === 0) { alert('Select at least one provider.'); return; }
+      if (!secret) { alert('Enter the admin secret first.'); return; }
+
+      running = true;
+      var runBtn = document.getElementById('run-btn');
+      runBtn.disabled = true;
+      runBtn.textContent = 'Running... (this takes 1-3 minutes)';
+      clearStatus();
+      addStatus('Starting audit with: ' + providers.join(', '), 'info');
+
+      providers.forEach(function(p) {
+        var btn = document.querySelector('[data-provider="'+p+'"]');
+        if (btn) { btn.classList.remove('selected','done','error'); btn.classList.add('running'); }
+      });
+
+      var force = document.getElementById('force-checkbox').checked;
+      addStatus('Sending request to /api/audit/run...', 'wait');
+
+      try {
+        var resp = await fetch('/api/audit/run', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + secret },
+          body: JSON.stringify({ providers: providers, force: force })
+        });
+
+        if (resp.status === 401) {
+          addStatus('Unauthorized \\u2014 check your admin secret.', 'err');
+          secretStatus.innerHTML = '<span style="color:#ef4444">Invalid secret. Try again.</span>';
+          sessionStorage.removeItem('audit_admin_secret');
+          secret = '';
+          secretInput.value = '';
+          providers.forEach(function(p) {
+            var btn = document.querySelector('[data-provider="'+p+'"]');
+            if (btn) { btn.classList.remove('running'); btn.classList.add('error'); }
+          });
+          running = false; runBtn.disabled = false; runBtn.textContent = 'Run AI Audit Now';
+          return;
+        }
+
+        if (resp.status === 429) {
+          var rateLimitData = await resp.json().catch(function() { return {}; });
+          var waitMs = rateLimitData.retryAfterMs || RATE_LIMIT_MS;
+          addStatus(rateLimitData.error || 'Rate limited. Please wait before running another audit.', 'err');
+          localStorage.setItem('audit_last_run', String(Date.now() - (RATE_LIMIT_MS - waitMs)));
+          startCountdown(waitMs);
+          providers.forEach(function(p) {
+            var btn = document.querySelector('[data-provider="'+p+'"]');
+            if (btn) { btn.classList.remove('running'); }
+          });
+          running = false;
+          return;
+        }
+
+        if (!resp.ok) {
+          var errText = await resp.text();
+          addStatus('Error ' + resp.status + ': ' + errText.slice(0, 200), 'err');
+          providers.forEach(function(p) {
+            var btn = document.querySelector('[data-provider="'+p+'"]');
+            if (btn) { btn.classList.remove('running'); btn.classList.add('error'); }
+          });
+          running = false; runBtn.disabled = false; runBtn.textContent = 'Run AI Audit Now';
+          return;
+        }
+
+        var data = await resp.json();
+        addStatus('Audit complete!', 'ok');
+
+        // Record successful run for client-side rate limiting
+        recordLocalRateLimit();
+
+        if (data.summary && data.summary.averageScore != null) {
+          addStatus('Average score: ' + data.summary.averageScore + ' / 10', 'ok');
+        }
+
+        if (data.results) {
+          Object.entries(data.results).forEach(function(entry) {
+            var name = entry[0], r = entry[1];
+            var btn = document.querySelector('[data-provider="'+name+'"]');
+            if (r.status === 'success') {
+              addStatus(name + ': ' + (r.scores ? r.scores.overallScore + '/10' : 'done') + ' (' + (r.latencyMs/1000).toFixed(1) + 's)', 'ok');
+              if (btn) { btn.classList.remove('running'); btn.classList.add('done'); }
+            } else if (r.status === 'skipped') {
+              addStatus(name + ': skipped (' + (r.reason || 'cooldown') + ')', 'info');
+              if (btn) { btn.classList.remove('running'); btn.classList.add('done'); }
+            } else {
+              addStatus(name + ': ' + r.status + ' \\u2014 ' + (r.error || 'unknown error'), 'err');
+              if (btn) { btn.classList.remove('running'); btn.classList.add('error'); }
+            }
+          });
+        }
+
+        loadLastResults();
+      } catch(e) {
+        addStatus('Network error: ' + e.message, 'err');
+        providers.forEach(function(p) {
+          var btn = document.querySelector('[data-provider="'+p+'"]');
+          if (btn) { btn.classList.remove('running'); btn.classList.add('error'); }
+        });
+      }
+
+      running = false;
+      if (!countdownTimer) { runBtn.disabled = false; runBtn.textContent = 'Run AI Audit Now'; }
+    };
+
+    async function loadLastResults() {
+      var container = document.getElementById('results-container');
+      var loading = document.getElementById('results-loading');
+      try {
+        var resp = await fetch('/api/audit/results');
+        var data = await resp.json();
+        loading.style.display = 'none';
+
+        if (!data.providers || Object.keys(data.providers).length === 0) {
+          container.innerHTML = '<p style="color:var(--text2);font-size:0.9rem">No audit results found yet.</p>';
+          return;
+        }
+
+        var html = '';
+        if (data.averageScore != null) {
+          var avgCls = data.averageScore >= 7 ? '' : data.averageScore >= 5 ? ' warn' : ' err';
+          html += '<p style="margin-bottom:1rem"><strong>Average Score:</strong> <span class="score-badge'+avgCls+'">' + data.averageScore + ' / 10</span>';
+          if (data.completedAt) html += ' <span style="font-size:0.8rem;color:var(--text2)">&middot; ' + new Date(data.completedAt).toLocaleString() + '</span>';
+          html += '</p>';
+        }
+
+        var providerOrder = ['chatgpt','gemini','grok','claude'];
+        providerOrder.forEach(function(name) {
+          var p = data.providers[name];
+          if (!p) return;
+          var scoreCls = p.overallScore >= 7 ? '' : p.overallScore >= 5 ? ' warn' : ' err';
+          html += '<div class="result-card">';
+          html += '<h4>' + (p.displayName || name);
+          if (p.overallScore != null) html += ' <span class="score-badge'+scoreCls+'">' + p.overallScore + '/10</span>';
+          else html += ' <span class="score-badge warn">' + (p.status || 'Pending') + '</span>';
+          html += '</h4>';
+          html += '<div class="meta">' + (p.model || '') + (p.timestamp ? ' &middot; ' + new Date(p.timestamp).toLocaleString() : '') + '</div>';
+          if (p.error) html += '<div style="color:#ef4444;font-size:0.85rem">' + p.error + '</div>';
+          html += '</div>';
+        });
+
+        container.innerHTML = html;
+
+        providerOrder.forEach(async function(name) {
+          try {
+            var r = await fetch('/api/audit/results/' + name);
+            if (!r.ok) return;
+            var detail = await r.json();
+            if (detail.scores && detail.scores.dimensions) {
+              var cards = container.querySelectorAll('.result-card');
+              var cardIdx = 0;
+              var providersSeen = [];
+              providerOrder.forEach(function(pn) { if (data.providers[pn]) providersSeen.push(pn); });
+              var idx = providersSeen.indexOf(name);
+              if (idx >= 0 && cards[idx]) {
+                var dims = detail.scores.dimensions;
+                var dimsHtml = '<div class="dims">';
+                var dimLabels = {partisanBias:'Partisan Bias',factualAccuracy:'Factual Accuracy',fairnessOfFraming:'Fairness',balanceOfProsCons:'Balance',transparency:'Transparency'};
+                Object.keys(dimLabels).forEach(function(k) {
+                  if (dims[k] != null) dimsHtml += '<span>' + dimLabels[k] + ': <strong>' + dims[k] + '</strong></span>';
+                });
+                dimsHtml += '</div>';
+                cards[idx].insertAdjacentHTML('beforeend', dimsHtml);
+              }
+            }
+          } catch(e) { /* non-fatal */ }
+        });
+      } catch(e) {
+        loading.textContent = 'Failed to load results: ' + e.message;
+      }
+    }
+
+    loadLastResults();
+  })();
+  </script>
+</body>
+</html>`;
+
+  return new Response(html, {
+    headers: { "Content-Type": "text/html;charset=utf-8" },
+  });
+}
+
 function handleSupport() {
   const html = `<!DOCTYPE html>
 <html lang="en">
@@ -2618,7 +3125,7 @@ function handleSupport() {
       <li><a href="/candidates" data-t="All Candidates">All Candidates</a> — <span data-t="Browse every candidate with detailed profiles">Browse every candidate with detailed profiles</span></li>
     </ul>
 
-    <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
+    <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:#fff">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
   </div>
   ${pageI18n({
     'Support': 'Soporte',
@@ -2731,7 +3238,7 @@ function handlePrivacyPolicy() {
       <li><a href="/candidates" data-t="All Candidates">All Candidates</a> — <span data-t="Browse every candidate with detailed profiles">Browse every candidate with detailed profiles</span></li>
     </ul>
 
-    <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
+    <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:#fff">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
   </div>
   ${pageI18n({
     'Last updated: February 22, 2026': '\u00DAltima actualizaci\u00F3n: 22 de febrero de 2026',
@@ -2775,7 +3282,35 @@ function handlePrivacyPolicy() {
   });
 }
 
-function handleOpenSource() {
+async function handleOpenSource(env) {
+  // Load latest audit scores from KV (written by audit-runner.js)
+  const DEFAULT_REVIEWS = {
+    chatgpt: { displayName: "ChatGPT (OpenAI)", quote: "A robust framework for nonpartisan voting recommendations with strong transparency measures and deliberate design choices to mitigate bias.", score: 7.5 },
+    gemini: { displayName: "Gemini (Google)", quote: "Highly commendable commitment to fairness and transparency. Sets a high standard for responsible AI in election information.", score: 7.5 },
+    grok: { displayName: "Grok (xAI)", quote: "Well-designed application with strong nonpartisan intent. Exceptional openness with detailed exports and public APIs.", score: 7.8 },
+    claude: { displayName: "Claude (Anthropic)", quote: "Extraordinarily comprehensive methodology export. Multi-layered safeguards against bias more robust than typical voter platforms.", score: 8.2 },
+  };
+
+  let reviews = { ...DEFAULT_REVIEWS };
+  let auditTimestamp = null;
+  try {
+    const summaryRaw = await env.ELECTION_DATA.get("audit:summary");
+    if (summaryRaw) {
+      const summary = JSON.parse(summaryRaw);
+      auditTimestamp = summary.completedAt || summary.lastRun || null;
+      if (summary.providers) {
+        for (const [name, provider] of Object.entries(summary.providers)) {
+          if (provider.status === "success" && provider.overallScore) {
+            reviews[name] = {
+              displayName: provider.displayName || DEFAULT_REVIEWS[name]?.displayName || name,
+              quote: provider.topStrength || DEFAULT_REVIEWS[name]?.quote || "Review completed.",
+              score: provider.overallScore,
+            };
+          }
+        }
+      }
+    }
+  } catch { /* fall back to defaults */ }
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2827,28 +3362,18 @@ function handleOpenSource() {
 
     <h2 data-t="Independent AI Code Reviews">Independent AI Code Reviews</h2>
     <p data-t="We submitted our full codebase to four independent AI systems for review.">We submitted our full codebase — including all AI prompts, the data pipeline, and our methodology — to four independent AI systems for review. Each was asked to evaluate the code for partisan bias, security issues, and overall code quality.</p>
+    ${auditTimestamp ? `<p style="font-size:0.85rem;color:var(--text2)">Last audit: ${new Date(auditTimestamp).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</p>` : ""}
 
     <div class="review-cards">
-      <div class="review-card">
-        <h3 data-t="ChatGPT Code Review">ChatGPT Code Review</h3>
-        <p class="quote">"Well-intentioned methodology with strong transparency practices and balanced prompt design." — 7.5/10</p>
+      ${["chatgpt", "gemini", "grok", "claude"].map(name => {
+        const r = reviews[name];
+        const label = name === "chatgpt" ? "ChatGPT" : name === "gemini" ? "Gemini" : name === "grok" ? "Grok" : "Claude";
+        return `<div class="review-card">
+        <h3 data-t="${label} Code Review">${label} Code Review</h3>
+        <p class="quote">"${escapeHtml(r.quote)}" — ${r.score}/10</p>
         <a href="/audit" data-t="Read the full review">Read the full review &rarr;</a>
-      </div>
-      <div class="review-card">
-        <h3 data-t="Gemini Code Review">Gemini Code Review</h3>
-        <p class="quote">"A strong model for nonpartisan AI voting tools. Technically rigorous with exceptional transparency." — 8.0/10</p>
-        <a href="/audit" data-t="Read the full review">Read the full review &rarr;</a>
-      </div>
-      <div class="review-card">
-        <h3 data-t="Grok Code Review">Grok Code Review</h3>
-        <p class="quote">"Solid nonpartisan framework with good safeguards. Source hierarchy and daily verification add credibility." — 7.8/10</p>
-        <a href="/audit" data-t="Read the full review">Read the full review &rarr;</a>
-      </div>
-      <div class="review-card">
-        <h3 data-t="Claude Code Review">Claude Code Review</h3>
-        <p class="quote">"Self-review identifies genuine blind spots. Strong prompt-level guardrails with room for runtime bias detection." — 7.6/10</p>
-        <a href="/audit" data-t="Read the full review">Read the full review &rarr;</a>
-      </div>
+      </div>`;
+      }).join("\n      ")}
     </div>
 
     <h2 data-t="Automated Testing">Automated Testing</h2>
@@ -2875,7 +3400,7 @@ function handleOpenSource() {
       <li><a href="/candidates" data-t="All Candidates">All Candidates</a> — <span data-t="Browse every candidate with detailed profiles">Browse every candidate with detailed profiles</span></li>
     </ul>
 
-    <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
+    <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:#fff">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
   </div>
   ${pageI18n({
     'Texas Votes is Open Source': 'Texas Votes es C\u00F3digo Abierto',
@@ -2920,8 +3445,7 @@ async function handleBalanceCheck(env) {
   const results = {};
 
   for (const party of parties) {
-    let raw = await env.ELECTION_DATA.get(`ballot:statewide:${party}_primary_2026`);
-    if (!raw) raw = await env.ELECTION_DATA.get(`ballot:${party}_primary_2026`);
+    const raw = await env.ELECTION_DATA.get(`ballot:statewide:${party}_primary_2026`);
     if (!raw) {
       results[party] = { error: "No ballot data" };
       continue;
@@ -2964,11 +3488,8 @@ async function handleBallotFetch(request, env) {
     return jsonResponse({ error: "party parameter required (republican|democrat)" }, 400);
   }
 
-  // Load statewide ballot (new key structure), fall back to legacy key
+  // Load statewide ballot
   let raw = await env.ELECTION_DATA.get(`ballot:statewide:${party}_primary_2026`);
-  if (!raw) {
-    raw = await env.ELECTION_DATA.get(`ballot:${party}_primary_2026`);
-  }
   if (!raw) {
     return jsonResponse({ error: "No ballot data available" }, 404);
   }
@@ -3030,7 +3551,8 @@ async function handleCountyInfo(request, env) {
 async function handleTrigger(request, env) {
   const body = await request.json().catch(() => ({}));
   const parties = body.parties || undefined;
-  const result = await runDailyUpdate(env, { parties });
+  const skipCounties = body.skipCounties || false;
+  const result = await runDailyUpdate(env, { parties, skipCounties });
   return jsonResponse(result);
 }
 
@@ -3171,15 +3693,9 @@ async function handleGenerateCandidateTones(request, env) {
   }
 
   // Support both statewide and county ballots
-  let key;
-  if (countyFips) {
-    key = `ballot:county:${countyFips}:${party}_primary_2026`;
-  } else {
-    key = `ballot:statewide:${party}_primary_2026`;
-    // Fallback to legacy key format
-    const raw0 = await env.ELECTION_DATA.get(key);
-    if (!raw0) key = `ballot:${party}_primary_2026`;
-  }
+  const key = countyFips
+    ? `ballot:county:${countyFips}:${party}_primary_2026`
+    : `ballot:statewide:${party}_primary_2026`;
   const raw = await env.ELECTION_DATA.get(key);
   if (!raw) return jsonResponse({ error: "no ballot data" }, 404);
 
@@ -3335,7 +3851,7 @@ async function handleCandidateProfile(slug, env) {
     <a href="/candidates" class="back-top">&larr; <span data-t="All Candidates">All Candidates</span></a>
     <h1 data-t="Candidate Not Found">Candidate Not Found</h1>
     <p class="subtitle" data-t="We couldn't find a candidate matching this URL.">We couldn't find a candidate matching "${escapeHtml(slug)}". The candidate may not be in our database yet, or the URL may be incorrect.</p>
-    <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
+    <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:#fff">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
   </div>
   ${pageI18n({
     'Candidate Not Found': 'Candidato No Encontrado',
@@ -3356,6 +3872,17 @@ async function handleCandidateProfile(slug, env) {
   const summary = escapeHtml(rawSummary);
   const pros = resolveToneArray(c.pros);
   const cons = resolveToneArray(c.cons);
+
+  // Per-field confidence metadata (populated by updater.js)
+  const conf = c._confidence || {};
+  function confidenceBadge(fieldKey) {
+    const info = conf[fieldKey];
+    if (!info) return "";
+    if (info.level === "verified") {
+      return ` <span class="conf-badge conf-verified" title="Source: ${escapeHtml(info.source)}">Verified</span>`;
+    }
+    return ` <span class="conf-badge conf-inferred" title="Source: ${escapeHtml(info.source)}">AI-Inferred</span>`;
+  }
 
   // Load manifest for data freshness timestamp
   let dataUpdatedAt = null;
@@ -3397,7 +3924,7 @@ async function handleCandidateProfile(slug, env) {
 
   // Summary
   if (summary) {
-    sections.push(`<h2>About</h2><p>${summary}</p>`);
+    sections.push(`<h2>About${confidenceBadge("background")}</h2><p>${summary}</p>`);
   }
 
   // Education
@@ -3413,24 +3940,24 @@ async function handleCandidateProfile(slug, env) {
 
   // Key Positions
   if (c.keyPositions && c.keyPositions.length) {
-    sections.push(`<h2>Key Positions</h2><ul>${c.keyPositions.map(p => `<li>${escapeHtml(String(p))}</li>`).join("")}</ul>`);
+    sections.push(`<h2>Key Positions${confidenceBadge("keyPositions")}</h2><ul>${c.keyPositions.map(p => `<li>${escapeHtml(String(p))}</li>`).join("")}</ul>`);
   }
 
   // Strengths (pros)
   if (pros.length) {
-    sections.push(`<h2>Strengths</h2><ul>${pros.map(p => `<li>${escapeHtml(p)}</li>`).join("")}</ul>`);
+    sections.push(`<h2>Strengths${confidenceBadge("pros")}</h2><ul>${pros.map(p => `<li>${escapeHtml(p)}</li>`).join("")}</ul>`);
   }
 
   // Concerns (cons)
   if (cons.length) {
-    sections.push(`<h2>Concerns</h2><ul>${cons.map(p => `<li>${escapeHtml(p)}</li>`).join("")}</ul>`);
+    sections.push(`<h2>Concerns${confidenceBadge("cons")}</h2><ul>${cons.map(p => `<li>${escapeHtml(p)}</li>`).join("")}</ul>`);
   }
 
   // Endorsements
   if (c.endorsements) {
     const endorsements = Array.isArray(c.endorsements) ? c.endorsements : [c.endorsements];
     if (endorsements.length && endorsements[0]) {
-      sections.push(`<h2>Endorsements</h2><ul>${endorsements.map(e => {
+      sections.push(`<h2>Endorsements${confidenceBadge("endorsements")}</h2><ul>${endorsements.map(e => {
         const ne = normalizeEndorsement(e);
         const typeLabel = ne.type ? ` <span style="color:#666;font-size:0.85em">(${escapeHtml(ne.type)})</span>` : "";
         return `<li>${escapeHtml(ne.name)}${typeLabel}</li>`;
@@ -3441,13 +3968,13 @@ async function handleCandidateProfile(slug, env) {
   // Polling
   if (c.polling) {
     const polling = typeof c.polling === "string" ? c.polling : JSON.stringify(c.polling);
-    sections.push(`<h2>Polling</h2><p>${escapeHtml(polling)}</p>`);
+    sections.push(`<h2>Polling${confidenceBadge("polling")}</h2><p>${escapeHtml(polling)}</p>`);
   }
 
   // Fundraising
   if (c.fundraising) {
     const fundraising = typeof c.fundraising === "string" ? c.fundraising : JSON.stringify(c.fundraising);
-    sections.push(`<h2>Fundraising</h2><p>${escapeHtml(fundraising)}</p>`);
+    sections.push(`<h2>Fundraising${confidenceBadge("fundraising")}</h2><p>${escapeHtml(fundraising)}</p>`);
   }
 
   // Sources
@@ -3496,6 +4023,12 @@ async function handleCandidateProfile(slug, env) {
     ${dataUpdatedAt ? `<p style="margin-top:2rem;font-size:0.85rem;color:var(--text2)" data-t="Data last verified">Data last verified: ${new Date(dataUpdatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}${c.sources && c.sources.length ? ` &middot; ${c.sources.length} source${c.sources.length === 1 ? "" : "s"} cited` : ""}</p>` : ""}
     <p style="margin-top:${dataUpdatedAt ? "0.5rem" : "2rem"};font-size:0.9rem;color:var(--text2)" data-t="See something wrong? Let us know and we'll fix it.">See something wrong? <a href="mailto:howdy@txvotes.app?subject=Data correction: ${encodeURIComponent(c.name)}">Let us know</a> and we'll fix it.</p>
 
+    ${Object.keys(conf).length > 0 ? `<div class="conf-legend" data-t="Data Confidence Legend">
+      <strong data-t="Data Confidence">Data Confidence</strong><br>
+      <span class="conf-badge conf-verified">Verified</span> Data backed by official filings, nonpartisan references, or established news sources (tiers 1&ndash;6)<br>
+      <span class="conf-badge conf-inferred">AI-Inferred</span> Data gathered via AI web search without a high-tier source. Hover any badge for the source type.
+    </div>` : ""}
+
     <h2 data-t="Related">Related</h2>
     <ul class="related-links">
       <li><a href="/candidates" data-t="All Candidates">All Candidates</a> — <span data-t="Browse every candidate with detailed profiles">Browse every candidate with detailed profiles</span></li>
@@ -3505,7 +4038,7 @@ async function handleCandidateProfile(slug, env) {
       <li><a href="/nonpartisan" data-t="Nonpartisan by Design">Nonpartisan by Design</a> — <span data-t="How we keep the app fair for all voters">How we keep the app fair for all voters</span></li>
     </ul>
 
-    <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
+    <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:#fff">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
   </div>
   ${pageI18n({
     'See something wrong? Let us know and we\'ll fix it.': '\u00BFVes algo incorrecto? D\u00EDnoslo y lo corregiremos.',
@@ -3520,6 +4053,8 @@ async function handleCandidateProfile(slug, env) {
     'Polling': 'Encuestas',
     'Fundraising': 'Recaudaci\u00F3n de Fondos',
     'Sources': 'Fuentes',
+    'Data Confidence Legend': 'Leyenda de Confianza de Datos',
+    'Data Confidence': 'Confianza de Datos',
   })}
 </body>
 </html>`;
@@ -3656,7 +4191,7 @@ async function handleCandidatesIndex(env) {
       <li><a href="/open-source" data-t="Open Source">Open Source</a> — <span data-t="Source code, architecture, and independent code reviews">Source code, architecture, and independent code reviews</span></li>
     </ul>
 
-    <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
+    <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:#fff">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
   </div>
   <script>
   (function(){
@@ -3776,13 +4311,13 @@ const TX_COUNTY_NAMES = {
 };
 
 async function handleDataQuality(env) {
+  try {
   const parties = ["republican", "democrat"];
   const ballots = {};
 
-  // Load statewide ballots (with legacy fallback)
+  // Load statewide ballots
   for (const party of parties) {
-    let raw = await env.ELECTION_DATA.get(`ballot:statewide:${party}_primary_2026`);
-    if (!raw) raw = await env.ELECTION_DATA.get(`ballot:${party}_primary_2026`);
+    const raw = await env.ELECTION_DATA.get(`ballot:statewide:${party}_primary_2026`);
     ballots[party] = raw ? JSON.parse(raw) : null;
   }
 
@@ -3916,6 +4451,99 @@ async function handleDataQuality(env) {
     <p class="dq-note">No balance issues detected. All candidates have symmetric pros/cons coverage.</p>`;
   }
 
+  // --- Per-Race Balance Breakdown ---
+  let perRaceHtml = "";
+  const allRaceRows = [];
+  for (const party of parties) {
+    const report = balanceReports[party];
+    if (!report) continue;
+    const partyLabel = party === "republican" ? "Republican" : "Democrat";
+    const pTag = party === "republican" ? "R" : "D";
+    for (const race of report.races) {
+      // Compute per-race score using same formula as aggregate
+      let raceCritical = 0, raceWarning = 0, raceInfo = 0;
+      for (const f of race.raceFlags) {
+        if (f.severity === "critical") raceCritical++;
+        else if (f.severity === "warning") raceWarning++;
+        else raceInfo++;
+      }
+      for (const c of race.candidates) {
+        for (const f of c.flags) {
+          if (f.severity === "critical") raceCritical++;
+          else if (f.severity === "warning") raceWarning++;
+          else raceInfo++;
+        }
+      }
+      const raceDeductions = raceCritical * 10 + raceWarning * 5 + raceInfo * 2;
+      const raceScore = Math.max(0, 100 - raceDeductions);
+      allRaceRows.push({ party: pTag, partyLabel, label: race.label, score: raceScore, critical: raceCritical, warning: raceWarning, info: raceInfo, flagCount: race.flagCount, candidates: race.candidates, raceFlags: race.raceFlags });
+    }
+  }
+
+  if (allRaceRows.length > 0) {
+    let raceRowsHtml = "";
+    for (const r of allRaceRows) {
+      const scoreColor = r.score > 80 ? "#16a34a" : r.score >= 60 ? "#b45309" : "#dc2626";
+      const scoreBg = r.score > 80 ? "rgba(34,197,94,.1)" : r.score >= 60 ? "rgba(234,179,8,.1)" : "rgba(239,68,68,.08)";
+      // Build candidate detail rows for expandable section
+      let candidateDetail = "";
+      if (r.candidates && r.candidates.length > 0) {
+        for (const c of r.candidates) {
+          const cFlagCount = c.flags ? c.flags.length : 0;
+          // Compute candidate-level score
+          let cCrit = 0, cWarn = 0, cInfo = 0;
+          for (const f of (c.flags || [])) {
+            if (f.severity === "critical") cCrit++;
+            else if (f.severity === "warning") cWarn++;
+            else cInfo++;
+          }
+          const cScore = Math.max(0, 100 - (cCrit * 10 + cWarn * 5 + cInfo * 2));
+          const cScoreColor = cScore > 80 ? "#16a34a" : cScore >= 60 ? "#b45309" : "#dc2626";
+          let flagDetail = "";
+          if (cFlagCount > 0) {
+            flagDetail = `<ul style="margin:0.25rem 0 0 1rem;padding:0;font-size:0.8rem;color:var(--text2)">`;
+            for (const f of c.flags) {
+              const sevColor = f.severity === "critical" ? "#dc2626" : f.severity === "warning" ? "#b45309" : "#16a34a";
+              flagDetail += `<li style="margin-bottom:2px"><span style="color:${sevColor};font-weight:600;text-transform:uppercase;font-size:0.75rem">${f.severity}</span> ${f.detail}</li>`;
+            }
+            flagDetail += `</ul>`;
+          }
+          candidateDetail += `<div style="display:flex;align-items:baseline;gap:0.5rem;margin-bottom:0.25rem"><span style="font-weight:600;font-size:0.85rem;min-width:2.5rem;color:${cScoreColor}">${cScore}</span><span style="font-size:0.85rem">${c.name}</span><span style="font-size:0.8rem;color:var(--text2)">${cFlagCount} flag${cFlagCount === 1 ? "" : "s"}</span></div>${flagDetail}`;
+        }
+      }
+      // Race-level flags
+      let raceFlagDetail = "";
+      if (r.raceFlags && r.raceFlags.length > 0) {
+        raceFlagDetail = `<div style="margin-bottom:0.5rem"><ul style="margin:0.25rem 0 0 1rem;padding:0;font-size:0.8rem;color:var(--text2)">`;
+        for (const f of r.raceFlags) {
+          const sevColor = f.severity === "critical" ? "#dc2626" : f.severity === "warning" ? "#b45309" : "#16a34a";
+          raceFlagDetail += `<li style="margin-bottom:2px"><span style="color:${sevColor};font-weight:600;text-transform:uppercase;font-size:0.75rem">${f.severity}</span> ${f.detail}</li>`;
+        }
+        raceFlagDetail += `</ul></div>`;
+      }
+      const hasDetails = r.flagCount > 0;
+      raceRowsHtml += `<div class="dq-race-row" style="border:1px solid var(--border);border-radius:var(--rs);padding:0.75rem 1rem;margin-bottom:0.5rem;background:${scoreBg}">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem">
+          <div style="display:flex;align-items:center;gap:0.75rem;flex:1;min-width:200px">
+            <span style="font-size:1.25rem;font-weight:800;color:${scoreColor};min-width:2.5rem">${r.score}</span>
+            <div><div style="font-weight:600;font-size:0.95rem">${r.label}</div><div style="font-size:0.8rem;color:var(--text2)">${r.party} &middot; ${r.candidates.length} candidate${r.candidates.length === 1 ? "" : "s"}</div></div>
+          </div>
+          <div style="display:flex;gap:0.5rem;font-size:0.8rem">
+            ${r.critical > 0 ? `<span style="color:#dc2626;font-weight:600">${r.critical} critical</span>` : ""}
+            ${r.warning > 0 ? `<span style="color:#b45309;font-weight:600">${r.warning} warning</span>` : ""}
+            ${r.info > 0 ? `<span style="color:#16a34a;font-weight:600">${r.info} info</span>` : ""}
+            ${r.flagCount === 0 ? `<span style="color:#16a34a;font-weight:600">No flags</span>` : ""}
+          </div>
+        </div>
+        ${hasDetails ? `<details style="margin-top:0.5rem"><summary style="cursor:pointer;font-size:0.85rem;color:var(--blue);font-weight:600">Show candidate scores</summary><div style="margin-top:0.5rem;padding-left:0.25rem">${raceFlagDetail}${candidateDetail}</div></details>` : ""}
+      </div>`;
+    }
+    perRaceHtml = `
+    <h2 data-t="Balance by Race">Balance by Race</h2>
+    <p style="font-size:0.9rem;color:var(--text2);margin-bottom:1rem">Per-race balance scores show how symmetrically candidates are covered within each race. Scores above 80 indicate good balance. Expand any race to see individual candidate scores and flags.</p>
+    <div style="margin-bottom:1.5rem">${raceRowsHtml}</div>`;
+  }
+
   // --- County Coverage ---
   const BATCH = 50;
   const countyInfoResults = {};
@@ -3960,9 +4588,9 @@ async function handleDataQuality(env) {
   // --- Today's Update Activity ---
   let updateHtml = "";
   if (updateLog) {
-    const checkedCount = updateLog.log ? (updateLog.log.match(/Checking /g) || []).length : 0;
-    const updatedCount = updateLog.updated || 0;
-    const errorCount = updateLog.errors || 0;
+    const checkedCount = Array.isArray(updateLog.log) ? updateLog.log.length : (typeof updateLog.log === "string" ? (updateLog.log.match(/Checking /g) || []).length : 0);
+    const updatedCount = Array.isArray(updateLog.updated) ? updateLog.updated.length : (updateLog.updated || 0);
+    const errorCount = Array.isArray(updateLog.errors) ? updateLog.errors.length : (updateLog.errors || 0);
     updateHtml = `<div class="dq-card-grid"><div class="dq-card"><div class="dq-card-value">${checkedCount}</div><div class="dq-card-label">Races checked</div></div><div class="dq-card"><div class="dq-card-value">${updatedCount}</div><div class="dq-card-label">Updates applied</div></div><div class="dq-card"><div class="dq-card-value">${errorCount}</div><div class="dq-card-label">Errors</div></div></div>`;
     if (updateLog.timestamp) {
       const logTime = new Date(updateLog.timestamp);
@@ -4059,6 +4687,8 @@ async function handleDataQuality(env) {
       <p class="dq-note" style="margin-top:0.75rem">Balance checks run automatically. <a href="/api/balance-check">View raw JSON report</a>. Voters can also report bias directly using the "Flag this info" button on any candidate card — reports go to <a href="mailto:flagged@txvotes.app">flagged@txvotes.app</a> and feed back into data quality improvements.</p>
     </div>
 
+    ${perRaceHtml}
+
     <h2 data-t="County Coverage">County Coverage</h2>
     <div class="dq-card-grid">
       <div class="dq-card"><div class="dq-card-value">${infoPresent}<span class="dq-unit"> / 254</span></div><div class="dq-card-label" data-t="Counties with voting info">Counties with voting info</div></div>
@@ -4079,7 +4709,7 @@ async function handleDataQuality(env) {
       <li><a href="/candidates" data-t="Candidate Profiles">Candidate Profiles</a> — <span data-t="Browse all candidates with detailed information">Browse all candidates with detailed information</span></li>
     </ul>
 
-    <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
+    <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:#fff">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
   </div>
   <script>
   (function(){
@@ -4125,6 +4755,7 @@ async function handleDataQuality(env) {
     'Ballot Coverage': 'Cobertura de Boletas',
     'Candidate Data Completeness': 'Datos Completos de Candidatos',
     'Pros/Cons Balance': 'Equilibrio de Pros/Contras',
+    'Balance by Race': 'Equilibrio por Carrera',
     'County Coverage': 'Cobertura por Condado',
     'Counties with voting info': 'Condados con info de votaci\u00F3n',
     'Republican local ballots': 'Boletas locales Republicanas',
@@ -4141,7 +4772,390 @@ async function handleDataQuality(env) {
       "Cache-Control": "public, max-age=3600",
     },
   });
+  } catch (err) {
+    console.error("handleDataQuality error:", err);
+    const errMsg = String(err && err.message ? err.message : err)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    return new Response(`<!DOCTYPE html><html lang="en"><head>${pageHead({ title: "Data Quality \u2014 Texas Votes", url: "https://txvotes.app/data-quality" })}</head><body><div class="container" style="max-width:720px"><a href="/" class="back-top">&larr; Texas Votes</a><h1>Data Quality Dashboard</h1><p class="subtitle">This page is temporarily unavailable. Our team has been notified.</p><!-- debug: ${errMsg} --></div></body></html>`, {
+      status: 500,
+      headers: { "Content-Type": "text/html;charset=utf-8", "Cache-Control": "no-store" },
+    });
+  }
 }
+
+// MARK: - Health Check Endpoint
+
+async function handleHealthCheck(env) {
+  const start = Date.now();
+  const checks = {};
+  let overall = "ok";
+
+  // 1. KV connectivity — read manifest key
+  try {
+    const manifest = await env.ELECTION_DATA.get("manifest");
+    checks.kv = { ok: !!manifest, detail: manifest ? "manifest readable" : "manifest key missing" };
+    if (!manifest) overall = "degraded";
+  } catch (err) {
+    checks.kv = { ok: false, detail: "KV read failed: " + (err.message || String(err)) };
+    overall = "down";
+  }
+
+  // 2. Statewide ballot data exists and is valid JSON
+  try {
+    const [repRaw, demRaw] = await Promise.all([
+      env.ELECTION_DATA.get("ballot:statewide:republican_primary_2026"),
+      env.ELECTION_DATA.get("ballot:statewide:democrat_primary_2026"),
+    ]);
+    const repOk = !!repRaw;
+    const demOk = !!demRaw;
+    let repValid = false, demValid = false;
+    if (repRaw) { try { JSON.parse(repRaw); repValid = true; } catch { /* invalid */ } }
+    if (demRaw) { try { JSON.parse(demRaw); demValid = true; } catch { /* invalid */ } }
+    checks.ballotData = {
+      ok: repOk && demOk && repValid && demValid,
+      republican: { exists: repOk, validJson: repValid },
+      democrat: { exists: demOk, validJson: demValid },
+    };
+    if (!checks.ballotData.ok) overall = "degraded";
+  } catch (err) {
+    checks.ballotData = { ok: false, detail: "ballot check failed: " + (err.message || String(err)) };
+    overall = "degraded";
+  }
+
+  // 3. Cron freshness — check today's or yesterday's cron_status
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+    const [todayStatus, yesterdayStatus] = await Promise.all([
+      env.ELECTION_DATA.get(`cron_status:${today}`),
+      env.ELECTION_DATA.get(`cron_status:${yesterday}`),
+    ]);
+    const lastRun = todayStatus ? today : yesterdayStatus ? yesterday : null;
+    let lastResult = null;
+    if (todayStatus) { try { lastResult = JSON.parse(todayStatus); } catch { /* ignore */ } }
+    else if (yesterdayStatus) { try { lastResult = JSON.parse(yesterdayStatus); } catch { /* ignore */ } }
+    const hasErrors = lastResult && lastResult.tasks && Object.values(lastResult.tasks).some(t => t.status === "error");
+    checks.cronFreshness = {
+      ok: !!lastRun && !hasErrors,
+      lastRun,
+      hasErrors: !!hasErrors,
+    };
+    if (!lastRun) overall = overall === "down" ? "down" : "degraded";
+  } catch (err) {
+    checks.cronFreshness = { ok: false, detail: "cron check failed: " + (err.message || String(err)) };
+  }
+
+  // 4. Audit freshness — audit:summary lastRun within 48 hours
+  try {
+    const auditRaw = await env.ELECTION_DATA.get("audit:summary");
+    if (auditRaw) {
+      const audit = JSON.parse(auditRaw);
+      const lastRun = audit.lastRun || audit.timestamp || null;
+      const ageMs = lastRun ? Date.now() - new Date(lastRun).getTime() : Infinity;
+      const fresh = ageMs < 48 * 60 * 60 * 1000;
+      checks.auditFreshness = { ok: fresh, lastRun, ageHours: Math.round(ageMs / 3600000) };
+    } else {
+      checks.auditFreshness = { ok: false, detail: "no audit summary found" };
+    }
+  } catch (err) {
+    checks.auditFreshness = { ok: false, detail: "audit check failed: " + (err.message || String(err)) };
+  }
+
+  // 5. API key present
+  checks.apiKey = { ok: !!env.ANTHROPIC_API_KEY };
+  if (!env.ANTHROPIC_API_KEY) overall = "degraded";
+
+  const elapsed = Date.now() - start;
+  const status = overall === "ok" ? 200 : 503;
+
+  return new Response(JSON.stringify({
+    status: overall,
+    timestamp: new Date().toISOString(),
+    responseMs: elapsed,
+    checks,
+  }), {
+    status,
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+      "Cache-Control": "no-store",
+    },
+  });
+}
+
+// MARK: - Admin Status Dashboard
+
+async function handleAdminStatus(env) {
+  const errors = [];
+
+  // Gather status data in parallel
+  const today = new Date().toISOString().slice(0, 10);
+  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+
+  const [manifestRaw, repRaw, demRaw, cronTodayRaw, cronYesterdayRaw, auditRaw, healthLogRaw] = await Promise.all([
+    env.ELECTION_DATA.get("manifest").catch(e => { errors.push("manifest: " + e.message); return null; }),
+    env.ELECTION_DATA.get("ballot:statewide:republican_primary_2026").catch(e => { errors.push("rep ballot: " + e.message); return null; }),
+    env.ELECTION_DATA.get("ballot:statewide:democrat_primary_2026").catch(e => { errors.push("dem ballot: " + e.message); return null; }),
+    env.ELECTION_DATA.get(`cron_status:${today}`).catch(e => { errors.push("cron today: " + e.message); return null; }),
+    env.ELECTION_DATA.get(`cron_status:${yesterday}`).catch(e => { errors.push("cron yesterday: " + e.message); return null; }),
+    env.ELECTION_DATA.get("audit:summary").catch(e => { errors.push("audit: " + e.message); return null; }),
+    env.ELECTION_DATA.get(`health_log:${today}`).catch(e => { errors.push("health log: " + e.message); return null; }),
+  ]);
+
+  // Parse manifest
+  let manifest = null;
+  if (manifestRaw) { try { manifest = JSON.parse(manifestRaw); } catch { errors.push("manifest: invalid JSON"); } }
+
+  // Parse ballots for race/candidate counts
+  let repBallot = null, demBallot = null;
+  if (repRaw) { try { repBallot = JSON.parse(repRaw); } catch { errors.push("rep ballot: invalid JSON"); } }
+  if (demRaw) { try { demBallot = JSON.parse(demRaw); } catch { errors.push("dem ballot: invalid JSON"); } }
+
+  const repRaces = repBallot && repBallot.races ? repBallot.races.length : 0;
+  const demRaces = demBallot && demBallot.races ? demBallot.races.length : 0;
+  const repCandidates = repBallot && repBallot.races ? repBallot.races.reduce((sum, r) => sum + (r.candidates ? r.candidates.length : 0), 0) : 0;
+  const demCandidates = demBallot && demBallot.races ? demBallot.races.reduce((sum, r) => sum + (r.candidates ? r.candidates.length : 0), 0) : 0;
+
+  // Parse cron status
+  let cronStatus = null;
+  const cronRaw = cronTodayRaw || cronYesterdayRaw;
+  const cronDate = cronTodayRaw ? today : cronYesterdayRaw ? yesterday : null;
+  if (cronRaw) { try { cronStatus = JSON.parse(cronRaw); } catch { errors.push("cron status: invalid JSON"); } }
+
+  // Parse audit summary
+  let audit = null;
+  if (auditRaw) { try { audit = JSON.parse(auditRaw); } catch { errors.push("audit summary: invalid JSON"); } }
+
+  // Parse health log
+  let healthLog = null;
+  if (healthLogRaw) { try { healthLog = JSON.parse(healthLogRaw); } catch { /* ignore */ } }
+
+  // Also fetch last 3 days of update logs
+  const logDays = [];
+  for (let i = 0; i < 3; i++) {
+    const d = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
+    logDays.push(d);
+  }
+  const updateLogs = await Promise.all(
+    logDays.map(d => env.ELECTION_DATA.get(`update_log:${d}`).then(r => ({ date: d, raw: r })).catch(() => ({ date: d, raw: null })))
+  );
+
+  // Build status cards
+  const cronTaskRows = cronStatus && cronStatus.tasks
+    ? Object.entries(cronStatus.tasks).map(([name, t]) => {
+        const statusColor = t.status === "success" ? "#16a34a" : t.status === "error" ? "#dc2626" : "var(--text2)";
+        const detail = t.status === "error" ? escapeHtml(t.error || "") : (t.updated ? `${t.updated.length} updated` : "");
+        return `<tr><td>${escapeHtml(name)}</td><td style="color:${statusColor};font-weight:600">${escapeHtml(t.status || "unknown")}</td><td>${detail}</td></tr>`;
+      }).join("")
+    : '<tr><td colspan="3" style="color:var(--text2)">No cron data available</td></tr>';
+
+  const auditProviders = audit && audit.providers
+    ? Object.entries(audit.providers).map(([name, p]) => {
+        const score = p.score != null ? p.score.toFixed(1) : "N/A";
+        const scoreColor = p.score >= 7 ? "#16a34a" : p.score >= 5 ? "#d97706" : "#dc2626";
+        return `<tr><td style="text-transform:capitalize">${escapeHtml(name)}</td><td style="color:${scoreColor};font-weight:600">${score}/10</td><td>${escapeHtml(p.timestamp || "")}</td></tr>`;
+      }).join("")
+    : '<tr><td colspan="3" style="color:var(--text2)">No audit data</td></tr>';
+
+  const updateLogRows = updateLogs.map(l => {
+    if (!l.raw) return `<tr><td>${l.date}</td><td style="color:var(--text2)">No log</td><td></td></tr>`;
+    let log;
+    try { log = JSON.parse(l.raw); } catch { return `<tr><td>${l.date}</td><td style="color:var(--text2)">Invalid JSON</td><td></td></tr>`; }
+    const errs = log.errors || [];
+    const updated = log.updated || [];
+    const aiErrs = log.aiErrors || {};
+    const aiErrCount = aiErrs.totalErrors || 0;
+    const statusColor = errs.length === 0 ? "#16a34a" : "#dc2626";
+    const aiErrBadge = aiErrCount > 0 ? ` <span style="font-size:0.8rem;color:#d97706">(${aiErrCount} AI)</span>` : "";
+    const needsAttn = (aiErrs.needsAttention || []).length;
+    const attnBadge = needsAttn > 0 ? `<span class="badge badge-err">${needsAttn} need attention</span>` : "";
+    return `<tr><td>${l.date}</td><td style="color:${statusColor}">${updated.length} updated, ${errs.length} errors${aiErrBadge}${errs.length > 0 ? ": " + escapeHtml(errs.slice(0, 3).join("; ")) : ""}</td><td>${attnBadge}</td></tr>`;
+  }).join("");
+
+  const healthLogRows = healthLog && Array.isArray(healthLog.issues)
+    ? healthLog.issues.map(issue => `<tr><td>${escapeHtml(issue.check || "")}</td><td>${escapeHtml(issue.detail || "")}</td><td>${escapeHtml(issue.timestamp || "")}</td></tr>`).join("")
+    : '<tr><td colspan="3" style="color:var(--text2)">No health issues logged today</td></tr>';
+
+  const errBanner = errors.length > 0
+    ? `<div style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:var(--rs);padding:0.75rem 1rem;margin-bottom:1.5rem;font-size:0.85rem;color:#dc2626"><strong>Fetch errors:</strong><ul style="margin:0.5rem 0 0;padding-left:1.25rem">${errors.map(e => '<li>' + escapeHtml(e) + '</li>').join("")}</ul></div>` : "";
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  ${pageHead({
+    title: "System Status \u2014 Texas Votes Admin",
+    description: "System health and monitoring dashboard.",
+  })}
+  <style>
+    .container{max-width:900px}
+    table{width:100%;border-collapse:collapse;margin-bottom:1.5rem;font-size:0.9rem}
+    th,td{padding:6px 10px;border:1px solid var(--border);text-align:left}
+    th{background:var(--blue);color:#fff;font-weight:600;font-size:0.85rem}
+    .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-bottom:2rem}
+    .stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:1rem;text-align:center}
+    .stat-card .num{font-size:1.75rem;font-weight:800}
+    .stat-card .label{font-size:0.85rem;color:var(--text2)}
+    .ok{color:#16a34a}.warn{color:#d97706}.err{color:#dc2626}
+    .badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:0.8rem;font-weight:600}
+    .badge-ok{background:rgba(22,163,74,.15);color:#16a34a}
+    .badge-warn{background:rgba(217,119,6,.15);color:#d97706}
+    .badge-err{background:rgba(220,38,38,.15);color:#dc2626}
+    code{background:rgba(128,128,128,.1);padding:1px 4px;border-radius:3px;font-size:0.85em}
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:2rem}
+    @media(max-width:768px){.two-col{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="/" class="back-top">&larr; Texas Votes</a>
+    <h1>System Status</h1>
+    <p class="subtitle">Monitoring dashboard &mdash; last refreshed ${new Date().toISOString().replace("T", " ").slice(0, 19)} UTC</p>
+    ${errBanner}
+
+    <h2>Overview</h2>
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="num ${manifest ? "ok" : "err"}">${manifest ? "OK" : "Missing"}</div>
+        <div class="label">Manifest</div>
+      </div>
+      <div class="stat-card">
+        <div class="num ${repBallot ? "ok" : "err"}">${repRaces} races / ${repCandidates} candidates</div>
+        <div class="label">Republican Ballot</div>
+      </div>
+      <div class="stat-card">
+        <div class="num ${demBallot ? "ok" : "err"}">${demRaces} races / ${demCandidates} candidates</div>
+        <div class="label">Democrat Ballot</div>
+      </div>
+      <div class="stat-card">
+        <div class="num ${cronDate === today ? "ok" : cronDate === yesterday ? "warn" : "err"}">${cronDate || "Never"}</div>
+        <div class="label">Last Cron Run</div>
+      </div>
+      <div class="stat-card">
+        <div class="num ${audit && audit.averageScore >= 7 ? "ok" : audit && audit.averageScore >= 5 ? "warn" : "err"}">${audit && audit.averageScore != null ? audit.averageScore.toFixed(1) + "/10" : "N/A"}</div>
+        <div class="label">Avg Audit Score</div>
+      </div>
+      <div class="stat-card">
+        <div class="num ${env.ANTHROPIC_API_KEY ? "ok" : "err"}">${env.ANTHROPIC_API_KEY ? "Set" : "Missing"}</div>
+        <div class="label">Anthropic API Key</div>
+      </div>
+    </div>
+
+    <h2>Last Cron Run${cronDate ? " (" + cronDate + ")" : ""}</h2>
+    ${cronStatus ? `<p style="font-size:0.85rem;color:var(--text2)">Started: ${escapeHtml(cronStatus.timestamp || "unknown")}</p>` : ""}
+    <table>
+      <tr><th>Task</th><th>Status</th><th>Detail</th></tr>
+      ${cronTaskRows}
+    </table>
+
+    <div class="two-col">
+      <div>
+        <h2>Recent Update Logs</h2>
+        <table>
+          <tr><th>Date</th><th>Result</th><th>AI Errors</th></tr>
+          ${updateLogRows}
+        </table>
+        <p style="font-size:0.8rem"><a href="/admin/errors">View full AI error log &rarr;</a></p>
+      </div>
+      <div>
+        <h2>AI Audit Scores</h2>
+        <table>
+          <tr><th>Provider</th><th>Score</th><th>Last Run</th></tr>
+          ${auditProviders}
+        </table>
+      </div>
+    </div>
+
+    <h2>Health Log (${today})</h2>
+    <table>
+      <tr><th>Check</th><th>Detail</th><th>Time</th></tr>
+      ${healthLogRows}
+    </table>
+
+    <div class="page-footer">
+      <a href="/">Texas Votes</a> &middot;
+      <a href="/admin/coverage">Coverage</a> &middot;
+      <a href="/admin/analytics">Analytics</a> &middot;
+      <a href="/admin/errors">AI Errors</a> &middot;
+      <a href="/health">Health API</a> &middot;
+      <a href="/privacy">Privacy</a><br>
+      <span style="color:#fff">&starf;</span> Built in Texas &middot;
+      <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a>
+    </div>
+  </div>
+</body>
+</html>`;
+
+  return new Response(html, { headers: { "Content-Type": "text/html;charset=utf-8" } });
+}
+
+// MARK: - Discord Webhook Notification
+
+async function notifyDiscord(env, message) {
+  if (!env.DISCORD_WEBHOOK_URL) return;
+  try {
+    await fetch(env.DISCORD_WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content: message }),
+    });
+  } catch {
+    // Non-fatal — don't let notification failure break the cron
+  }
+}
+
+// MARK: - Cron Health Check
+
+async function runCronHealthCheck(env) {
+  const today = new Date().toISOString().slice(0, 10);
+  const issues = [];
+
+  // Check manifest exists
+  try {
+    const manifest = await env.ELECTION_DATA.get("manifest");
+    if (!manifest) issues.push({ check: "manifest", detail: "manifest key missing from KV", timestamp: new Date().toISOString() });
+  } catch (err) {
+    issues.push({ check: "manifest", detail: "KV read failed: " + (err.message || String(err)), timestamp: new Date().toISOString() });
+  }
+
+  // Check statewide ballots
+  for (const party of ["republican", "democrat"]) {
+    try {
+      const raw = await env.ELECTION_DATA.get(`ballot:statewide:${party}_primary_2026`);
+      if (!raw) {
+        issues.push({ check: `ballot:${party}`, detail: `${party} statewide ballot missing`, timestamp: new Date().toISOString() });
+      } else {
+        try { JSON.parse(raw); } catch {
+          issues.push({ check: `ballot:${party}`, detail: `${party} statewide ballot is invalid JSON`, timestamp: new Date().toISOString() });
+        }
+      }
+    } catch (err) {
+      issues.push({ check: `ballot:${party}`, detail: `KV read failed: ${err.message || String(err)}`, timestamp: new Date().toISOString() });
+    }
+  }
+
+  // Check API key
+  if (!env.ANTHROPIC_API_KEY) {
+    issues.push({ check: "apiKey", detail: "ANTHROPIC_API_KEY not set", timestamp: new Date().toISOString() });
+  }
+
+  // Write health log
+  const healthLog = {
+    date: today,
+    timestamp: new Date().toISOString(),
+    issueCount: issues.length,
+    issues,
+  };
+  await env.ELECTION_DATA.put(`health_log:${today}`, JSON.stringify(healthLog));
+
+  // Alert if critical issues found
+  if (issues.length > 0) {
+    const summary = issues.map(i => `- ${i.check}: ${i.detail}`).join("\n");
+    await notifyDiscord(env, `**Texas Votes Health Alert** (${today})\n${issues.length} issue(s) detected:\n${summary}`);
+  }
+
+  return healthLog;
+}
+
 
 // MARK: - Admin Coverage Dashboard
 
@@ -4151,8 +5165,7 @@ async function handleAdminCoverage(env) {
 
   // Load statewide ballots
   for (const party of parties) {
-    let raw = await env.ELECTION_DATA.get(`ballot:statewide:${party}_primary_2026`);
-    if (!raw) raw = await env.ELECTION_DATA.get(`ballot:${party}_primary_2026`);
+    const raw = await env.ELECTION_DATA.get(`ballot:statewide:${party}_primary_2026`);
     ballots[party] = raw ? JSON.parse(raw) : null;
   }
 
@@ -4356,7 +5369,7 @@ async function handleAdminCoverage(env) {
     </table>
     </div>
 
-    <div class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> Built in Texas &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
+    <div class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a><br><span style="color:#fff">&starf;</span> Built in Texas &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
   </div>
 </body>
 </html>`;
@@ -4556,7 +5569,7 @@ async function handleAdminAnalytics(env) {
     </div>
     <h2>Guide Errors</h2>
     <div class="scroll-table"><table><tr><th>Error Message</th><th style="text-align:right">Count</th></tr>${er}</table></div>
-    <div class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/admin/coverage">Coverage</a> &middot; <a href="/privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> Built in Texas &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
+    <div class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/admin/coverage">Coverage</a> &middot; <a href="/privacy">Privacy</a><br><span style="color:#fff">&starf;</span> Built in Texas &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
   </div>
 </body>
 </html>`;
@@ -4664,6 +5677,513 @@ async function handleAnalyticsEvent(request, env) {
   return new Response(null, { status: 204 });
 }
 
+// ---------------------------------------------------------------------------
+// MARK: - Admin Verified Baseline
+// ---------------------------------------------------------------------------
+
+/**
+ * GET /api/admin/baseline — View the verified baseline for a party.
+ * Query params: ?party=republican (default) or ?party=democrat
+ */
+async function handleAdminBaselineView(url, env) {
+  const party = url.searchParams.get("party") || "republican";
+  const baselineKey = `${BASELINE_KEY_PREFIX}${party}_primary_2026`;
+  const raw = await env.ELECTION_DATA.get(baselineKey);
+
+  if (!raw) {
+    return jsonResponse({
+      exists: false,
+      party,
+      key: baselineKey,
+      message: "No baseline found. Use POST /api/admin/baseline/seed to create one.",
+    });
+  }
+
+  let baseline;
+  try {
+    baseline = JSON.parse(raw);
+  } catch {
+    return jsonResponse({ error: "Baseline data is corrupt JSON", party, key: baselineKey }, 500);
+  }
+
+  // Summarize for the response
+  let totalCandidates = 0;
+  const raceSummary = (baseline.races || []).map((r) => {
+    totalCandidates += (r.candidates || []).length;
+    return {
+      office: r.office,
+      district: r.district || null,
+      candidateCount: (r.candidates || []).length,
+      candidates: (r.candidates || []).map((c) => ({
+        name: c.name,
+        isIncumbent: c.isIncumbent,
+        withdrawn: c.withdrawn || false,
+        hasBackground: !!c.background,
+        hasSummary: !!c.summary,
+      })),
+    };
+  });
+
+  return jsonResponse({
+    exists: true,
+    party,
+    key: baselineKey,
+    seededAt: baseline.seededAt,
+    sourceKey: baseline.sourceKey,
+    totalRaces: (baseline.races || []).length,
+    totalCandidates,
+    races: raceSummary,
+  });
+}
+
+/**
+ * GET /api/admin/baseline/log — View the baseline fallback log.
+ * Returns the last 30 days of fallback triggers.
+ */
+async function handleAdminBaselineLog(env) {
+  const raw = await env.ELECTION_DATA.get(BASELINE_LOG_KEY);
+  if (!raw) {
+    return jsonResponse({
+      entries: [],
+      message: "No baseline fallbacks have been triggered yet.",
+    });
+  }
+
+  let log;
+  try {
+    log = JSON.parse(raw);
+  } catch {
+    return jsonResponse({ error: "Fallback log is corrupt JSON" }, 500);
+  }
+
+  // Summarize
+  const totalFallbacks = log.reduce((sum, entry) => sum + (entry.count || 0), 0);
+  return jsonResponse({
+    totalDaysWithFallbacks: log.length,
+    totalFallbacks,
+    entries: log,
+  });
+}
+
+/**
+ * POST /api/admin/baseline/seed — Seed the verified baseline from current KV ballot data.
+ * Body: { "parties": ["republican", "democrat"] } or omit for both parties.
+ */
+async function handleAdminBaselineSeed(request, env) {
+  const body = await request.json().catch(() => ({}));
+  const parties = body.parties || ["republican", "democrat"];
+  const results = [];
+
+  for (const party of parties) {
+    const result = await seedBaseline(party, env);
+    results.push({ party, ...result });
+  }
+
+  return jsonResponse({
+    seeded: results.filter((r) => r.success).map((r) => r.party),
+    results,
+  });
+}
+
+/**
+ * POST /api/admin/baseline/update — Update specific candidate fields in the baseline.
+ * Body: { "party": "republican", "candidateName": "John Smith", "fields": { "background": "new bg", "isIncumbent": true } }
+ */
+async function handleAdminBaselineUpdate(request, env) {
+  const body = await request.json().catch(() => ({}));
+  if (!body.party || !body.candidateName) {
+    return jsonResponse({ error: "party and candidateName are required" }, 400);
+  }
+
+  const baselineKey = `${BASELINE_KEY_PREFIX}${body.party}_primary_2026`;
+  const raw = await env.ELECTION_DATA.get(baselineKey);
+  if (!raw) {
+    return jsonResponse({ error: `No baseline found for ${body.party}. Seed it first.` }, 404);
+  }
+
+  let baseline;
+  try {
+    baseline = JSON.parse(raw);
+  } catch {
+    return jsonResponse({ error: "Baseline data is corrupt JSON" }, 500);
+  }
+
+  // Find the candidate across all races
+  let found = false;
+  let updatedFields = [];
+  for (const race of baseline.races || []) {
+    const cand = (race.candidates || []).find((c) => c.name === body.candidateName);
+    if (cand) {
+      found = true;
+      const allowedFields = ["background", "summary", "isIncumbent", "withdrawn", "name"];
+      for (const [field, value] of Object.entries(body.fields || {})) {
+        if (allowedFields.includes(field)) {
+          cand[field] = value;
+          updatedFields.push(field);
+        }
+      }
+      break;
+    }
+  }
+
+  if (!found) {
+    return jsonResponse({ error: `Candidate "${body.candidateName}" not found in ${body.party} baseline` }, 404);
+  }
+
+  if (updatedFields.length === 0) {
+    return jsonResponse({ error: "No valid fields to update. Allowed: background, summary, isIncumbent, withdrawn, name" }, 400);
+  }
+
+  baseline.lastUpdatedAt = new Date().toISOString();
+  await env.ELECTION_DATA.put(baselineKey, JSON.stringify(baseline));
+
+  return jsonResponse({
+    success: true,
+    party: body.party,
+    candidateName: body.candidateName,
+    updatedFields,
+  });
+}
+
+// ---------------------------------------------------------------------------
+// MARK: - Admin KV Cleanup
+// ---------------------------------------------------------------------------
+
+async function handleAdminCleanup(url, env) {
+  const dryRun = url.searchParams.get("dry-run") !== "false";
+
+  // 1. List ALL KV keys using cursor pagination
+  const allKeys = [];
+  let cursor = undefined;
+  do {
+    const opts = cursor ? { cursor } : {};
+    const result = await env.ELECTION_DATA.list(opts);
+    for (const key of result.keys) {
+      allKeys.push(key.name);
+    }
+    cursor = result.list_complete ? undefined : result.cursor;
+  } while (cursor);
+
+  // 2. Categorize keys
+  const categories = {
+    statewideBallots: [],
+    countyBallots: [],
+    countyInfo: [],
+    precinctMaps: [],
+    manifest: [],
+    staleTracker: [],
+    updateLogs: [],
+    cronStatus: [],
+    healthLogs: [],
+    usageLogs: [],
+    auditResults: [],
+    auditLogs: [],
+    auditOther: [],
+    candidatesIndex: [],
+    verifiedBaselines: [],
+    baselineFallbackLog: [],
+    legacyBallots: [],
+    unknown: [],
+  };
+
+  for (const key of allKeys) {
+    if (key.startsWith("ballot:statewide:")) {
+      categories.statewideBallots.push(key);
+    } else if (key.startsWith("ballot:county:")) {
+      categories.countyBallots.push(key);
+    } else if (/^ballot:\w+_primary_\d{4}$/.test(key)) {
+      // Legacy ballot keys (e.g. ballot:republican_primary_2026) — no statewide: or county: prefix
+      categories.legacyBallots.push(key);
+    } else if (key.startsWith("county_info:")) {
+      categories.countyInfo.push(key);
+    } else if (key.startsWith("precinct_map:")) {
+      categories.precinctMaps.push(key);
+    } else if (key === "manifest") {
+      categories.manifest.push(key);
+    } else if (key === "stale_tracker") {
+      categories.staleTracker.push(key);
+    } else if (key === "candidates_index") {
+      categories.candidatesIndex.push(key);
+    } else if (key.startsWith("verified_baseline:")) {
+      categories.verifiedBaselines.push(key);
+    } else if (key === "baseline_fallback_log") {
+      categories.baselineFallbackLog.push(key);
+    } else if (key.startsWith("update_log:")) {
+      categories.updateLogs.push(key);
+    } else if (key.startsWith("cron_status:")) {
+      categories.cronStatus.push(key);
+    } else if (key.startsWith("health_log:")) {
+      categories.healthLogs.push(key);
+    } else if (key.startsWith("usage_log:")) {
+      categories.usageLogs.push(key);
+    } else if (key.startsWith("audit:result:")) {
+      categories.auditResults.push(key);
+    } else if (key.startsWith("audit:log:")) {
+      categories.auditLogs.push(key);
+    } else if (key.startsWith("audit:")) {
+      categories.auditOther.push(key);
+    } else {
+      categories.unknown.push(key);
+    }
+  }
+
+  // 3. Identify stale keys
+  const stale = [];
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - 14);
+  const cutoffStr = cutoff.toISOString().slice(0, 10);
+
+  // Dated log keys older than 14 days
+  const datedPrefixes = [
+    { keys: categories.updateLogs, prefix: "update_log:" },
+    { keys: categories.auditLogs, prefix: "audit:log:" },
+    { keys: categories.cronStatus, prefix: "cron_status:" },
+    { keys: categories.healthLogs, prefix: "health_log:" },
+    { keys: categories.usageLogs, prefix: "usage_log:" },
+  ];
+
+  for (const { keys, prefix } of datedPrefixes) {
+    for (const key of keys) {
+      const dateStr = key.replace(prefix, "");
+      if (dateStr < cutoffStr) {
+        stale.push({ key, reason: `Older than 14 days (${dateStr})` });
+      }
+    }
+  }
+
+  // Legacy ballot keys are always stale
+  for (const key of categories.legacyBallots) {
+    stale.push({ key, reason: "Legacy ballot key (replaced by ballot:statewide:)" });
+  }
+
+  // 4. Delete if not dry-run
+  let deletedCount = 0;
+  const deleteErrors = [];
+
+  if (!dryRun && stale.length > 0) {
+    for (const entry of stale) {
+      try {
+        await env.ELECTION_DATA.delete(entry.key);
+        deletedCount++;
+      } catch (err) {
+        deleteErrors.push({ key: entry.key, error: err.message || String(err) });
+      }
+    }
+  }
+
+  // 5. Build category summary (count per category)
+  const categorySummary = {};
+  for (const [cat, keys] of Object.entries(categories)) {
+    if (keys.length > 0) {
+      categorySummary[cat] = { count: keys.length, keys };
+    }
+  }
+
+  return jsonResponse({
+    dryRun,
+    totalKeys: allKeys.length,
+    categories: categorySummary,
+    stale: stale.map(s => ({ key: s.key, reason: s.reason })),
+    staleCount: stale.length,
+    deletedCount,
+    deleteErrors: deleteErrors.length > 0 ? deleteErrors : undefined,
+  });
+}
+
+// MARK: - Admin AI Error Log Dashboard
+
+async function handleAdminErrors(request, env) {
+  const url = new URL(request.url);
+  const format = url.searchParams.get("format");
+
+  // Fetch the last 7 days of error logs
+  const days = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
+    days.push(d);
+  }
+
+  const errorLogs = await Promise.all(
+    days.map((d) =>
+      env.ELECTION_DATA.get(`${ERROR_LOG_PREFIX}${d}`)
+        .then((raw) => ({ date: d, raw }))
+        .catch(() => ({ date: d, raw: null }))
+    )
+  );
+
+  // If JSON format requested, return raw data
+  if (format === "json") {
+    const data = {};
+    for (const log of errorLogs) {
+      if (log.raw) {
+        try { data[log.date] = JSON.parse(log.raw); } catch { data[log.date] = null; }
+      }
+    }
+    return jsonResponse(data);
+  }
+
+  // Build HTML dashboard
+  let dayCards = "";
+  let totalErrors = 0;
+  const allNeedsAttention = new Set();
+  const globalCategoryCounts = {};
+
+  for (const log of errorLogs) {
+    if (!log.raw) {
+      dayCards += `<div class="day-card">
+        <h3>${log.date}</h3>
+        <p style="color:var(--text2)">No errors logged</p>
+      </div>`;
+      continue;
+    }
+
+    let parsed;
+    try { parsed = JSON.parse(log.raw); } catch {
+      dayCards += `<div class="day-card">
+        <h3>${log.date}</h3>
+        <p style="color:var(--text2)">Invalid JSON in error log</p>
+      </div>`;
+      continue;
+    }
+
+    const summary = parsed.summary || {};
+    totalErrors += summary.totalErrors || 0;
+    if (summary.needsAttention) {
+      for (const ctx of summary.needsAttention) allNeedsAttention.add(ctx);
+    }
+    for (const [cat, count] of Object.entries(summary.categoryCounts || {})) {
+      globalCategoryCounts[cat] = (globalCategoryCounts[cat] || 0) + count;
+    }
+
+    const categoryRows = Object.entries(summary.categoryCounts || {})
+      .map(([cat, count]) => {
+        const color = count >= 5 ? "#dc2626" : count >= 2 ? "#d97706" : "var(--text2)";
+        return `<tr><td>${escapeHtml(cat)}</td><td style="color:${color};font-weight:600">${count}</td></tr>`;
+      })
+      .join("");
+
+    const topOffenderRows = (summary.topOffenders || [])
+      .map((o) => {
+        const badge = o.count >= 3 ? ' <span class="badge badge-err">needs attention</span>' : o.count >= 2 ? ' <span class="badge badge-warn">recurring</span>' : "";
+        return `<tr><td>${escapeHtml(o.context)}${badge}</td><td>${o.count}</td></tr>`;
+      })
+      .join("");
+
+    const entryRows = (parsed.entries || []).slice(0, 20)
+      .map((e) => {
+        const catColor = e.category === "json_parse_failure" || e.category === "api_error" || e.category === "rate_limit_exhausted" ? "#dc2626"
+          : e.category === "validation_failure" || e.category === "low_quality_sources" ? "#d97706"
+          : "var(--text2)";
+        const detail = e.reason || "";
+        const snippet = e.snippet ? `<br><code style="font-size:0.75rem">${escapeHtml(e.snippet.slice(0, 80))}</code>` : "";
+        const urls = e.urls ? `<br><span style="font-size:0.75rem;color:var(--text2)">${e.urls.slice(0, 3).map((u) => escapeHtml(u)).join(", ")}</span>` : "";
+        return `<tr><td style="color:${catColor}">${escapeHtml(e.category)}</td><td>${escapeHtml(e.context)}</td><td>${escapeHtml(detail)}${snippet}${urls}</td><td style="font-size:0.75rem">${e.timestamp ? e.timestamp.slice(11, 19) : ""}</td></tr>`;
+      })
+      .join("");
+
+    dayCards += `<div class="day-card">
+      <h3>${log.date} <span style="font-size:0.85rem;color:var(--text2)">${summary.totalErrors || 0} error(s)</span></h3>
+      <div class="two-col">
+        <div>
+          <h4>By Category</h4>
+          <table><tr><th>Category</th><th>Count</th></tr>${categoryRows || '<tr><td colspan="2">None</td></tr>'}</table>
+        </div>
+        <div>
+          <h4>Top Offenders</h4>
+          <table><tr><th>Race/Context</th><th>Count</th></tr>${topOffenderRows || '<tr><td colspan="2">None</td></tr>'}</table>
+        </div>
+      </div>
+      ${(parsed.entries || []).length > 0 ? `<details><summary style="cursor:pointer;font-size:0.85rem">View ${parsed.entries.length} individual error(s)</summary>
+        <table style="margin-top:0.5rem"><tr><th>Category</th><th>Context</th><th>Detail</th><th>Time</th></tr>${entryRows}</table>
+      </details>` : ""}
+    </div>`;
+  }
+
+  // Global summary cards
+  const attentionList = [...allNeedsAttention].map((ctx) => `<li>${escapeHtml(ctx)}</li>`).join("");
+  const globalCatRows = Object.entries(globalCategoryCounts)
+    .sort((a, b) => b[1] - a[1])
+    .map(([cat, count]) => `<tr><td>${escapeHtml(cat)}</td><td style="font-weight:600">${count}</td></tr>`)
+    .join("");
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  ${pageHead({
+    title: "AI Error Log \u2014 Texas Votes Admin",
+    description: "Structured error log for AI search failures.",
+  })}
+  <style>
+    .container{max-width:900px}
+    table{width:100%;border-collapse:collapse;margin-bottom:1rem;font-size:0.85rem}
+    th,td{padding:5px 8px;border:1px solid var(--border);text-align:left}
+    th{background:var(--blue);color:#fff;font-weight:600;font-size:0.8rem}
+    .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-bottom:2rem}
+    .stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:1rem;text-align:center}
+    .stat-card .num{font-size:1.75rem;font-weight:800}
+    .stat-card .label{font-size:0.85rem;color:var(--text2)}
+    .ok{color:#16a34a}.warn{color:#d97706}.err{color:#dc2626}
+    .badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:0.75rem;font-weight:600}
+    .badge-ok{background:rgba(22,163,74,.15);color:#16a34a}
+    .badge-warn{background:rgba(217,119,6,.15);color:#d97706}
+    .badge-err{background:rgba(220,38,38,.15);color:#dc2626}
+    .day-card{background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:1rem 1.25rem;margin-bottom:1.5rem}
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+    @media(max-width:768px){.two-col{grid-template-columns:1fr}}
+    code{background:rgba(128,128,128,.1);padding:1px 4px;border-radius:3px;font-size:0.8em}
+    details summary{font-weight:600;color:var(--blue)}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="/admin/status" class="back-top">&larr; System Status</a>
+    <h1>AI Error Log</h1>
+    <p class="subtitle">Structured error tracking for AI search failures &mdash; last 7 days</p>
+    <p style="font-size:0.85rem;color:var(--text2)">JSON format: <a href="/admin/errors?format=json">/admin/errors?format=json</a></p>
+
+    <h2>7-Day Overview</h2>
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="num ${totalErrors === 0 ? "ok" : totalErrors < 10 ? "warn" : "err"}">${totalErrors}</div>
+        <div class="label">Total Errors</div>
+      </div>
+      <div class="stat-card">
+        <div class="num ${allNeedsAttention.size === 0 ? "ok" : "err"}">${allNeedsAttention.size}</div>
+        <div class="label">Needs Attention</div>
+      </div>
+      <div class="stat-card">
+        <div class="num">${Object.keys(globalCategoryCounts).length}</div>
+        <div class="label">Error Types</div>
+      </div>
+    </div>
+
+    ${allNeedsAttention.size > 0 ? `<div style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:var(--rs);padding:0.75rem 1rem;margin-bottom:1.5rem">
+      <strong style="color:#dc2626">Races needing manual attention</strong> (2+ recurring errors):
+      <ul style="margin:0.5rem 0 0;padding-left:1.25rem">${attentionList}</ul>
+    </div>` : ""}
+
+    ${globalCatRows ? `<h2>Error Categories (7-Day Total)</h2>
+    <table style="max-width:400px"><tr><th>Category</th><th>Count</th></tr>${globalCatRows}</table>` : ""}
+
+    <h2>Daily Breakdown</h2>
+    ${dayCards}
+
+    <div class="page-footer">
+      <a href="/">Texas Votes</a> &middot;
+      <a href="/admin/status">Status</a> &middot;
+      <a href="/admin/coverage">Coverage</a> &middot;
+      <a href="/admin/analytics">Analytics</a> &middot;
+      <a href="/privacy">Privacy</a><br>
+      <span style="color:#fff">&starf;</span> Built in Texas &middot;
+      <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a>
+    </div>
+  </div>
+</body>
+</html>`;
+
+  return new Response(html, { headers: { "Content-Type": "text/html;charset=utf-8" } });
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -4701,6 +6221,9 @@ export default {
       if (url.pathname === "/audit") {
         return handleAuditPage(env);
       }
+      if (url.pathname === "/run-audit-now") {
+        return handleRunAuditNow();
+      }
       if (url.pathname === "/api/audit/export") {
         return handleAuditExport();
       }
@@ -4718,7 +6241,7 @@ export default {
         return handleSampleBallot();
       }
       if (url.pathname === "/open-source") {
-        return handleOpenSource();
+        return handleOpenSource(env);
       }
       if (url.pathname === "/data-quality") {
         return handleDataQuality(env);
@@ -4742,10 +6265,13 @@ export default {
       }
       // Vanity tone entry points — clear data and start fresh with tone preset
       if (url.pathname === "/cowboy") {
-        return handlePWA_Clear("/app?tone=7", "Texas Votes (Cowboy)");
+        return handlePWA_Clear("/app?tone=7", "Texas Votes \u2014 Yeehaw Edition", "Get your personalized Texas voting guide, cowboy style.", "https://txvotes.app/og-image-cowboy.png");
       }
       if (url.pathname === "/chef") {
-        return handlePWA_Clear("/app?tone=6", "Texas Votes (Swedish Chef)");
+        return handlePWA_Clear("/app?tone=6", "Texas Votes \u2014 Bork Bork Bork!", "Get your personalized Texas voting guide, Swedish Chef style.", "https://txvotes.app/og-image-chef.png");
+      }
+      if (url.pathname === "/trump") {
+        return handlePWA_Clear("/app?tone=8", "Texas Votes \u2014 Trump Edition", "Get your personalized Texas voting guide. It\u2019s going to be tremendous, believe me.");
       }
       // Vanity LLM entry points
       if (url.pathname === "/gemini") {
@@ -4759,7 +6285,7 @@ export default {
       }
       // PWA routes (no auth)
       if (url.pathname === "/app/clear" || url.pathname === "/clear") {
-        return handlePWA_Clear();
+        return handlePWA_Clear("/", "Clear Data \u2014 Texas Votes", "Reset your Texas Votes data and start fresh.", "https://txvotes.app/og-image-clear.png");
       }
       if (url.pathname === "/app") {
         return handlePWA();
@@ -4782,6 +6308,19 @@ export default {
       if (url.pathname === "/app/api/polymarket") {
         return new Response(JSON.stringify({ odds: {} }), { headers: { "Content-Type": "application/json" } });
       }
+      // Health check endpoint (public, no auth)
+      if (url.pathname === "/health") {
+        return handleHealthCheck(env);
+      }
+      // Admin status dashboard (GET with Bearer auth)
+      if (url.pathname === "/admin/status") {
+        const auth = request.headers.get("Authorization");
+        if (!auth || auth !== `Bearer ${env.ADMIN_SECRET}`) {
+          return new Response("Unauthorized", { status: 401 });
+        }
+        return handleAdminStatus(env);
+      }
+
       // Admin coverage dashboard (GET with Bearer auth)
       if (url.pathname === "/admin/coverage") {
         const auth = request.headers.get("Authorization");
@@ -4797,6 +6336,41 @@ export default {
           return new Response("Unauthorized", { status: 401 });
         }
         return handleAdminAnalytics(env);
+      }
+      // Admin AI error log endpoint (GET with Bearer auth)
+      if (url.pathname === "/admin/errors") {
+        const auth = request.headers.get("Authorization");
+        if (!auth || auth !== `Bearer ${env.ADMIN_SECRET}`) {
+          return new Response("Unauthorized", { status: 401 });
+        }
+        return handleAdminErrors(request, env);
+      }
+      // Admin API usage endpoint (GET with Bearer auth)
+      if (url.pathname === "/api/admin/usage") {
+        const auth = request.headers.get("Authorization");
+        if (!auth || auth !== `Bearer ${env.ADMIN_SECRET}`) {
+          return new Response("Unauthorized", { status: 401 });
+        }
+        const date = url.searchParams.get("date") || new Date().toISOString().slice(0, 10);
+        const usageLog = await getUsageLog(env, date);
+        const costs = estimateCost(usageLog);
+        return jsonResponse({ date, usage: usageLog, estimatedCosts: costs });
+      }
+      // Admin baseline view (GET with Bearer auth)
+      if (url.pathname === "/api/admin/baseline") {
+        const auth = request.headers.get("Authorization");
+        if (!auth || auth !== `Bearer ${env.ADMIN_SECRET}`) {
+          return new Response("Unauthorized", { status: 401 });
+        }
+        return handleAdminBaselineView(url, env);
+      }
+      // Admin baseline fallback log (GET with Bearer auth)
+      if (url.pathname === "/api/admin/baseline/log") {
+        const auth = request.headers.get("Authorization");
+        if (!auth || auth !== `Bearer ${env.ADMIN_SECRET}`) {
+          return new Response("Unauthorized", { status: 401 });
+        }
+        return handleAdminBaselineLog(env);
       }
       return handleLandingPage();
     }
@@ -4840,6 +6414,22 @@ export default {
       if (!auth || auth !== `Bearer ${env.ADMIN_SECRET}`) {
         return new Response("Unauthorized", { status: 401 });
       }
+
+      // Rate limit: one audit run every 10 minutes (hard limit, force flag does NOT bypass)
+      const AUDIT_RATE_LIMIT_MS = 10 * 60 * 1000;
+      const lastRunRaw = await env.ELECTION_DATA.get("audit:last_run");
+      if (lastRunRaw) {
+        const lastRunTime = parseInt(lastRunRaw, 10);
+        const elapsed = Date.now() - lastRunTime;
+        if (elapsed < AUDIT_RATE_LIMIT_MS) {
+          const waitMin = Math.ceil((AUDIT_RATE_LIMIT_MS - elapsed) / 60000);
+          return jsonResponse(
+            { error: `Rate limited. Please wait ${waitMin} more minute${waitMin === 1 ? "" : "s"} before running another audit.`, retryAfterMs: AUDIT_RATE_LIMIT_MS - elapsed },
+            429
+          );
+        }
+      }
+
       const body = await request.json().catch(() => ({}));
       const exportData = buildAuditExportData();
       const result = await runAudit(env, {
@@ -4848,6 +6438,10 @@ export default {
         exportData,
         triggeredBy: "api",
       });
+
+      // Record successful run timestamp for rate limiting
+      await env.ELECTION_DATA.put("audit:last_run", String(Date.now()));
+
       return jsonResponse(result);
     }
 
@@ -4870,7 +6464,9 @@ export default {
       if (!body.countyFips || !body.countyName) {
         return jsonResponse({ error: "countyFips and countyName required" }, 400);
       }
-      const result = await seedFullCounty(body.countyFips, body.countyName, env);
+      const options = {};
+      if (body.reset) options.reset = true;
+      const result = await seedFullCounty(body.countyFips, body.countyName, env, options);
       return jsonResponse(result);
     }
 
@@ -4892,20 +6488,98 @@ export default {
       return handleGenerateCandidateTones(request, env);
     }
 
+    // POST: /api/election/seed-translations — pre-generate Spanish translations for candidate data
+    if (url.pathname === "/api/election/seed-translations") {
+      const auth = request.headers.get("Authorization");
+      if (!auth || auth !== `Bearer ${env.ADMIN_SECRET}`) {
+        return new Response("Unauthorized", { status: 401 });
+      }
+      const body = await request.json().catch(() => ({}));
+      const txParty = body.party || "republican";
+      const txCountyFips = body.countyFips || null;
+      const result = await handleSeedTranslations(env, txParty, txCountyFips);
+      return jsonResponse(result);
+    }
+
+    // POST: /api/admin/cleanup — list/delete stale KV keys
+    if (url.pathname === "/api/admin/cleanup") {
+      const auth = request.headers.get("Authorization");
+      if (!auth || auth !== `Bearer ${env.ADMIN_SECRET}`) {
+        return new Response("Unauthorized", { status: 401 });
+      }
+      return handleAdminCleanup(url, env);
+    }
+
+    // POST: /api/admin/baseline/seed — seed verified baseline from current KV ballot data
+    if (url.pathname === "/api/admin/baseline/seed") {
+      const auth = request.headers.get("Authorization");
+      if (!auth || auth !== `Bearer ${env.ADMIN_SECRET}`) {
+        return new Response("Unauthorized", { status: 401 });
+      }
+      return handleAdminBaselineSeed(request, env);
+    }
+
+    // POST: /api/admin/baseline/update — update specific candidate baseline fields
+    if (url.pathname === "/api/admin/baseline/update") {
+      const auth = request.headers.get("Authorization");
+      if (!auth || auth !== `Bearer ${env.ADMIN_SECRET}`) {
+        return new Response("Unauthorized", { status: 401 });
+      }
+      return handleAdminBaselineUpdate(request, env);
+    }
+
     return new Response("Not found", { status: 404 });
   },
 
   async scheduled(event, env, ctx) {
-    ctx.waitUntil(runDailyUpdate(env));
+    const today = new Date().toISOString().slice(0, 10);
+    const cronLog = { timestamp: new Date().toISOString(), tasks: {} };
 
-    // Run AI audit daily until election day (March 3, 2026)
+    // Daily update with error tracking
+    try {
+      const result = await runDailyUpdate(env);
+      cronLog.tasks.dailyUpdate = { status: "success", ...result };
+    } catch (err) {
+      cronLog.tasks.dailyUpdate = { status: "error", error: err.message || String(err) };
+      console.error("Cron dailyUpdate error:", err);
+    }
+
+    // AI audit daily until election day (March 3, 2026)
     if (new Date() <= new Date("2026-03-04T00:00:00Z")) {
-      ctx.waitUntil(
-        runAudit(env, {
+      try {
+        const auditResult = await runAudit(env, {
           exportData: buildAuditExportData(),
           triggeredBy: "cron",
-        })
-      );
+        });
+        cronLog.tasks.aiAudit = { status: "success", providers: Object.keys(auditResult.providers || {}) };
+      } catch (err) {
+        cronLog.tasks.aiAudit = { status: "error", error: err.message || String(err) };
+        console.error("Cron aiAudit error:", err);
+      }
+    }
+
+    // Health check — verify critical KV keys and log issues
+    try {
+      const healthResult = await runCronHealthCheck(env);
+      cronLog.tasks.healthCheck = { status: "success", issueCount: healthResult.issueCount };
+    } catch (err) {
+      cronLog.tasks.healthCheck = { status: "error", error: err.message || String(err) };
+      console.error("Cron healthCheck error:", err);
+    }
+
+    // Write cron status to KV
+    try {
+      await env.ELECTION_DATA.put(`cron_status:${today}`, JSON.stringify(cronLog));
+    } catch (err) {
+      console.error("Failed to write cron_status:", err);
+    }
+
+    // Notify Discord if any tasks failed
+    const failedTasks = Object.entries(cronLog.tasks).filter(([, t]) => t.status === "error");
+    if (failedTasks.length > 0) {
+      const summary = failedTasks.map(([name, t]) => `- ${name}: ${t.error}`).join("\n");
+      ctx.waitUntil(notifyDiscord(env, `**Texas Votes Cron Alert** (${today})\n${failedTasks.length} task(s) failed:\n${summary}`));
     }
   },
+
 };

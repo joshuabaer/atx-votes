@@ -1,6 +1,8 @@
 // Server-side guide generation for PWA
 // Ported from ClaudeService.swift
 
+import { logTokenUsage } from "./usage-logger.js";
+
 const SYSTEM_PROMPT =
   "You are a non-partisan voting guide assistant for Texas elections. " +
   "Your job is to make personalized recommendations based ONLY on the voter's stated values and the candidate data provided. " +
@@ -27,8 +29,60 @@ function json(data, status = 200) {
   });
 }
 
+// MARK: - Guide Response Caching
+
+/**
+ * Build a deterministic SHA-256 hash of the voter profile + ballot data
+ * for use as a cache key. Includes all fields that affect guide output.
+ *
+ * @param {object} profile - Voter profile (topIssues, politicalSpectrum, candidateQualities, policyViews, freeform)
+ * @param {object} ballot - Filtered ballot data (after district filtering + county merge)
+ * @param {string} party - "republican" or "democrat"
+ * @param {string|null} lang - Language code ("en", "es", etc.)
+ * @param {number|undefined} readingLevel - Reading level 1-8
+ * @param {string|null} llm - LLM provider ("claude", "chatgpt", etc.)
+ * @returns {Promise<string>} Hex-encoded SHA-256 hash
+ */
+async function hashGuideKey(profile, ballot, party, lang, readingLevel, llm) {
+  var keyObj = {
+    party: party,
+    lang: lang || "en",
+    readingLevel: readingLevel || 3,
+    llm: llm || "claude",
+    issues: (profile.topIssues || []).slice().sort(),
+    spectrum: profile.politicalSpectrum || "Moderate",
+    qualities: (profile.candidateQualities || []).slice().sort(),
+    stances: Object.keys(profile.policyViews || {}).sort().map(function(k) {
+      return k + ":" + profile.policyViews[k];
+    }),
+    freeform: profile.freeform || "",
+    // Hash ballot race/candidate structure so cache invalidates when ballot data changes
+    ballotRaces: ballot.races.map(function(r) {
+      return r.office + "|" + (r.district || "") + "|" +
+        r.candidates.filter(function(c) { return !c.withdrawn; })
+          .map(function(c) { return c.name; }).join(",");
+    }).sort(),
+    ballotProps: (ballot.propositions || []).map(function(p) {
+      return p.number + ":" + p.title;
+    }),
+  };
+
+  var data = new TextEncoder().encode(JSON.stringify(keyObj));
+  var hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  var hashArray = new Uint8Array(hashBuffer);
+  var hex = "";
+  for (var i = 0; i < hashArray.length; i++) {
+    hex += hashArray[i].toString(16).padStart(2, "0");
+  }
+  return hex;
+}
+
 export async function handlePWA_Guide(request, env) {
   try {
+    // Check for cache bypass via query param or request body
+    var requestUrl = new URL(request.url);
+    var nocache = requestUrl.searchParams.get("nocache") === "1";
+
     const { party, profile, districts, lang, countyFips, readingLevel, llm } = await request.json();
 
     if (!party || !["republican", "democrat"].includes(party)) {
@@ -38,15 +92,18 @@ export async function handlePWA_Guide(request, env) {
       return json({ error: "profile required" }, 400);
     }
 
-    // Load statewide ballot from KV (new key structure), fall back to legacy key
-    var raw = await env.ELECTION_DATA.get(
-      "ballot:statewide:" + party + "_primary_2026"
-    );
-    if (!raw) {
-      raw = await env.ELECTION_DATA.get(
-        "ballot:" + party + "_primary_2026"
-      );
-    }
+    // Parallel KV reads — statewide, legacy fallback, county, and manifest are independent
+    var [statewideRaw, legacyRaw, countyRaw, manifestRaw] = await Promise.all([
+      env.ELECTION_DATA.get("ballot:statewide:" + party + "_primary_2026"),
+      env.ELECTION_DATA.get("ballot:" + party + "_primary_2026"),
+      countyFips
+        ? env.ELECTION_DATA.get("ballot:county:" + countyFips + ":" + party + "_primary_2026")
+        : Promise.resolve(null),
+      env.ELECTION_DATA.get("manifest"),
+    ]);
+
+    // Statewide ballot: prefer new key, fall back to legacy
+    var raw = statewideRaw || legacyRaw;
     if (!raw) {
       return json({ error: "No ballot data available" }, 404);
     }
@@ -54,22 +111,17 @@ export async function handlePWA_Guide(request, env) {
 
     // Merge county-specific races if countyFips provided
     var countyBallotAvailable = false;
-    if (countyFips) {
-      var countyRaw = await env.ELECTION_DATA.get(
-        "ballot:county:" + countyFips + ":" + party + "_primary_2026"
-      );
-      if (countyRaw) {
-        try {
-          var countyBallot = JSON.parse(countyRaw);
-          var seenRaces = new Set(ballot.races.map(r => `${r.office}|${r.district || ''}`));
-          var dedupedCounty = (countyBallot.races || []).filter(r => !seenRaces.has(`${r.office}|${r.district || ''}`));
-          ballot.races = ballot.races.concat(dedupedCounty);
-          if (countyBallot.propositions) {
-            ballot.propositions = (ballot.propositions || []).concat(countyBallot.propositions);
-          }
-          countyBallotAvailable = true;
-        } catch (e) { /* use statewide-only if merge fails */ }
-      }
+    if (countyFips && countyRaw) {
+      try {
+        var countyBallot = JSON.parse(countyRaw);
+        var seenRaces = new Set(ballot.races.map(r => `${r.office}|${r.district || ''}`));
+        var dedupedCounty = (countyBallot.races || []).filter(r => !seenRaces.has(`${r.office}|${r.district || ''}`));
+        ballot.races = ballot.races.concat(dedupedCounty);
+        if (countyBallot.propositions) {
+          ballot.propositions = (ballot.propositions || []).concat(countyBallot.propositions);
+        }
+        countyBallotAvailable = true;
+      } catch (e) { /* use statewide-only if merge fails */ }
     }
 
     // Filter by districts
@@ -77,21 +129,54 @@ export async function handlePWA_Guide(request, env) {
       ballot = filterBallotToDistricts(ballot, districts);
     }
 
-    // Build prompts
+    // --- Guide response caching ---
+    var cacheKey = null;
+    var cached = false;
+    if (!nocache) {
+      try {
+        var hash = await hashGuideKey(profile, ballot, party, lang, readingLevel, llm);
+        cacheKey = "guide_cache:" + hash;
+        var cachedRaw = await env.ELECTION_DATA.get(cacheKey);
+        if (cachedRaw) {
+          var cachedResult = JSON.parse(cachedRaw);
+          cachedResult.cached = true;
+          console.log("Guide cache HIT for " + party + " (key=" + cacheKey.slice(0, 30) + "...)");
+          return json(cachedResult);
+        }
+      } catch (e) {
+        // Cache lookup failed — proceed without cache
+        console.log("Guide cache lookup error:", e.message);
+        cacheKey = null;
+      }
+    }
+
+    // Check for cached Spanish translations in KV
+    var cachedTranslations = null;
+    if (lang === "es") {
+      cachedTranslations = await loadCachedTranslations(env, party, countyFips);
+    }
+
+    // Build prompts (skip candidateTranslations schema if we have cached translations)
     var ballotDesc = buildCondensedBallotDescription(ballot);
-    var userPrompt = buildUserPrompt(profile, ballotDesc, ballot, party, lang, readingLevel);
+    var userPrompt = buildUserPrompt(profile, ballotDesc, ballot, party, lang, readingLevel, cachedTranslations);
 
-    // Call LLM (Claude by default, or alternative if specified)
-    var responseText = await callLLM(env, SYSTEM_PROMPT, userPrompt, lang, llm);
+    // Call LLM — use smaller token budget when translations are cached
+    var effectiveLang = (lang === "es" && cachedTranslations) ? "es_cached" : lang;
+    var responseText = await callLLM(env, SYSTEM_PROMPT, userPrompt, effectiveLang, llm);
 
-    // Parse and merge
+    // Parse and merge (apply cached translations if available)
     var guideResponse = parseResponse(responseText);
-    var mergedBallot = mergeRecommendations(guideResponse, ballot, lang);
+    var mergedBallot = mergeRecommendations(guideResponse, ballot, lang, cachedTranslations);
 
-    // Load manifest for data freshness timestamp
+    // Post-generation partisan balance scoring
+    var balanceScore = scorePartisanBalance(guideResponse, ballot);
+    if (balanceScore.flags.length > 0) {
+      console.log("Partisan balance flags for " + party + " guide:", balanceScore.flags.join("; "));
+    }
+
+    // Extract data freshness timestamp from manifest (already loaded in parallel)
     var dataUpdatedAt = null;
     try {
-      var manifestRaw = await env.ELECTION_DATA.get("manifest");
       if (manifestRaw) {
         var manifest = JSON.parse(manifestRaw);
         if (manifest[party] && manifest[party].updatedAt) {
@@ -100,13 +185,25 @@ export async function handlePWA_Guide(request, env) {
       }
     } catch (e) { /* non-fatal */ }
 
-    return json({
+    var result = {
       ballot: mergedBallot,
       profileSummary: guideResponse.profileSummary,
       llm: llm || "claude",
       countyBallotAvailable: countyFips ? countyBallotAvailable : null,
       dataUpdatedAt: dataUpdatedAt,
-    });
+      balanceScore: balanceScore,
+      skewNote: balanceScore.skewNote,
+      translationsCached: lang === "es" ? !!cachedTranslations : null,
+      cached: false,
+    };
+
+    // Store in cache (non-blocking, 1-hour TTL)
+    if (cacheKey) {
+      env.ELECTION_DATA.put(cacheKey, JSON.stringify(result), { expirationTtl: 3600 })
+        .catch(function(e) { console.log("Guide cache write error:", e.message); });
+    }
+
+    return json(result);
   } catch (err) {
     console.error("Guide generation error:", err);
     return json({ error: err.message || "Guide generation failed" }, 500);
@@ -232,20 +329,23 @@ function buildCondensedBallotDescription(ballot) {
       var c = activeCandidates[j];
       var inc = c.isIncumbent ? " (incumbent)" : "";
       lines.push("  - " + c.name + inc);
-      if (c.keyPositions && c.keyPositions.length) {
-        lines.push("    Positions: " + c.keyPositions.join("; "));
-      }
-      if (c.endorsements && c.endorsements.length) {
-        lines.push("    Endorsements: " + c.endorsements.map(e => {
-          if (typeof e === "string") return e;
-          return e.type ? `${e.name} (${e.type})` : e.name;
-        }).join("; "));
-      }
-      if (c.pros && c.pros.length) {
-        lines.push("    Pros: " + c.pros.join("; "));
-      }
-      if (c.cons && c.cons.length) {
-        lines.push("    Cons: " + c.cons.join("; "));
+      // Skip detailed fields for uncontested races to save tokens
+      if (effectivelyContested) {
+        if (c.keyPositions && c.keyPositions.length) {
+          lines.push("    Positions: " + c.keyPositions.join("; "));
+        }
+        if (c.endorsements && c.endorsements.length) {
+          lines.push("    Endorsements: " + c.endorsements.map(e => {
+            if (typeof e === "string") return e;
+            return e.type ? `${e.name} (${e.type})` : e.name;
+          }).join("; "));
+        }
+        if (c.pros && c.pros.length) {
+          lines.push("    Pros: " + c.pros.join("; "));
+        }
+        if (c.cons && c.cons.length) {
+          lines.push("    Cons: " + c.cons.join("; "));
+        }
       }
     }
     lines.push("");
@@ -282,9 +382,10 @@ var READING_LEVEL_INSTRUCTIONS = {
   5: "TONE: Write at an expert level, like a political science professor. Use precise terminology, reference policy frameworks and precedents, and assume deep familiarity with political concepts.\n\n",
   6: "TONE: Write EVERYTHING as the Swedish Chef from the Muppets. Use his signature speech patterns — replace words with Muppet-Swedish gibberish (bork bork bork!), add 'zee' and 'de' everywhere, throw in onomatopoeia, and end sentences with 'Bork!' or 'Hurdy gurdy!'. The JSON field values (reasoning, strategicNotes, etc.) should all be in Swedish Chef voice. Keep the actual candidate names and office titles accurate, but everything else should sound like the Swedish Chef is explaining politics. Have fun with it!\n\n",
   7: "TONE: Write EVERYTHING as a folksy Texas cowboy. Use Texas ranch metaphors, say 'y'all', 'reckon', 'fixin' to', 'partner', 'well I'll be', and 'dadgum'. Compare political situations to cattle ranching, rodeos, and wide open spaces. Keep the actual candidate names and office titles accurate, but everything else should sound like a weathered ranch hand explaining politics over a campfire. Throw in the occasional 'yeehaw' for good measure.\n\n",
+  8: "TONE: Write EVERYTHING as if President Donald J. Trump is personally giving this voter their ballot advice at a rally. This should be HILARIOUS — the most over-the-top, unmistakable Trump impression possible while still delivering genuinely useful ballot information.\n\nTRUMP SPEECH PATTERNS (use ALL of these liberally throughout):\n- Superlatives on EVERYTHING: 'the best', 'tremendous', 'incredible', 'beautiful', 'fantastic', 'the greatest', 'like nobody has ever seen before', 'the likes of which the world has never known'\n- Repetition for emphasis: say things twice or three times ('believe me, believe me', 'very very strongly', 'big big beautiful')\n- Signature phrases sprinkled EVERYWHERE: 'many people are saying', 'everybody knows it', 'you know it, I know it, everybody knows it', 'a lot of people don\\'t know this', 'not a lot of people know that', 'frankly', 'to be honest with you', 'and by the way'\n- Self-references and brags: 'nobody knows more about [topic] than me', 'I\\'ve been saying this for years', 'I said it first, nobody else was saying it', 'a lot of very smart people have told me'\n- Rally-style audience engagement: 'can you believe it?', 'am I right?', 'is that incredible or what?', 'you love to see it, don\\'t you?', 'and the crowd goes wild'\n- Random CAPS for emphasis: occasionally CAPITALIZE a key word mid-sentence like 'TREMENDOUS', 'HUGE', 'SAD!', 'WRONG!', 'BEAUTIFUL', 'WINNING', 'INCREDIBLE'\n- Tangential asides that loop back: briefly go off-topic ('and by the way, Texas — what a state, maybe the best state, and I won Texas in a LANDSLIDE, everyone remembers that') then return to the ballot point\n- Deals and winning framing: every race is about 'winning', 'making a deal', 'strength', or 'getting tough'\n- Populist language: 'the forgotten men and women', 'the people of Texas', 'the American people are smart, very smart'\n- Dismissive asides about opponents or bad options: 'not good, not good at all', 'a total disaster', 'we\\'ll see what happens', 'give me a break'\n\nCRITICAL RULES:\n- Keep ALL candidate names, office titles, and factual ballot information 100% ACCURATE — the humor is in the DELIVERY, never in changing facts\n- The strategic analysis should still be genuinely useful and match the voter\\'s stated issues/preferences — just delivered in Trump\\'s voice\n- Write the strategicNotes and reasoning fields as if Trump is personally riffing on each race like he\\'s at a podium\n- Open the summary as if addressing a rally crowd in Texas\n- This should make the reader laugh out loud while still learning about their ballot\n\n",
 };
 
-function buildUserPrompt(profile, ballotDesc, ballot, party, lang, readingLevel) {
+function buildUserPrompt(profile, ballotDesc, ballot, party, lang, readingLevel, cachedTranslations) {
   var raceLines = ballot.races.map(function (r) {
     var names = r.candidates.filter(function(c){ return !c.withdrawn; }).map(function (c) {
       return c.name;
@@ -306,6 +407,9 @@ function buildUserPrompt(profile, ballotDesc, ballot, party, lang, readingLevel)
     .join("; ");
 
   var toneInstruction = READING_LEVEL_INSTRUCTIONS[readingLevel] || "";
+
+  // When Spanish with cached translations, skip the candidateTranslations schema
+  var needsLiveTranslations = lang === "es" && !cachedTranslations;
 
   return (
     "Recommend ONE candidate per race and a stance on each proposition. Be concise.\n\n" +
@@ -364,7 +468,7 @@ function buildUserPrompt(profile, ballotDesc, ballot, party, lang, readingLevel)
     '      "confidence": "Clear Call|Lean|Genuinely Contested"\n' +
     "    }\n" +
     "  ]" +
-    (lang === "es"
+    (needsLiveTranslations
       ? ',\n  "candidateTranslations": [\n' +
         "    {\n" +
         '      "name": "exact candidate name (do not translate)",\n' +
@@ -379,10 +483,223 @@ function buildUserPrompt(profile, ballotDesc, ballot, party, lang, readingLevel)
   );
 }
 
+// MARK: - Cached Translation Loader
+
+/**
+ * Load pre-generated Spanish translations from KV.
+ * Checks statewide translations and optionally county-specific translations,
+ * merging them into a single array.
+ *
+ * KV key structure: translations:es:{party}_primary_2026
+ *                   translations:es:county:{fips}:{party}_primary_2026
+ *
+ * @returns {Array|null} Array of translation objects or null if none cached
+ */
+async function loadCachedTranslations(env, party, countyFips) {
+  var translations = [];
+
+  // Load statewide translations
+  var statewideKey = "translations:es:" + party + "_primary_2026";
+  var statewideRaw = await env.ELECTION_DATA.get(statewideKey);
+  if (statewideRaw) {
+    try {
+      var statewideTx = JSON.parse(statewideRaw);
+      if (Array.isArray(statewideTx)) {
+        translations = translations.concat(statewideTx);
+      }
+    } catch (e) { /* skip malformed data */ }
+  }
+
+  // Load county-specific translations if countyFips provided
+  if (countyFips) {
+    var countyKey = "translations:es:county:" + countyFips + ":" + party + "_primary_2026";
+    var countyRaw = await env.ELECTION_DATA.get(countyKey);
+    if (countyRaw) {
+      try {
+        var countyTx = JSON.parse(countyRaw);
+        if (Array.isArray(countyTx)) {
+          // Deduplicate: county translations override statewide for same candidate
+          var existingNames = new Set(countyTx.map(function(t) { return t.name; }));
+          translations = translations.filter(function(t) { return !existingNames.has(t.name); });
+          translations = translations.concat(countyTx);
+        }
+      } catch (e) { /* skip malformed data */ }
+    }
+  }
+
+  return translations.length > 0 ? translations : null;
+}
+
+// MARK: - Translation Seeding
+
+/**
+ * Generate and cache Spanish translations for all candidates in a ballot.
+ * Calls Claude to translate candidate summaries, positions, pros, and cons.
+ * Stores results in KV under translations:es:{party}_primary_2026.
+ *
+ * @param {object} env - Worker environment with ELECTION_DATA and ANTHROPIC_API_KEY
+ * @param {string} party - "republican" or "democrat"
+ * @param {string|null} countyFips - Optional county FIPS code for county-specific translations
+ * @returns {object} Result with success status and translation count
+ */
+export async function handleSeedTranslations(env, party, countyFips) {
+  // Load ballot data
+  var ballotKey, translationKey;
+  if (countyFips) {
+    ballotKey = "ballot:county:" + countyFips + ":" + party + "_primary_2026";
+    translationKey = "translations:es:county:" + countyFips + ":" + party + "_primary_2026";
+  } else {
+    ballotKey = "ballot:statewide:" + party + "_primary_2026";
+    translationKey = "translations:es:" + party + "_primary_2026";
+    // Fallback to legacy key
+    var raw = await env.ELECTION_DATA.get(ballotKey);
+    if (!raw) {
+      ballotKey = "ballot:" + party + "_primary_2026";
+      raw = await env.ELECTION_DATA.get(ballotKey);
+    }
+    if (!raw) {
+      return { error: "No ballot data found for " + party };
+    }
+  }
+
+  var ballotRaw = await env.ELECTION_DATA.get(ballotKey);
+  if (!ballotRaw) {
+    return { error: "No ballot data found at " + ballotKey };
+  }
+
+  var ballot = JSON.parse(ballotRaw);
+  if (!ballot.races || !ballot.races.length) {
+    return { error: "No races in ballot" };
+  }
+
+  // Collect all candidates with translatable text
+  var candidates = [];
+  for (var i = 0; i < ballot.races.length; i++) {
+    var race = ballot.races[i];
+    for (var j = 0; j < race.candidates.length; j++) {
+      var c = race.candidates[j];
+      if (c.withdrawn) continue;
+      // Extract base text (handle tone-keyed objects)
+      var summary = typeof c.summary === "string" ? c.summary : (c.summary && c.summary["3"] || "");
+      var keyPositions = (c.keyPositions || []).map(function(p) {
+        return typeof p === "string" ? p : (p && p["3"] || "");
+      });
+      var pros = (c.pros || []).map(function(p) {
+        return typeof p === "string" ? p : (p && p["3"] || "");
+      });
+      var cons = (c.cons || []).map(function(p) {
+        return typeof p === "string" ? p : (p && p["3"] || "");
+      });
+      if (summary || keyPositions.length || pros.length || cons.length) {
+        candidates.push({
+          name: c.name,
+          office: race.office,
+          summary: summary,
+          keyPositions: keyPositions,
+          pros: pros,
+          cons: cons,
+        });
+      }
+    }
+  }
+
+  if (candidates.length === 0) {
+    return { error: "No candidates with translatable text" };
+  }
+
+  // Build the translation prompt
+  var candidateList = candidates.map(function(c) {
+    var lines = [];
+    lines.push("Candidate: " + c.name + " (" + c.office + ")");
+    if (c.summary) lines.push("  summary: " + JSON.stringify(c.summary));
+    if (c.keyPositions.length) lines.push("  keyPositions: " + JSON.stringify(c.keyPositions));
+    if (c.pros.length) lines.push("  pros: " + JSON.stringify(c.pros));
+    if (c.cons.length) lines.push("  cons: " + JSON.stringify(c.cons));
+    return lines.join("\n");
+  }).join("\n\n");
+
+  var prompt = "Translate ALL of the following Texas election candidate text fields into Spanish. " +
+    "Keep candidate names in English. Use neutral, non-partisan language. " +
+    "Maintain the same meaning and roughly the same length as the originals.\n\n" +
+    candidateList + "\n\n" +
+    "Return a JSON array of objects, one per candidate:\n" +
+    "[\n" +
+    "  {\n" +
+    '    "name": "exact candidate name (do not translate)",\n' +
+    '    "summary": "Spanish translation",\n' +
+    '    "keyPositions": ["Spanish translations"],\n' +
+    '    "pros": ["Spanish translations"],\n' +
+    '    "cons": ["Spanish translations"]\n' +
+    "  }\n" +
+    "]\n\n" +
+    "Return ONLY valid JSON — no markdown, no explanation.";
+
+  var system = "You are a professional translator specializing in Texas political content. " +
+    "Translate from English to Spanish with neutral, non-partisan language. " +
+    "Keep candidate names, office titles, and district names in English. " +
+    "Return ONLY valid JSON.";
+
+  // Call Claude for translation
+  var res = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": env.ANTHROPIC_API_KEY,
+      "anthropic-version": "2023-06-01",
+    },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 8192,
+      system: system,
+      messages: [{ role: "user", content: prompt }],
+    }),
+  });
+
+  if (!res.ok) {
+    var errBody = await res.text();
+    return { error: "Claude API error " + res.status + ": " + errBody.slice(0, 200) };
+  }
+
+  var data = await res.json();
+  var responseText = data.content && data.content[0] && data.content[0].text;
+  if (!responseText) {
+    return { error: "No text in Claude response" };
+  }
+
+  // Parse the translations
+  var translations;
+  try {
+    var cleaned = responseText.trim();
+    if (cleaned.indexOf("```json") === 0) cleaned = cleaned.slice(7);
+    else if (cleaned.indexOf("```") === 0) cleaned = cleaned.slice(3);
+    if (cleaned.slice(-3) === "```") cleaned = cleaned.slice(0, -3);
+    cleaned = cleaned.trim();
+    translations = JSON.parse(cleaned);
+  } catch (e) {
+    return { error: "Failed to parse translation response", raw: responseText.slice(0, 300) };
+  }
+
+  if (!Array.isArray(translations)) {
+    return { error: "Expected array of translations" };
+  }
+
+  // Store in KV
+  await env.ELECTION_DATA.put(translationKey, JSON.stringify(translations));
+
+  return {
+    success: true,
+    party: party,
+    countyFips: countyFips || null,
+    kvKey: translationKey,
+    candidatesTranslated: translations.length,
+    totalCandidates: candidates.length,
+  };
+}
+
 // MARK: - Claude API Call
 
-async function callClaude(env, system, userMessage, lang) {
-  var maxTokens = lang === "es" ? 8192 : 4096;
+async function callClaude(env, system, userMessage, lang, component) {
+  var maxTokens = lang === "es" ? 8192 : (lang === "es_cached" ? 4096 : 2048);
   for (var i = 0; i < MODELS.length; i++) {
     var model = MODELS[i];
     for (var attempt = 0; attempt <= 1; attempt++) {
@@ -396,7 +713,7 @@ async function callClaude(env, system, userMessage, lang) {
         body: JSON.stringify({
           model: model,
           max_tokens: maxTokens,
-          system: system,
+          system: [{ type: "text", text: system, cache_control: { type: "ephemeral" } }],
           messages: [{ role: "user", content: userMessage }],
         }),
       });
@@ -405,6 +722,13 @@ async function callClaude(env, system, userMessage, lang) {
         var data = await res.json();
         var text = data.content && data.content[0] && data.content[0].text;
         if (!text) throw new Error("No text in API response");
+
+        // Log token usage
+        if (data.usage && component) {
+          console.log("Token usage [" + component + "] model=" + model + " input=" + data.usage.input_tokens + " output=" + data.usage.output_tokens);
+          logTokenUsage(env, component, data.usage, model).catch(function() {});
+        }
+
         return text;
       }
 
@@ -443,8 +767,8 @@ async function callClaude(env, system, userMessage, lang) {
 
 // MARK: - OpenAI-compatible API Call (ChatGPT, Grok)
 
-async function callOpenAICompatible(env, system, userMessage, lang, endpoint, apiKey, model) {
-  var maxTokens = lang === "es" ? 8192 : 4096;
+async function callOpenAICompatible(env, system, userMessage, lang, endpoint, apiKey, model, component) {
+  var maxTokens = lang === "es" ? 8192 : (lang === "es_cached" ? 4096 : 2048);
   for (var attempt = 0; attempt <= 1; attempt++) {
     var res = await fetch(endpoint, {
       method: "POST",
@@ -466,6 +790,14 @@ async function callOpenAICompatible(env, system, userMessage, lang, endpoint, ap
       var data = await res.json();
       var text = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
       if (!text) throw new Error("No text in " + model + " API response");
+
+      // Log token usage (OpenAI format: usage.prompt_tokens / completion_tokens)
+      if (data.usage && component) {
+        var openaiUsage = { input_tokens: data.usage.prompt_tokens || 0, output_tokens: data.usage.completion_tokens || 0 };
+        console.log("Token usage [" + component + "] model=" + model + " input=" + openaiUsage.input_tokens + " output=" + openaiUsage.output_tokens);
+        logTokenUsage(env, component, openaiUsage, model).catch(function() {});
+      }
+
       return text;
     }
 
@@ -495,8 +827,8 @@ async function callOpenAICompatible(env, system, userMessage, lang, endpoint, ap
 
 // MARK: - Gemini API Call
 
-async function callGemini(env, system, userMessage, lang) {
-  var maxTokens = lang === "es" ? 8192 : 4096;
+async function callGemini(env, system, userMessage, lang, component) {
+  var maxTokens = lang === "es" ? 8192 : (lang === "es_cached" ? 4096 : 2048);
   var endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + env.GEMINI_API_KEY;
 
   for (var attempt = 0; attempt <= 1; attempt++) {
@@ -516,6 +848,14 @@ async function callGemini(env, system, userMessage, lang) {
         data.candidates[0].content.parts && data.candidates[0].content.parts[0] &&
         data.candidates[0].content.parts[0].text;
       if (!text) throw new Error("No text in Gemini API response");
+
+      // Log token usage (Gemini format: usageMetadata.promptTokenCount / candidatesTokenCount)
+      if (data.usageMetadata && component) {
+        var geminiUsage = { input_tokens: data.usageMetadata.promptTokenCount || 0, output_tokens: data.usageMetadata.candidatesTokenCount || 0 };
+        console.log("Token usage [" + component + "] model=gemini-2.5-flash input=" + geminiUsage.input_tokens + " output=" + geminiUsage.output_tokens);
+        logTokenUsage(env, component, geminiUsage, "gemini-2.5-flash").catch(function() {});
+      }
+
       return text;
     }
 
@@ -583,26 +923,29 @@ function parseResponse(text) {
 
 // MARK: - Merge Recommendations
 
-function mergeRecommendations(guideResponse, ballot, lang) {
+function mergeRecommendations(guideResponse, ballot, lang, cachedTranslations) {
   // Deep clone
   var merged = JSON.parse(JSON.stringify(ballot));
 
-  // Merge candidate translations for Spanish
-  if (lang === "es" && guideResponse.candidateTranslations) {
-    var txMap = {};
-    for (var t = 0; t < guideResponse.candidateTranslations.length; t++) {
-      var tx = guideResponse.candidateTranslations[t];
-      txMap[tx.name] = tx;
-    }
-    for (var ri2 = 0; ri2 < merged.races.length; ri2++) {
-      for (var ci2 = 0; ci2 < merged.races[ri2].candidates.length; ci2++) {
-        var cand = merged.races[ri2].candidates[ci2];
-        var tr = txMap[cand.name];
-        if (!tr) continue;
-        if (tr.summary) cand.summary = tr.summary;
-        if (tr.keyPositions && tr.keyPositions.length) cand.keyPositions = tr.keyPositions;
-        if (tr.pros && tr.pros.length) cand.pros = tr.pros;
-        if (tr.cons && tr.cons.length) cand.cons = tr.cons;
+  // Merge candidate translations for Spanish — prefer cached, fall back to LLM-generated
+  if (lang === "es") {
+    var translationSource = cachedTranslations || guideResponse.candidateTranslations;
+    if (translationSource) {
+      var txMap = {};
+      for (var t = 0; t < translationSource.length; t++) {
+        var tx = translationSource[t];
+        txMap[tx.name] = tx;
+      }
+      for (var ri2 = 0; ri2 < merged.races.length; ri2++) {
+        for (var ci2 = 0; ci2 < merged.races[ri2].candidates.length; ci2++) {
+          var cand = merged.races[ri2].candidates[ci2];
+          var tr = txMap[cand.name];
+          if (!tr) continue;
+          if (tr.summary) cand.summary = tr.summary;
+          if (tr.keyPositions && tr.keyPositions.length) cand.keyPositions = tr.keyPositions;
+          if (tr.pros && tr.pros.length) cand.pros = tr.pros;
+          if (tr.cons && tr.cons.length) cand.cons = tr.cons;
+        }
       }
     }
   }
@@ -674,4 +1017,184 @@ function mergeRecommendations(guideResponse, ballot, lang) {
   return merged;
 }
 
-export { sortOrder, parseResponse, filterBallotToDistricts, buildUserPrompt, mergeRecommendations, buildCondensedBallotDescription, callLLM, VALID_LLMS };
+// MARK: - Post-Generation Partisan Balance Scoring
+
+var CONFIDENCE_SCORES = {
+  "Strong Match": 4,
+  "Good Match": 3,
+  "Best Available": 2,
+  "Symbolic Race": 1,
+};
+
+/**
+ * Score partisan balance of a generated guide.
+ * Analyzes recommendations for skew in confidence, reasoning enthusiasm,
+ * and match distribution. Runs on every guide generation to detect if
+ * the LLM shows uneven treatment across candidates.
+ *
+ * @param {object} guideResponse - Parsed LLM response with races[] and propositions[]
+ * @param {object} ballot - The ballot data with party and candidate info
+ * @returns {object} balanceScore with metrics, flags, and optional skew note
+ */
+function scorePartisanBalance(guideResponse, ballot) {
+  var races = guideResponse.races || [];
+  var party = ballot.party || "unknown";
+
+  // --- Confidence distribution ---
+  var confidenceCounts = { "Strong Match": 0, "Good Match": 0, "Best Available": 0, "Symbolic Race": 0 };
+  var totalConfidenceScore = 0;
+  var raceCount = 0;
+
+  for (var i = 0; i < races.length; i++) {
+    var rec = races[i];
+    var conf = rec.confidence || "Good Match";
+    if (confidenceCounts[conf] !== undefined) {
+      confidenceCounts[conf]++;
+    }
+    totalConfidenceScore += (CONFIDENCE_SCORES[conf] || 2);
+    raceCount++;
+  }
+
+  var avgConfidence = raceCount > 0 ? Math.round((totalConfidenceScore / raceCount) * 100) / 100 : 0;
+
+  // --- Reasoning enthusiasm analysis ---
+  var reasoningLengths = [];
+  var totalReasoningLength = 0;
+  for (var j = 0; j < races.length; j++) {
+    var reasonLen = (races[j].reasoning || "").length;
+    reasoningLengths.push({ office: races[j].office, length: reasonLen });
+    totalReasoningLength += reasonLen;
+  }
+  var avgReasoningLength = raceCount > 0 ? Math.round(totalReasoningLength / raceCount) : 0;
+
+  // --- Match factor analysis ---
+  var totalMatchFactors = 0;
+  for (var k = 0; k < races.length; k++) {
+    totalMatchFactors += (races[k].matchFactors || []).length;
+  }
+  var avgMatchFactors = raceCount > 0 ? Math.round((totalMatchFactors / raceCount) * 100) / 100 : 0;
+
+  // --- Incumbent vs challenger analysis ---
+  var incumbentRecs = 0;
+  var challengerRecs = 0;
+  var ballotRaces = ballot.races || [];
+  for (var m = 0; m < races.length; m++) {
+    var recName = races[m].recommendedCandidate;
+    for (var n = 0; n < ballotRaces.length; n++) {
+      var ballotRace = ballotRaces[n];
+      if (ballotRace.office === races[m].office &&
+          (ballotRace.district || null) === (races[m].district || null)) {
+        var activeCandidates = (ballotRace.candidates || []).filter(function(c) { return !c.withdrawn; });
+        if (activeCandidates.length <= 1) break; // skip uncontested
+        for (var p = 0; p < activeCandidates.length; p++) {
+          if (activeCandidates[p].name === recName) {
+            if (activeCandidates[p].isIncumbent) {
+              incumbentRecs++;
+            } else {
+              challengerRecs++;
+            }
+            break;
+          }
+        }
+        break;
+      }
+    }
+  }
+
+  // --- Strong/Good match ratio (enthusiasm metric) ---
+  var highConfidenceCount = confidenceCounts["Strong Match"] + confidenceCounts["Good Match"];
+  var enthusiasmRatio = raceCount > 0 ? Math.round((highConfidenceCount / raceCount) * 100) : 0;
+
+  // --- Pro/con text length comparison for recommended vs non-recommended ---
+  var recProTotal = 0;
+  var recConTotal = 0;
+  var nonRecProTotal = 0;
+  var nonRecConTotal = 0;
+  var recCandCount = 0;
+  var nonRecCandCount = 0;
+
+  for (var q = 0; q < races.length; q++) {
+    var guideRace = races[q];
+    for (var r = 0; r < ballotRaces.length; r++) {
+      var bRace = ballotRaces[r];
+      if (bRace.office === guideRace.office &&
+          (bRace.district || null) === (guideRace.district || null)) {
+        var active = (bRace.candidates || []).filter(function(c) { return !c.withdrawn; });
+        if (active.length <= 1) break; // skip uncontested
+        for (var s = 0; s < active.length; s++) {
+          var cand = active[s];
+          var prosText = (cand.pros || []).join(" ");
+          var consText = (cand.cons || []).join(" ");
+          if (cand.name === guideRace.recommendedCandidate) {
+            recProTotal += prosText.length;
+            recConTotal += consText.length;
+            recCandCount++;
+          } else {
+            nonRecProTotal += prosText.length;
+            nonRecConTotal += consText.length;
+            nonRecCandCount++;
+          }
+        }
+        break;
+      }
+    }
+  }
+
+  var recAvgPros = recCandCount > 0 ? Math.round(recProTotal / recCandCount) : 0;
+  var recAvgCons = recCandCount > 0 ? Math.round(recConTotal / recCandCount) : 0;
+  var nonRecAvgPros = nonRecCandCount > 0 ? Math.round(nonRecProTotal / nonRecCandCount) : 0;
+  var nonRecAvgCons = nonRecCandCount > 0 ? Math.round(nonRecConTotal / nonRecCandCount) : 0;
+
+  // --- Detect skew ---
+  var flags = [];
+
+  // Flag if all contested races recommend incumbents or all recommend challengers
+  var contestedCount = incumbentRecs + challengerRecs;
+  if (contestedCount >= 3) {
+    var incumbentPct = Math.round((incumbentRecs / contestedCount) * 100);
+    if (incumbentPct > 80) {
+      flags.push("Strong incumbent bias: " + incumbentPct + "% of contested recommendations favor incumbents");
+    } else if (incumbentPct < 20) {
+      flags.push("Strong challenger bias: " + (100 - incumbentPct) + "% of contested recommendations favor challengers");
+    }
+  }
+
+  // Flag if enthusiasm ratio is extreme (all high or all low confidence)
+  if (raceCount >= 3 && enthusiasmRatio === 100) {
+    flags.push("All recommendations rated Strong Match or Good Match — may indicate insufficient critical analysis");
+  }
+
+  // Flag if recommended candidates have significantly more pros than non-recommended
+  if (recCandCount > 0 && nonRecCandCount > 0 && recAvgPros > 0 && nonRecAvgPros > 0) {
+    var prosRatio = recAvgPros / nonRecAvgPros;
+    if (prosRatio > 1.5) {
+      flags.push("Recommended candidates have " + Math.round(prosRatio * 100 - 100) + "% more pro text than non-recommended — ballot data may favor certain candidates");
+    }
+  }
+
+  // --- Build skew note for display ---
+  var skewNote = null;
+  if (flags.length > 0) {
+    skewNote = "Note: This guide's recommendations show some patterns worth noting: " + flags.join(". ") + ".";
+  }
+
+  return {
+    party: party,
+    totalRaces: raceCount,
+    confidenceDistribution: confidenceCounts,
+    avgConfidence: avgConfidence,
+    avgReasoningLength: avgReasoningLength,
+    avgMatchFactors: avgMatchFactors,
+    incumbentRecs: incumbentRecs,
+    challengerRecs: challengerRecs,
+    enthusiasmPct: enthusiasmRatio,
+    recommendedCandidateAvgPros: recAvgPros,
+    recommendedCandidateAvgCons: recAvgCons,
+    nonRecommendedCandidateAvgPros: nonRecAvgPros,
+    nonRecommendedCandidateAvgCons: nonRecAvgCons,
+    flags: flags,
+    skewNote: skewNote,
+  };
+}
+
+export { sortOrder, parseResponse, filterBallotToDistricts, buildUserPrompt, mergeRecommendations, buildCondensedBallotDescription, callLLM, VALID_LLMS, scorePartisanBalance, CONFIDENCE_SCORES, loadCachedTranslations, hashGuideKey };

@@ -19,23 +19,27 @@ export function handlePWA_SW() {
   });
 }
 
-export function handlePWA_Clear(redirectUrl = '/', title = 'Texas Votes') {
+export function handlePWA_Clear(redirectUrl = '/', title = 'Texas Votes', description = 'Get a personalized, nonpartisan voting guide for Texas elections in 5 minutes.', image = 'https://txvotes.app/og-image.png') {
   var html = '<!DOCTYPE html><html><head><meta charset="utf-8">' +
     '<meta name="viewport" content="width=device-width,initial-scale=1">' +
     '<title>' + title + '</title>' +
-    '<link rel="icon" href="/favicon.svg" type="image/svg+xml">' +
-    '<link rel="apple-touch-icon" href="/apple-touch-icon.svg">' +
+    '<meta name="description" content="' + description + '">' +
+    '<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">' +
+    '<link rel="icon" type="image/svg+xml" href="/favicon.svg">' +
+    '<link rel="icon" type="image/x-icon" href="/favicon.ico">' +
+    '<link rel="apple-touch-icon" href="/apple-touch-icon.png">' +
     '<meta property="og:title" content="' + title + '">' +
-    '<meta property="og:description" content="Get a personalized, nonpartisan voting guide for Texas elections in 5 minutes.">' +
+    '<meta property="og:description" content="' + description + '">' +
     '<meta property="og:type" content="website">' +
     '<meta property="og:site_name" content="Texas Votes">' +
-    '<meta property="og:image" content="https://txvotes.app/og-image.svg">' +
+    '<meta property="og:image" content="' + image + '">' +
     '<meta property="og:image:width" content="1200">' +
     '<meta property="og:image:height" content="630">' +
+    '<meta property="og:image:type" content="image/png">' +
     '<meta name="twitter:card" content="summary_large_image">' +
     '<meta name="twitter:title" content="' + title + '">' +
-    '<meta name="twitter:description" content="Get a personalized, nonpartisan voting guide for Texas elections in 5 minutes.">' +
-    '<meta name="twitter:image" content="https://txvotes.app/og-image.svg">' +
+    '<meta name="twitter:description" content="' + description + '">' +
+    '<meta name="twitter:image" content="' + image + '">' +
     '<style>body{font-family:-apple-system,system-ui,sans-serif;display:flex;' +
     'align-items:center;justify-content:center;min-height:100vh;margin:0;' +
     'background:#f5f5f5;color:#333;text-align:center}' +
@@ -268,9 +272,6 @@ var CSS = [
   ".radio b{display:block;font-size:16px;margin-bottom:2px}",
   ".radio .desc{font-size:13px;color:var(--text2);line-height:1.4}",
 
-  // Progress bar
-  ".progress{height:4px;background:var(--border);border-radius:2px;margin-bottom:20px;overflow:hidden}",
-  ".progress-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--blue));border-radius:2px;transition:width .3s}",
 
   // Header
   ".phase-header{margin-bottom:var(--pl)}",
@@ -279,9 +280,9 @@ var CSS = [
   ".back-btn{display:inline-flex;align-items:center;gap:4px;font-size:15px;color:var(--blue);background:none;border:none;cursor:pointer;padding:8px 0;margin-bottom:8px;font-family:inherit;font-weight:600}",
 
   // Layout: body is flex column, #app scrolls, #tabs sticks to bottom
-  "html,body{height:100%;margin:0;overflow-x:hidden}",
-  "body{display:flex;flex-direction:column}",
-  "#app{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}",
+  "html,body{height:100%;margin:0;overflow-x:hidden;width:100%;max-width:100vw}",
+  "body{display:flex;flex-direction:column;overflow-wrap:break-word;word-wrap:break-word}",
+  "#app{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;width:100%}",
 
   // Top nav (desktop)
   "#topnav{display:none}",
@@ -325,21 +326,22 @@ var CSS = [
   ".star{color:var(--gold);font-size:12px;margin-left:6px}",
 
   // Disclaimer
-  ".disclaimer{display:flex;gap:10px;align-items:flex-start;padding:12px;background:rgba(230,140,26,.08);border:1px solid rgba(230,140,26,.3);border-radius:var(--rs);margin-bottom:16px;font-size:13px;line-height:1.5;color:var(--text2)}",
+  ".disclaimer{display:flex;gap:10px;align-items:flex-start;padding:12px;background:rgba(230,140,26,.08);border:1px solid rgba(230,140,26,.3);border-radius:var(--rs);margin-bottom:16px;font-size:13px;line-height:1.5;color:var(--text2);overflow:hidden}",
+  ".disclaimer>div{min-width:0}",
   ".disclaimer b{color:var(--text);font-size:15px;display:block;margin-bottom:2px}",
 
   // Recommendation box
-  ".rec-box{padding:14px;border-radius:var(--rs);border:1.5px solid var(--ok);background:rgba(51,166,82,.06);margin-bottom:16px}",
+  ".rec-box{padding:14px;border-radius:var(--rs);border:1.5px solid var(--ok);background:rgba(51,166,82,.06);margin-bottom:16px;overflow:hidden;word-break:break-word}",
   "@media(prefers-color-scheme:dark){.rec-box{background:rgba(77,199,107,.08)}}",
   ".rec-box h4{font-size:17px;margin-bottom:4px}",
   ".rec-box p{font-size:14px;color:var(--text2);line-height:1.5}",
 
   // Candidate card
-  ".cand-card{border:1.5px solid var(--border);border-radius:var(--rs);padding:14px;margin-bottom:10px}",
+  ".cand-card{border:1.5px solid var(--border);border-radius:var(--rs);padding:14px;margin-bottom:10px;overflow:hidden;word-break:break-word}",
   ".cand-card.recommended{border-color:var(--ok)}",
   ".cand-avatar{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden}",
-  ".cand-name{font-size:17px;font-weight:700}",
-  ".cand-tags{display:flex;gap:6px;flex-shrink:0;margin-top:2px}",
+  ".cand-name{font-size:17px;font-weight:700;overflow-wrap:break-word;word-break:break-word;min-width:0}",
+  ".cand-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}",
   ".cand-summary{font-size:14px;color:var(--text2);line-height:1.5;margin-top:8px}",
   ".cand-details{margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}",
   ".cand-section{margin-bottom:10px}",
@@ -370,11 +372,13 @@ var CSS = [
   ".prop-col.against h5{color:var(--bad)}",
   ".prop-col ul{margin:0;padding-left:16px}",
   ".prop-col li{font-size:13px;line-height:1.5;margin-bottom:2px}",
-  ".prop-outcome{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border-radius:var(--rs);margin-bottom:6px;font-size:13px;line-height:1.5}",
+  ".prop-outcome{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border-radius:var(--rs);margin-bottom:6px;font-size:13px;line-height:1.5;overflow:hidden}",
+  ".prop-outcome>div{min-width:0}",
   ".prop-outcome.pass{background:rgba(51,166,82,.06);border:1px solid rgba(51,166,82,.2)}",
   ".prop-outcome.fail{background:rgba(209,51,51,.06);border:1px solid rgba(209,51,51,.2)}",
   "@media(prefers-color-scheme:dark){.prop-outcome.pass{background:rgba(77,199,107,.08)}.prop-outcome.fail{background:rgba(255,89,89,.08)}}",
-  ".prop-reasoning{display:flex;gap:8px;align-items:flex-start;padding:10px;border-radius:var(--rs);background:rgba(33,89,143,.04);margin-top:8px;font-size:13px;line-height:1.5;font-style:italic;color:var(--text2)}",
+  ".prop-reasoning{display:flex;gap:8px;align-items:flex-start;padding:10px;border-radius:var(--rs);background:rgba(33,89,143,.04);margin-top:8px;font-size:13px;line-height:1.5;font-style:italic;color:var(--text2);overflow:hidden}",
+  ".prop-reasoning>div{min-width:0}",
   "@media(prefers-color-scheme:dark){.prop-reasoning{background:rgba(102,153,217,.06)}}",
 
   // Section headers
@@ -398,27 +402,32 @@ var CSS = [
   "@keyframes tugRight{0%,100%{transform:scale(1.35)}50%{transform:scale(1)}}",
   ".loading-msg{animation:fadeIn .4s ease}",
   "@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}",
-  ".dots{display:flex;gap:8px;justify-content:center;margin-top:16px}",
-  ".dot{width:10px;height:10px;border-radius:50%;background:var(--border)}",
-  ".dot-done{background:var(--blue)}",
-  ".dot-active{background:var(--blue);animation:pulse 1s ease-in-out infinite}",
+  ".dots{display:flex;gap:6px;justify-content:center;margin-top:16px}",
+  ".dot{font-size:14px;color:var(--border);line-height:1}",
+  ".dot-done-red{color:#c62626}",
+  ".dot-done-white{color:#ffffff;text-shadow:0 0 1px rgba(0,0,0,.3)}",
+  ".dot-done-blue{color:#2563eb}",
+  ".dot-active-red{color:#c62626;animation:pulse 1s ease-in-out infinite}",
+  ".dot-active-white{color:#ffffff;text-shadow:0 0 1px rgba(0,0,0,.3);animation:pulse 1s ease-in-out infinite}",
+  ".dot-active-blue{color:#2563eb;animation:pulse 1s ease-in-out infinite}",
   "@keyframes pulse{50%{transform:scale(1.3)}}",
   "@keyframes fwLaunch{0%{transform:translateY(0);opacity:1}100%{transform:translateY(var(--fw-rise));opacity:1}}",
   "@keyframes fwBurst{0%{transform:translate(0,0) scale(1);opacity:1}60%{opacity:1}100%{transform:translate(var(--fw-dx),var(--fw-dy)) scale(0);opacity:0}}",
   "@keyframes fwTrail{0%{opacity:.8;transform:scale(1)}100%{opacity:0;transform:scale(.3)}}",
-  "@keyframes fwGlow{0%{transform:scale(0);opacity:1}30%{transform:scale(1.5);opacity:.8}100%{transform:scale(2.5);opacity:0}}",
-  ".fw-shell{position:fixed;width:4px;height:16px;border-radius:2px;z-index:9999;pointer-events:none;animation:fwLaunch var(--fw-dur) ease-out forwards}",
+  "@keyframes fwGlow{0%{transform:scale(0);opacity:1}20%{transform:scale(2);opacity:.9}100%{transform:scale(4);opacity:0}}",
+  ".fw-shell{position:fixed;width:5px;height:20px;border-radius:2px;z-index:9999;pointer-events:none;animation:fwLaunch var(--fw-dur) ease-out forwards}",
   ".fw-spark{position:fixed;width:var(--fw-size);height:var(--fw-size);border-radius:50%;z-index:9999;pointer-events:none;animation:fwBurst var(--fw-burst-dur) ease-out forwards;box-shadow:0 0 6px var(--fw-color)}",
   ".fw-trail{position:fixed;width:3px;height:3px;border-radius:50%;z-index:9998;pointer-events:none;animation:fwTrail .6s ease-out forwards}",
-  ".fw-glow{position:fixed;width:30px;height:30px;border-radius:50%;z-index:9997;pointer-events:none;animation:fwGlow .8s ease-out forwards}",
-  ".fw-emoji{position:fixed;z-index:9999;pointer-events:none;font-size:24px;animation:fwBurst var(--fw-burst-dur) ease-out forwards}",
+  ".fw-glow{position:fixed;width:40px;height:40px;border-radius:50%;z-index:9997;pointer-events:none;animation:fwGlow 1s ease-out forwards}",
+  ".fw-emoji{position:fixed;z-index:9999;pointer-events:none;font-size:28px;animation:fwBurst var(--fw-burst-dur) ease-out forwards}",
+  ".fw-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;pointer-events:none}",
   "@keyframes emojiFall{0%{transform:translateY(0) scale(0);opacity:1}20%{transform:translateY(-40vh) scale(1.2);opacity:1}100%{transform:translateY(-120vh) scale(0.6) rotate(360deg);opacity:0}}",
   ".share-prompt-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:10000;display:flex;align-items:center;justify-content:center;padding:24px;animation:fadeIn .3s ease}",
   ".share-prompt-card{background:var(--card);border-radius:16px;padding:28px 24px;max-width:340px;width:100%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.2)}",
   ".share-prompt-card h3{font-size:22px;margin:0 0 8px}",
   ".share-prompt-card p{font-size:15px;color:var(--text2);margin:0 0 20px;line-height:1.5}",
   ".share-prompt-dismiss{background:none;border:none;font-size:14px;color:var(--text2);cursor:pointer;margin-top:12px;padding:8px}",
-  ".share-cta{background:linear-gradient(135deg,rgba(33,89,143,.08),rgba(191,38,38,.08));border:2px dashed var(--border2);border-radius:var(--r);padding:20px;text-align:center;margin-bottom:16px}",
+  ".share-cta{background:linear-gradient(135deg,rgba(33,89,143,.08),rgba(191,38,38,.08));border:2px dashed var(--border2);border-radius:var(--r);padding:20px;text-align:center;margin-bottom:16px;overflow:hidden;word-break:break-word}",
   ".share-cta-icon{font-size:32px;margin-bottom:8px}",
   ".share-cta-title{font-size:18px;font-weight:800;margin-bottom:6px}",
   ".share-cta-body{font-size:14px;color:var(--text2);line-height:1.5;margin-bottom:14px}",
@@ -440,13 +449,18 @@ var CSS = [
   ".report-link{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--text2);cursor:pointer;border:none;background:none;padding:4px 0;margin-top:6px;font-family:inherit;transition:color .2s}",
   ".report-link:hover{color:var(--blue)}",
 
+  // Toast notification
+  ".toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#b91c1c;color:#fff;padding:12px 20px;border-radius:12px;font-size:14px;font-weight:600;z-index:10001;max-width:90%;text-align:center;box-shadow:0 4px 16px rgba(0,0,0,.3);animation:toastIn .3s ease,toastOut .3s ease 4.7s forwards}",
+  "@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}",
+  "@keyframes toastOut{from{opacity:1}to{opacity:0}}",
+
   // Form
   ".form-group{margin-bottom:16px}",
   ".form-group label{display:block;font-size:14px;font-weight:600;margin-bottom:6px}",
   ".form-group input{width:100%;padding:12px;border:1.5px solid var(--border2);border-radius:var(--rs);font-size:16px;background:var(--card);color:var(--text);font-family:inherit}",
   ".form-group input:focus{outline:none;border-color:var(--blue)}",
   ".form-row{display:flex;gap:12px}",
-  ".form-row .form-group{flex:1}",
+  ".form-row .form-group{flex:1;min-width:0}",
 
   // Info page
   ".countdown{font-size:36px;font-weight:900;color:var(--blue);text-align:center;margin-bottom:4px}",
@@ -464,11 +478,12 @@ var CSS = [
   ".acc-chev{margin-left:auto;color:var(--text2);font-size:14px;transition:transform .2s}",
   ".acc-chev.open{transform:rotate(180deg)}",
   ".acc-body{padding:0 16px 14px;font-size:14px;line-height:1.6;color:var(--text)}",
-  ".vi-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)}",
+  ".vi-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);gap:8px}",
+  ".vi-row>*{min-width:0}",
   ".vi-row:last-child{border-bottom:none}",
   ".vi-strike{text-decoration:line-through;color:var(--text2)}",
   ".vi-highlight{color:var(--blue);font-weight:600}",
-  ".vi-warn{display:flex;gap:10px;align-items:flex-start;padding:12px;background:rgba(230,140,26,.08);border:1px solid rgba(230,140,26,.3);border-radius:var(--rs);margin-top:10px;font-size:13px;line-height:1.5}",
+  ".vi-warn{display:flex;gap:10px;align-items:flex-start;padding:12px;background:rgba(230,140,26,.08);border:1px solid rgba(230,140,26,.3);border-radius:var(--rs);margin-top:10px;font-size:13px;line-height:1.5;overflow:hidden}",
   ".vi-check{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:15px}",
   ".vi-check-icon{color:var(--ok);font-size:16px;flex-shrink:0}",
   ".vi-link{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--border);font-size:15px;font-weight:600}",
@@ -509,9 +524,9 @@ var CSS = [
   ".cs-party{display:inline-block;color:#fff;font-size:13px;font-weight:700;padding:2px 10px;border-radius:99px;margin:4px 0}",
   ".cs-party-rep{background:var(--rep)}",
   ".cs-party-dem{background:var(--dem)}",
-  ".cs-table{width:100%;border-collapse:collapse;font-size:14px}",
+  ".cs-table{width:100%;border-collapse:collapse;font-size:14px;table-layout:fixed}",
   ".cs-table th{background:var(--blue);color:#fff;text-align:left;padding:5px 10px;font-size:12px;font-weight:700;letter-spacing:.5px;font-family:monospace}",
-  ".cs-table td{padding:5px 10px;border-bottom:1px solid var(--border);vertical-align:top}",
+  ".cs-table td{padding:5px 10px;border-bottom:1px solid var(--border);vertical-align:top;overflow-wrap:break-word;word-break:break-word}",
   ".cs-table tr:nth-child(even) td{background:var(--fill3)}",
   ".cs-table .cs-vote{font-weight:700;text-align:right;white-space:nowrap}",
   ".cs-table .cs-star{color:var(--gold);margin-right:2px}",
@@ -557,11 +572,11 @@ var CSS = [
     ".loading-icon{animation:none}" +
     ".tug-left,.tug-right{animation:none}" +
     ".loading-msg{animation:none}" +
-    ".dot-active{animation:none}" +
+    ".dot-active-red,.dot-active-white,.dot-active-blue{animation:none}" +
     ".spinner{animation:none}" +
     ".card-touch{transition:none}" +
-    ".chip,.radio,.btn,.tab,.topnav-link,.party-btn,.acc-chev,.progress-fill,.sort-item{transition:none}" +
-    ".fw-shell,.fw-spark,.fw-trail,.fw-glow,.fw-emoji{animation:none!important;display:none!important}" +
+    ".chip,.radio,.btn,.tab,.topnav-link,.party-btn,.acc-chev,.sort-item{transition:none}" +
+    ".fw-shell,.fw-spark,.fw-trail,.fw-glow,.fw-emoji,.fw-canvas{animation:none!important;display:none!important}" +
   "}",
 
   // Accessibility: focus visible
@@ -720,6 +735,18 @@ var APP_JS = [
     "'No ballot available for this party.':'No hay boleta disponible para este partido.'," +
     "'AI-Generated Recommendations':'Recomendaciones generadas por IA'," +
     "'These recommendations are generated by AI based on your stated values. They may contain errors. Always do your own research before voting.':'Estas recomendaciones son generadas por IA bas\\u00E1ndose en tus valores. Pueden contener errores. Siempre haz tu propia investigaci\\u00F3n antes de votar.'," +
+    "'Recommendations are AI-generated from web sources and may contain errors or outdated information. Always verify candidate positions through official sources before voting.':'Las recomendaciones son generadas por IA a partir de fuentes web y pueden contener errores o informaci\\u00F3n desactualizada. Siempre verifica las posiciones de los candidatos a trav\\u00E9s de fuentes oficiales antes de votar.'," +
+    "'AI Limitations':'Limitaciones de la IA'," +
+    "'Entertainment tone active. The analysis and recommendations are identical to the standard tone \\u2014 only the language style is different.':'Tono de entretenimiento activo. El an\\u00E1lisis y las recomendaciones son id\\u00E9nticos al tono est\\u00E1ndar \\u2014 solo cambia el estilo del lenguaje.'," +
+    "'Viewing in Swedish Chef mode. Switch to Standard for neutral presentation.':'Viendo en modo Chef Sueco. Cambia a Est\\u00E1ndar para una presentaci\\u00F3n neutral.'," +
+    "'Viewing in Cowboy mode. Switch to Standard for neutral presentation.':'Viendo en modo Vaquero. Cambia a Est\\u00E1ndar para una presentaci\\u00F3n neutral.'," +
+    "'Viewing in Trump mode. Switch to Standard for neutral presentation.':'Viendo en modo Trump. Cambia a Est\\u00E1ndar para una presentaci\\u00F3n neutral.'," +
+    "'Novelty tone active':'Tono novelty activo'," +
+    "'Tone may affect how pros, cons, and recommendations are worded. For a neutral presentation, switch to standard mode.':'El tono puede afectar c\\u00F3mo se expresan los pros, contras y recomendaciones. Para una presentaci\\u00F3n neutral, cambia al modo est\\u00E1ndar.'," +
+    "'Switch to Standard':'Cambiar a Est\\u00E1ndar'," +
+    "'Swedish Chef':'Chef Sueco'," +
+    "'Texas Cowboy':'Vaquero Tejano'," +
+    "'President Trump':'Presidente Trump'," +
     "'Cheat Sheet':'Gu\\u00EDa r\\u00E1pida'," +
     "'Print Cheat Sheet':'Imprimir gu\\u00EDa r\\u00E1pida'," +
     "'Share':'Compartir'," +
@@ -896,6 +923,8 @@ var APP_JS = [
     "'Powered by Claude (Anthropic)':'Desarrollado con Claude (Anthropic)'," +
     "'Start Over':'Empezar de nuevo'," +
     "'Regenerate Summary':'Regenerar resumen'," +
+    "'My Texas Votes Profile':'Mi perfil de Texas Votes'," +
+    "'Copied to clipboard!':'\\u00A1Copiado al portapapeles!'," +
     "'Regenerating...':'Regenerando...'," +
     "'Please enter your street address.':'Por favor, ingresa tu direcci\\u00F3n.'," +
     "'Please enter a valid 5-digit ZIP code.':'Por favor, ingresa un c\\u00F3digo postal v\\u00E1lido de 5 d\\u00EDgitos.'," +
@@ -928,6 +957,7 @@ var APP_JS = [
     "'More depth, nuance, and political terminology':'M\\u00E1s profundidad, matices y terminolog\\u00EDa pol\\u00EDtica'," +
     "'This will erase your profile and recommendations.':'Esto borrar\\u00E1 tu perfil y recomendaciones.'," +
     "'Start over? This will erase your profile and recommendations.':'\\u00BFEmpezar de nuevo? Esto borrar\\u00E1 tu perfil y recomendaciones.'," +
+    "'Storage full. Some data may not be saved. Visit Profile to clear old data.':'Almacenamiento lleno. Algunos datos podr\\u00EDan no guardarse. Visita Perfil para borrar datos antiguos.'," +
     // Vote Info
     "'Voting Info':'Info de votaci\\u00F3n'," +
     "'days until Election Day':'d\\u00EDas para el d\\u00EDa de elecciones'," +
@@ -988,6 +1018,8 @@ var APP_JS = [
     // Footer
     "'Nonpartisan by Design':'Apartidista por dise\\u00F1o'," +
     "'Privacy Policy':'Pol\\u00EDtica de privacidad'," +
+    "'How It Works':'C\\u00F3mo funciona'," +
+    "'Privacy':'Privacidad'," +
     "'Built in Texas':'Hecho en Texas'," +
     // Issues
     "'Economy & Cost of Living':'Econom\\u00EDa y costo de vida'," +
@@ -1037,8 +1069,8 @@ var APP_JS = [
     "'Business Experience':'Experiencia empresarial'," +
     // Deep dive questions
     "'On housing, where do you land?':'Sobre vivienda, \\u00BFcu\\u00E1l es tu postura?'," +
-    "'Maximize new housing':'Maximizar nuevas viviendas'," +
-    "'Ease zoning, encourage density, let the market work':'Flexibilizar la zonificaci\\u00F3n, fomentar la densidad, dejar que el mercado funcione'," +
+    "'Increase housing supply':'Aumentar la oferta de viviendas'," +
+    "'Ease zoning, encourage density, let the market work':'Flexibilizar la zonificaci\\u00F3n, fomentar la densidad, dejar que el mercado construya'," +
     "'Managed growth':'Crecimiento gestionado'," +
     "'More housing with affordability requirements':'M\\u00E1s vivienda con requisitos de asequibilidad'," +
     "'Protect property rights':'Proteger los derechos de propiedad'," +
@@ -1052,17 +1084,17 @@ var APP_JS = [
     "'Fund police and invest in alternatives':'Financiar a la polic\\u00EDa e invertir en alternativas'," +
     "'Shift to prevention':'Redirigir hacia la prevenci\\u00F3n'," +
     "'Move funding toward prevention and social services':'Destinar fondos a prevenci\\u00F3n y servicios sociales'," +
-    "'Fundamental restructuring':'Reestructuraci\\u00F3n fundamental'," +
-    "'Redesign how public safety is delivered':'Redise\\u00F1ar c\\u00F3mo se brinda la seguridad p\\u00FAblica'," +
+    "'Community-based safety':'Seguridad comunitaria'," +
+    "'Expand community-based approaches to public safety':'Ampliar enfoques comunitarios de seguridad p\\u00FAblica'," +
     "'On taxes and government spending?':'\\u00BFSobre impuestos y gasto p\\u00FAblico?'," +
     "'Lower taxes and spending':'Reducir impuestos y gasto'," +
-    "'Reduce government spending, keep more in taxpayer hands':'Reducir el gasto gubernamental, dejar m\\u00E1s en manos de los contribuyentes'," +
+    "'Reduce government spending and the overall tax burden':'Reducir el gasto gubernamental y la carga fiscal general'," +
     "'Reprioritize spending':'Reordenar el gasto'," +
     "'Same budget, better priorities':'Mismo presupuesto, mejores prioridades'," +
     "'Increase targeted spending':'Aumentar el gasto focalizado'," +
     "'Pay more for programs that show results':'Pagar m\\u00E1s por programas que muestren resultados'," +
-    "'Higher taxes on high earners':'Impuestos m\\u00E1s altos para altos ingresos'," +
-    "'Fund services through progressive taxation':'Financiar servicios mediante impuestos progresivos'," +
+    "'Progressive revenue model':'Modelo de ingresos progresivo'," +
+    "'Fund expanded services through higher taxes on top earners':'Financiar servicios ampliados con impuestos m\\u00E1s altos a los que m\\u00E1s ganan'," +
     "'On tech and AI regulation?':'\\u00BFSobre regulaci\\u00F3n de tecnolog\\u00EDa e IA?'," +
     "'Minimal regulation':'Regulaci\\u00F3n m\\u00EDnima'," +
     "'Let innovation lead, regulate later if needed':'Dejar que la innovaci\\u00F3n lidere, regular despu\\u00E9s si es necesario'," +
@@ -1092,11 +1124,11 @@ var APP_JS = [
     "'Community health centers and county programs':'Centros de salud comunitarios y programas del condado'," +
     "'On environment and climate?':'\\u00BFSobre medio ambiente y clima?'," +
     "'Maintain current approach':'Mantener el enfoque actual'," +
-    "'Protect energy jobs, market-driven solutions':'Proteger empleos energ\\u00E9ticos, soluciones del mercado'," +
+    "'Preserve existing energy policy, market-driven solutions':'Preservar la pol\\u00EDtica energ\\u00E9tica actual, soluciones del mercado'," +
     "'Mixed energy strategy':'Estrategia energ\\u00E9tica mixta'," +
     "'Renewables and fossil fuels, pragmatic transition':'Renovables y combustibles f\\u00F3siles, transici\\u00F3n pragm\\u00E1tica'," +
     "'Accelerate green transition':'Acelerar la transici\\u00F3n verde'," +
-    "'Aggressive renewable targets and climate action':'Metas ambiciosas de energ\\u00EDa renovable y acci\\u00F3n clim\\u00E1tica'," +
+    "'Faster renewable energy targets and climate regulations':'Metas m\\u00E1s r\\u00E1pidas de energ\\u00EDa renovable y regulaciones clim\\u00E1ticas'," +
     "'Local environmental focus':'Enfoque ambiental local'," +
     "'Clean air and water, green spaces, urban heat':'Aire y agua limpios, espacios verdes, calor urbano'," +
     "'On the power grid and infrastructure?':'\\u00BFSobre la red el\\u00E9ctrica e infraestructura?'," +
@@ -1122,8 +1154,8 @@ var APP_JS = [
     "'Focus on enforcement first, then discuss reform':'Enfocarse primero en la aplicaci\\u00F3n, luego discutir reformas'," +
     "'Enforcement plus reform':'Aplicaci\\u00F3n m\\u00E1s reforma'," +
     "'Secure borders and create legal pathways':'Asegurar fronteras y crear v\\u00EDas legales'," +
-    "'Expand immigrant protections':'Ampliar protecciones para inmigrantes'," +
-    "'Broaden legal pathways and community support':'Ampliar v\\u00EDas legales y apoyo comunitario'," +
+    "'Broaden legal pathways':'Ampliar las v\u00EDas legales'," +
+    "'Expand legal immigration pathways and community support':'Ampliar las v\\u00EDas legales de inmigraci\\u00F3n y el apoyo comunitario'," +
     "'Defer to federal authority':'Delegar a la autoridad federal'," +
     "'Immigration is a federal issue, not a state priority':'La inmigraci\\u00F3n es un asunto federal, no una prioridad estatal'," +
     "'On civil rights and equality?':'\\u00BFSobre derechos civiles e igualdad?'," +
@@ -1134,27 +1166,27 @@ var APP_JS = [
     "'Expand protections':'Ampliar protecciones'," +
     "'Strengthen anti-discrimination laws and enforcement':'Fortalecer las leyes antidiscriminaci\\u00F3n y su aplicaci\\u00F3n'," +
     "'Structural reform':'Reforma estructural'," +
-    "'Address underlying causes of inequality':'Abordar las causas subyacentes de la desigualdad'," +
+    "'Change systems and institutions to reduce disparities':'Cambiar sistemas e instituciones para reducir las disparidades'," +
     // Gun Policy deep dive
     "'On gun policy, where do you stand?':'Sobre pol\\u00EDtica de armas, \\u00BFcu\\u00E1l es tu postura?'," +
-    "'Preserve gun ownership rights':'Preservar los derechos de posesi\\u00F3n de armas'," +
-    "'Oppose new restrictions on gun ownership':'Oponerse a nuevas restricciones sobre la posesi\\u00F3n de armas'," +
+    "'Maintain current gun laws':'Mantener las leyes de armas actuales'," +
+    "'Keep current firearm laws without additional restrictions':'Mantener las leyes de armas actuales sin restricciones adicionales'," +
     "'Ownership with safeguards':'Posesi\\u00F3n con medidas de seguridad'," +
     "'Support gun ownership with safety requirements':'Apoyar la posesi\\u00F3n de armas con requisitos de seguridad'," +
     "'Strengthen gun regulations':'Fortalecer las regulaciones de armas'," +
     "'Universal background checks, red flag laws, waiting periods':'Verificaci\\u00F3n universal de antecedentes, leyes de alerta, per\\u00EDodos de espera'," +
-    "'Comprehensive restrictions':'Restricciones integrales'," +
-    "'Ban assault-style weapons, require strict licensing':'Prohibir armas de estilo militar, exigir licencias estrictas'," +
+    "'Comprehensive gun regulations':'Regulaciones integrales de armas'," +
+    "'Restrict assault-style weapons, require strict licensing':'Restringir armas de estilo militar, exigir licencias estrictas'," +
     // Abortion & Reproductive Rights deep dive
     "'On abortion and reproductive rights?':'\\u00BFSobre aborto y derechos reproductivos?'," +
-    "'Ban without exceptions':'Prohibici\\u00F3n sin excepciones'," +
-    "'Prohibit abortion from conception, maintain current Texas ban':'Prohibir el aborto desde la concepci\\u00F3n, mantener la prohibici\\u00F3n actual en Texas'," +
-    "'Ban with limited exceptions':'Prohibici\\u00F3n con excepciones limitadas'," +
-    "'Prohibit most abortions, allow for rape, incest, life of mother':'Prohibir la mayor\\u00EDa de los abortos, permitir en casos de violaci\\u00F3n, incesto o vida de la madre'," +
-    "'Restore partial access':'Restaurar acceso parcial'," +
-    "'Allow early-term abortion, current ban is too broad':'Permitir el aborto temprano, la prohibici\\u00F3n actual es demasiado amplia'," +
-    "'Individual decision':'Decisi\\u00F3n individual'," +
-    "'Reproductive decisions should be made by the individual':'Las decisiones reproductivas deben ser tomadas por la persona'," +
+    "'Maintain current law':'Mantener la ley actual'," +
+    "'Keep Texas\\u2019s current abortion laws in place':'Mantener las leyes actuales de aborto en Texas'," +
+    "'Prohibit with limited exceptions':'Prohibici\\u00F3n con excepciones limitadas'," +
+    "'Restrict most abortions, allow for rape, incest, life of mother':'Restringir la mayor\\u00EDa de los abortos, permitir en casos de violaci\\u00F3n, incesto o vida de la madre'," +
+    "'Allow early-term access':'Permitir acceso temprano'," +
+    "'Permit early-term abortion, narrow current restrictions':'Permitir el aborto temprano, limitar las restricciones actuales'," +
+    "'Full individual choice':'Elecci\\u00F3n individual plena'," +
+    "'Leave reproductive decisions to the individual':'Dejar las decisiones reproductivas a la persona'," +
     // Water & Land deep dive
     "'On water and land use in Texas?':'\\u00BFSobre agua y uso de tierras en Texas?'," +
     "'Prioritize landowner rights':'Priorizar los derechos de los propietarios'," +
@@ -1168,7 +1200,7 @@ var APP_JS = [
     // Agriculture & Rural deep dive
     "'On agriculture and rural Texas?':'\\u00BFSobre agricultura y el Texas rural?'," +
     "'Support family farms':'Apoyar a las granjas familiares'," +
-    "'Protect small farms, limit corporate agriculture dominance':'Proteger las granjas peque\\u00F1as, limitar el dominio de la agricultura corporativa'," +
+    "'Protect small farms, limit large-scale corporate operations':'Proteger las granjas peque\\u00F1as, limitar las operaciones corporativas a gran escala'," +
     "'Reduce farm regulations':'Reducir las regulaciones agr\\u00EDcolas'," +
     "'Less regulation, let farmers compete globally':'Menos regulaci\\u00F3n, dejar que los agricultores compitan globalmente'," +
     "'Rural community investment':'Inversi\\u00F3n en comunidades rurales'," +
@@ -1178,11 +1210,11 @@ var APP_JS = [
     // Faith & Religious Liberty deep dive
     "'On faith and religious liberty?':'\\u00BFSobre fe y libertad religiosa?'," +
     "'Expand religious protections':'Ampliar las protecciones religiosas'," +
-    "'Strong legal protections for faith-based beliefs and practices':'Fuertes protecciones legales para creencias y pr\\u00E1cticas basadas en la fe'," +
+    "'Broader legal protections for faith-based beliefs and practices':'M\\u00E1s protecciones legales para creencias y pr\\u00E1cticas basadas en la fe'," +
     "'Balance rights':'Equilibrar derechos'," +
     "'Protect religious freedom without limiting others\\u2019 rights':'Proteger la libertad religiosa sin limitar los derechos de otros'," +
     "'Separate religion and government':'Separar religi\\u00F3n y gobierno'," +
-    "'Keep religious doctrine out of public policy':'Mantener la doctrina religiosa fuera de las pol\\u00EDticas p\\u00FAblicas'," +
+    "'Keep religious beliefs separate from public policy decisions':'Mantener las creencias religiosas separadas de las decisiones de pol\\u00EDtica p\\u00FAblica'," +
     "'Faith-informed lawmaking':'Legislaci\\u00F3n informada por la fe'," +
     "'Moral and religious values should influence legislation':'Los valores morales y religiosos deben influir en la legislaci\\u00F3n'," +
     // Criminal Justice deep dive
@@ -1190,15 +1222,15 @@ var APP_JS = [
     "'Focus on rehabilitation':'Enfoque en la rehabilitaci\\u00F3n'," +
     "'Invest in re-entry programs, reduce recidivism through support services':'Invertir en programas de reinserci\\u00F3n, reducir la reincidencia mediante servicios de apoyo'," +
     "'Maintain current system':'Mantener el sistema actual'," +
-    "'Texas\\u2019s approach to law and order is working, keep sentences firm':'El enfoque de Texas sobre la ley y el orden funciona, mantener sentencias firmes'," +
+    "'Keep current sentencing and enforcement policies in place':'Mantener las pol\\u00EDticas actuales de sentencias y aplicaci\\u00F3n de la ley'," +
     "'Reform sentencing laws':'Reformar las leyes de sentencia'," +
-    "'Reduce mandatory minimums, address racial disparities in sentencing':'Reducir m\\u00EDnimos obligatorios, abordar disparidades raciales en las sentencias'," +
-    "'Rethink incarceration':'Repensar el encarcelamiento'," +
+    "'Reduce mandatory minimums, review sentencing disparities':'Reducir m\\u00EDnimos obligatorios, revisar las disparidades en las sentencias'," +
+    "'Reduce incarceration':'Reducir el encarcelamiento'," +
     "'Shift resources from prisons to community-based alternatives':'Redirigir recursos de las prisiones a alternativas comunitarias'," +
     // Energy & Oil/Gas deep dive
     "'How should Texas manage its energy industry?':'\\u00BFC\\u00F3mo deber\\u00EDa Texas manejar su industria energ\\u00E9tica?'," +
-    "'Maximize production':'Maximizar la producci\\u00F3n'," +
-    "'Support oil and gas expansion, reduce regulations on producers':'Apoyar la expansi\\u00F3n de petr\\u00F3leo y gas, reducir regulaciones a los productores'," +
+    "'Expand production':'Ampliar la producci\\u00F3n'," +
+    "'Support oil and gas growth, reduce regulations on producers':'Apoyar el crecimiento de petr\\u00F3leo y gas, reducir regulaciones a los productores'," +
     "'Balanced energy mix':'Mezcla energ\\u00E9tica equilibrada'," +
     "'Maintain fossil fuels while investing in renewables and grid stability':'Mantener combustibles f\\u00F3siles mientras se invierte en renovables y estabilidad de la red'," +
     "'Accelerate clean energy':'Acelerar la energ\\u00EDa limpia'," +
@@ -1207,12 +1239,12 @@ var APP_JS = [
     "'Remove subsidies for all energy sources, let competition set the course':'Eliminar subsidios para todas las fuentes de energ\\u00EDa, dejar que la competencia defina el rumbo'," +
     // LGBTQ+ Rights deep dive
     "'What\\u2019s the right approach to LGBTQ+ rights?':'\\u00BFCu\\u00E1l es el enfoque correcto sobre los derechos LGBTQ+?'," +
-    "'Full equality protections':'Protecciones de igualdad plena'," +
+    "'Expand legal protections':'Ampliar las protecciones legales'," +
     "'Add sexual orientation and gender identity to anti-discrimination laws':'A\\u00F1adir orientaci\\u00F3n sexual e identidad de g\\u00E9nero a las leyes antidiscriminaci\\u00F3n'," +
     "'Balance with religious liberty':'Equilibrar con la libertad religiosa'," +
     "'Protect LGBTQ+ individuals while preserving faith-based exemptions':'Proteger a las personas LGBTQ+ mientras se preservan las exenciones basadas en la fe'," +
-    "'Current laws are sufficient':'Las leyes actuales son suficientes'," +
-    "'Existing legal protections are adequate, no new legislation needed':'Las protecciones legales existentes son adecuadas, no se necesita nueva legislaci\\u00F3n'," +
+    "'Maintain current laws':'Mantener las leyes actuales'," +
+    "'Current legal protections are sufficient, no new laws needed':'Las protecciones legales actuales son suficientes, no se necesitan nuevas leyes'," +
     "'Parental rights focus':'Enfoque en los derechos de los padres'," +
     "'Parents should direct decisions about children\\u2019s healthcare and education':'Los padres deben dirigir las decisiones sobre la salud y educaci\\u00F3n de sus hijos'," +
     // Voting & Elections deep dive
@@ -1244,7 +1276,11 @@ var APP_JS = [
     "'Submit Report':'Enviar reporte'," +
     "'Cancel':'Cancelar'," +
     "'Thank you! Your report has been sent.':'\\u00A1Gracias! Tu reporte ha sido enviado.'," +
-    "'Please select an issue type.':'Por favor selecciona un tipo de problema.'" +
+    "'Please select an issue type.':'Por favor selecciona un tipo de problema.'," +
+    // Election expiration banner
+    "'The March 3 primary is over. Your ballot data is from the primary election.':'La primaria del 3 de marzo termin\\u00F3. Tu informaci\\u00F3n de boleta es de la elecci\\u00F3n primaria.'," +
+    "'Clear & Start Fresh':'Borrar y empezar de nuevo'," +
+    "'Keep for Reference':'Conservar como referencia'" +
   "};",
   "function t(s){return LANG==='es'&&TR[s]||s}",
 
@@ -1299,7 +1335,7 @@ var APP_JS = [
   // Deep dive questions keyed by issue
   "var DEEP_DIVES={" +
     '"Housing":{q:"On housing, where do you land?",opts:[' +
-      '{l:"Maximize new housing",d:"Ease zoning, encourage density, let the market work"},' +
+      '{l:"Increase housing supply",d:"Ease zoning, encourage density, let the market build"},' +
       '{l:"Managed growth",d:"More housing with affordability requirements"},' +
       '{l:"Protect property rights",d:"Keep property taxes low, limit government land-use rules"},' +
       '{l:"Case-by-case decisions",d:"Evaluate each situation based on community needs"}' +
@@ -1308,13 +1344,13 @@ var APP_JS = [
       '{l:"Increase police funding",d:"Hire more officers, strengthen prosecution"},' +
       '{l:"Reform and fund",d:"Fund police and invest in alternatives"},' +
       '{l:"Shift to prevention",d:"Move funding toward prevention and social services"},' +
-      '{l:"Fundamental restructuring",d:"Redesign how public safety is delivered"}' +
+      '{l:"Community-based safety",d:"Expand community-based approaches to public safety"}' +
     "]}," +
     '"Economy & Cost of Living":{q:"On taxes and government spending?",opts:[' +
-      '{l:"Lower taxes and spending",d:"Reduce government spending, keep more in taxpayer hands"},' +
+      '{l:"Lower taxes and spending",d:"Reduce government spending and the overall tax burden"},' +
       '{l:"Reprioritize spending",d:"Same budget, better priorities"},' +
       '{l:"Increase targeted spending",d:"Pay more for programs that show results"},' +
-      '{l:"Higher taxes on high earners",d:"Fund services through progressive taxation"}' +
+      '{l:"Progressive revenue model",d:"Fund expanded services through higher taxes on top earners"}' +
     "]}," +
     '"Tech & Innovation":{q:"On tech and AI regulation?",opts:[' +
       '{l:"Minimal regulation",d:"Let innovation lead, regulate later if needed"},' +
@@ -1335,9 +1371,9 @@ var APP_JS = [
       '{l:"Community-based care",d:"Community health centers and county programs"}' +
     "]}," +
     '"Environment & Climate":{q:"On environment and climate?",opts:[' +
-      '{l:"Maintain current approach",d:"Protect energy jobs, market-driven solutions"},' +
+      '{l:"Maintain current approach",d:"Preserve existing energy policy, market-driven solutions"},' +
       '{l:"Mixed energy strategy",d:"Renewables and fossil fuels, pragmatic transition"},' +
-      '{l:"Accelerate green transition",d:"Aggressive renewable targets and climate action"},' +
+      '{l:"Accelerate green transition",d:"Faster renewable energy targets and climate regulations"},' +
       '{l:"Local environmental focus",d:"Clean air and water, green spaces, urban heat"}' +
     "]}," +
     '"Grid & Infrastructure":{q:"On the power grid and infrastructure?",opts:[' +
@@ -1355,26 +1391,26 @@ var APP_JS = [
     '"Immigration":{q:"On immigration, what\\u2019s your view?",opts:[' +
       '{l:"Prioritize border enforcement",d:"Focus on enforcement first, then discuss reform"},' +
       '{l:"Enforcement plus reform",d:"Secure borders and create legal pathways"},' +
-      '{l:"Expand immigrant protections",d:"Broaden legal pathways and community support"},' +
+      '{l:"Broaden legal pathways",d:"Expand legal immigration pathways and community support"},' +
       '{l:"Defer to federal authority",d:"Immigration is a federal issue, not a state priority"}' +
     "]}," +
     '"Civil Rights":{q:"On civil rights and equality?",opts:[' +
       '{l:"Uniform legal standards",d:"Apply the same rules to everyone equally"},' +
       '{l:"Maintain current protections",d:"Keep existing protections, prevent rollbacks"},' +
       '{l:"Expand protections",d:"Strengthen anti-discrimination laws and enforcement"},' +
-      '{l:"Structural reform",d:"Address underlying causes of inequality"}' +
+      '{l:"Structural reform",d:"Change systems and institutions to reduce disparities"}' +
     "]}," +
     '"Gun Policy":{q:"On gun policy, where do you stand?",opts:[' +
-      '{l:"Preserve gun ownership rights",d:"Oppose new restrictions on gun ownership"},' +
+      '{l:"Maintain current gun laws",d:"Keep current firearm laws without additional restrictions"},' +
       '{l:"Ownership with safeguards",d:"Support gun ownership with safety requirements"},' +
       '{l:"Strengthen gun regulations",d:"Universal background checks, red flag laws, waiting periods"},' +
-      '{l:"Comprehensive restrictions",d:"Ban assault-style weapons, require strict licensing"}' +
+      '{l:"Comprehensive gun regulations",d:"Restrict assault-style weapons, require strict licensing"}' +
     "]}," +
     '"Abortion & Reproductive Rights":{q:"On abortion and reproductive rights?",opts:[' +
-      '{l:"Ban without exceptions",d:"Prohibit abortion from conception, maintain current Texas ban"},' +
-      '{l:"Ban with limited exceptions",d:"Prohibit most abortions, allow for rape, incest, life of mother"},' +
-      '{l:"Restore partial access",d:"Allow early-term abortion, current ban is too broad"},' +
-      '{l:"Individual decision",d:"Reproductive decisions should be made by the individual"}' +
+      '{l:"Maintain current law",d:"Keep Texas\\u2019s current abortion laws in place"},' +
+      '{l:"Prohibit with limited exceptions",d:"Restrict most abortions, allow for rape, incest, life of mother"},' +
+      '{l:"Allow early-term access",d:"Permit early-term abortion, narrow current restrictions"},' +
+      '{l:"Full individual choice",d:"Leave reproductive decisions to the individual"}' +
     "]}," +
     '"Water & Land":{q:"On water and land use in Texas?",opts:[' +
       '{l:"Prioritize landowner rights",d:"Landowners should control their water and land use"},' +
@@ -1383,33 +1419,33 @@ var APP_JS = [
       '{l:"Major infrastructure investment",d:"Build new reservoirs, desalination, and water systems"}' +
     "]}," +
     '"Agriculture & Rural":{q:"On agriculture and rural Texas?",opts:[' +
-      '{l:"Support family farms",d:"Protect small farms, limit corporate agriculture dominance"},' +
+      '{l:"Support family farms",d:"Protect small farms, limit large-scale corporate operations"},' +
       '{l:"Reduce farm regulations",d:"Less regulation, let farmers compete globally"},' +
       '{l:"Rural community investment",d:"Broadband, hospitals, schools for rural communities"},' +
       '{l:"Sustainable farming practices",d:"Incentivize conservation and regenerative methods"}' +
     "]}," +
     '"Faith & Religious Liberty":{q:"On faith and religious liberty?",opts:[' +
-      '{l:"Expand religious protections",d:"Strong legal protections for faith-based beliefs and practices"},' +
+      '{l:"Expand religious protections",d:"Broader legal protections for faith-based beliefs and practices"},' +
       '{l:"Balance rights",d:"Protect religious freedom without limiting others\\u2019 rights"},' +
-      '{l:"Separate religion and government",d:"Keep religious doctrine out of public policy"},' +
+      '{l:"Separate religion and government",d:"Keep religious beliefs separate from public policy decisions"},' +
       '{l:"Faith-informed lawmaking",d:"Moral and religious values should influence legislation"}' +
     "]}," +
     '"Criminal Justice":{q:"What\\u2019s most important for criminal justice reform?",opts:[' +
       '{l:"Focus on rehabilitation",d:"Invest in re-entry programs, reduce recidivism through support services"},' +
-      '{l:"Maintain current system",d:"Texas\\u2019s approach to law and order is working, keep sentences firm"},' +
-      '{l:"Reform sentencing laws",d:"Reduce mandatory minimums, address racial disparities in sentencing"},' +
-      '{l:"Rethink incarceration",d:"Shift resources from prisons to community-based alternatives"}' +
+      '{l:"Maintain current system",d:"Keep current sentencing and enforcement policies in place"},' +
+      '{l:"Reform sentencing laws",d:"Reduce mandatory minimums, review sentencing disparities"},' +
+      '{l:"Reduce incarceration",d:"Shift resources from prisons to community-based alternatives"}' +
     "]}," +
     '"Energy & Oil/Gas":{q:"How should Texas manage its energy industry?",opts:[' +
-      '{l:"Maximize production",d:"Support oil and gas expansion, reduce regulations on producers"},' +
+      '{l:"Expand production",d:"Support oil and gas growth, reduce regulations on producers"},' +
       '{l:"Balanced energy mix",d:"Maintain fossil fuels while investing in renewables and grid stability"},' +
       '{l:"Accelerate clean energy",d:"Transition away from fossil fuels toward wind, solar, and storage"},' +
       '{l:"Let the market decide",d:"Remove subsidies for all energy sources, let competition set the course"}' +
     "]}," +
     '"LGBTQ+ Rights":{q:"What\\u2019s the right approach to LGBTQ+ rights?",opts:[' +
-      '{l:"Full equality protections",d:"Add sexual orientation and gender identity to anti-discrimination laws"},' +
+      '{l:"Expand legal protections",d:"Add sexual orientation and gender identity to anti-discrimination laws"},' +
       '{l:"Balance with religious liberty",d:"Protect LGBTQ+ individuals while preserving faith-based exemptions"},' +
-      '{l:"Current laws are sufficient",d:"Existing legal protections are adequate, no new legislation needed"},' +
+      '{l:"Maintain current laws",d:"Current legal protections are sufficient, no new laws needed"},' +
       '{l:"Parental rights focus",d:"Parents should direct decisions about children\\u2019s healthcare and education"}' +
     "]}," +
     '"Voting & Elections":{q:"What matters most for elections?",opts:[' +
@@ -1432,7 +1468,8 @@ var APP_JS = [
     "isLoading:false,loadPhase:0,loadMsg:'',error:null,geolocating:false," +
     "readingLevel:1," +
     "expanded:{'vi-dates':true,'vi-bring':true},disclaimerDismissed:false,hasVoted:false," +
-    "staleBallot:false" +
+    "staleBallot:false," +
+    "electionExpired:false" +
     "};",
 
   // Shuffled arrays (set once per question display)
@@ -1441,8 +1478,11 @@ var APP_JS = [
   // Easter egg unlocks (persisted in localStorage)
   "var eeChef=!!localStorage.getItem('tx_votes_ee_chef');",
   "var eeCowboy=!!localStorage.getItem('tx_votes_ee_cowboy');",
+  "var eeTrump=!!localStorage.getItem('tx_votes_ee_trump');",
   "var borkBuf='';var borkTimer=null;",
   "var yeehawBuf='';var yeehawTimer=null;",
+  "var trumpBuf='';var trumpTimer=null;",
+  "var secretTaps=0;var secretTapTimer=null;",
 
   // ============ UTILS ============
   "function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;')}",
@@ -1556,8 +1596,30 @@ var APP_JS = [
     "if(localStorage.getItem('atx_votes_profile')&&!localStorage.getItem('tx_votes_profile')){" +
       "var keys=['profile','ballot_republican','ballot_democrat','selected_party','has_voted','lang'];" +
       "for(var i=0;i<keys.length;i++){var v=localStorage.getItem('atx_votes_'+keys[i]);if(v)localStorage.setItem('tx_votes_'+keys[i],v)}" +
+      "for(var i=0;i<keys.length;i++){localStorage.removeItem('atx_votes_'+keys[i])}" +
     "}" +
   "}catch(e){}}());",
+
+  "function showToast(msg){" +
+    "var old=document.querySelector('.toast');if(old)old.remove();" +
+    "var d=document.createElement('div');d.className='toast';d.textContent=msg;" +
+    "document.body.appendChild(d);" +
+    "setTimeout(function(){if(d.parentNode)d.remove()},5000)" +
+  "}",
+
+  "function getStorageUsage(){" +
+    "var total=0;" +
+    "try{" +
+      "for(var i=0;i<localStorage.length;i++){" +
+        "var k=localStorage.key(i);" +
+        "if(k&&k.indexOf('tx_votes_')===0){" +
+          "var v=localStorage.getItem(k);" +
+          "if(v)total+=(k.length+v.length)*2" +
+        "}" +
+      "}" +
+    "}catch(e){}" +
+    "return total" +
+  "}",
 
   "function save(){" +
     "try{" +
@@ -1572,7 +1634,12 @@ var APP_JS = [
     "if(S.demDataUpdatedAt)localStorage.setItem('tx_votes_data_updated_democrat',S.demDataUpdatedAt);" +
     "localStorage.setItem('tx_votes_selected_party',S.selectedParty);" +
     "localStorage.setItem('tx_votes_has_voted',S.hasVoted?'1':'');" +
-    "}catch(e){}" +
+    "if(!localStorage.getItem('tx_votes_election_date'))localStorage.setItem('tx_votes_election_date','2026-03-03');" +
+    "}catch(e){" +
+      "if(e&&e.name==='QuotaExceededError'){" +
+        "showToast(t('Storage full. Some data may not be saved. Visit Profile to clear old data.'))" +
+      "}" +
+    "}" +
   "}",
 
   "function load(){" +
@@ -1604,6 +1671,13 @@ var APP_JS = [
     "if(sp)S.selectedParty=sp;" +
     "S.hasVoted=!!localStorage.getItem('tx_votes_has_voted');" +
     "if(S.repBallot||S.demBallot){S.guideComplete=true}" +
+    // Check if election cycle has expired (>7 days past election date)
+    "var _ed=localStorage.getItem('tx_votes_election_date');" +
+    "if(!_ed&&S.guideComplete){_ed='2026-03-03';localStorage.setItem('tx_votes_election_date',_ed)}" +
+    "if(_ed&&!localStorage.getItem('tx_votes_post_election_dismissed')){" +
+      "var _edMs=new Date(_ed+'T00:00:00').getTime();" +
+      "if(Date.now()-_edMs>7*24*60*60*1000){S.electionExpired=true}" +
+    "}" +
     "}catch(e){}" +
   "}",
 
@@ -1626,7 +1700,7 @@ var APP_JS = [
       "if(S.phase===5)initSortable('sort-qualities','qualities');" +
     "return}" +
     "var h=location.hash||'#/ballot';" +
-    "if(h!==_lastPage){_lastPage=h;trk('page_view',{d1:h});" +
+    "if(h!==_lastPage){_lastPage=h;S._noveltyBannerDismissed=false;trk('page_view',{d1:h});" +
       "if(h.indexOf('#/race/')===0){var _ri=parseInt(h.split('/')[2]);var _races=(S.selectedParty==='democrat'?S.demBallot:S.repBallot);_races=_races&&_races.races||[];trk('race_view',{d1:(_races[_ri]&&_races[_ri].office)||'',d2:(_races[_ri]&&_races[_ri].district)||''})}" +
       "else if(h==='#/cheatsheet'){trk('cheatsheet_view')}" +
     "}" +
@@ -1657,17 +1731,14 @@ var APP_JS = [
   "function renderInterview(){" +
     "if(S.phase===0){location.href='/';return''}" +
     "if(S.phase===8)return renderBuilding();" +
-    "var step=S.phase;var total=7;" +
-    "if(S.phase===4){step=4};" +
-    "var pbar='<div class=\"progress\"><div class=\"progress-fill\" style=\"width:'+(step/total*100)+'%\"></div></div>';" +
     "var back='<button class=\"back-btn\" data-action=\"back\">&larr; Back</button>';" +
-    "if(S.phase===1)return pbar+back+renderTone();" +
-    "if(S.phase===2)return pbar+back+renderIssues();" +
-    "if(S.phase===3)return pbar+back+renderSpectrum();" +
-    "if(S.phase===4)return pbar+back+renderDeepDive();" +
-    "if(S.phase===5)return pbar+back+renderQualities();" +
-    "if(S.phase===6)return pbar+back+renderFreeform();" +
-    "if(S.phase===7)return pbar+back+renderAddress();" +
+    "if(S.phase===1)return back+renderTone();" +
+    "if(S.phase===2)return back+renderIssues();" +
+    "if(S.phase===3)return back+renderSpectrum();" +
+    "if(S.phase===4)return back+renderDeepDive();" +
+    "if(S.phase===5)return back+renderQualities();" +
+    "if(S.phase===6)return back+renderFreeform();" +
+    "if(S.phase===7)return back+renderAddress();" +
     "return'';" +
   "}",
 
@@ -1708,9 +1779,10 @@ var APP_JS = [
   "var llmCompareTab='table';",
   "function renderTone(){" +
     "var opts=TONE_OPTS.slice();" +
-    "if(chefTaps>=5||eeChef||eeCowboy||S.readingLevel>=6){" +
+    "if(chefTaps>=5||eeChef||eeCowboy||eeTrump||S.readingLevel>=6){" +
       "opts.push({v:6,l:'Bork bork bork!',d:'The Swedish Chef from the Muppets explains your ballot'});" +
-      "opts.push({v:7,l:'Howdy, partner',d:'A Texas cowboy explains your ballot, y\\u2019all'})" +
+      "opts.push({v:7,l:'Howdy, partner',d:'A Texas cowboy explains your ballot, y\\u2019all'});" +
+      "opts.push({v:8,l:'Tremendous!',d:'President Trump personally advises you on your ballot. Many people are saying it\\u2019s the best.'})" +
     "}" +
     "var h='<div class=\"phase-header\"><h2 data-action=\"chef-tap\">'+t('Talk to me like...')+'</h2><p>'+t('How should we explain things?')+'</p></div>';" +
     "h+='<div class=\"radio-list\">';" +
@@ -1920,28 +1992,23 @@ var APP_JS = [
     "navigator.geolocation.getCurrentPosition(onPos,onErr,{enableHighAccuracy:true,timeout:15000,maximumAge:60000})" +
   "}",
 
-  // Building / Loading — tug-of-war animation (pure CSS, no timer needed)
-  "function startMascotTimer(){}",
-  "function stopMascotTimer(){}",
-
   "function llmLabel(){var m=window._llmOverride;if(!m)return'Claude';if(m==='chatgpt')return'ChatGPT';if(m==='gemini')return'Gemini';if(m==='grok')return'Grok';return m}",
 
   "function renderBuilding(){" +
-    "var pct=Math.min(100,Math.round((S.loadPhase/5)*100));" +
     "var h='<div class=\"loading\">';" +
     "h+='<div class=\"tug-arena\"><span class=\"tug-left\">\u{1FACF}</span><span class=\"tug-star\">\u2B50</span><span class=\"tug-right\">\u{1F418}</span></div>';" +
     "h+='<h2>'+t('Building Your Guide')+'</h2>';" +
     "if(window._llmOverride){h+='<div style=\"text-align:center;margin-bottom:8px\"><span class=\"badge\" style=\"font-size:12px\">Powered by '+esc(llmLabel())+'</span></div>'}" +
     "h+='<p style=\"min-height:24px\" class=\"loading-msg\" aria-live=\"polite\">'+t(S.loadMsg||'Finding your ballot...')+'</p>';" +
-    "h+='<div class=\"progress\" style=\"max-width:240px;margin:20px auto 16px;height:6px\"><div class=\"progress-fill\" style=\"width:'+pct+'%;transition:width .5s ease\"></div></div>';" +
     "if(S.error){h+='<div class=\"error-box\" style=\"margin-top:16px\"><p>'+t(S.error)+'</p></div><button class=\"btn btn-primary mt-md\" data-action=\"retry\">'+t('Try Again')+'</button>'}" +
     "h+='<div class=\"dots\" style=\"margin-top:20px\">';" +
+    "var _rwb=['red','white','blue'];" +
     "for(var i=0;i<6;i++){" +
-      "var cls='dot';if(i<S.loadPhase)cls+=' dot-done';else if(i===S.loadPhase&&!S.error)cls+=' dot-active';" +
-      "h+='<div class=\"'+cls+'\"></div>'" +
+      "var cls='dot';var cname=_rwb[i%3];" +
+      "if(i<S.loadPhase)cls+=' dot-done-'+cname;else if(i===S.loadPhase&&!S.error)cls+=' dot-active-'+cname;" +
+      "h+='<div class=\"'+cls+'\">\\u2605</div>'" +
     "}" +
     "h+='</div></div>';" +
-    "setTimeout(startMascotTimer,100);" +
     "return h;" +
   "}",
 
@@ -1963,7 +2030,7 @@ var APP_JS = [
     // Election info header
     "var partyLabel=S.selectedParty==='democrat'?t('Democratic'):t('Republican');" +
     "h+='<div class=\"card\" style=\"margin-bottom:16px;text-align:center\">';" +
-    "h+='<div style=\"font-size:18px;font-weight:800\"><span style=\"color:var(--red)\">&starf;</span> Texas '+esc(partyLabel)+' '+t('Primary')+'</div>';" +
+    "h+='<div style=\"font-size:18px;font-weight:800\"><span style=\"color:#fff\">&starf;</span> Texas '+esc(partyLabel)+' '+t('Primary')+'</div>';" +
     "h+='<div style=\"font-size:14px;color:var(--text2);margin-top:2px\">'+t('Tuesday, March 3, 2026')+'</div>';" +
     "if(window._llmOverride){h+='<div style=\"margin-top:6px\"><span class=\"badge\" style=\"font-size:11px;background:var(--card);border:1px solid var(--border)\">Powered by '+esc(llmLabel())+'</span></div>'}" +
     "if(S.districts&&(S.districts.congressional||S.districts.stateSenate||S.districts.stateHouse)){" +
@@ -1986,6 +2053,18 @@ var APP_JS = [
       "h+='<span>'+t('Your ballot data may be outdated. Tap to refresh.')+'</span>';" +
       "h+='</div>'" +
     "}" +
+    // Election cycle expired banner (shown >7 days after election date)
+    "if(S.electionExpired){" +
+      "h+='<div style=\"background:#fff3cd;border:1px solid #ffc107;border-radius:12px;padding:14px 16px;margin-bottom:12px;font-size:14px;color:#664d03\">';" +
+      "h+='<div style=\"display:flex;align-items:center;gap:10px;margin-bottom:10px\">';" +
+      "h+='<span style=\"font-size:18px;flex-shrink:0\">\u{1F4C5}</span>';" +
+      "h+='<span>'+t('The March 3 primary is over. Your ballot data is from the primary election.')+'</span>';" +
+      "h+='</div>';" +
+      "h+='<div style=\"display:flex;gap:8px;flex-wrap:wrap\">';" +
+      "h+='<button data-action=\"election-clear\" style=\"background:var(--blue);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:14px;font-weight:600;cursor:pointer\">'+t('Clear & Start Fresh')+'</button>';" +
+      "h+='<button data-action=\"election-keep\" style=\"background:transparent;color:#664d03;border:1px solid #b8960c;border-radius:8px;padding:8px 16px;font-size:14px;font-weight:600;cursor:pointer\">'+t('Keep for Reference')+'</button>';" +
+      "h+='</div></div>'" +
+    "}" +
     // County coverage info banner
     "if(S.countyBallotAvailable===false&&S.districts&&S.districts.countyFips){" +
       "var _cn=S.districts.countyName||'';" +
@@ -1998,8 +2077,30 @@ var APP_JS = [
     "if(!S.disclaimerDismissed){" +
       "h+='<div class=\"disclaimer\"><span style=\"font-size:20px\">\u26A0\u{FE0F}</span><div>" +
         "<b>'+t('AI-Generated Recommendations')+'</b>" +
-        "'+t('These recommendations are generated by AI based on your stated values. They may contain errors. Always do your own research before voting.')+'" +
+        "'+t('Recommendations are AI-generated from web sources and may contain errors or outdated information. Always verify candidate positions through official sources before voting.')+'" +
       "</div><button data-action=\"dismiss-disclaimer\" style=\"background:none;border:none;font-size:20px;cursor:pointer;padding:4px 8px;color:var(--text2);flex-shrink:0\">&times;</button></div>'" +
+    "}" +
+    // Persistent AI limitations note (always visible)
+    "h+='<div style=\"font-size:12px;color:var(--text2);text-align:center;margin-bottom:12px;line-height:1.4\">'+t('AI Limitations')+': '+t('Recommendations are AI-generated from web sources and may contain errors or outdated information. Always verify candidate positions through official sources before voting.')+'</div>';" +
+    // Novelty tone warning banner (Swedish Chef / Cowboy / Trump)
+    "if(S.readingLevel===6||S.readingLevel===7||S.readingLevel===8){" +
+      "var _ntEmoji=S.readingLevel===6?'\uD83E\uDD7C':S.readingLevel===7?'\uD83E\uDD20':'\uD83C\uDDFA\uD83C\uDDF8';" +
+      "var _ntLabel=S.readingLevel===6?t('Swedish Chef'):S.readingLevel===7?t('Texas Cowboy'):t('President Trump');" +
+      "if(!S._noveltyBannerDismissed){" +
+        "h+='<div style=\"margin-bottom:14px;padding:12px 14px;background:#fef3c7;border:2px solid #f59e0b;border-radius:10px;color:#92400e\">';" +
+        "h+='<div style=\"display:flex;align-items:start;gap:10px\">';" +
+        "h+='<span style=\"font-size:22px;flex-shrink:0;line-height:1\">'+_ntEmoji+'</span>';" +
+        "h+='<div style=\"flex:1;min-width:0\">';" +
+        "h+='<div style=\"font-weight:700;font-size:14px;margin-bottom:4px\">'+t('Novelty tone active')+': '+_ntLabel+'</div>';" +
+        "h+='<div style=\"font-size:13px;line-height:1.4;margin-bottom:10px\">'+t('Tone may affect how pros, cons, and recommendations are worded. For a neutral presentation, switch to standard mode.')+'</div>';" +
+        "h+='<div style=\"display:flex;gap:8px;flex-wrap:wrap\">';" +
+        "h+='<button data-action=\"switch-to-standard\" style=\"background:#92400e;color:#fff;border:none;border-radius:6px;padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer\">'+t('Switch to Standard')+'</button>';" +
+        "h+='<button data-action=\"dismiss-novelty-warning\" style=\"background:transparent;color:#92400e;border:1px solid #d97706;border-radius:6px;padding:7px 14px;font-size:13px;cursor:pointer\">&times;</button>';" +
+        "h+='</div></div></div></div>'" +
+      "}else{" +
+        "var _ntMsg=S.readingLevel===6?'Viewing in Swedish Chef mode. Switch to Standard for neutral presentation.':S.readingLevel===7?'Viewing in Cowboy mode. Switch to Standard for neutral presentation.':'Viewing in Trump mode. Switch to Standard for neutral presentation.';" +
+        "h+='<div style=\"font-size:12px;color:#a16207;text-align:center;margin-bottom:12px;padding:8px 12px;background:rgba(161,98,7,.06);border-radius:8px;line-height:1.4;cursor:pointer\" data-action=\"show-novelty-warning\">'+_ntEmoji+' '+t(_ntMsg)+'</div>'" +
+      "}" +
     "}" +
     // Actions
     "h+='<div class=\"actions\">';" +
@@ -2015,7 +2116,7 @@ var APP_JS = [
     "h+='</div>';" +
     // Key races
     "if(keyRaces.length){" +
-      "h+='<div class=\"section-head\">\u2B50 '+t('Key Races')+'</div>';" +
+      "h+='<div class=\"section-head\">'+t('Key Races')+'</div>';" +
       "for(var i=0;i<keyRaces.length;i++)h+=renderRaceCard(keyRaces[i],races)" +
     "}" +
     // Other contested
@@ -2041,17 +2142,20 @@ var APP_JS = [
           "h+='<img src=\"/headshots/'+slug+'.jpg\" alt=\"\" style=\"width:100%;height:100%;object-fit:cover;border-radius:50%\" onerror=\"if(this.src.indexOf(\\'.jpg\\')>0){this.src=this.src.replace(\\'.jpg\\',\\'.png\\')}else{this.style.display=\\'none\\';this.nextSibling.style.display=\\'\\';}\">';" +
           "h+='<span style=\"display:none\">'+initial+'</span></div>'" +
         "}" +
-        "h+='<div><div style=\"font-size:14px;color:var(--text2)\">'+esc(r.office)+(r.district?' \\u2014 '+esc(r.district):'')+'</div>" +
+        "h+='<div style=\"min-width:0;flex:1\"><div style=\"font-size:14px;color:var(--text2)\">'+esc(r.office)+(r.district?' \\u2014 '+esc(r.district):'')+'</div>" +
           "<div style=\"font-size:16px;font-weight:600;margin-top:2px\">'+esc(name)+'</div></div>';" +
         "h+='</div></div>'" +
       "}" +
     "}" +
     // Footer links
     "h+='<div style=\"text-align:center;padding:24px 0 8px;font-size:13px;color:var(--text2)\">';" +
-    "h+='<a href=\"/nonpartisan\" target=\"_blank\" style=\"color:var(--text2)\">'+t('Nonpartisan by Design')+'</a>';" +
+    "h+='<a href=\"/\" style=\"color:var(--text2)\">'+t('Texas Votes')+'</a>';" +
     "h+=' &middot; ';" +
-    "h+='<a href=\"/privacy\" target=\"_blank\" style=\"color:var(--text2)\">'+t('Privacy Policy')+'</a>';" +
-    "h+='<br><span style=\"margin-top:6px;display:inline-block\"><span style=\"color:var(--red)\">&starf;</span> Built in Texas &middot; <a href=\"mailto:howdy@txvotes.app\" style=\"color:var(--text2)\">howdy@txvotes.app</a> &middot; <span data-action=\"debug-tap\" style=\"cursor:default;-webkit-user-select:none;user-select:none\">v'+APP_VERSION+'</span></span>';" +
+    "h+='<a href=\"/how-it-works\" target=\"_blank\" style=\"color:var(--text2)\">'+t('How It Works')+'</a>';" +
+    "h+=' &middot; ';" +
+    "h+='<a href=\"/privacy\" target=\"_blank\" style=\"color:var(--text2)\">'+t('Privacy')+'</a>';" +
+    "h+='<br><span style=\"margin-top:6px;display:inline-block\"><span style=\"color:#fff\">&starf;</span> '+t('Built in Texas')+' &middot; <a href=\"mailto:howdy@txvotes.app\" style=\"color:var(--text2)\">howdy@txvotes.app</a></span>';" +
+    "h+='<p data-action=\"secret-tap\" style=\"font-size:12px;color:var(--text2);margin-top:8px;cursor:default;-webkit-user-select:none;user-select:none\">'+t('Powered by Claude (Anthropic)')+'</p>';" +
     "h+='</div>';" +
     "return h;" +
   "}",
@@ -2070,7 +2174,7 @@ var APP_JS = [
     "var partyCls=S.selectedParty==='democrat'?'cs-party-dem':'cs-party-rep';" +
     // Header
     "var h='<div class=\"cs-header\">';" +
-    "h+='<h2><span style=\"color:var(--red)\">&starf;</span> '+t('Your Ballot Cheat Sheet')+'</h2>';" +
+    "h+='<h2><span style=\"color:#fff\">&starf;</span> '+t('Your Ballot Cheat Sheet')+'</h2>';" +
     "if(addr&&addr.street){h+='<div class=\"cs-meta\">'+esc(addr.street)+(addr.city?', '+esc(addr.city):'')+' '+esc(addr.zip||'')+'</div>'}" +
     "h+='<span class=\"cs-party '+partyCls+'\">'+esc(partyName)+' '+t('Primary')+'</span>';" +
     "h+='<div class=\"cs-meta\">'+t('March 3, 2026')+'</div>';" +
@@ -2123,7 +2227,7 @@ var APP_JS = [
     "}" +
     // Legend & footer
     "h+='<div class=\"cs-legend\"><span>\u2B50 '+t('= Key race')+'</span><span>\u26A0\uFE0F '+t('AI-generated \\u2014 do your own research')+'</span></div>';" +
-    "h+='<div class=\"cs-footer\"><span style=\"color:var(--red)\">&starf;</span> '+t('Built with Texas Votes')+' &middot; txvotes.app</div>';" +
+    "h+='<div class=\"cs-footer\"><span style=\"color:#fff\">&starf;</span> '+t('Built with Texas Votes')+' &middot; txvotes.app</div>';" +
     // Party switcher + back link (hidden in print)
     "h+=renderPartySwitcher();" +
     "h+='<div style=\"text-align:center;margin-top:8px\" class=\"cs-actions\"><button class=\"btn btn-secondary\" data-action=\"nav\" data-to=\"#/ballot\">&larr; '+t('Back to Ballot')+'</button></div>';" +
@@ -2162,7 +2266,7 @@ var APP_JS = [
     "var activeCands=race.candidates.filter(function(c){return !c.withdrawn});" +
     "h+='<div style=\"font-size:13px;color:var(--text2);margin-top:4px\">'+activeCands.length+' '+(activeCands.length!==1?t('candidates'):t('candidate'))+'</div>';" +
     "var colors=['#4A90D9','#D95B43','#5B8C5A','#8E6BBF','#D4A843','#C75B8F','#5BBFC7','#7B8D6F','#D97B43','#6B8FBF'];" +
-    "h+='<div style=\"display:flex;gap:4px;margin-top:6px\">';" +
+    "h+='<div style=\"display:flex;flex-wrap:wrap;gap:4px;margin-top:6px\">';" +
     "for(var j=0;j<activeCands.length;j++){" +
       "var c=activeCands[j];" +
       "var slug=c.name.toLowerCase().replace(/[^a-z0-9 -]/g,'').replace(/\\s+/g,'-');" +
@@ -2247,6 +2351,12 @@ var APP_JS = [
     "var race=races[idx];if(!race)return '<p>Race not found</p>';" +
     "var candidates=shuffle(race.candidates.filter(function(c){return !c.withdrawn}));" +
     "var h='<button class=\"back-btn\" data-action=\"nav\" data-to=\"#/ballot\">&larr; '+t('Back to Ballot')+'</button>';" +
+    // Novelty tone compact warning on race detail
+    "if(S.readingLevel===6||S.readingLevel===7||S.readingLevel===8){" +
+      "var _rdEmoji=S.readingLevel===6?'\uD83E\uDD7C':S.readingLevel===7?'\uD83E\uDD20':'\uD83C\uDDFA\uD83C\uDDF8';" +
+      "var _rdMsg=S.readingLevel===6?'Viewing in Swedish Chef mode. Switch to Standard for neutral presentation.':S.readingLevel===7?'Viewing in Cowboy mode. Switch to Standard for neutral presentation.':'Viewing in Trump mode. Switch to Standard for neutral presentation.';" +
+      "h+='<div style=\"font-size:12px;color:#92400e;margin-bottom:12px;padding:8px 12px;background:#fef3c7;border:1.5px solid #f59e0b;border-radius:8px;line-height:1.4;display:flex;align-items:center;gap:8px;flex-wrap:wrap\">'+_rdEmoji+' '+t(_rdMsg)+' <a href=\"#\" data-action=\"switch-to-standard\" style=\"color:#92400e;font-weight:600;text-decoration:underline;white-space:nowrap\">'+t('Switch to Standard')+'</a></div>'" +
+    "}" +
     "h+='<h2 style=\"font-size:22px;font-weight:800;margin-bottom:4px\">'+esc(race.office)+'</h2>';" +
     "if(race.district)h+='<div style=\"font-size:15px;color:var(--text2);margin-bottom:16px\">'+esc(race.district)+'</div>';" +
     "else h+='<div style=\"margin-bottom:16px\"></div>';" +
@@ -2301,7 +2411,7 @@ var APP_JS = [
       "h+='<img src=\"/headshots/'+slug+'.jpg\" alt=\"\" style=\"width:100%;height:100%;object-fit:cover;border-radius:50%\" onerror=\"if(this.src.indexOf(\\'.jpg\\')>0){this.src=this.src.replace(\\'.jpg\\',\\'.png\\')}else{this.style.display=\\'none\\';this.nextSibling.style.display=\\'\\';}\">';" +
       "h+='<span style=\"display:none\">'+initial+'</span></div>';" +
       "h+='<div style=\"flex:1;min-width:0\">';" +
-      "h+='<div style=\"display:flex;justify-content:space-between;align-items:flex-start\">';" +
+      "h+='<div style=\"display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:4px\">';" +
       "h+='<div class=\"cand-name\">'+esc(c.name)+'</div>';" +
       "h+='<div class=\"cand-tags\">';" +
       "if(c.isIncumbent)h+='<span class=\"badge badge-blue\">'+t('Incumbent')+'</span>';" +
@@ -2348,7 +2458,8 @@ var APP_JS = [
       "h+='<div class=\"profile-summary\">\"'+esc(S.summary)+'\"</div>';" +
       "h+='<div style=\"text-align:center;margin-bottom:16px\">';" +
       "if(S.regenerating){h+='<span style=\"font-size:13px;color:var(--text2)\">'+t('Regenerating...')+'</span>'}" +
-      "else{h+='<button class=\"btn\" style=\"font-size:13px;padding:6px 14px\" data-action=\"regen-summary\">\\u2728 '+t('Regenerate Summary')+'</button>'}" +
+      "else{h+='<button class=\"btn btn-secondary\" style=\"font-size:13px;padding:6px 14px;margin-right:8px\" data-action=\"share-profile\">\\uD83D\\uDCE4 '+t('Share')+'</button>';" +
+      "h+='<button class=\"btn\" style=\"font-size:13px;padding:6px 14px\" data-action=\"regen-summary\">\\u2728 '+t('Regenerate Summary')+'</button>'}" +
       "h+='</div>'" +
     "}" +
     "h+='<div class=\"card\">';" +
@@ -2386,7 +2497,7 @@ var APP_JS = [
     // Send Feedback + Credits
     "h+='<div class=\"card\" style=\"margin-top:16px;text-align:center\">';" +
     "h+='<a href=\"mailto:howdy@txvotes.app\" style=\"font-size:15px;font-weight:600\">'+t('Send Feedback')+' &rarr;</a>';" +
-    "h+='<p style=\"font-size:13px;color:var(--text2);margin-top:8px\">'+t('Powered by Claude (Anthropic)')+'</p>';" +
+    "h+='<p data-action=\"secret-tap\" style=\"font-size:13px;color:var(--text2);margin-top:8px;cursor:default;-webkit-user-select:none;user-select:none\">'+t('Powered by Claude (Anthropic)')+'</p>';" +
     "h+='</div>';" +
     // Language toggle
     "h+='<div class=\"card\" style=\"margin-top:16px;text-align:center\">';" +
@@ -2398,15 +2509,15 @@ var APP_JS = [
     // Reading level slider (extends with easter eggs)
     "h+='<div class=\"card\" style=\"margin-top:16px\">';" +
     "h+='<div style=\"font-size:15px;font-weight:600;margin-bottom:12px\">\u{1F4D6} '+t('Reading Level')+'</div>';" +
-    "var rlMap=[1,3,4];if(eeChef)rlMap.push(6);if(eeCowboy)rlMap.push(7);" +
-    "var rlNames={1:t('Simple'),3:t('Standard'),4:t('Detailed'),6:'\\uD83E\\uDD7C Bork Bork Bork!',7:'\\uD83E\\uDD20 Howdy Partner!'};" +
+    "var rlMap=[1,3,4];if(eeChef)rlMap.push(6);if(eeCowboy)rlMap.push(7);if(eeTrump)rlMap.push(8);" +
+    "var rlNames={1:t('Simple'),3:t('Standard'),4:t('Detailed'),6:'\\uD83E\\uDD7C Bork Bork Bork!',7:'\\uD83E\\uDD20 Howdy Partner!',8:'\\uD83C\\uDDFA\\uD83C\\uDDF8 Tremendous!'};" +
     "var rlIdx=rlMap.indexOf(S.readingLevel);if(rlIdx<0)rlIdx=1;" +
     "var rlMax=rlMap.length-1;" +
-    "h+='<input type=\"range\" min=\"0\" max=\"'+rlMax+'\" value=\"'+rlIdx+'\" data-action=\"set-reading-level\" style=\"width:100%;accent-color:'+(S.readingLevel===6?'#f59e0b':S.readingLevel===7?'#a16207':'var(--blue)')+'\">';" +
+    "h+='<input type=\"range\" min=\"0\" max=\"'+rlMax+'\" value=\"'+rlIdx+'\" data-action=\"set-reading-level\" style=\"width:100%;accent-color:'+(S.readingLevel===6?'#f59e0b':S.readingLevel===7?'#a16207':S.readingLevel===8?'#b91c1c':'var(--blue)')+'\">';" +
     "h+='<div style=\"display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-top:4px\">';" +
     "h+='<span>'+t('Simple')+'</span>';" +
     "h+='<span style=\"font-weight:600;color:'+(S.readingLevel>=6?'#a16207':'var(--text1)')+'\">'+(rlNames[S.readingLevel]||t('Standard'))+'</span>';" +
-    "h+='<span>'+(eeCowboy?'\\uD83E\\uDD20':(eeChef?'\\uD83E\\uDD7C':t('Detailed')))+'</span>';" +
+    "h+='<span>'+(eeTrump?'\\uD83C\\uDDFA\\uD83C\\uDDF8':(eeCowboy?'\\uD83E\\uDD20':(eeChef?'\\uD83E\\uDD7C':t('Detailed'))))+'</span>';" +
     "h+='</div>';" +
     "if(S.guideComplete&&!S.isLoading){h+='<button class=\"btn btn-primary\" style=\"width:100%;margin-top:12px\" data-action=\"reprocess-guide\">'+t('Reprocess Guide')+'</button>'}" +
     "h+='</div>';" +
@@ -2648,7 +2759,7 @@ var APP_JS = [
     "var election=new Date(2026,2,3);" + // March 3, 2026
     "var now=new Date();" +
     "var diff=Math.ceil((election-now)/(1000*60*60*24));" +
-    "var h='<h2 style=\"font-size:22px;font-weight:800;margin-bottom:16px\"><span style=\"color:var(--red)\">&starf;</span> '+t('Voting Info')+'</h2>';" +
+    "var h='<h2 style=\"font-size:22px;font-weight:800;margin-bottom:16px\"><span style=\"color:#fff\">&starf;</span> '+t('Voting Info')+'</h2>';" +
     // Countdown card
     "h+='<div class=\"card\" style=\"text-align:center;margin-bottom:16px\">';" +
     "var isEarly=diff>0;" +
@@ -2822,7 +2933,7 @@ var APP_JS = [
     "h+='<a href=\"/nonpartisan\" target=\"_blank\" style=\"color:var(--text2)\">'+t('Nonpartisan by Design')+'</a>';" +
     "h+=' &middot; ';" +
     "h+='<a href=\"/privacy\" target=\"_blank\" style=\"color:var(--text2)\">'+t('Privacy Policy')+'</a>';" +
-    "h+='<br><span style=\"margin-top:6px;display:inline-block\"><span style=\"color:var(--red)\">&starf;</span> Built in Texas &middot; <a href=\"mailto:howdy@txvotes.app\" style=\"color:var(--text2)\">howdy@txvotes.app</a></span>';" +
+    "h+='<br><span style=\"margin-top:6px;display:inline-block\"><span style=\"color:#fff\">&starf;</span> Built in Texas &middot; <a href=\"mailto:howdy@txvotes.app\" style=\"color:var(--text2)\">howdy@txvotes.app</a></span>';" +
     "h+='</div>';" +
     "return h;" +
   "}",
@@ -2895,17 +3006,43 @@ var APP_JS = [
         "S.phase=0;S.issues=[];S._pickedIssues=0;S.spectrum=null;S.policyViews={};S.qualities=[];S._pickedQuals=0;S.freeform='';S.readingLevel=1;" +
         "S.address={street:'',city:'',state:'TX',zip:''};S.ddIndex=0;S.ddQuestions=[];S.countyInfo=null;S.countyBallotAvailable=null;" +
         "S.repBallot=null;S.demBallot=null;S.selectedParty='republican';" +
-        "S.guideComplete=false;S.summary=null;S.districts=null;S.expanded={};S.addressError=null;S.verifyingAddress=false;" +
+        "S.guideComplete=false;S.summary=null;S.districts=null;S.expanded={};S.addressError=null;S.verifyingAddress=false;S.electionExpired=false;" +
         "shuffledSpectrum=null;shuffledDD={};" +
         "try{localStorage.removeItem('tx_votes_profile');localStorage.removeItem('tx_votes_ballot_republican');" +
         "localStorage.removeItem('tx_votes_ballot_democrat');localStorage.removeItem('tx_votes_selected_party');localStorage.removeItem('tx_votes_has_voted');localStorage.removeItem('tx_votes_sharePromptSeen');" +
+        "localStorage.removeItem('tx_votes_data_updated_republican');localStorage.removeItem('tx_votes_data_updated_democrat');" +
+        "localStorage.removeItem('tx_votes_llm_compare_claude');localStorage.removeItem('tx_votes_llm_compare_chatgpt');localStorage.removeItem('tx_votes_llm_compare_gemini');localStorage.removeItem('tx_votes_llm_compare_grok');" +
+        "localStorage.removeItem('tx_votes_election_date');localStorage.removeItem('tx_votes_post_election_dismissed');" +
         "localStorage.removeItem('atx_votes_profile');localStorage.removeItem('atx_votes_ballot_republican');" +
         "localStorage.removeItem('atx_votes_ballot_democrat');localStorage.removeItem('atx_votes_selected_party');localStorage.removeItem('atx_votes_has_voted')}catch(e){}" +
         "location.hash='#/';render()" +
       "}" +
     "}" +
     "else if(action==='dismiss-disclaimer'){S.disclaimerDismissed=true;render()}" +
+    "else if(action==='dismiss-novelty-warning'){S._noveltyBannerDismissed=true;render()}" +
+    "else if(action==='show-novelty-warning'){S._noveltyBannerDismissed=false;render()}" +
+    "else if(action==='switch-to-standard'){S.readingLevel=3;S._noveltyBannerDismissed=false;save();reprocessGuide()}" +
     "else if(action==='refresh-ballots'){S.staleBallot=false;refreshBallots();render()}" +
+    "else if(action==='election-clear'){" +
+      "S.phase=0;S.issues=[];S._pickedIssues=0;S.spectrum=null;S.policyViews={};S.qualities=[];S._pickedQuals=0;S.freeform='';S.readingLevel=1;" +
+      "S.address={street:'',city:'',state:'TX',zip:''};S.ddIndex=0;S.ddQuestions=[];S.countyInfo=null;S.countyBallotAvailable=null;" +
+      "S.repBallot=null;S.demBallot=null;S.selectedParty='republican';" +
+      "S.guideComplete=false;S.summary=null;S.districts=null;S.expanded={};S.addressError=null;S.verifyingAddress=false;S.electionExpired=false;" +
+      "shuffledSpectrum=null;shuffledDD={};" +
+      "try{localStorage.removeItem('tx_votes_profile');localStorage.removeItem('tx_votes_ballot_republican');" +
+      "localStorage.removeItem('tx_votes_ballot_democrat');localStorage.removeItem('tx_votes_selected_party');localStorage.removeItem('tx_votes_has_voted');localStorage.removeItem('tx_votes_sharePromptSeen');" +
+      "localStorage.removeItem('tx_votes_data_updated_republican');localStorage.removeItem('tx_votes_data_updated_democrat');" +
+      "localStorage.removeItem('tx_votes_llm_compare_claude');localStorage.removeItem('tx_votes_llm_compare_chatgpt');localStorage.removeItem('tx_votes_llm_compare_gemini');localStorage.removeItem('tx_votes_llm_compare_grok');" +
+      "localStorage.removeItem('tx_votes_election_date');localStorage.removeItem('tx_votes_post_election_dismissed');" +
+      "localStorage.removeItem('atx_votes_profile');localStorage.removeItem('atx_votes_ballot_republican');" +
+      "localStorage.removeItem('atx_votes_ballot_democrat');localStorage.removeItem('atx_votes_selected_party');localStorage.removeItem('atx_votes_has_voted')}catch(e){}" +
+      "location.hash='#/';render()" +
+    "}" +
+    "else if(action==='election-keep'){" +
+      "S.electionExpired=false;" +
+      "try{localStorage.setItem('tx_votes_post_election_dismissed','1')}catch(e){}" +
+      "render()" +
+    "}" +
     "else if(action==='set-lang'){trk('lang_toggle',{d1:el.dataset.value});setLang(el.dataset.value)}" +
     "else if(action==='mark-voted'){S.hasVoted=true;trk('i_voted');save();render();launchConfetti();setTimeout(showSharePrompt,1500)}" +
     "else if(action==='unvote'){S.hasVoted=false;save();render()}" +
@@ -2915,9 +3052,11 @@ var APP_JS = [
     "else if(action==='share-app'){trk('share_app');shareApp()}" +
     "else if(action==='share-race'){trk('share_race',{d1:el.dataset.idx});shareRace(parseInt(el.dataset.idx))}" +
     "else if(action==='report-issue'){trk('report_issue',{d1:el.dataset.candidate});showReportModal(el.dataset.candidate,el.dataset.race)}" +
+    "else if(action==='share-profile'){trk('share_profile');shareProfileSummary()}" +
     "else if(action==='regen-summary'){regenerateSummary()}" +
     "else if(action==='reprocess-guide'){reprocessGuide()}" +
     "else if(action==='debug-tap'){debugTaps++;if(debugTaps>=5){debugTaps=0;location.hash='#/debug/compare'}}" +
+    "else if(action==='secret-tap'){clearTimeout(secretTapTimer);secretTaps++;secretTapTimer=setTimeout(function(){secretTaps=0},3000);if(secretTaps>=7){secretTaps=0;showSecretMenu()}}" +
     "else if(action==='llm-generate'){llmGenerate(el.dataset.llm)}" +
     "else if(action==='llm-tab'){llmCompareTab=el.dataset.tab;render()}" +
     "else if(action==='llm-clear'){" +
@@ -2930,7 +3069,7 @@ var APP_JS = [
   // Range input handler for reading level slider
   "document.getElementById('app').addEventListener('input',function(e){" +
     "var el=e.target;if(!el.dataset||!el.dataset.action)return;" +
-    "if(el.dataset.action==='set-reading-level'){var rlMap=[1,3,4];if(eeChef)rlMap.push(6);if(eeCowboy)rlMap.push(7);S.readingLevel=rlMap[parseInt(el.value)]||3;save();render()}" +
+    "if(el.dataset.action==='set-reading-level'){var rlMap=[1,3,4];if(eeChef)rlMap.push(6);if(eeCowboy)rlMap.push(7);if(eeTrump)rlMap.push(8);S.readingLevel=rlMap[parseInt(el.value)]||3;save();render()}" +
   "});",
 
   // Tab bar click handler (tabs live outside #app)
@@ -2951,10 +3090,10 @@ var APP_JS = [
     "}" +
   "});",
 
-  // Easter egg: type 'bork' on profile page to unlock Swedish Chef (tone 6)
+  // Easter egg: type 'bork' on profile/ballot page to unlock Swedish Chef (tone 6)
   "document.addEventListener('keydown',function(e){" +
     "if(eeChef)return;" +
-    "if(location.hash!=='#/profile')return;" +
+    "var h=location.hash||'#/ballot';if(h!=='#/profile'&&h!=='#/ballot')return;" +
     "if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;" +
     "clearTimeout(borkTimer);" +
     "borkBuf+=e.key.toLowerCase();" +
@@ -2967,19 +3106,35 @@ var APP_JS = [
     "}" +
   "});",
 
-  // Easter egg: type 'yeehaw' on profile page to unlock Texas Cowboy (tone 7)
+  // Easter egg: type 'yeehaw' or 'cowboy' on profile/ballot page to unlock Texas Cowboy (tone 7)
   "document.addEventListener('keydown',function(e){" +
     "if(eeCowboy)return;" +
-    "if(location.hash!=='#/profile')return;" +
+    "var h=location.hash||'#/ballot';if(h!=='#/profile'&&h!=='#/ballot')return;" +
     "if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;" +
     "clearTimeout(yeehawTimer);" +
     "yeehawBuf+=e.key.toLowerCase();" +
     "yeehawTimer=setTimeout(function(){yeehawBuf=''},2000);" +
-    "if(yeehawBuf.indexOf('yeehaw')!==-1){" +
+    "if(yeehawBuf.indexOf('yeehaw')!==-1||yeehawBuf.indexOf('cowboy')!==-1){" +
       "eeCowboy=true;localStorage.setItem('tx_votes_ee_cowboy','1');" +
       "yeehawBuf='';emojiBurst('\\uD83E\\uDD20',25);" +
       "if(navigator.vibrate)navigator.vibrate([100,50,100,50,200]);" +
       "S.readingLevel=7;save();reprocessGuide()" +
+    "}" +
+  "});",
+
+  // Easter egg: type 'trump' or 'maga' on profile/ballot page to unlock President Trump (tone 8)
+  "document.addEventListener('keydown',function(e){" +
+    "if(eeTrump)return;" +
+    "var h=location.hash||'#/ballot';if(h!=='#/profile'&&h!=='#/ballot')return;" +
+    "if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;" +
+    "clearTimeout(trumpTimer);" +
+    "trumpBuf+=e.key.toLowerCase();" +
+    "trumpTimer=setTimeout(function(){trumpBuf=''},2000);" +
+    "if(trumpBuf.indexOf('trump')!==-1||trumpBuf.indexOf('maga')!==-1){" +
+      "eeTrump=true;localStorage.setItem('tx_votes_ee_trump','1');" +
+      "trumpBuf='';emojiBurst('\\uD83C\\uDDFA\\uD83C\\uDDF8',25);" +
+      "if(navigator.vibrate)navigator.vibrate([200,50,200,50,400]);" +
+      "S.readingLevel=8;save();reprocessGuide()" +
     "}" +
   "});",
 
@@ -3021,6 +3176,55 @@ var APP_JS = [
   "window.addEventListener('hashchange',render);",
 
   // ============ BUILD GUIDE ============
+  // Funny rotating messages for easter egg modes during loading
+  "var chefLoadMsgs=[" +
+    "'Chöpping zee Repoobleecun bellet... bork bork!'," +
+    "'Steering zee Democret soooop...'," +
+    "'Meexing zee ingredients... bork!'," +
+    "'Bekeeng zee vooting gueedee...'," +
+    "'Fleepping zee pelitikul pencekeees...'," +
+    "'Tessing zee cundeedet sooffl\\u00E9...'," +
+    "'Seerving up-a zee recoommendeshuns!'," +
+    "'Bork bork bork! Almost dun!'," +
+    "'Chekkeeng zee polls... vhet-a mess!'," +
+    "'Merinating zee bellet in speshul sauce...'," +
+    "'Gredding zee cheeses... I meen cundeedets!'," +
+    "'Vhere-a deed I put zee spatoola?'" +
+  "];",
+  "var cowboyLoadMsgs=[" +
+    "'Wranglin\\u2019 up them Republican candidates...'," +
+    "'Roundin\\u2019 up the Democrat herd...'," +
+    "'Checkin\\u2019 the brands on these here politicians...'," +
+    "'Ridin\\u2019 the range for your ballot, partner...'," +
+    "'Tyin\\u2019 up your votin\\u2019 guide, yeehaw...'," +
+    "'Askin\\u2019 the ol\\u2019 campfire oracle...'," +
+    "'Dustin\\u2019 off the ballot box...'," +
+    "'Saddlin\\u2019 up your recommendations...'," +
+    "'Hitchin\\u2019 the horses to the votin\\u2019 wagon...'," +
+    "'Brewin\\u2019 some cowboy coffee while we wait...'," +
+    "'Consultin\\u2019 the tumbleweeds for wisdom...'," +
+    "'Hot diggity! Almost got yer guide ready...'" +
+  "];",
+  "var trumpLoadMsgs=[" +
+    "'Nobody knows ballots better than me. NOBODY. Believe me...'," +
+    "'Making your voting guide GREAT again \\u2014 maybe the greatest guide ever made...'," +
+    "'Looking at the candidates \\u2014 some tremendous people, some not so tremendous...'," +
+    "'The Democrats? We\\u2019re checking them too. We\\u2019re very fair. Very very fair...'," +
+    "'A lot of very smart people are saying this is the best voting guide in history...'," +
+    "'We\\u2019re WINNING \\u2014 your ballot is almost ready. You\\u2019re going to love it...'," +
+    "'The fake news said you couldn\\u2019t get a guide this good. WRONG! So wrong...'," +
+    "'We\\u2019re making deals on your ballot \\u2014 the BEST deals, like nobody has ever seen...'," +
+    "'Your guide is going to be so good, you\\u2019ll be tired of winning. Actually no, you won\\u2019t...'," +
+    "'Nobody \\u2014 and I mean NOBODY \\u2014 builds voting guides like us...'," +
+    "'Almost done. It\\u2019s going to be TREMENDOUS. Frankly, incredible...'," +
+    "'I\\u2019ve looked at a lot of ballots \\u2014 a LOT \\u2014 and this one is very interesting...'," +
+    "'Many people are calling me \\u2014 sir, they say, sir, this guide is amazing...'," +
+    "'Texas! What a state. I won Texas in a LANDSLIDE. Everyone remembers...'," +
+    "'The algorithms are working very hard \\u2014 harder than Congress, I can tell you that...'," +
+    "'We\\u2019re draining the swamp of bad ballot advice \\u2014 believe me...'," +
+    "'I\\u2019ve been told by very important people that this guide is a masterpiece...'," +
+    "'Your ballot, your choice \\u2014 but I\\u2019m going to help you make the RIGHT choice. HUGE...'" +
+  "];",
   "function lm(key){" +
     "var chef={" +
       "'Finding your ballot...':'Looking for zee ballot, bork bork bork!'," +
@@ -3036,8 +3240,16 @@ var APP_JS = [
       "'Researching Democrats...':'Moseyin\\u2019 through Democrat country...'," +
       "'Finalizing recommendations...':'Puttin\\u2019 the final brand on yer guide...'" +
     "};" +
+    "var trump={" +
+      "'Finding your ballot...':'Finding your ballot \\u2014 nobody finds ballots faster, believe me...'," +
+      "'Researching candidates...':'Checking out the candidates \\u2014 I know them all, TREMENDOUS people...'," +
+      "'Researching Republicans...':'Looking at the Republicans \\u2014 the BEST party, everybody knows it...'," +
+      "'Researching Democrats...':'Investigating the Democrats \\u2014 we\\u2019re being very fair, very very fair...'," +
+      "'Finalizing recommendations...':'Finishing your guide \\u2014 it\\u2019s going to be INCREDIBLE, frankly...'" +
+    "};" +
     "if(S.readingLevel===6)return chef[key]||t(key);" +
     "if(S.readingLevel===7)return cowboy[key]||t(key);" +
+    "if(S.readingLevel===8)return trump[key]||t(key);" +
     "return t(key)" +
   "}",
   "function buildGuide(){" +
@@ -3074,8 +3286,13 @@ var APP_JS = [
       // Rotate messages while both requests are in-flight
       "var repResult=null,demResult=null;" +
       "var msgs=demFirst?[lm('Researching Democrats...'),lm('Researching Republicans...')]:['Researching Republicans...','Researching Democrats...'].map(lm);" +
-      "var mi=0;S.loadPhase=3;S.loadMsg=msgs[0];render();" +
-      "var rotateTimer=setInterval(function(){mi=1-mi;S.loadPhase=Math.max(S.loadPhase,mi===0?3:4);S.loadMsg=msgs[mi];render()},3000);" +
+      // Easter egg modes: use funny rotating arrays instead of just 2 party messages
+      "var funnyMsgs=S.readingLevel===6?chefLoadMsgs:S.readingLevel===7?cowboyLoadMsgs:S.readingLevel===8?trumpLoadMsgs:null;" +
+      "var mi=0;S.loadPhase=3;S.loadMsg=funnyMsgs?funnyMsgs[0]:msgs[0];render();" +
+      "var rotateTimer=setInterval(function(){" +
+        "if(funnyMsgs){mi=(mi+1)%funnyMsgs.length;S.loadPhase=Math.min(Math.max(S.loadPhase,3),4);S.loadMsg=funnyMsgs[mi]}" +
+        "else{mi=1-mi;S.loadPhase=Math.max(S.loadPhase,mi===0?3:4);S.loadMsg=msgs[mi]}" +
+        ";render()},funnyMsgs?2500:3000);" +
       "var results=await Promise.allSettled([repP,demP]);" +
       "clearInterval(rotateTimer);" +
       "repResult=results[0].status==='fulfilled'?results[0].value:null;" +
@@ -3105,21 +3322,77 @@ var APP_JS = [
       "if(S.selectedParty==='republican'&&!S.repBallot)S.selectedParty='democrat';" +
       "if(S.selectedParty==='democrat'&&!S.demBallot)S.selectedParty='republican';" +
       // Save and show
-      "S.guideComplete=true;S.isLoading=false;stopMascotTimer();" +
+      "S.guideComplete=true;S.isLoading=false;" +
       "trk('guide_complete',{ms:Date.now()-(S._iStart||Date.now())});" +
       "save();" +
       "await new Promise(function(r){setTimeout(r,500)});" +
       "location.hash='#/ballot';render();" +
     "}catch(err){" +
       "trk('guide_error',{d1:(err.message||'unknown').slice(0,128)});" +
-      "stopMascotTimer();S.error=err.message||'Something went wrong. Please try again.';render();" +
+      "S.error=err.message||'Something went wrong. Please try again.';render();" +
     "}" +
+  "}",
+
+  // ============ SECRET MENU (mobile-friendly easter egg trigger) ============
+  "function showSecretMenu(){" +
+    "var ov=document.createElement('div');" +
+    "ov.id='secret-menu-overlay';" +
+    "ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:99998;display:flex;align-items:center;justify-content:center;padding:24px;animation:fadeIn .2s ease';" +
+    "var h='<div style=\"background:var(--card);border-radius:16px;padding:24px;max-width:320px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)\">';" +
+    "h+='<div style=\"font-size:28px;margin-bottom:8px\">\\uD83E\\uDD2B</div>';" +
+    "h+='<h3 style=\"font-size:18px;font-weight:800;margin-bottom:4px\">Secret Menu</h3>';" +
+    "h+='<p style=\"font-size:13px;color:var(--text2);margin-bottom:16px\">You found the hidden modes!</p>';" +
+    "h+='<div data-action=\"secret-unlock\" data-mode=\"chef\" style=\"display:flex;align-items:center;gap:12px;padding:14px;background:rgba(245,158,11,.08);border:2px solid rgba(245,158,11,.3);border-radius:12px;margin-bottom:10px;cursor:pointer;-webkit-tap-highlight-color:transparent\">';" +
+    "h+='<span style=\"font-size:32px\">\\uD83E\\uDD7C</span>';" +
+    "h+='<div style=\"text-align:left\"><div style=\"font-size:15px;font-weight:700\">Swedish Chef</div><div style=\"font-size:12px;color:var(--text2)\">Bork bork bork! The Muppets explain your ballot</div></div>';" +
+    "h+='</div>';" +
+    "h+='<div data-action=\"secret-unlock\" data-mode=\"cowboy\" style=\"display:flex;align-items:center;gap:12px;padding:14px;background:rgba(161,98,7,.08);border:2px solid rgba(161,98,7,.3);border-radius:12px;margin-bottom:10px;cursor:pointer;-webkit-tap-highlight-color:transparent\">';" +
+    "h+='<span style=\"font-size:32px\">\\uD83E\\uDD20</span>';" +
+    "h+='<div style=\"text-align:left\"><div style=\"font-size:15px;font-weight:700\">Texas Cowboy</div><div style=\"font-size:12px;color:var(--text2)\">Howdy partner! A cowboy explains your ballot</div></div>';" +
+    "h+='</div>';" +
+    "h+='<div data-action=\"secret-unlock\" data-mode=\"trump\" style=\"display:flex;align-items:center;gap:12px;padding:14px;background:rgba(185,28,28,.08);border:2px solid rgba(185,28,28,.3);border-radius:12px;margin-bottom:16px;cursor:pointer;-webkit-tap-highlight-color:transparent\">';" +
+    "h+='<span style=\"font-size:32px\">\\uD83C\\uDDFA\\uD83C\\uDDF8</span>';" +
+    "h+='<div style=\"text-align:left\"><div style=\"font-size:15px;font-weight:700\">President Trump</div><div style=\"font-size:12px;color:var(--text2)\">The President personally advises you on your ballot. Many people are saying it\\u2019s the best guide ever made.</div></div>';" +
+    "h+='</div>';" +
+    "h+='<button data-action=\"secret-close\" style=\"background:none;border:1px solid var(--border);border-radius:8px;padding:8px 20px;font-size:14px;color:var(--text2);cursor:pointer;font-family:inherit\">Never mind</button>';" +
+    "h+='</div>';" +
+    "ov.innerHTML=h;" +
+    "ov.addEventListener('click',function(e){" +
+      "var el=e.target.closest('[data-action]');" +
+      "if(el){e.preventDefault();var action=el.dataset.action;" +
+        "if(action==='secret-unlock'){" +
+          "var mode=el.dataset.mode;" +
+          "if(mode==='chef'){" +
+            "if(!eeChef){eeChef=true;localStorage.setItem('tx_votes_ee_chef','1');emojiBurst('\\uD83E\\uDD7C',25);if(navigator.vibrate)navigator.vibrate([50,30,50,30,100])}" +
+            "S.readingLevel=6;save();ov.remove();render()" +
+          "}else if(mode==='cowboy'){" +
+            "if(!eeCowboy){eeCowboy=true;localStorage.setItem('tx_votes_ee_cowboy','1');emojiBurst('\\uD83E\\uDD20',25);if(navigator.vibrate)navigator.vibrate([100,50,100,50,200])}" +
+            "S.readingLevel=7;save();ov.remove();render()" +
+          "}else if(mode==='trump'){" +
+            "if(!eeTrump){eeTrump=true;localStorage.setItem('tx_votes_ee_trump','1');emojiBurst('\\uD83C\\uDDFA\\uD83C\\uDDF8',25);if(navigator.vibrate)navigator.vibrate([200,50,200,50,400])}" +
+            "S.readingLevel=8;save();ov.remove();render()" +
+          "}" +
+        "}else if(action==='secret-close'){ov.remove()}" +
+      "}else if(e.target===ov){ov.remove()}" +
+    "});" +
+    "document.body.appendChild(ov)" +
   "}",
 
   // ============ REPROCESS GUIDE ============
   "function reprocessGuide(){" +
     "S.guideComplete=false;S.phase=8;S.error=null;S.loadPhase=0;S.loadMsg=lm('Finding your ballot...');S.isLoading=true;render();" +
     "doGuide();" +
+  "}",
+
+  // ============ SHARE PROFILE SUMMARY ============
+  "function shareProfileSummary(){" +
+    "if(!S.summary)return;" +
+    "var text=S.summary+'\\n\\nBuild your own voting guide at txvotes.app';" +
+    "if(navigator.share){" +
+      "navigator.share({title:t('My Texas Votes Profile'),text:text,url:'https://txvotes.app'}).catch(function(){})" +
+    "}else{" +
+      "navigator.clipboard.writeText(text).then(function(){alert(t('Copied to clipboard!'))}).catch(function(){alert(text)})" +
+    "}" +
   "}",
 
   // ============ REGENERATE SUMMARY ============
@@ -3290,80 +3563,174 @@ var APP_JS = [
   "}",
 
 
-  // ============ CONFETTI BURST ============
+  // ============ CONFETTI BURST (Canvas-based fireworks) ============
   "function launchConfetti(){" +
     "if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches)return;" +
-    "var colors=[['#CC1919','#FF4444','#FF6666'],['#FFFFFF','#E8E8E8','#FFD700'],['#0D2738','#3b82f6','#60A5FA'],['#FFD700','#FFA500','#FF6347'],['#22c55e','#4ADE80','#86EFAC']];" +
-    "var emojis=['\\u2B50','\\u2728','\\uD83C\\uDF1F','\\uD83C\\uDDFA\\uD83C\\uDDF8','\\uD83C\\uDF86','\\uD83C\\uDF87'];" +
-    "var vw=window.innerWidth;var vh=window.innerHeight;" +
-    "function rand(a,b){return a+Math.random()*(b-a)}" +
-    "function fireShell(delay,x,riseY,palette){" +
-      "setTimeout(function(){" +
-        "var shell=document.createElement('div');" +
-        "shell.className='fw-shell';" +
-        "shell.style.cssText='left:'+x+'px;bottom:0;background:'+palette[0]+';--fw-rise:-'+riseY+'px;--fw-dur:'+rand(0.6,0.9)+'s;';" +
-        "document.body.appendChild(shell);" +
-        "var trailCount=5;" +
-        "for(var t=0;t<trailCount;t++){" +
-          "(function(ti){setTimeout(function(){" +
-            "var tr=document.createElement('div');" +
-            "tr.className='fw-trail';" +
-            "tr.style.cssText='left:'+(x-1)+'px;bottom:'+(ti*(riseY/trailCount))+'px;background:'+palette[0]+';opacity:'+(0.5-ti*0.08)+';';" +
-            "document.body.appendChild(tr);" +
-            "setTimeout(function(){tr.remove()},800)" +
-          "},ti*80)})(t)" +
-        "}" +
-        "setTimeout(function(){" +
-          "shell.remove();" +
-          "var burstX=x;var burstY=vh-riseY;" +
-          "var glow=document.createElement('div');" +
-          "glow.className='fw-glow';" +
-          "glow.style.cssText='left:'+(burstX-15)+'px;top:'+(burstY-15)+'px;background:'+palette[0]+';';" +
-          "document.body.appendChild(glow);" +
-          "setTimeout(function(){glow.remove()},1000);" +
-          "var sparkCount=Math.floor(rand(28,42));" +
-          "for(var i=0;i<sparkCount;i++){" +
-            "var angle=Math.random()*Math.PI*2;" +
-            "var speed=rand(60,180);" +
-            "var dx=Math.cos(angle)*speed;" +
-            "var dy=Math.sin(angle)*speed+rand(30,80);" +
-            "var sz=rand(3,7);" +
-            "var dur=rand(0.8,1.6);" +
-            "var c=palette[Math.floor(Math.random()*palette.length)];" +
-            "var sp=document.createElement('div');" +
-            "sp.className='fw-spark';" +
-            "sp.style.cssText='left:'+burstX+'px;top:'+burstY+'px;background:'+c+';--fw-dx:'+dx+'px;--fw-dy:'+dy+'px;--fw-size:'+sz+'px;--fw-burst-dur:'+dur+'s;--fw-color:'+c+';';" +
-            "document.body.appendChild(sp);" +
-            "setTimeout(function(){sp.remove()},dur*1000+100)" +
-          "}" +
-          "var emojiCount=Math.floor(rand(3,6));" +
-          "for(var j=0;j<emojiCount;j++){" +
-            "var ea=Math.random()*Math.PI*2;" +
-            "var es=rand(80,160);" +
-            "var edx=Math.cos(ea)*es;" +
-            "var edy=Math.sin(ea)*es+rand(20,60);" +
-            "var edur=rand(1.0,1.8);" +
-            "var em=document.createElement('div');" +
-            "em.className='fw-emoji';" +
-            "em.textContent=emojis[Math.floor(Math.random()*emojis.length)];" +
-            "em.style.cssText='left:'+burstX+'px;top:'+burstY+'px;--fw-dx:'+edx+'px;--fw-dy:'+edy+'px;--fw-burst-dur:'+edur+'s;';" +
-            "document.body.appendChild(em);" +
-            "setTimeout(function(){em.remove()},edur*1000+100)" +
-          "}" +
-        "},rand(600,900))" +
-      "},delay)" +
-    "}" +
-    "var shells=[" +
-      "{d:0,x:vw*0.5,r:vh*0.6,p:0}," +
-      "{d:300,x:vw*0.25,r:vh*0.55,p:1}," +
-      "{d:500,x:vw*0.75,r:vh*0.5,p:2}," +
-      "{d:900,x:vw*0.4,r:vh*0.65,p:3}," +
-      "{d:1200,x:vw*0.6,r:vh*0.55,p:4}," +
-      "{d:1600,x:vw*0.35,r:vh*0.5,p:0}," +
-      "{d:1900,x:vw*0.65,r:vh*0.6,p:2}," +
-      "{d:2200,x:vw*0.5,r:vh*0.7,p:1}" +
+    "var cvs=document.createElement('canvas');" +
+    "cvs.className='fw-canvas';" +
+    "var dpr=window.devicePixelRatio||1;" +
+    "var W=window.innerWidth;var H=window.innerHeight;" +
+    "cvs.width=W*dpr;cvs.height=H*dpr;" +
+    "cvs.style.width=W+'px';cvs.style.height=H+'px';" +
+    "document.body.appendChild(cvs);" +
+    "var ctx=cvs.getContext('2d');" +
+    "ctx.scale(dpr,dpr);" +
+    // Color palettes: patriotic red/white/blue + gold accents
+    "var palettes=[" +
+      "['#CC1919','#FF4444','#FF6666','#FF8888']," +
+      "['#FFFFFF','#E8E8E8','#F0F0F0','#FFD700']," +
+      "['#0D2738','#3b82f6','#60A5FA','#93C5FD']," +
+      "['#FFD700','#FFA500','#FF6347','#FFE066']," +
+      "['#CC1919','#FFFFFF','#3b82f6','#FFD700']" +
     "];" +
-    "shells.forEach(function(s){fireShell(s.d,s.x,s.r,colors[s.p])})" +
+    "var gravity=0.12;var friction=0.985;" +
+    "var particles=[];var shells=[];var sparkles=[];" +
+    "var startTime=Date.now();var duration=4800;" +
+    "function rand(a,b){return a+Math.random()*(b-a)}" +
+    // Shell: rises from bottom
+    "function Shell(x,targetY,delay,pi){" +
+      "this.x=x;this.y=H;this.targetY=targetY;this.delay=delay;" +
+      "this.palette=palettes[pi%palettes.length];" +
+      "this.speed=rand(8,13);this.alive=true;this.launched=false;" +
+      "this.trail=[];this.time=0" +
+    "}" +
+    "Shell.prototype.update=function(){" +
+      "if(!this.launched)return;" +
+      "this.y-=this.speed;this.speed*=0.98;" +
+      "this.trail.push({x:this.x+rand(-1,1),y:this.y,a:0.8,sz:rand(1.5,3)});" +
+      "if(this.trail.length>12)this.trail.shift();" +
+      "for(var i=0;i<this.trail.length;i++){this.trail[i].a*=0.88;this.trail[i].sz*=0.95}" +
+      "if(this.y<=this.targetY||this.speed<2){this.alive=false;this.burst()}" +
+    "};" +
+    "Shell.prototype.draw=function(){" +
+      "if(!this.launched||!this.alive)return;" +
+      "for(var i=0;i<this.trail.length;i++){" +
+        "var t=this.trail[i];ctx.globalAlpha=t.a;" +
+        "ctx.fillStyle=this.palette[0];" +
+        "ctx.beginPath();ctx.arc(t.x,t.y,t.sz,0,Math.PI*2);ctx.fill()" +
+      "}" +
+      "ctx.globalAlpha=1;ctx.fillStyle=this.palette[0];" +
+      "ctx.beginPath();ctx.arc(this.x,this.y,2.5,0,Math.PI*2);ctx.fill()" +
+    "};" +
+    // Burst: creates particles when shell explodes
+    "Shell.prototype.burst=function(){" +
+      "var count=Math.floor(rand(70,120));" +
+      "var burstRadius=rand(3,7);" +
+      "var bx=this.x;var by=this.y;var pal=this.palette;" +
+      // Initial flash glow
+      "sparkles.push({x:bx,y:by,r:10,maxR:rand(60,100),a:0.9,color:pal[0],growth:rand(6,10)});" +
+      "for(var i=0;i<count;i++){" +
+        "var angle=Math.random()*Math.PI*2;" +
+        "var speed=rand(1.5,burstRadius);" +
+        // Slight bias toward spherical distribution
+        "var r=Math.pow(Math.random(),0.5);" +
+        "var vx=Math.cos(angle)*speed*r;" +
+        "var vy=Math.sin(angle)*speed*r;" +
+        "var c=pal[Math.floor(Math.random()*pal.length)];" +
+        "particles.push({" +
+          "x:bx,y:by,vx:vx,vy:vy," +
+          "color:c,alpha:1,decay:rand(0.012,0.025)," +
+          "size:rand(1.5,4),trail:[],twinkle:Math.random()<0.3,twinkleSpeed:rand(0.05,0.15)" +
+        "})" +
+      "}" +
+      // Add some larger slow-moving sparkle particles
+      "var sparkCount=Math.floor(rand(8,16));" +
+      "for(var j=0;j<sparkCount;j++){" +
+        "var sa=Math.random()*Math.PI*2;" +
+        "var ss=rand(0.5,2.5);" +
+        "particles.push({" +
+          "x:bx,y:by,vx:Math.cos(sa)*ss,vy:Math.sin(sa)*ss," +
+          "color:'#FFD700',alpha:1,decay:rand(0.008,0.015)," +
+          "size:rand(2.5,5),trail:[],twinkle:true,twinkleSpeed:rand(0.08,0.2)" +
+        "})" +
+      "}" +
+    "};" +
+    // Particle update with gravity and friction
+    "function updateParticles(){" +
+      "for(var i=particles.length-1;i>=0;i--){" +
+        "var p=particles[i];" +
+        "p.trail.push({x:p.x,y:p.y,a:p.alpha*0.5});" +
+        "if(p.trail.length>6)p.trail.shift();" +
+        "p.vy+=gravity;p.vx*=friction;p.vy*=friction;" +
+        "p.x+=p.vx;p.y+=p.vy;" +
+        "p.alpha-=p.decay;" +
+        "if(p.alpha<=0)particles.splice(i,1)" +
+      "}" +
+    "}" +
+    // Draw particles with trails and twinkle
+    "function drawParticles(){" +
+      "for(var i=0;i<particles.length;i++){" +
+        "var p=particles[i];" +
+        // Draw trail
+        "for(var j=0;j<p.trail.length;j++){" +
+          "var t=p.trail[j];t.a*=0.75;" +
+          "ctx.globalAlpha=t.a*0.4;" +
+          "ctx.fillStyle=p.color;" +
+          "ctx.beginPath();ctx.arc(t.x,t.y,p.size*0.6,0,Math.PI*2);ctx.fill()" +
+        "}" +
+        // Twinkle effect
+        "var alpha=p.alpha;" +
+        "if(p.twinkle){alpha*=(0.5+0.5*Math.sin(Date.now()*p.twinkleSpeed))}" +
+        "ctx.globalAlpha=alpha;" +
+        "ctx.fillStyle=p.color;" +
+        "ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fill();" +
+        // Glow effect on brighter particles
+        "if(p.size>2.5){" +
+          "ctx.globalAlpha=alpha*0.3;" +
+          "ctx.beginPath();ctx.arc(p.x,p.y,p.size*2.5,0,Math.PI*2);ctx.fill()" +
+        "}" +
+      "}" +
+    "}" +
+    // Sparkle (flash) update and draw
+    "function updateSparkles(){" +
+      "for(var i=sparkles.length-1;i>=0;i--){" +
+        "var s=sparkles[i];" +
+        "s.r+=s.growth;s.a-=0.04;" +
+        "if(s.a<=0){sparkles.splice(i,1);continue}" +
+        "ctx.globalAlpha=s.a*0.25;" +
+        "ctx.fillStyle=s.color;" +
+        "ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fill()" +
+      "}" +
+    "}" +
+    // Schedule shells across the full viewport
+    "var shellDefs=[" +
+      "{d:0,x:W*0.5,y:H*0.25,p:0}," +
+      "{d:150,x:W*0.2,y:H*0.3,p:1}," +
+      "{d:350,x:W*0.8,y:H*0.2,p:2}," +
+      "{d:600,x:W*0.35,y:H*0.15,p:3}," +
+      "{d:800,x:W*0.65,y:H*0.28,p:4}," +
+      "{d:1000,x:W*0.15,y:H*0.22,p:0}," +
+      "{d:1200,x:W*0.85,y:H*0.18,p:2}," +
+      "{d:1500,x:W*0.45,y:H*0.12,p:1}," +
+      "{d:1700,x:W*0.7,y:H*0.35,p:3}," +
+      "{d:1900,x:W*0.3,y:H*0.2,p:4}," +
+      "{d:2200,x:W*0.55,y:H*0.15,p:0}," +
+      "{d:2500,x:W*0.1,y:H*0.3,p:2}," +
+      "{d:2700,x:W*0.9,y:H*0.25,p:1}," +
+      "{d:3000,x:W*0.4,y:H*0.1,p:3}," +
+      "{d:3200,x:W*0.6,y:H*0.2,p:4}," +
+      "{d:3500,x:W*0.5,y:H*0.18,p:0}" +
+    "];" +
+    "for(var si=0;si<shellDefs.length;si++){" +
+      "shells.push(new Shell(shellDefs[si].x,shellDefs[si].y,shellDefs[si].d,shellDefs[si].p))" +
+    "}" +
+    // Animation loop
+    "var rafId;function animate(){" +
+      "var elapsed=Date.now()-startTime;" +
+      "ctx.clearRect(0,0,W,H);" +
+      // Launch shells at their scheduled time
+      "for(var i=0;i<shells.length;i++){" +
+        "if(!shells[i].launched&&elapsed>=shells[i].delay){shells[i].launched=true}" +
+        "if(shells[i].alive&&shells[i].launched){shells[i].update();shells[i].draw()}" +
+      "}" +
+      "updateParticles();drawParticles();updateSparkles();" +
+      "ctx.globalAlpha=1;" +
+      // Continue until all particles gone and all shells fired + enough time passed
+      "var allDone=elapsed>duration&&particles.length===0&&sparkles.length===0;" +
+      "if(allDone){cancelAnimationFrame(rafId);cvs.remove();return}" +
+      "rafId=requestAnimationFrame(animate)" +
+    "}" +
+    "rafId=requestAnimationFrame(animate)" +
   "}",
 
   // Emoji burst animation for easter egg unlocks
@@ -3460,20 +3827,13 @@ var APP_JS = [
   // ============ INIT ============
   "load();",
   "(function(){if(location.search.indexOf('start=1')!==-1&&S.phase===0){S.phase=1;S._iStart=Date.now();save()}}());",
-  "(function(){var m=location.search.match(/tone=(\\d+)/);if(m&&!S.guideComplete){S.readingLevel=parseInt(m[1]);if(S.phase<2)S.phase=2;save()}}());",
+  "(function(){var m=location.search.match(/tone=(\\d+)/);if(m&&!S.guideComplete){var tn=parseInt(m[1]);S.readingLevel=tn;if(tn===6&&!eeChef){eeChef=true;localStorage.setItem('tx_votes_ee_chef','1')}if(tn===7&&!eeCowboy){eeCowboy=true;localStorage.setItem('tx_votes_ee_cowboy','1')}if(tn===8&&!eeTrump){eeTrump=true;localStorage.setItem('tx_votes_ee_trump','1')}if(S.phase<2)S.phase=2;save()}}());",
   "(function(){var s=location.search.toLowerCase();var llms=['gemini','grok','chatgpt'];for(var i=0;i<llms.length;i++){if(s.indexOf(llms[i])!==-1){window._llmOverride=llms[i];break}}}());",
   "if(location.search)history.replaceState(null,'',location.pathname+location.hash);",
   "if(!S.guideComplete&&location.hash&&location.hash!=='#/')location.hash='#/';",
   "render();",
   "refreshBallots();",
-  "if('serviceWorker' in navigator){" +
-    "navigator.serviceWorker.getRegistrations().then(function(regs){" +
-      "regs.forEach(function(r){r.unregister()});" +
-      "navigator.serviceWorker.register('/app/sw.js').catch(function(){});" +
-    "}).catch(function(){" +
-      "navigator.serviceWorker.register('/app/sw.js').catch(function(){});" +
-    "})" +
-  "}",
+  "if('serviceWorker' in navigator){navigator.serviceWorker.register('/app/sw.js').catch(function(){})}",
 
   // Track interview abandonment when page is hidden mid-interview
   "document.addEventListener('visibilitychange',function(){" +
@@ -3491,8 +3851,10 @@ var APP_HTML =
   '<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">' +
   "<title>Texas Votes</title>" +
   '<link rel="manifest" href="/app/manifest.json">' +
-  '<link rel="icon" href="/favicon.svg" type="image/svg+xml">' +
-  '<link rel="apple-touch-icon" href="/apple-touch-icon.svg">' +
+  '<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">' +
+  '<link rel="icon" type="image/svg+xml" href="/favicon.svg">' +
+  '<link rel="icon" type="image/x-icon" href="/favicon.ico">' +
+  '<link rel="apple-touch-icon" href="/apple-touch-icon.png">' +
   '<meta name="theme-color" content="#21598e">' +
   '<meta name="apple-mobile-web-app-capable" content="yes">' +
   '<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">' +
@@ -3502,13 +3864,14 @@ var APP_HTML =
   '<meta property="og:type" content="website">' +
   '<meta property="og:url" content="https://txvotes.app/app">' +
   '<meta property="og:site_name" content="Texas Votes">' +
-  '<meta property="og:image" content="https://txvotes.app/og-image.svg">' +
+  '<meta property="og:image" content="https://txvotes.app/og-image.png">' +
   '<meta property="og:image:width" content="1200">' +
   '<meta property="og:image:height" content="630">' +
+  '<meta property="og:image:type" content="image/png">' +
   '<meta name="twitter:card" content="summary_large_image">' +
   '<meta name="twitter:title" content="Texas Votes — Your Personalized Voting Guide">' +
   '<meta name="twitter:description" content="Get a personalized, nonpartisan voting guide for Texas elections in 5 minutes.">' +
-  '<meta name="twitter:image" content="https://txvotes.app/og-image.svg">' +
+  '<meta name="twitter:image" content="https://txvotes.app/og-image.png">' +
   "<style>" +
   CSS +
   "</style>" +

@@ -569,6 +569,8 @@ async function runAudit(env, options = {}) {
     summary.providers[name] = {
       status: result.status,
       overallScore: result.scores?.overallScore || null,
+      topStrength: result.scores?.topStrength || null,
+      topWeakness: result.scores?.topWeakness || null,
       displayName: PROVIDERS[name]?.displayName || name,
       model: PROVIDERS[name]?.model || null,
       timestamp: result.timestamp || null,
@@ -635,6 +637,25 @@ async function runAudit(env, options = {}) {
     ),
   };
   await env.ELECTION_DATA.put(`audit:log:${today}`, JSON.stringify(logEntry, null, 2));
+
+  // Clean up audit logs older than 14 days
+  try {
+    const logKeys = await env.ELECTION_DATA.list({ prefix: "audit:log:" });
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 14);
+    const cutoffStr = cutoff.toISOString().slice(0, 10);
+    let cleaned = 0;
+    for (const key of logKeys.keys) {
+      const dateStr = key.name.replace("audit:log:", "");
+      if (dateStr < cutoffStr) {
+        await env.ELECTION_DATA.delete(key.name);
+        cleaned++;
+      }
+    }
+    if (cleaned > 0) {
+      summary.auditLogCleanup = `Deleted ${cleaned} old audit log(s)`;
+    }
+  } catch { /* non-fatal */ }
 
   return { success: true, summary, results };
 }

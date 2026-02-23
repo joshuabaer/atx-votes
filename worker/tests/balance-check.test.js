@@ -7,6 +7,17 @@ import {
   checkRaceBalance,
   checkBallotBalance,
   formatBalanceSummary,
+  matchesGenericPhrase,
+  countGenericItems,
+  scoreSpecificity,
+  scoreSpecificityArray,
+  analyzeSentiment,
+  countWordMatches,
+  GENERIC_PHRASES,
+  STRONG_POSITIVE_WORDS,
+  WEAK_POSITIVE_WORDS,
+  STRONG_NEGATIVE_WORDS,
+  HEDGING_WORDS,
 } from "../src/balance-check.js";
 
 // ---------------------------------------------------------------------------
@@ -459,8 +470,16 @@ describe("checkBallotBalance", () => {
         {
           office: "Governor",
           candidates: [
-            { name: "Alice", pros: ["Strong record", "Bipartisan"], cons: ["Slow on housing", "Establishment"] },
-            { name: "Bob", pros: ["Fresh ideas", "Grassroots"], cons: ["No experience", "Thin support"] },
+            {
+              name: "Alice",
+              pros: ["Sponsored HB 1234 to expand Medicaid in 2023", "Chaired the committee on education funding reform"],
+              cons: ["Voted against SB 567 border security bill in 2024", "Rated C by the Texas Taxpayers Association"],
+            },
+            {
+              name: "Bob",
+              pros: ["Founded a nonprofit that created 500 jobs in rural Texas", "Endorsed by the Texas AFL-CIO and Sierra Club"],
+              cons: ["Filed zero bills during 4 years on city council", "Voted against the $2M infrastructure bond in 2022"],
+            },
           ],
         },
       ],
@@ -628,8 +647,10 @@ describe("checkBallotBalance — sample ballot fixture", () => {
 
   it("sample ballot is reasonably well balanced", () => {
     const report = checkBallotBalance(ballot);
-    // The sample ballot should score fairly well
-    expect(report.summary.score).toBeGreaterThanOrEqual(80);
+    // The sample ballot scores lower now due to generic content and specificity checks
+    // but should still be above 50 (no critical issues)
+    expect(report.summary.score).toBeGreaterThanOrEqual(50);
+    expect(report.summary.criticalCount).toBe(0);
   });
 });
 
@@ -707,5 +728,670 @@ describe("formatBalanceSummary", () => {
     const summary = formatBalanceSummary(report);
     expect(summary).not.toContain("Governor:");
     expect(summary).toContain("Senator:");
+  });
+});
+
+
+// ---------------------------------------------------------------------------
+// matchesGenericPhrase
+// ---------------------------------------------------------------------------
+describe("matchesGenericPhrase", () => {
+  it("detects exact generic phrases (case-insensitive)", () => {
+    expect(matchesGenericPhrase("Experienced leader")).toBe("experienced leader");
+    expect(matchesGenericPhrase("PROVEN TRACK RECORD")).toBe("proven track record");
+    expect(matchesGenericPhrase("fresh perspective")).toBe("fresh perspective");
+  });
+
+  it("detects generic phrases embedded in short text", () => {
+    expect(matchesGenericPhrase("A proven leader in Texas")).toBe("proven leader");
+    expect(matchesGenericPhrase("She is a strong advocate")).toBe("strong advocate");
+  });
+
+  it("returns null for specific/non-generic text", () => {
+    expect(matchesGenericPhrase("Voted for HB 1234 to fund rural schools")).toBeNull();
+    expect(matchesGenericPhrase("Secured $5M in infrastructure funding")).toBeNull();
+    expect(matchesGenericPhrase("Sponsored the Clean Water Act amendment in 2023")).toBeNull();
+  });
+
+  it("returns null for long text even if it contains a generic phrase", () => {
+    // Long text (>60 chars) should not match even if it contains a generic phrase
+    const longText = "While some call her an experienced leader, her record shows she voted against HB 1234 and failed to attend 30% of committee meetings";
+    expect(matchesGenericPhrase(longText)).toBeNull();
+  });
+
+  it("detects negative generic phrases", () => {
+    expect(matchesGenericPhrase("Career politician")).toBe("career politician");
+    expect(matchesGenericPhrase("Out of touch")).toBe("out of touch");
+    expect(matchesGenericPhrase("Empty promises")).toBe("empty promises");
+    expect(matchesGenericPhrase("More of the same")).toBe("more of the same");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// countGenericItems
+// ---------------------------------------------------------------------------
+describe("countGenericItems", () => {
+  it("counts generic items in an array", () => {
+    const items = ["Experienced leader", "Voted for HB 1234 in 2023", "Proven track record"];
+    const result = countGenericItems(items);
+    expect(result.genericCount).toBe(2);
+    expect(result.totalCount).toBe(3);
+    expect(result.genericItems).toHaveLength(2);
+  });
+
+  it("returns zero for all specific items", () => {
+    const items = ["Sponsored SB 567 border security bill", "Secured $2M for school funding"];
+    const result = countGenericItems(items);
+    expect(result.genericCount).toBe(0);
+    expect(result.totalCount).toBe(2);
+    expect(result.genericItems).toHaveLength(0);
+  });
+
+  it("handles empty array", () => {
+    const result = countGenericItems([]);
+    expect(result.genericCount).toBe(0);
+    expect(result.totalCount).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// scoreSpecificity
+// ---------------------------------------------------------------------------
+describe("scoreSpecificity", () => {
+  it("scores zero for empty/null text", () => {
+    expect(scoreSpecificity("")).toBe(0);
+    expect(scoreSpecificity(null)).toBe(0);
+  });
+
+  it("scores zero for generic phrases", () => {
+    expect(scoreSpecificity("Strong leader")).toBe(0);
+    expect(scoreSpecificity("Proven track record")).toBe(0);
+    expect(scoreSpecificity("Fresh perspective")).toBe(0);
+  });
+
+  it("scores higher for text with verifiable references", () => {
+    const score1 = scoreSpecificity("Voted for HB 1234 in 2023");
+    expect(score1).toBeGreaterThan(0);
+
+    const score2 = scoreSpecificity("Secured $5M in funding for schools");
+    expect(score2).toBeGreaterThan(0);
+
+    const score3 = scoreSpecificity("Chaired the committee on education reform");
+    expect(score3).toBeGreaterThan(0);
+  });
+
+  it("scores higher for more specific references", () => {
+    const vague = scoreSpecificity("Has some experience in government");
+    const specific = scoreSpecificity("Sponsored HB 1234, passed in 2023, reducing property taxes by 15%");
+    expect(specific).toBeGreaterThan(vague);
+  });
+
+  it("gives length bonus for longer statements", () => {
+    // Two texts with no specificity indicators, but different lengths
+    const short = scoreSpecificity("Good on education");
+    const medium = scoreSpecificity("Supports improving public education across the state");
+    // Short (<30 chars) gets no length bonus; medium (30-59 chars) gets 0.1 bonus
+    expect(short).toBe(0);
+    expect(medium).toBe(0.1);
+  });
+
+  it("caps score at 1.0", () => {
+    const maxed = scoreSpecificity("In 2023, voted for HB 1234, co-sponsored SB 567, chaired the committee on finance, founded the rural education initiative, and secured $10M");
+    expect(maxed).toBeLessThanOrEqual(1.0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// scoreSpecificityArray
+// ---------------------------------------------------------------------------
+describe("scoreSpecificityArray", () => {
+  it("returns zero avgScore for empty array", () => {
+    const result = scoreSpecificityArray([]);
+    expect(result.avgScore).toBe(0);
+    expect(result.scores).toHaveLength(0);
+    expect(result.lowSpecificityCount).toBe(0);
+  });
+
+  it("calculates average specificity across items", () => {
+    const items = [
+      "Voted for HB 1234 in 2023",  // high specificity
+      "Strong leader",               // zero specificity
+    ];
+    const result = scoreSpecificityArray(items);
+    expect(result.avgScore).toBeGreaterThan(0);
+    expect(result.scores).toHaveLength(2);
+    expect(result.lowSpecificityCount).toBe(1);
+  });
+
+  it("counts items with zero specificity", () => {
+    const items = ["Good candidate", "Nice person", "Fresh ideas"];
+    const result = scoreSpecificityArray(items);
+    expect(result.lowSpecificityCount).toBe(3);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// countWordMatches / analyzeSentiment
+// ---------------------------------------------------------------------------
+describe("analyzeSentiment", () => {
+  it("returns zeros for empty input", () => {
+    const result = analyzeSentiment([]);
+    expect(result.strongPositiveCount).toBe(0);
+    expect(result.weakPositiveCount).toBe(0);
+    expect(result.strongNegativeCount).toBe(0);
+    expect(result.hedgingCount).toBe(0);
+    expect(result.avgWordCount).toBe(0);
+  });
+
+  it("returns zeros for null input", () => {
+    const result = analyzeSentiment(null);
+    expect(result.strongPositiveCount).toBe(0);
+    expect(result.weakPositiveCount).toBe(0);
+    expect(result.strongNegativeCount).toBe(0);
+    expect(result.hedgingCount).toBe(0);
+    expect(result.avgWordCount).toBe(0);
+  });
+
+  it("counts strong positive words", () => {
+    const result = analyzeSentiment(["An outstanding and remarkable achievement"]);
+    expect(result.strongPositiveCount).toBe(2);
+    expect(result.hedgingCount).toBe(0);
+  });
+
+  it("counts weak positive words", () => {
+    const result = analyzeSentiment(["A decent and adequate performance overall"]);
+    expect(result.weakPositiveCount).toBe(2);
+    expect(result.strongPositiveCount).toBe(0);
+  });
+
+  it("counts strong negative words", () => {
+    const result = analyzeSentiment(["A reckless and dangerous approach to policy"]);
+    expect(result.strongNegativeCount).toBe(2);
+    expect(result.strongPositiveCount).toBe(0);
+  });
+
+  it("counts hedging words", () => {
+    const result = analyzeSentiment(["She somewhat lacks clarity and could perhaps improve"]);
+    expect(result.hedgingCount).toBeGreaterThanOrEqual(2);
+    expect(result.strongPositiveCount).toBe(0);
+  });
+
+  it("calculates average word count", () => {
+    const result = analyzeSentiment(["One two three", "Four five"]);
+    // 3 + 2 = 5 total words, 5/2 = 2.5, rounded = 3
+    expect(result.avgWordCount).toBe(3);
+  });
+
+  it("detects phrase-based hedging terms", () => {
+    const result = analyzeSentiment(["Some say the policy is mixed"]);
+    expect(result.hedgingCount).toBeGreaterThanOrEqual(2);  // "some say" + "mixed"
+  });
+
+  it("distinguishes all four sentiment categories in mixed text", () => {
+    const result = analyzeSentiment([
+      "Outstanding leadership",       // strong positive
+      "Adequate performance",          // weak positive
+      "Dangerous proposal",            // strong negative
+      "Perhaps somewhat unclear",      // hedging
+    ]);
+    expect(result.strongPositiveCount).toBeGreaterThanOrEqual(1);
+    expect(result.weakPositiveCount).toBeGreaterThanOrEqual(1);
+    expect(result.strongNegativeCount).toBeGreaterThanOrEqual(1);
+    expect(result.hedgingCount).toBeGreaterThanOrEqual(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// checkCandidateBalance — new flag types
+// ---------------------------------------------------------------------------
+describe("checkCandidateBalance — sentiment_asymmetry", () => {
+  it("flags word count asymmetry between pros and cons", () => {
+    const analysis = {
+      name: "TestCandidate",
+      prosCount: 2,
+      consCount: 2,
+      prosLength: 200,
+      consLength: 40,
+      prosAvgLength: 100,
+      consAvgLength: 20,
+      prosSentiment: { strongPositiveCount: 0, weakPositiveCount: 0, strongNegativeCount: 0, hedgingCount: 0, avgWordCount: 15 },
+      consSentiment: { strongPositiveCount: 0, weakPositiveCount: 0, strongNegativeCount: 0, hedgingCount: 0, avgWordCount: 3 },
+      prosSpecificity: { avgScore: 0.5, scores: [0.5, 0.5], lowSpecificityCount: 0 },
+      consSpecificity: { avgScore: 0.5, scores: [0.5, 0.5], lowSpecificityCount: 0 },
+      prosGeneric: { genericCount: 0, totalCount: 2, genericItems: [] },
+      consGeneric: { genericCount: 0, totalCount: 2, genericItems: [] },
+    };
+    const flags = checkCandidateBalance(analysis);
+    const sentimentFlag = flags.find(f => f.type === "sentiment_asymmetry");
+    expect(sentimentFlag).toBeDefined();
+    expect(sentimentFlag.severity).toBe("info");
+    expect(sentimentFlag.detail).toContain("word count asymmetry");
+  });
+
+  it("flags enthusiastic pros with hedging cons", () => {
+    const analysis = {
+      name: "TestCandidate",
+      prosCount: 2,
+      consCount: 2,
+      prosLength: 100,
+      consLength: 100,
+      prosAvgLength: 50,
+      consAvgLength: 50,
+      prosSentiment: { strongPositiveCount: 3, weakPositiveCount: 0, strongNegativeCount: 0, hedgingCount: 0, avgWordCount: 8 },
+      consSentiment: { strongPositiveCount: 0, weakPositiveCount: 0, strongNegativeCount: 0, hedgingCount: 2, avgWordCount: 8 },
+      prosSpecificity: { avgScore: 0.5, scores: [0.5, 0.5], lowSpecificityCount: 0 },
+      consSpecificity: { avgScore: 0.5, scores: [0.5, 0.5], lowSpecificityCount: 0 },
+      prosGeneric: { genericCount: 0, totalCount: 2, genericItems: [] },
+      consGeneric: { genericCount: 0, totalCount: 2, genericItems: [] },
+    };
+    const flags = checkCandidateBalance(analysis);
+    const sentimentFlag = flags.find(f => f.type === "sentiment_asymmetry" && f.detail.includes("subtly favorable"));
+    expect(sentimentFlag).toBeDefined();
+    expect(sentimentFlag.severity).toBe("warning");
+  });
+
+  it("flags weak positive pros with strong negative cons", () => {
+    const analysis = {
+      name: "TestCandidate",
+      prosCount: 2,
+      consCount: 2,
+      prosLength: 100,
+      consLength: 100,
+      prosAvgLength: 50,
+      consAvgLength: 50,
+      prosSentiment: { strongPositiveCount: 0, weakPositiveCount: 2, strongNegativeCount: 0, hedgingCount: 0, avgWordCount: 8 },
+      consSentiment: { strongPositiveCount: 0, weakPositiveCount: 0, strongNegativeCount: 3, hedgingCount: 0, avgWordCount: 8 },
+      prosSpecificity: { avgScore: 0.5, scores: [0.5, 0.5], lowSpecificityCount: 0 },
+      consSpecificity: { avgScore: 0.5, scores: [0.5, 0.5], lowSpecificityCount: 0 },
+      prosGeneric: { genericCount: 0, totalCount: 2, genericItems: [] },
+      consGeneric: { genericCount: 0, totalCount: 2, genericItems: [] },
+    };
+    const flags = checkCandidateBalance(analysis);
+    const sentimentFlag = flags.find(f => f.type === "sentiment_asymmetry" && f.detail.includes("strong negative"));
+    expect(sentimentFlag).toBeDefined();
+    expect(sentimentFlag.severity).toBe("warning");
+    expect(sentimentFlag.detail).toContain("subtly unfavorable");
+  });
+
+  it("does not flag when both sides use similar language", () => {
+    const analysis = {
+      name: "TestCandidate",
+      prosCount: 2,
+      consCount: 2,
+      prosLength: 100,
+      consLength: 100,
+      prosAvgLength: 50,
+      consAvgLength: 50,
+      prosSentiment: { strongPositiveCount: 1, weakPositiveCount: 0, strongNegativeCount: 0, hedgingCount: 0, avgWordCount: 8 },
+      consSentiment: { strongPositiveCount: 1, weakPositiveCount: 0, strongNegativeCount: 0, hedgingCount: 0, avgWordCount: 8 },
+      prosSpecificity: { avgScore: 0.5, scores: [0.5, 0.5], lowSpecificityCount: 0 },
+      consSpecificity: { avgScore: 0.5, scores: [0.5, 0.5], lowSpecificityCount: 0 },
+      prosGeneric: { genericCount: 0, totalCount: 2, genericItems: [] },
+      consGeneric: { genericCount: 0, totalCount: 2, genericItems: [] },
+    };
+    const flags = checkCandidateBalance(analysis);
+    const sentimentFlags = flags.filter(f => f.type === "sentiment_asymmetry");
+    expect(sentimentFlags).toHaveLength(0);
+  });
+});
+
+describe("checkCandidateBalance — generic_content", () => {
+  it("flags candidates with mostly generic pros/cons as warning", () => {
+    const analysis = {
+      name: "TestCandidate",
+      prosCount: 2,
+      consCount: 2,
+      prosLength: 60,
+      consLength: 60,
+      prosAvgLength: 30,
+      consAvgLength: 30,
+      prosSentiment: { strongPositiveCount: 0, weakPositiveCount: 0, strongNegativeCount: 0, hedgingCount: 0, avgWordCount: 3 },
+      consSentiment: { strongPositiveCount: 0, weakPositiveCount: 0, strongNegativeCount: 0, hedgingCount: 0, avgWordCount: 3 },
+      prosSpecificity: { avgScore: 0, scores: [0, 0], lowSpecificityCount: 2 },
+      consSpecificity: { avgScore: 0, scores: [0, 0], lowSpecificityCount: 2 },
+      prosGeneric: { genericCount: 2, totalCount: 2, genericItems: [
+        { text: "Experienced leader", matchedPhrase: "experienced leader" },
+        { text: "Strong advocate", matchedPhrase: "strong advocate" },
+      ]},
+      consGeneric: { genericCount: 2, totalCount: 2, genericItems: [
+        { text: "Out of touch", matchedPhrase: "out of touch" },
+        { text: "Career politician", matchedPhrase: "career politician" },
+      ]},
+    };
+    const flags = checkCandidateBalance(analysis);
+    const genericFlag = flags.find(f => f.type === "generic_content");
+    expect(genericFlag).toBeDefined();
+    expect(genericFlag.severity).toBe("warning");
+    expect(genericFlag.detail).toContain("4 of 4");
+    expect(genericFlag.detail).toContain("needs human review");
+  });
+
+  it("flags even a single generic item", () => {
+    const analysis = {
+      name: "TestCandidate",
+      prosCount: 3,
+      consCount: 2,
+      prosLength: 100,
+      consLength: 80,
+      prosAvgLength: 33,
+      consAvgLength: 40,
+      prosSentiment: { strongPositiveCount: 0, weakPositiveCount: 0, strongNegativeCount: 0, hedgingCount: 0, avgWordCount: 5 },
+      consSentiment: { strongPositiveCount: 0, weakPositiveCount: 0, strongNegativeCount: 0, hedgingCount: 0, avgWordCount: 5 },
+      prosSpecificity: { avgScore: 0.3, scores: [0.5, 0.5, 0], lowSpecificityCount: 1 },
+      consSpecificity: { avgScore: 0.5, scores: [0.5, 0.5], lowSpecificityCount: 0 },
+      prosGeneric: { genericCount: 1, totalCount: 3, genericItems: [
+        { text: "Strong leader", matchedPhrase: "strong leader" },
+      ]},
+      consGeneric: { genericCount: 0, totalCount: 2, genericItems: [] },
+    };
+    const flags = checkCandidateBalance(analysis);
+    const genericFlag = flags.find(f => f.type === "generic_content");
+    expect(genericFlag).toBeDefined();
+    expect(genericFlag.detail).toContain("1 of 5");
+  });
+
+  it("does not flag when no generic content found", () => {
+    const analysis = {
+      name: "TestCandidate",
+      prosCount: 2,
+      consCount: 2,
+      prosLength: 100,
+      consLength: 100,
+      prosAvgLength: 50,
+      consAvgLength: 50,
+      prosSentiment: { strongPositiveCount: 0, weakPositiveCount: 0, strongNegativeCount: 0, hedgingCount: 0, avgWordCount: 8 },
+      consSentiment: { strongPositiveCount: 0, weakPositiveCount: 0, strongNegativeCount: 0, hedgingCount: 0, avgWordCount: 8 },
+      prosSpecificity: { avgScore: 0.5, scores: [0.5, 0.5], lowSpecificityCount: 0 },
+      consSpecificity: { avgScore: 0.5, scores: [0.5, 0.5], lowSpecificityCount: 0 },
+      prosGeneric: { genericCount: 0, totalCount: 2, genericItems: [] },
+      consGeneric: { genericCount: 0, totalCount: 2, genericItems: [] },
+    };
+    const flags = checkCandidateBalance(analysis);
+    const genericFlag = flags.find(f => f.type === "generic_content");
+    expect(genericFlag).toBeUndefined();
+  });
+});
+
+describe("checkCandidateBalance — specificity_gap", () => {
+  it("flags when pros are specific but cons are generic", () => {
+    const analysis = {
+      name: "TestCandidate",
+      prosCount: 2,
+      consCount: 2,
+      prosLength: 100,
+      consLength: 40,
+      prosAvgLength: 50,
+      consAvgLength: 20,
+      prosSentiment: { strongPositiveCount: 0, weakPositiveCount: 0, strongNegativeCount: 0, hedgingCount: 0, avgWordCount: 8 },
+      consSentiment: { strongPositiveCount: 0, weakPositiveCount: 0, strongNegativeCount: 0, hedgingCount: 0, avgWordCount: 3 },
+      prosSpecificity: { avgScore: 0.5, scores: [0.5, 0.5], lowSpecificityCount: 0 },
+      consSpecificity: { avgScore: 0, scores: [0, 0], lowSpecificityCount: 2 },
+      prosGeneric: { genericCount: 0, totalCount: 2, genericItems: [] },
+      consGeneric: { genericCount: 0, totalCount: 2, genericItems: [] },
+    };
+    const flags = checkCandidateBalance(analysis);
+    const specFlag = flags.find(f => f.type === "specificity_gap" && f.detail.includes("cons are entirely generic"));
+    expect(specFlag).toBeDefined();
+    expect(specFlag.severity).toBe("warning");
+  });
+
+  it("flags when cons are specific but pros are generic", () => {
+    const analysis = {
+      name: "TestCandidate",
+      prosCount: 2,
+      consCount: 2,
+      prosLength: 40,
+      consLength: 100,
+      prosAvgLength: 20,
+      consAvgLength: 50,
+      prosSentiment: { strongPositiveCount: 0, weakPositiveCount: 0, strongNegativeCount: 0, hedgingCount: 0, avgWordCount: 3 },
+      consSentiment: { strongPositiveCount: 0, weakPositiveCount: 0, strongNegativeCount: 0, hedgingCount: 0, avgWordCount: 8 },
+      prosSpecificity: { avgScore: 0, scores: [0, 0], lowSpecificityCount: 2 },
+      consSpecificity: { avgScore: 0.5, scores: [0.5, 0.5], lowSpecificityCount: 0 },
+      prosGeneric: { genericCount: 0, totalCount: 2, genericItems: [] },
+      consGeneric: { genericCount: 0, totalCount: 2, genericItems: [] },
+    };
+    const flags = checkCandidateBalance(analysis);
+    const specFlag = flags.find(f => f.type === "specificity_gap" && f.detail.includes("pros are entirely generic"));
+    expect(specFlag).toBeDefined();
+    expect(specFlag.severity).toBe("warning");
+  });
+
+  it("flags large specificity ratio (3x or more)", () => {
+    const analysis = {
+      name: "TestCandidate",
+      prosCount: 2,
+      consCount: 2,
+      prosLength: 100,
+      consLength: 100,
+      prosAvgLength: 50,
+      consAvgLength: 50,
+      prosSentiment: { strongPositiveCount: 0, weakPositiveCount: 0, strongNegativeCount: 0, hedgingCount: 0, avgWordCount: 8 },
+      consSentiment: { strongPositiveCount: 0, weakPositiveCount: 0, strongNegativeCount: 0, hedgingCount: 0, avgWordCount: 8 },
+      prosSpecificity: { avgScore: 0.75, scores: [0.75, 0.75], lowSpecificityCount: 0 },
+      consSpecificity: { avgScore: 0.1, scores: [0.1, 0.1], lowSpecificityCount: 0 },
+      prosGeneric: { genericCount: 0, totalCount: 2, genericItems: [] },
+      consGeneric: { genericCount: 0, totalCount: 2, genericItems: [] },
+    };
+    const flags = checkCandidateBalance(analysis);
+    const specFlag = flags.find(f => f.type === "specificity_gap" && f.detail.includes("more specific"));
+    expect(specFlag).toBeDefined();
+    expect(specFlag.severity).toBe("info");
+  });
+
+  it("flags when all pros/cons lack specificity", () => {
+    const analysis = {
+      name: "TestCandidate",
+      prosCount: 2,
+      consCount: 2,
+      prosLength: 60,
+      consLength: 60,
+      prosAvgLength: 30,
+      consAvgLength: 30,
+      prosSentiment: { strongPositiveCount: 0, weakPositiveCount: 0, strongNegativeCount: 0, hedgingCount: 0, avgWordCount: 5 },
+      consSentiment: { strongPositiveCount: 0, weakPositiveCount: 0, strongNegativeCount: 0, hedgingCount: 0, avgWordCount: 5 },
+      prosSpecificity: { avgScore: 0, scores: [0, 0], lowSpecificityCount: 2 },
+      consSpecificity: { avgScore: 0, scores: [0, 0], lowSpecificityCount: 2 },
+      prosGeneric: { genericCount: 0, totalCount: 2, genericItems: [] },
+      consGeneric: { genericCount: 0, totalCount: 2, genericItems: [] },
+    };
+    const flags = checkCandidateBalance(analysis);
+    const specFlag = flags.find(f => f.type === "specificity_gap" && f.detail.includes("lack specific references"));
+    expect(specFlag).toBeDefined();
+    expect(specFlag.severity).toBe("warning");
+  });
+
+  it("does not flag when both sides are similarly specific", () => {
+    const analysis = {
+      name: "TestCandidate",
+      prosCount: 2,
+      consCount: 2,
+      prosLength: 100,
+      consLength: 100,
+      prosAvgLength: 50,
+      consAvgLength: 50,
+      prosSentiment: { strongPositiveCount: 0, weakPositiveCount: 0, strongNegativeCount: 0, hedgingCount: 0, avgWordCount: 8 },
+      consSentiment: { strongPositiveCount: 0, weakPositiveCount: 0, strongNegativeCount: 0, hedgingCount: 0, avgWordCount: 8 },
+      prosSpecificity: { avgScore: 0.5, scores: [0.5, 0.5], lowSpecificityCount: 0 },
+      consSpecificity: { avgScore: 0.5, scores: [0.5, 0.5], lowSpecificityCount: 0 },
+      prosGeneric: { genericCount: 0, totalCount: 2, genericItems: [] },
+      consGeneric: { genericCount: 0, totalCount: 2, genericItems: [] },
+    };
+    const flags = checkCandidateBalance(analysis);
+    const specFlags = flags.filter(f => f.type === "specificity_gap");
+    expect(specFlags).toHaveLength(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// analyzeCandidate — extended fields
+// ---------------------------------------------------------------------------
+describe("analyzeCandidate — extended analysis", () => {
+  it("includes sentiment analysis in results", () => {
+    const candidate = {
+      name: "TestCandidate",
+      pros: ["An outstanding record of transformative legislation"],
+      cons: ["Somewhat unclear on policy, could arguably do better"],
+    };
+    const result = analyzeCandidate(candidate);
+    expect(result.prosSentiment).toBeDefined();
+    expect(result.consSentiment).toBeDefined();
+    expect(result.prosSentiment.strongPositiveCount).toBeGreaterThan(0);
+    expect(result.consSentiment.hedgingCount).toBeGreaterThan(0);
+  });
+
+  it("includes specificity scoring in results", () => {
+    const candidate = {
+      name: "TestCandidate",
+      pros: ["Voted for HB 1234 in 2023"],
+      cons: ["Lacks experience"],
+    };
+    const result = analyzeCandidate(candidate);
+    expect(result.prosSpecificity).toBeDefined();
+    expect(result.consSpecificity).toBeDefined();
+    expect(result.prosSpecificity.avgScore).toBeGreaterThan(0);
+    expect(result.consSpecificity.avgScore).toBe(0);
+  });
+
+  it("includes generic content detection in results", () => {
+    const candidate = {
+      name: "TestCandidate",
+      pros: ["Experienced leader", "Voted for HB 1234"],
+      cons: ["Career politician"],
+    };
+    const result = analyzeCandidate(candidate);
+    expect(result.prosGeneric).toBeDefined();
+    expect(result.consGeneric).toBeDefined();
+    expect(result.prosGeneric.genericCount).toBe(1);
+    expect(result.consGeneric.genericCount).toBe(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Integration: end-to-end with realistic candidates
+// ---------------------------------------------------------------------------
+describe("integration — realistic candidate balance checks", () => {
+  it("flags a subtly biased candidate (glowing pros, tepid cons)", () => {
+    const candidate = {
+      name: "Favored Candidate",
+      pros: [
+        "An extraordinary and transformative leader who has achieved remarkable results",
+        "Instrumental in passing unprecedented legislation that dramatically improved schools",
+      ],
+      cons: [
+        "Could perhaps do somewhat better on housing policy",
+        "Some say the approach seems fairly cautious on transit",
+      ],
+    };
+    const analysis = analyzeCandidate(candidate);
+    const flags = checkCandidateBalance(analysis);
+    const sentimentFlags = flags.filter(f => f.type === "sentiment_asymmetry");
+    expect(sentimentFlags.length).toBeGreaterThan(0);
+  });
+
+  it("flags a candidate with all generic content", () => {
+    const candidate = {
+      name: "Generic Candidate",
+      pros: ["Experienced leader", "Strong advocate"],
+      cons: ["Career politician", "Out of touch"],
+    };
+    const analysis = analyzeCandidate(candidate);
+    const flags = checkCandidateBalance(analysis);
+    const genericFlags = flags.filter(f => f.type === "generic_content");
+    expect(genericFlags.length).toBeGreaterThan(0);
+    expect(genericFlags[0].detail).toContain("4 of 4");
+  });
+
+  it("flags specificity gap (specific pros, vague cons)", () => {
+    const candidate = {
+      name: "Lopsided Candidate",
+      pros: [
+        "Voted for HB 1234 to fund $50M in school construction in 2023",
+        "Chaired the committee on education and passed 3 major bills",
+      ],
+      cons: [
+        "Not great on transit",
+        "Needs improvement",
+      ],
+    };
+    const analysis = analyzeCandidate(candidate);
+    const flags = checkCandidateBalance(analysis);
+    const specFlags = flags.filter(f => f.type === "specificity_gap");
+    expect(specFlags.length).toBeGreaterThan(0);
+  });
+
+  it("produces clean report for well-crafted specific content", () => {
+    const candidate = {
+      name: "Well Documented",
+      pros: [
+        "Sponsored HB 1234 which reduced property taxes by 12% in 2023",
+        "Endorsed by the Texas AFL-CIO and rated A by the League of Conservation Voters",
+      ],
+      cons: [
+        "Voted against SB 567 border security bill which passed with bipartisan support",
+        "Rated D by the Texas Taxpayers Association for 3 consecutive years",
+      ],
+    };
+    const analysis = analyzeCandidate(candidate);
+    const flags = checkCandidateBalance(analysis);
+    const genericFlags = flags.filter(f => f.type === "generic_content");
+    const specGapFlags = flags.filter(f => f.type === "specificity_gap");
+    expect(genericFlags).toHaveLength(0);
+    expect(specGapFlags).toHaveLength(0);
+  });
+
+  it("flags tepid pros paired with harsh cons (weak positive + strong negative)", () => {
+    const candidate = {
+      name: "Unfairly Treated",
+      pros: [
+        "A decent and adequate representative who is generally reliable",
+        "Satisfactory performance on committees and passable attendance record",
+      ],
+      cons: [
+        "A dangerous and reckless approach that has been catastrophic for the district",
+        "Appalling record of negligent oversight and irresponsible spending decisions",
+      ],
+    };
+    const analysis = analyzeCandidate(candidate);
+    const flags = checkCandidateBalance(analysis);
+    const sentimentFlags = flags.filter(f => f.type === "sentiment_asymmetry");
+    expect(sentimentFlags.length).toBeGreaterThan(0);
+    // Should detect the weak-positive vs strong-negative pattern
+    const weakStrongFlag = sentimentFlags.find(f => f.detail.includes("strong negative"));
+    expect(weakStrongFlag).toBeDefined();
+    expect(weakStrongFlag.severity).toBe("warning");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Word list validation
+// ---------------------------------------------------------------------------
+describe("word lists — validation", () => {
+  it("WEAK_POSITIVE_WORDS has at least 10 entries", () => {
+    expect(WEAK_POSITIVE_WORDS.length).toBeGreaterThanOrEqual(10);
+  });
+
+  it("STRONG_NEGATIVE_WORDS has at least 10 entries", () => {
+    expect(STRONG_NEGATIVE_WORDS.length).toBeGreaterThanOrEqual(10);
+  });
+
+  it("WEAK_POSITIVE_WORDS and STRONG_POSITIVE_WORDS do not overlap", () => {
+    const overlap = WEAK_POSITIVE_WORDS.filter(w => STRONG_POSITIVE_WORDS.includes(w));
+    expect(overlap).toHaveLength(0);
+  });
+
+  it("STRONG_NEGATIVE_WORDS and HEDGING_WORDS do not overlap", () => {
+    const overlap = STRONG_NEGATIVE_WORDS.filter(w => HEDGING_WORDS.includes(w));
+    expect(overlap).toHaveLength(0);
+  });
+
+  it("countWordMatches detects weak positive words", () => {
+    const count = countWordMatches("This is a decent and adequate policy", WEAK_POSITIVE_WORDS);
+    expect(count).toBe(2);
+  });
+
+  it("countWordMatches detects strong negative words", () => {
+    const count = countWordMatches("A dangerous and catastrophic failure", STRONG_NEGATIVE_WORDS);
+    expect(count).toBe(2);
   });
 });

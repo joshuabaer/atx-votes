@@ -5,6 +5,9 @@ import {
   seedCountyBallot,
   seedPrecinctMap,
   seedFullCounty,
+  classifyError,
+  errorCategoryLabel,
+  resetProgress,
 } from "../src/county-seeder.js";
 
 // ---------------------------------------------------------------------------
@@ -156,7 +159,7 @@ describe("seedCountyInfo", () => {
     );
 
     await expect(seedCountyInfo("48453", "Travis", mockEnv)).rejects.toThrow(
-      "Claude API returned 500"
+      "Claude API server error (500)"
     );
   });
 
@@ -282,7 +285,7 @@ describe("seedCountyBallot", () => {
                         district: "Precinct 1",
                         isContested: true,
                         candidates: [
-                          { id: "c1", name: "John Smith", isIncumbent: true },
+                          { id: "c1", name: "John Smith", isIncumbent: true, pros: ["Strong community ties", "Experience in local government"], cons: ["Limited budget oversight record", "No prior county-level office"] },
                         ],
                       },
                     ],
@@ -430,7 +433,7 @@ describe("seedCountyBallot", () => {
                         id: "r1",
                         office: "County Judge",
                         candidates: [
-                          { id: "c1", name: "Jane Doe", isIncumbent: false },
+                          { id: "c1", name: "Jane Doe", isIncumbent: false, pros: ["Strong community ties", "Experience in local government"], cons: ["Limited budget oversight record", "No prior county-level office"] },
                         ],
                       },
                     ],
@@ -548,6 +551,62 @@ describe("seedPrecinctMap", () => {
 });
 
 // ---------------------------------------------------------------------------
+// classifyError
+// ---------------------------------------------------------------------------
+describe("classifyError", () => {
+  it("classifies 401 as AUTH", () => {
+    expect(classifyError(new Error("Claude API auth error (401)"))).toBe("AUTH");
+  });
+
+  it("classifies 403 as AUTH", () => {
+    expect(classifyError(new Error("Claude API auth error (403)"))).toBe("AUTH");
+  });
+
+  it("classifies 429 as RATE_LIMIT", () => {
+    expect(classifyError(new Error("Claude API returned 429 after 3 retries"))).toBe("RATE_LIMIT");
+  });
+
+  it("classifies 529 as OVERLOADED", () => {
+    expect(classifyError(new Error("Claude API returned 529"))).toBe("OVERLOADED");
+  });
+
+  it("classifies 500 as SERVER", () => {
+    expect(classifyError(new Error("Claude API server error (500)"))).toBe("SERVER");
+  });
+
+  it("classifies 502 as SERVER", () => {
+    expect(classifyError(new Error("Claude API server error (502)"))).toBe("SERVER");
+  });
+
+  it("classifies JSON parse errors as DATA", () => {
+    expect(classifyError(new Error("Failed to parse response as JSON"))).toBe("DATA");
+  });
+
+  it("classifies validation errors as DATA", () => {
+    expect(classifyError(new Error("Validation failed for County Judge"))).toBe("DATA");
+  });
+
+  it("classifies unknown errors as OTHER", () => {
+    expect(classifyError(new Error("Something unexpected happened"))).toBe("OTHER");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// errorCategoryLabel
+// ---------------------------------------------------------------------------
+describe("errorCategoryLabel", () => {
+  it("returns human-readable labels for all categories", () => {
+    expect(errorCategoryLabel("AUTH")).toContain("Auth error");
+    expect(errorCategoryLabel("RATE_LIMIT")).toContain("Rate limited");
+    expect(errorCategoryLabel("OVERLOADED")).toContain("overloaded");
+    expect(errorCategoryLabel("SERVER")).toContain("Server error");
+    expect(errorCategoryLabel("NETWORK")).toContain("Network");
+    expect(errorCategoryLabel("DATA")).toContain("Data error");
+    expect(errorCategoryLabel("OTHER")).toContain("Other");
+  });
+});
+
+// ---------------------------------------------------------------------------
 // seedFullCounty
 // ---------------------------------------------------------------------------
 describe("seedFullCounty", () => {
@@ -557,9 +616,9 @@ describe("seedFullCounty", () => {
     vi.useFakeTimers();
     mockEnv = {
       ELECTION_DATA: {
-        get: vi.fn(),
-        put: vi.fn(),
-        delete: vi.fn(),
+        get: vi.fn().mockResolvedValue(null), // No previous progress
+        put: vi.fn().mockResolvedValue(undefined),
+        delete: vi.fn().mockResolvedValue(undefined),
       },
       ANTHROPIC_API_KEY: "test-key",
     };
@@ -619,6 +678,15 @@ describe("seedFullCounty", () => {
     expect(result.steps.precinctMap).toBeDefined();
   });
 
+  it("includes summary with counts", async () => {
+    const result = await runWithTimers(seedFullCounty("48453", "Travis", mockEnv));
+    expect(result.summary).toBeDefined();
+    expect(result.summary.total).toBe(4);
+    expect(result.summary.completed).toBe(4);
+    expect(result.summary.errored).toBe(0);
+    expect(result.summary.skipped).toBe(0);
+  });
+
   it("catches errors in individual steps without failing entirely", async () => {
     let callCount = 0;
     vi.stubGlobal(
@@ -650,10 +718,151 @@ describe("seedFullCounty", () => {
     );
 
     const result = await runWithTimers(seedFullCounty("48453", "Travis", mockEnv));
-    // First step should have an error
+    // First step should have an error with category
     expect(result.steps.countyInfo.error).toBeDefined();
+    expect(result.steps.countyInfo.category).toBe("SERVER");
     // Other steps should succeed
     expect(result.steps.republican.success).toBe(true);
+    // Error summary should be present
+    expect(result.errors.length).toBe(1);
+    expect(result.errorSummary.SERVER).toBeDefined();
+    expect(result.errorSummary.SERVER.count).toBe(1);
+  });
+
+  it("does NOT mark failed steps as completed in progress", async () => {
+    let callCount = 0;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() => {
+        callCount++;
+        // Fail the first call (county info), succeed the rest
+        if (callCount === 1) {
+          return Promise.resolve({ ok: false, status: 500 });
+        }
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          json: () =>
+            Promise.resolve({
+              content: [
+                {
+                  type: "text",
+                  text: JSON.stringify({
+                    races: [],
+                    propositions: [],
+                    "78701": "1",
+                  }),
+                },
+              ],
+            }),
+        });
+      })
+    );
+
+    await runWithTimers(seedFullCounty("48453", "Travis", mockEnv));
+    // Find the progress save call
+    const progressPutCall = mockEnv.ELECTION_DATA.put.mock.calls.find(
+      (c) => c[0] === "seed_progress:48453"
+    );
+    expect(progressPutCall).toBeDefined();
+    const savedProgress = JSON.parse(progressPutCall[1]);
+    // countyInfo should NOT be in completed (it failed)
+    expect(savedProgress.completed["info:48453"]).toBeUndefined();
+    // Other steps should be completed
+    expect(savedProgress.completed["ballot:48453:republican"]).toBe(true);
+    expect(savedProgress.completed["ballot:48453:democrat"]).toBe(true);
+    expect(savedProgress.completed["precinct:48453"]).toBe(true);
+    // Error should be recorded
+    expect(savedProgress.errors.length).toBe(1);
+    expect(savedProgress.errors[0].category).toBe("SERVER");
+  });
+
+  it("skips already-completed steps on re-run", async () => {
+    // Simulate previous progress with countyInfo already done
+    mockEnv.ELECTION_DATA.get.mockImplementation((key, format) => {
+      if (key === "seed_progress:48453") {
+        return Promise.resolve({
+          completed: { "info:48453": true },
+          errors: [],
+          startedAt: "2026-02-01T00:00:00Z",
+        });
+      }
+      return Promise.resolve(null);
+    });
+
+    const result = await runWithTimers(seedFullCounty("48453", "Travis", mockEnv));
+    // countyInfo should be skipped
+    expect(result.steps.countyInfo.skipped).toBe(true);
+    expect(result.steps.countyInfo.reason).toBe("already completed");
+    // Other steps should still run
+    expect(result.steps.republican.success).toBe(true);
+    expect(result.summary.skipped).toBe(1);
+  });
+
+  it("clears stale errors from previous runs", async () => {
+    // Simulate previous progress with stale errors
+    mockEnv.ELECTION_DATA.get.mockImplementation((key, format) => {
+      if (key === "seed_progress:48453") {
+        return Promise.resolve({
+          completed: { "info:48453": true },
+          errors: [
+            { step: "ballot:48453:republican", error: "Old error", category: "AUTH", at: "2026-02-01T00:00:00Z" },
+          ],
+          startedAt: "2026-02-01T00:00:00Z",
+        });
+      }
+      return Promise.resolve(null);
+    });
+
+    const result = await runWithTimers(seedFullCounty("48453", "Travis", mockEnv));
+    // Should succeed (old errors cleared, steps retried)
+    expect(result.steps.republican.success).toBe(true);
+    // The saved progress should not contain old errors
+    const progressPutCall = mockEnv.ELECTION_DATA.put.mock.calls.find(
+      (c) => c[0] === "seed_progress:48453"
+    );
+    const savedProgress = JSON.parse(progressPutCall[1]);
+    // Only new errors (if any) should be present — no stale ones
+    const oldErrors = savedProgress.errors.filter((e) => e.at === "2026-02-01T00:00:00Z");
+    expect(oldErrors.length).toBe(0);
+  });
+
+  it("reset option clears progress before running", async () => {
+    // Simulate existing progress
+    mockEnv.ELECTION_DATA.get.mockImplementation((key, format) => {
+      if (key === "seed_progress:48453") {
+        return Promise.resolve(null); // After reset, get returns null
+      }
+      return Promise.resolve(null);
+    });
+
+    const result = await runWithTimers(
+      seedFullCounty("48453", "Travis", mockEnv, { reset: true })
+    );
+    // Should have called delete on the progress key
+    expect(mockEnv.ELECTION_DATA.delete).toHaveBeenCalledWith("seed_progress:48453");
+    // All steps should run (none skipped)
+    expect(result.summary.skipped).toBe(0);
+  });
+
+  it("aborts on auth errors and marks remaining steps as not attempted", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() =>
+        Promise.resolve({ ok: false, status: 401 })
+      )
+    );
+
+    const result = await runWithTimers(seedFullCounty("48453", "Travis", mockEnv));
+    // Should abort at countyInfo
+    expect(result.abortedAt).toBe("countyInfo");
+    expect(result.abortReason).toContain("Authentication failed");
+    // Only countyInfo should have an error; others should not be attempted
+    expect(result.steps.countyInfo.error).toBeDefined();
+    expect(result.steps.countyInfo.category).toBe("AUTH");
+    expect(result.steps.republican).toBeUndefined();
+    expect(result.steps.democrat).toBeUndefined();
+    expect(result.steps.precinctMap).toBeUndefined();
   });
 
   it("retries on 429 rate limiting", async () => {
@@ -693,7 +902,7 @@ describe("seedFullCounty", () => {
     expect(attempts).toBeGreaterThan(1);
   });
 
-  it("throws after 3 consecutive 429 retries", async () => {
+  it("records 429 exhaustion as RATE_LIMIT category", async () => {
     vi.stubGlobal(
       "fetch",
       vi.fn(() =>
@@ -702,8 +911,35 @@ describe("seedFullCounty", () => {
     );
 
     const result = await runWithTimers(seedFullCounty("48453", "Travis", mockEnv));
-    // County info should have error about 429 retries
+    // County info should have error about 429 retries with category
     expect(result.steps.countyInfo.error).toContain("429");
+    expect(result.steps.countyInfo.category).toBe("RATE_LIMIT");
+  });
+
+  it("saves progress to KV after completion", async () => {
+    await runWithTimers(seedFullCounty("48453", "Travis", mockEnv));
+    // Should have saved progress
+    const progressPutCall = mockEnv.ELECTION_DATA.put.mock.calls.find(
+      (c) => c[0] === "seed_progress:48453"
+    );
+    expect(progressPutCall).toBeDefined();
+    const savedProgress = JSON.parse(progressPutCall[1]);
+    expect(Object.keys(savedProgress.completed).length).toBe(4);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// resetProgress
+// ---------------------------------------------------------------------------
+describe("resetProgress", () => {
+  it("deletes the progress key from KV", async () => {
+    const mockEnv = {
+      ELECTION_DATA: {
+        delete: vi.fn().mockResolvedValue(undefined),
+      },
+    };
+    await resetProgress(mockEnv, "48453");
+    expect(mockEnv.ELECTION_DATA.delete).toHaveBeenCalledWith("seed_progress:48453");
   });
 });
 

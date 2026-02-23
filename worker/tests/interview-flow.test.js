@@ -1099,16 +1099,11 @@ describe("Full interview happy path", () => {
 });
 
 // ---------------------------------------------------------------------------
-// Progress bar
+// Progress bar removed — stars serve as loading indicator
 // ---------------------------------------------------------------------------
-describe("Progress bar", () => {
-  it("shows progress bar during interview phases 1-7", () => {
-    expect(getApp()).toContain("progress-fill");
-  });
-
-  it("phase 1 (first screen) shows progress bar", () => {
-    expect(S().phase).toBe(1);
-    expect(getApp()).toContain("progress-fill");
+describe("No progress bar", () => {
+  it("does not render progress bar during interview phases", () => {
+    expect(getApp()).not.toContain("progress-fill");
   });
 });
 

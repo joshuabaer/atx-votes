@@ -679,18 +679,33 @@ describe("Audit page rendering", () => {
 // Cron scheduled handler
 // ---------------------------------------------------------------------------
 describe("Cron scheduled handler", () => {
-  it("runs daily update via ctx.waitUntil", () => {
-    expect(indexSrc).toContain("ctx.waitUntil(runDailyUpdate(env))");
+  it("runs daily update with error tracking", () => {
+    expect(indexSrc).toContain("await runDailyUpdate(env)");
+    expect(indexSrc).toContain('cronLog.tasks.dailyUpdate = { status: "success"');
   });
 
   it("runs AI audit daily until election day", () => {
-    expect(indexSrc).toContain("ctx.waitUntil(");
     expect(indexSrc).toContain("runAudit(env");
     expect(indexSrc).toContain('triggeredBy: "cron"');
   });
 
   it("passes exportData to audit via buildAuditExportData", () => {
     expect(indexSrc).toContain("exportData: buildAuditExportData()");
+  });
+
+  it("writes cron_status to KV after tasks complete", () => {
+    expect(indexSrc).toContain("cron_status:");
+    expect(indexSrc).toContain("JSON.stringify(cronLog)");
+  });
+
+  it("runs health check as part of cron", () => {
+    expect(indexSrc).toContain("runCronHealthCheck(env)");
+    expect(indexSrc).toContain('cronLog.tasks.healthCheck');
+  });
+
+  it("notifies Discord when tasks fail", () => {
+    expect(indexSrc).toContain("notifyDiscord(env");
+    expect(indexSrc).toContain("Cron Alert");
   });
 });
 
@@ -722,5 +737,277 @@ describe("Vanity entry points", () => {
   it("chatgpt entry point clears data", () => {
     expect(indexSrc).toContain('"/chatgpt"');
     expect(indexSrc).toContain("Powered by ChatGPT");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Health check endpoint
+// ---------------------------------------------------------------------------
+describe("Health check endpoint", () => {
+  it("has /health route in GET handler", () => {
+    expect(indexSrc).toContain('url.pathname === "/health"');
+  });
+
+  it("routes to handleHealthCheck", () => {
+    expect(indexSrc).toContain("handleHealthCheck(env)");
+  });
+
+  it("health check reads manifest key", () => {
+    expect(indexSrc).toContain('env.ELECTION_DATA.get("manifest")');
+  });
+
+  it("health check validates both statewide ballots", () => {
+    expect(indexSrc).toContain("ballot:statewide:republican_primary_2026");
+    expect(indexSrc).toContain("ballot:statewide:democrat_primary_2026");
+  });
+
+  it("health check returns status ok/degraded/down", () => {
+    expect(indexSrc).toContain('"ok"');
+    expect(indexSrc).toContain('"degraded"');
+    expect(indexSrc).toContain('"down"');
+  });
+
+  it("health check includes responseMs timing", () => {
+    expect(indexSrc).toContain("responseMs");
+  });
+
+  it("health endpoint is public (no auth check)", () => {
+    // The /health route should NOT check Authorization
+    const healthRouteIdx = indexSrc.indexOf('url.pathname === "/health"');
+    const nextLines = indexSrc.slice(healthRouteIdx, healthRouteIdx + 200);
+    expect(nextLines).not.toContain("ADMIN_SECRET");
+  });
+
+  it("health check includes cron freshness check", () => {
+    expect(indexSrc).toContain("cronFreshness");
+    expect(indexSrc).toContain("cron_status:");
+  });
+
+  it("health check includes audit freshness", () => {
+    expect(indexSrc).toContain("auditFreshness");
+  });
+
+  it("health check verifies API key presence", () => {
+    expect(indexSrc).toContain("checks.apiKey");
+    expect(indexSrc).toContain("ANTHROPIC_API_KEY");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Admin status dashboard
+// ---------------------------------------------------------------------------
+describe("Admin status dashboard", () => {
+  it("has /admin/status route", () => {
+    expect(indexSrc).toContain('url.pathname === "/admin/status"');
+  });
+
+  it("requires ADMIN_SECRET auth", () => {
+    const statusRouteIdx = indexSrc.indexOf('url.pathname === "/admin/status"');
+    const nextLines = indexSrc.slice(statusRouteIdx, statusRouteIdx + 300);
+    expect(nextLines).toContain("ADMIN_SECRET");
+    expect(nextLines).toContain("Unauthorized");
+  });
+
+  it("routes to handleAdminStatus", () => {
+    expect(indexSrc).toContain("handleAdminStatus(env)");
+  });
+
+  it("admin status shows cron task results", () => {
+    expect(indexSrc).toContain("cronTaskRows");
+  });
+
+  it("admin status shows audit provider scores", () => {
+    expect(indexSrc).toContain("auditProviders");
+  });
+
+  it("admin status shows update logs", () => {
+    expect(indexSrc).toContain("updateLogRows");
+  });
+
+  it("admin status shows health log", () => {
+    expect(indexSrc).toContain("healthLogRows");
+  });
+
+  it("admin status links to AI error log", () => {
+    expect(indexSrc).toContain("/admin/errors");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Admin AI error log dashboard
+// ---------------------------------------------------------------------------
+describe("Admin AI error log dashboard", () => {
+  it("has /admin/errors route", () => {
+    expect(indexSrc).toContain('url.pathname === "/admin/errors"');
+  });
+
+  it("requires ADMIN_SECRET auth", () => {
+    const routeIdx = indexSrc.indexOf('url.pathname === "/admin/errors"');
+    const nextLines = indexSrc.slice(routeIdx, routeIdx + 300);
+    expect(nextLines).toContain("ADMIN_SECRET");
+    expect(nextLines).toContain("Unauthorized");
+  });
+
+  it("routes to handleAdminErrors", () => {
+    expect(indexSrc).toContain("handleAdminErrors(request, env)");
+  });
+
+  it("has handleAdminErrors function", () => {
+    expect(indexSrc).toContain("async function handleAdminErrors(request, env)");
+  });
+
+  it("supports JSON format parameter", () => {
+    expect(indexSrc).toContain('format === "json"');
+  });
+
+  it("fetches error_log: prefix from KV", () => {
+    expect(indexSrc).toContain("ERROR_LOG_PREFIX");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Discord webhook notification
+// ---------------------------------------------------------------------------
+describe("Discord webhook notification", () => {
+  it("has notifyDiscord helper function", () => {
+    expect(indexSrc).toContain("async function notifyDiscord(env, message)");
+  });
+
+  it("checks for DISCORD_WEBHOOK_URL", () => {
+    expect(indexSrc).toContain("env.DISCORD_WEBHOOK_URL");
+  });
+
+  it("sends JSON content to webhook", () => {
+    expect(indexSrc).toContain('"Content-Type": "application/json"');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Cron health check
+// ---------------------------------------------------------------------------
+describe("Cron health check", () => {
+  it("has runCronHealthCheck function", () => {
+    expect(indexSrc).toContain("async function runCronHealthCheck(env)");
+  });
+
+  it("writes health_log to KV", () => {
+    expect(indexSrc).toContain("health_log:");
+  });
+
+  it("checks manifest key exists", () => {
+    const fnIdx = indexSrc.indexOf("async function runCronHealthCheck");
+    const fnBody = indexSrc.slice(fnIdx, fnIdx + 2000);
+    expect(fnBody).toContain("manifest");
+  });
+
+  it("checks both statewide ballots", () => {
+    const fnIdx = indexSrc.indexOf("async function runCronHealthCheck");
+    const fnBody = indexSrc.slice(fnIdx, fnIdx + 2000);
+    expect(fnBody).toContain("republican");
+    expect(fnBody).toContain("democrat");
+  });
+
+  it("alerts Discord when issues found", () => {
+    const fnIdx = indexSrc.indexOf("async function runCronHealthCheck");
+    const fnBody = indexSrc.slice(fnIdx, fnIdx + 2000);
+    expect(fnBody).toContain("notifyDiscord");
+    expect(fnBody).toContain("Health Alert");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Admin KV cleanup endpoint
+// ---------------------------------------------------------------------------
+describe("Admin KV cleanup endpoint", () => {
+  it("has /api/admin/cleanup route", () => {
+    expect(indexSrc).toContain('url.pathname === "/api/admin/cleanup"');
+  });
+
+  it("requires ADMIN_SECRET auth", () => {
+    const routeIdx = indexSrc.indexOf('url.pathname === "/api/admin/cleanup"');
+    const nextLines = indexSrc.slice(routeIdx, routeIdx + 300);
+    expect(nextLines).toContain("ADMIN_SECRET");
+    expect(nextLines).toContain("Unauthorized");
+  });
+
+  it("routes to handleAdminCleanup", () => {
+    expect(indexSrc).toContain("handleAdminCleanup(url, env)");
+  });
+
+  it("has handleAdminCleanup function", () => {
+    expect(indexSrc).toContain("async function handleAdminCleanup(url, env)");
+  });
+
+  it("supports dry-run parameter", () => {
+    const fnIdx = indexSrc.indexOf("async function handleAdminCleanup");
+    const fnBody = indexSrc.slice(fnIdx, fnIdx + 5000);
+    expect(fnBody).toContain("dry-run");
+    expect(fnBody).toContain("dryRun");
+  });
+
+  it("uses cursor pagination to list all KV keys", () => {
+    const fnIdx = indexSrc.indexOf("async function handleAdminCleanup");
+    const fnBody = indexSrc.slice(fnIdx, fnIdx + 5000);
+    expect(fnBody).toContain("cursor");
+    expect(fnBody).toContain("list_complete");
+    expect(fnBody).toContain("ELECTION_DATA.list");
+  });
+
+  it("categorizes statewide and county ballot keys", () => {
+    const fnIdx = indexSrc.indexOf("async function handleAdminCleanup");
+    const fnBody = indexSrc.slice(fnIdx, fnIdx + 5000);
+    expect(fnBody).toContain("statewideBallots");
+    expect(fnBody).toContain("countyBallots");
+    expect(fnBody).toContain("ballot:statewide:");
+    expect(fnBody).toContain("ballot:county:");
+  });
+
+  it("categorizes log key types", () => {
+    const fnIdx = indexSrc.indexOf("async function handleAdminCleanup");
+    const fnBody = indexSrc.slice(fnIdx, fnIdx + 5000);
+    expect(fnBody).toContain("updateLogs");
+    expect(fnBody).toContain("cronStatus");
+    expect(fnBody).toContain("healthLogs");
+    expect(fnBody).toContain("usageLogs");
+    expect(fnBody).toContain("auditLogs");
+  });
+
+  it("identifies legacy ballot keys as stale", () => {
+    const fnIdx = indexSrc.indexOf("async function handleAdminCleanup");
+    const fnBody = indexSrc.slice(fnIdx, fnIdx + 5000);
+    expect(fnBody).toContain("legacyBallots");
+    expect(fnBody).toContain("Legacy ballot key");
+  });
+
+  it("uses 14-day cutoff for dated logs", () => {
+    const fnIdx = indexSrc.indexOf("async function handleAdminCleanup");
+    const fnBody = indexSrc.slice(fnIdx, fnIdx + 5000);
+    expect(fnBody).toContain("14");
+    expect(fnBody).toContain("cutoff");
+    expect(fnBody).toContain("cutoffStr");
+  });
+
+  it("returns JSON response with expected fields", () => {
+    const fnIdx = indexSrc.indexOf("async function handleAdminCleanup");
+    const fnBody = indexSrc.slice(fnIdx, fnIdx + 5000);
+    expect(fnBody).toContain("totalKeys");
+    expect(fnBody).toContain("categories");
+    expect(fnBody).toContain("staleCount");
+    expect(fnBody).toContain("deletedCount");
+    expect(fnBody).toContain("jsonResponse");
+  });
+
+  it("deletes keys when not in dry-run mode", () => {
+    const fnIdx = indexSrc.indexOf("async function handleAdminCleanup");
+    const fnBody = indexSrc.slice(fnIdx, fnIdx + 5000);
+    expect(fnBody).toContain("ELECTION_DATA.delete");
+    expect(fnBody).toContain("!dryRun");
+  });
+
+  it("handles delete errors gracefully", () => {
+    const fnIdx = indexSrc.indexOf("async function handleAdminCleanup");
+    const fnBody = indexSrc.slice(fnIdx, fnIdx + 5000);
+    expect(fnBody).toContain("deleteErrors");
+    expect(fnBody).toContain("catch");
   });
 });

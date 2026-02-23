@@ -3,10 +3,118 @@
 //
 // Run via: POST /api/election/seed-county with ADMIN_SECRET auth
 // Body: { countyFips: "48453", countyName: "Travis", party: "republican" }
+//
+// Options:
+//   reset: true — clear progress for this county before seeding
+//
+// Progress is tracked in KV at `seed_progress:{countyFips}`. Only successful
+// steps are marked completed; failed steps are retried on the next run.
 
 import { extractSourcesFromResponse, mergeSources, validateRaceUpdate } from "./updater.js";
+import { logTokenUsage } from "./usage-logger.js";
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// ─── Error Classification ───────────────────────────────────────────────────
+
+/**
+ * Classify an error into a category for structured reporting.
+ * Categories: AUTH, RATE_LIMIT, OVERLOADED, SERVER, NETWORK, DATA, OTHER
+ */
+export function classifyError(error) {
+  const msg = error.message || String(error);
+  if (msg.includes("401") || msg.includes("403") || msg.includes("auth")) return "AUTH";
+  if (msg.includes("429")) return "RATE_LIMIT";
+  if (msg.includes("529")) return "OVERLOADED";
+  if (msg.includes("500") || msg.includes("502") || msg.includes("503")) return "SERVER";
+  if (msg.includes("fetch") || msg.includes("ECONN") || msg.includes("ETIMEDOUT") || msg.includes("network")) return "NETWORK";
+  if (msg.includes("parse") || msg.includes("JSON") || msg.includes("Validation")) return "DATA";
+  return "OTHER";
+}
+
+/**
+ * Human-readable label for an error category
+ */
+export function errorCategoryLabel(category) {
+  switch (category) {
+    case "AUTH": return "Auth error (401/403) — check ANTHROPIC_API_KEY";
+    case "RATE_LIMIT": return "Rate limited (429) — wait and retry";
+    case "OVERLOADED": return "API overloaded (529) — wait and retry";
+    case "SERVER": return "Server error (5xx) — transient, retry later";
+    case "NETWORK": return "Network error — check connectivity";
+    case "DATA": return "Data error — response parsing or validation failed";
+    default: return "Other error";
+  }
+}
+
+// ─── KV-based Progress Tracking ─────────────────────────────────────────────
+
+const PROGRESS_KEY_PREFIX = "seed_progress:";
+
+/**
+ * Load progress for a county from KV
+ */
+async function loadProgress(env, countyFips) {
+  try {
+    const data = await env.ELECTION_DATA.get(`${PROGRESS_KEY_PREFIX}${countyFips}`, "json");
+    if (!data) return { completed: {}, errors: [], startedAt: new Date().toISOString() };
+    // Clear stale errors from previous runs — they'll be re-populated if they recur
+    const staleErrorCount = (data.errors || []).length;
+    if (staleErrorCount > 0) {
+      data.errors = [];
+    }
+    return data;
+  } catch {
+    return { completed: {}, errors: [], startedAt: new Date().toISOString() };
+  }
+}
+
+/**
+ * Save progress for a county to KV
+ */
+async function saveProgress(env, countyFips, progress) {
+  await env.ELECTION_DATA.put(
+    `${PROGRESS_KEY_PREFIX}${countyFips}`,
+    JSON.stringify(progress),
+    { expirationTtl: 2592000 } // 30 days
+  );
+}
+
+/**
+ * Clear progress for a county (used by --reset / reset option)
+ */
+export async function resetProgress(env, countyFips) {
+  await env.ELECTION_DATA.delete(`${PROGRESS_KEY_PREFIX}${countyFips}`);
+}
+
+/**
+ * Check if a step is completed in progress
+ */
+function isCompleted(progress, stepKey) {
+  return progress.completed[stepKey] === true;
+}
+
+/**
+ * Mark a step as completed (only call after successful KV write)
+ */
+function markCompleted(progress, stepKey, meta = {}) {
+  progress.completed[stepKey] = true;
+  progress.lastCompleted = { step: stepKey, at: new Date().toISOString(), ...meta };
+}
+
+/**
+ * Record an error for a step (does NOT mark as completed — step will retry)
+ */
+function markError(progress, stepKey, error) {
+  const category = classifyError(error);
+  progress.errors.push({
+    step: stepKey,
+    error: error.message || String(error),
+    category,
+    at: new Date().toISOString(),
+  });
+  // Explicitly do NOT mark as completed — failed steps will be retried on next run
+}
 
 // Top 30 Texas counties by population (covers ~75% of TX voters)
 export const TOP_COUNTIES = [
@@ -159,6 +267,12 @@ Return ONLY this JSON:
   "propositions": []
 }
 
+BALANCE REQUIREMENTS:
+- Every candidate MUST have at least 2 pros AND at least 2 cons
+- Pros and cons counts should be within 1 of each other (e.g., 3 pros / 3 cons or 3 pros / 4 cons)
+- Each pro and con should be 30-80 characters long
+- Even lesser-known candidates deserve equal analytical treatment
+
 IMPORTANT:
 - Return ONLY valid JSON
 - Only include races that are actually on the ${partyLabel} primary ballot
@@ -197,6 +311,9 @@ IMPORTANT:
       }
     }
   }
+
+  // Ensure countyName is in the ballot data for the candidates index
+  if (!result.countyName) result.countyName = countyName;
 
   const key = `ballot:county:${countyFips}:${party}_primary_2026`;
   await env.ELECTION_DATA.put(key, JSON.stringify(result));
@@ -239,7 +356,10 @@ IMPORTANT:
 }
 
 /**
- * Calls Claude with web_search tool to research election data
+ * Calls Claude with web_search tool to research election data.
+ * - Auth errors (401/403) throw immediately without retrying
+ * - Rate limits (429) and overloaded (529) retry up to 3 times
+ * - Server errors (5xx) throw with status detail
  */
 async function callClaudeWithSearch(env, userPrompt) {
   const body = {
@@ -273,16 +393,35 @@ async function callClaudeWithSearch(env, userPrompt) {
       body: JSON.stringify(body),
     });
 
+    // Auth errors — fail immediately, no retry (key is invalid/expired)
+    if (response.status === 401 || response.status === 403) {
+      throw new Error(`Claude API auth error (${response.status}): check ANTHROPIC_API_KEY`);
+    }
+
+    // Rate limit — retry with backoff
     if (response.status === 429) {
       await sleep((attempt + 1) * 10000);
       continue;
     }
 
+    // Overloaded — retry with backoff
+    if (response.status === 529) {
+      await sleep((attempt + 1) * 5000);
+      continue;
+    }
+
+    // Other errors — throw with status detail
     if (!response.ok) {
-      throw new Error(`Claude API returned ${response.status}`);
+      throw new Error(`Claude API server error (${response.status})`);
     }
 
     const result = await response.json();
+
+    // Log token usage for seeder calls
+    if (result.usage) {
+      console.log("Token usage [seeder] model=claude-sonnet-4-20250514 input=" + result.usage.input_tokens + " output=" + result.usage.output_tokens);
+      logTokenUsage(env, "seeder", result.usage, "claude-sonnet-4-20250514").catch(function() {});
+    }
 
     // Extract source URLs from raw API response before filtering to text blocks
     const apiSources = extractSourcesFromResponse(result.content);
@@ -313,48 +452,140 @@ async function callClaudeWithSearch(env, userPrompt) {
       }
       return parsed;
     } catch {
-      throw new Error(`Failed to parse response as JSON`);
+      throw new Error(`Failed to parse response as JSON (${cleaned.slice(0, 120)}...)`);
     }
   }
 
-  throw new Error("Claude API returned 429 after 3 retries");
+  throw new Error("Claude API returned 429/529 after 3 retries");
 }
 
 /**
- * Batch seed: run county info + both party ballots for a single county
+ * Batch seed: run county info + both party ballots for a single county.
+ *
+ * Progress is tracked in KV — only successful steps are marked completed.
+ * Re-running will skip completed steps and retry failed ones.
+ *
+ * @param {string} countyFips
+ * @param {string} countyName
+ * @param {object} env
+ * @param {object} [options]
+ * @param {boolean} [options.reset] - Clear progress before starting
  */
-export async function seedFullCounty(countyFips, countyName, env) {
-  const results = { countyFips, countyName, steps: {} };
+export async function seedFullCounty(countyFips, countyName, env, options = {}) {
+  const results = { countyFips, countyName, steps: {}, errors: [] };
 
-  // Step 1: County voting info
-  try {
-    results.steps.countyInfo = await seedCountyInfo(countyFips, countyName, env);
-  } catch (err) {
-    results.steps.countyInfo = { error: err.message };
+  // Handle reset option — clear progress for this county
+  if (options.reset) {
+    await resetProgress(env, countyFips);
   }
-  await sleep(3000);
 
-  // Step 2: Republican local races
-  try {
-    results.steps.republican = await seedCountyBallot(countyFips, countyName, "republican", env);
-  } catch (err) {
-    results.steps.republican = { error: err.message };
+  // Load progress (clears stale errors from previous runs automatically)
+  const progress = await loadProgress(env, countyFips);
+
+  // Step definitions: key, label, async fn
+  const stepDefs = [
+    {
+      key: "countyInfo",
+      progressKey: `info:${countyFips}`,
+      fn: () => seedCountyInfo(countyFips, countyName, env),
+    },
+    {
+      key: "republican",
+      progressKey: `ballot:${countyFips}:republican`,
+      fn: () => seedCountyBallot(countyFips, countyName, "republican", env),
+    },
+    {
+      key: "democrat",
+      progressKey: `ballot:${countyFips}:democrat`,
+      fn: () => seedCountyBallot(countyFips, countyName, "democrat", env),
+    },
+    {
+      key: "precinctMap",
+      progressKey: `precinct:${countyFips}`,
+      fn: () => seedPrecinctMap(countyFips, countyName, env),
+    },
+  ];
+
+  for (let i = 0; i < stepDefs.length; i++) {
+    const step = stepDefs[i];
+
+    // Skip already-completed steps
+    if (isCompleted(progress, step.progressKey)) {
+      results.steps[step.key] = { skipped: true, reason: "already completed" };
+      continue;
+    }
+
+    try {
+      const stepResult = await step.fn();
+
+      // Check if the step function returned an error (e.g., "No response from Claude")
+      if (stepResult && stepResult.error) {
+        const err = new Error(stepResult.error);
+        const category = classifyError(err);
+        markError(progress, step.progressKey, err);
+        results.steps[step.key] = { error: stepResult.error, category };
+        results.errors.push({ step: step.key, error: stepResult.error, category });
+
+        // Auth errors are fatal — abort remaining steps
+        if (category === "AUTH") {
+          results.abortedAt = step.key;
+          results.abortReason = "Authentication failed — all subsequent API calls would fail";
+          break;
+        }
+      } else {
+        // Success — mark completed in progress
+        markCompleted(progress, step.progressKey, stepResult);
+        results.steps[step.key] = stepResult;
+      }
+    } catch (err) {
+      const category = classifyError(err);
+      markError(progress, step.progressKey, err);
+      results.steps[step.key] = { error: err.message, category };
+      results.errors.push({ step: step.key, error: err.message, category });
+
+      // Auth errors are fatal — abort remaining steps
+      if (category === "AUTH") {
+        results.abortedAt = step.key;
+        results.abortReason = "Authentication failed — all subsequent API calls would fail";
+        break;
+      }
+    }
+
+    // Rate-limit delay between steps (skip after last step)
+    if (i < stepDefs.length - 1) {
+      await sleep(3000);
+    }
   }
-  await sleep(3000);
 
-  // Step 3: Democrat local races
-  try {
-    results.steps.democrat = await seedCountyBallot(countyFips, countyName, "democrat", env);
-  } catch (err) {
-    results.steps.democrat = { error: err.message };
-  }
-  await sleep(3000);
+  // Save progress to KV (includes completed steps, current run errors)
+  await saveProgress(env, countyFips, progress);
 
-  // Step 4: Precinct map
-  try {
-    results.steps.precinctMap = await seedPrecinctMap(countyFips, countyName, env);
-  } catch (err) {
-    results.steps.precinctMap = { error: err.message };
+  // Add summary to results
+  const completedCount = Object.keys(progress.completed).length;
+  const errorCount = results.errors.length;
+  const skippedCount = Object.values(results.steps).filter((s) => s && s.skipped).length;
+  results.summary = {
+    completed: completedCount,
+    errored: errorCount,
+    skipped: skippedCount,
+    total: stepDefs.length,
+  };
+
+  // Group errors by category for the summary
+  if (errorCount > 0) {
+    const byCategory = {};
+    for (const err of results.errors) {
+      if (!byCategory[err.category]) byCategory[err.category] = [];
+      byCategory[err.category].push(err);
+    }
+    results.errorSummary = {};
+    for (const [cat, errs] of Object.entries(byCategory)) {
+      results.errorSummary[cat] = {
+        label: errorCategoryLabel(cat),
+        count: errs.length,
+        steps: errs.map((e) => e.step),
+      };
+    }
   }
 
   return results;

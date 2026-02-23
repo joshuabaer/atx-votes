@@ -9,6 +9,9 @@ import {
   mergeRecommendations,
   buildCondensedBallotDescription,
   VALID_LLMS,
+  scorePartisanBalance,
+  CONFIDENCE_SCORES,
+  loadCachedTranslations,
 } from "../src/pwa-guide.js";
 
 const ballot = JSON.parse(
@@ -763,5 +766,769 @@ describe("sortOrder — additional offices", () => {
 
   it("ranks Court of Appeals at 32", () => {
     expect(sortOrder({ office: "Court of Appeals, 3rd District" })).toBe(32);
+  });
+});
+
+
+// ---------------------------------------------------------------------------
+// CONFIDENCE_SCORES
+// ---------------------------------------------------------------------------
+describe("CONFIDENCE_SCORES", () => {
+  it("assigns highest score to Strong Match", () => {
+    expect(CONFIDENCE_SCORES["Strong Match"]).toBe(4);
+  });
+
+  it("assigns lowest score to Symbolic Race", () => {
+    expect(CONFIDENCE_SCORES["Symbolic Race"]).toBe(1);
+  });
+
+  it("has exactly 4 confidence levels", () => {
+    expect(Object.keys(CONFIDENCE_SCORES)).toHaveLength(4);
+  });
+
+  it("scores are in descending order", () => {
+    expect(CONFIDENCE_SCORES["Strong Match"]).toBeGreaterThan(CONFIDENCE_SCORES["Good Match"]);
+    expect(CONFIDENCE_SCORES["Good Match"]).toBeGreaterThan(CONFIDENCE_SCORES["Best Available"]);
+    expect(CONFIDENCE_SCORES["Best Available"]).toBeGreaterThan(CONFIDENCE_SCORES["Symbolic Race"]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// scorePartisanBalance — basic structure
+// ---------------------------------------------------------------------------
+describe("scorePartisanBalance — basic structure", () => {
+  const guideResponse = {
+    profileSummary: "Test voter summary",
+    races: [
+      {
+        office: "U.S. Senator",
+        district: null,
+        recommendedCandidate: "Alice Johnson",
+        reasoning: "Strong healthcare record matches voter priorities.",
+        matchFactors: ["Healthcare focus", "Climate action"],
+        strategicNotes: null,
+        caveats: null,
+        confidence: "Strong Match",
+      },
+      {
+        office: "State Rep",
+        district: "District 46",
+        recommendedCandidate: "Carol Davis",
+        reasoning: "Housing focus aligns with voter values.",
+        matchFactors: ["Affordable housing"],
+        strategicNotes: "First-time candidate.",
+        caveats: "Limited experience.",
+        confidence: "Good Match",
+      },
+    ],
+    propositions: [
+      {
+        number: 1,
+        recommendation: "Lean Yes",
+        reasoning: "Transit expansion matches priorities.",
+        confidence: "Clear Call",
+      },
+    ],
+  };
+
+  it("returns an object with all expected fields", () => {
+    const score = scorePartisanBalance(guideResponse, ballot);
+    expect(score).toHaveProperty("party");
+    expect(score).toHaveProperty("totalRaces");
+    expect(score).toHaveProperty("confidenceDistribution");
+    expect(score).toHaveProperty("avgConfidence");
+    expect(score).toHaveProperty("avgReasoningLength");
+    expect(score).toHaveProperty("avgMatchFactors");
+    expect(score).toHaveProperty("incumbentRecs");
+    expect(score).toHaveProperty("challengerRecs");
+    expect(score).toHaveProperty("enthusiasmPct");
+    expect(score).toHaveProperty("recommendedCandidateAvgPros");
+    expect(score).toHaveProperty("recommendedCandidateAvgCons");
+    expect(score).toHaveProperty("nonRecommendedCandidateAvgPros");
+    expect(score).toHaveProperty("nonRecommendedCandidateAvgCons");
+    expect(score).toHaveProperty("flags");
+    expect(score).toHaveProperty("skewNote");
+  });
+
+  it("correctly identifies ballot party", () => {
+    const score = scorePartisanBalance(guideResponse, ballot);
+    expect(score.party).toBe("democrat");
+  });
+
+  it("counts total races", () => {
+    const score = scorePartisanBalance(guideResponse, ballot);
+    expect(score.totalRaces).toBe(2);
+  });
+
+  it("tracks confidence distribution", () => {
+    const score = scorePartisanBalance(guideResponse, ballot);
+    expect(score.confidenceDistribution["Strong Match"]).toBe(1);
+    expect(score.confidenceDistribution["Good Match"]).toBe(1);
+    expect(score.confidenceDistribution["Best Available"]).toBe(0);
+    expect(score.confidenceDistribution["Symbolic Race"]).toBe(0);
+  });
+
+  it("calculates average confidence score", () => {
+    const score = scorePartisanBalance(guideResponse, ballot);
+    // (4 + 3) / 2 = 3.5
+    expect(score.avgConfidence).toBe(3.5);
+  });
+
+  it("calculates average reasoning length", () => {
+    const score = scorePartisanBalance(guideResponse, ballot);
+    const expectedAvg = Math.round(
+      ("Strong healthcare record matches voter priorities.".length +
+       "Housing focus aligns with voter values.".length) / 2
+    );
+    expect(score.avgReasoningLength).toBe(expectedAvg);
+  });
+
+  it("calculates average match factors", () => {
+    const score = scorePartisanBalance(guideResponse, ballot);
+    // (2 + 1) / 2 = 1.5
+    expect(score.avgMatchFactors).toBe(1.5);
+  });
+
+  it("counts incumbent vs challenger recommendations", () => {
+    const score = scorePartisanBalance(guideResponse, ballot);
+    // Alice Johnson is incumbent, Carol Davis is not
+    expect(score.incumbentRecs).toBe(1);
+    expect(score.challengerRecs).toBe(1);
+  });
+
+  it("calculates enthusiasm percentage", () => {
+    const score = scorePartisanBalance(guideResponse, ballot);
+    // Both are Strong Match or Good Match = 100%
+    expect(score.enthusiasmPct).toBe(100);
+  });
+
+  it("returns no flags for balanced guide with < 3 races", () => {
+    const score = scorePartisanBalance(guideResponse, ballot);
+    // Only 2 races, so enthusiasm flag (requires >= 3) should not trigger
+    expect(score.flags).toEqual([]);
+    expect(score.skewNote).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// scorePartisanBalance — empty/edge cases
+// ---------------------------------------------------------------------------
+describe("scorePartisanBalance — empty and edge cases", () => {
+  it("handles empty guide response", () => {
+    const score = scorePartisanBalance({ races: [], propositions: [] }, ballot);
+    expect(score.totalRaces).toBe(0);
+    expect(score.avgConfidence).toBe(0);
+    expect(score.avgReasoningLength).toBe(0);
+    expect(score.avgMatchFactors).toBe(0);
+    expect(score.incumbentRecs).toBe(0);
+    expect(score.challengerRecs).toBe(0);
+    expect(score.enthusiasmPct).toBe(0);
+    expect(score.flags).toEqual([]);
+    expect(score.skewNote).toBeNull();
+  });
+
+  it("handles missing races key in guide response", () => {
+    const score = scorePartisanBalance({}, ballot);
+    expect(score.totalRaces).toBe(0);
+    expect(score.flags).toEqual([]);
+  });
+
+  it("handles ballot with no party field", () => {
+    const score = scorePartisanBalance({ races: [] }, { races: [] });
+    expect(score.party).toBe("unknown");
+  });
+
+  it("handles guide with unknown confidence level", () => {
+    const guideWithUnknown = {
+      races: [
+        {
+          office: "U.S. Senator",
+          district: null,
+          recommendedCandidate: "Alice Johnson",
+          reasoning: "test",
+          confidence: "Super Duper Match",
+        },
+      ],
+    };
+    const score = scorePartisanBalance(guideWithUnknown, ballot);
+    // Unknown confidence should not crash, defaults to score 2
+    expect(score.totalRaces).toBe(1);
+    expect(score.avgConfidence).toBe(2);
+  });
+
+  it("handles guide with null confidence (defaults to Good Match)", () => {
+    const guideNullConf = {
+      races: [
+        {
+          office: "U.S. Senator",
+          district: null,
+          recommendedCandidate: "Alice Johnson",
+          reasoning: "test",
+          confidence: null,
+        },
+      ],
+    };
+    const score = scorePartisanBalance(guideNullConf, ballot);
+    expect(score.confidenceDistribution["Good Match"]).toBe(1);
+    expect(score.avgConfidence).toBe(3);
+  });
+
+  it("handles uncontested race (skips for incumbent/challenger count)", () => {
+    // Board of Education has only 1 candidate (Eve Thompson)
+    const guideWithUncontested = {
+      races: [
+        {
+          office: "Board of Education",
+          district: "District 5",
+          recommendedCandidate: "Eve Thompson",
+          reasoning: "Only candidate.",
+          confidence: "Symbolic Race",
+        },
+      ],
+    };
+    const score = scorePartisanBalance(guideWithUncontested, ballot);
+    expect(score.incumbentRecs).toBe(0);
+    expect(score.challengerRecs).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// scorePartisanBalance — skew detection
+// ---------------------------------------------------------------------------
+describe("scorePartisanBalance — skew detection", () => {
+  // Build a ballot with 4 contested races for testing threshold flags
+  const multiBallot = {
+    party: "republican",
+    races: [
+      {
+        office: "Governor",
+        district: null,
+        candidates: [
+          { name: "Inc A", isIncumbent: true, pros: ["Good"], cons: ["Bad"] },
+          { name: "Chal A", isIncumbent: false, pros: ["Good"], cons: ["Bad"] },
+        ],
+      },
+      {
+        office: "AG",
+        district: null,
+        candidates: [
+          { name: "Inc B", isIncumbent: true, pros: ["Good"], cons: ["Bad"] },
+          { name: "Chal B", isIncumbent: false, pros: ["Good"], cons: ["Bad"] },
+        ],
+      },
+      {
+        office: "Comptroller",
+        district: null,
+        candidates: [
+          { name: "Inc C", isIncumbent: true, pros: ["Good"], cons: ["Bad"] },
+          { name: "Chal C", isIncumbent: false, pros: ["Good"], cons: ["Bad"] },
+        ],
+      },
+      {
+        office: "Land Commissioner",
+        district: null,
+        candidates: [
+          { name: "Inc D", isIncumbent: true, pros: ["Good"], cons: ["Bad"] },
+          { name: "Chal D", isIncumbent: false, pros: ["Good"], cons: ["Bad"] },
+        ],
+      },
+    ],
+  };
+
+  it("flags strong incumbent bias when > 80% recommend incumbents", () => {
+    const allIncumbentGuide = {
+      races: [
+        { office: "Governor", district: null, recommendedCandidate: "Inc A", reasoning: "test", confidence: "Strong Match" },
+        { office: "AG", district: null, recommendedCandidate: "Inc B", reasoning: "test", confidence: "Strong Match" },
+        { office: "Comptroller", district: null, recommendedCandidate: "Inc C", reasoning: "test", confidence: "Strong Match" },
+        { office: "Land Commissioner", district: null, recommendedCandidate: "Inc D", reasoning: "test", confidence: "Strong Match" },
+      ],
+    };
+    const score = scorePartisanBalance(allIncumbentGuide, multiBallot);
+    expect(score.incumbentRecs).toBe(4);
+    expect(score.challengerRecs).toBe(0);
+    expect(score.flags.length).toBeGreaterThan(0);
+    expect(score.flags.some(f => f.includes("incumbent bias"))).toBe(true);
+  });
+
+  it("flags strong challenger bias when > 80% recommend challengers", () => {
+    const allChallengerGuide = {
+      races: [
+        { office: "Governor", district: null, recommendedCandidate: "Chal A", reasoning: "test", confidence: "Good Match" },
+        { office: "AG", district: null, recommendedCandidate: "Chal B", reasoning: "test", confidence: "Good Match" },
+        { office: "Comptroller", district: null, recommendedCandidate: "Chal C", reasoning: "test", confidence: "Good Match" },
+        { office: "Land Commissioner", district: null, recommendedCandidate: "Chal D", reasoning: "test", confidence: "Good Match" },
+      ],
+    };
+    const score = scorePartisanBalance(allChallengerGuide, multiBallot);
+    expect(score.incumbentRecs).toBe(0);
+    expect(score.challengerRecs).toBe(4);
+    expect(score.flags.some(f => f.includes("challenger bias"))).toBe(true);
+  });
+
+  it("does not flag when incumbent/challenger split is balanced", () => {
+    const balancedGuide = {
+      races: [
+        { office: "Governor", district: null, recommendedCandidate: "Inc A", reasoning: "test", confidence: "Good Match" },
+        { office: "AG", district: null, recommendedCandidate: "Chal B", reasoning: "test", confidence: "Good Match" },
+        { office: "Comptroller", district: null, recommendedCandidate: "Inc C", reasoning: "test", confidence: "Best Available" },
+        { office: "Land Commissioner", district: null, recommendedCandidate: "Chal D", reasoning: "test", confidence: "Best Available" },
+      ],
+    };
+    const score = scorePartisanBalance(balancedGuide, multiBallot);
+    expect(score.incumbentRecs).toBe(2);
+    expect(score.challengerRecs).toBe(2);
+    expect(score.flags.filter(f => f.includes("bias"))).toEqual([]);
+  });
+
+  it("flags all-high-confidence when >= 3 races all Strong/Good Match", () => {
+    const allHighGuide = {
+      races: [
+        { office: "Governor", district: null, recommendedCandidate: "Inc A", reasoning: "test", confidence: "Strong Match" },
+        { office: "AG", district: null, recommendedCandidate: "Chal B", reasoning: "test", confidence: "Good Match" },
+        { office: "Comptroller", district: null, recommendedCandidate: "Inc C", reasoning: "test", confidence: "Strong Match" },
+      ],
+    };
+    const score = scorePartisanBalance(allHighGuide, multiBallot);
+    expect(score.enthusiasmPct).toBe(100);
+    expect(score.flags.some(f => f.includes("insufficient critical analysis"))).toBe(true);
+  });
+
+  it("does not flag enthusiasm when some races have lower confidence", () => {
+    const mixedGuide = {
+      races: [
+        { office: "Governor", district: null, recommendedCandidate: "Inc A", reasoning: "test", confidence: "Strong Match" },
+        { office: "AG", district: null, recommendedCandidate: "Chal B", reasoning: "test", confidence: "Best Available" },
+        { office: "Comptroller", district: null, recommendedCandidate: "Inc C", reasoning: "test", confidence: "Good Match" },
+      ],
+    };
+    const score = scorePartisanBalance(mixedGuide, multiBallot);
+    expect(score.enthusiasmPct).toBeLessThan(100);
+    expect(score.flags.filter(f => f.includes("critical analysis"))).toEqual([]);
+  });
+
+  it("generates skewNote when flags are present", () => {
+    const allIncumbentGuide = {
+      races: [
+        { office: "Governor", district: null, recommendedCandidate: "Inc A", reasoning: "test", confidence: "Strong Match" },
+        { office: "AG", district: null, recommendedCandidate: "Inc B", reasoning: "test", confidence: "Strong Match" },
+        { office: "Comptroller", district: null, recommendedCandidate: "Inc C", reasoning: "test", confidence: "Strong Match" },
+        { office: "Land Commissioner", district: null, recommendedCandidate: "Inc D", reasoning: "test", confidence: "Strong Match" },
+      ],
+    };
+    const score = scorePartisanBalance(allIncumbentGuide, multiBallot);
+    expect(score.skewNote).not.toBeNull();
+    expect(score.skewNote).toContain("Note:");
+    expect(score.skewNote).toContain("patterns worth noting");
+  });
+
+  it("returns null skewNote when no flags", () => {
+    const cleanGuide = {
+      races: [
+        { office: "Governor", district: null, recommendedCandidate: "Inc A", reasoning: "test", confidence: "Good Match" },
+        { office: "AG", district: null, recommendedCandidate: "Chal B", reasoning: "test", confidence: "Best Available" },
+      ],
+    };
+    const score = scorePartisanBalance(cleanGuide, multiBallot);
+    expect(score.skewNote).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// scorePartisanBalance — pro/con text analysis
+// ---------------------------------------------------------------------------
+describe("scorePartisanBalance — pro/con text analysis", () => {
+  it("compares pro text between recommended and non-recommended candidates", () => {
+    const asymmetricBallot = {
+      party: "democrat",
+      races: [
+        {
+          office: "Governor",
+          district: null,
+          candidates: [
+            { name: "Favored", isIncumbent: false, pros: ["This candidate has an extraordinarily strong record on every issue imaginable"], cons: ["Minor flaw"] },
+            { name: "Underdog", isIncumbent: false, pros: ["OK"], cons: ["Lots and lots of critical issues with this candidate that are deeply problematic"] },
+          ],
+        },
+      ],
+    };
+    const guide = {
+      races: [
+        { office: "Governor", district: null, recommendedCandidate: "Favored", reasoning: "test", confidence: "Strong Match" },
+      ],
+    };
+    const score = scorePartisanBalance(guide, asymmetricBallot);
+    expect(score.recommendedCandidateAvgPros).toBeGreaterThan(score.nonRecommendedCandidateAvgPros);
+  });
+
+  it("flags when recommended candidates have >50% more pro text", () => {
+    const skewedBallot = {
+      party: "democrat",
+      races: [
+        {
+          office: "Governor",
+          district: null,
+          candidates: [
+            { name: "Favored", isIncumbent: false, pros: ["Incredibly strong record on policy, leadership, and community engagement over many years"], cons: ["X"] },
+            { name: "Underdog", isIncumbent: false, pros: ["OK"], cons: ["X"] },
+          ],
+        },
+      ],
+    };
+    const guide = {
+      races: [
+        { office: "Governor", district: null, recommendedCandidate: "Favored", reasoning: "test", confidence: "Good Match" },
+      ],
+    };
+    const score = scorePartisanBalance(guide, skewedBallot);
+    // Should flag the pros imbalance
+    expect(score.flags.some(f => f.includes("more pro text"))).toBe(true);
+  });
+
+  it("does not flag when pro text is roughly equal", () => {
+    const equalBallot = {
+      party: "democrat",
+      races: [
+        {
+          office: "Governor",
+          district: null,
+          candidates: [
+            { name: "Alice", isIncumbent: false, pros: ["Strong record on healthcare policy"], cons: ["Weak on housing"] },
+            { name: "Bob", isIncumbent: false, pros: ["Fresh ideas on climate action"], cons: ["No experience"] },
+          ],
+        },
+      ],
+    };
+    const guide = {
+      races: [
+        { office: "Governor", district: null, recommendedCandidate: "Alice", reasoning: "test", confidence: "Good Match" },
+      ],
+    };
+    const score = scorePartisanBalance(guide, equalBallot);
+    expect(score.flags.filter(f => f.includes("pro text"))).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// scorePartisanBalance — sample ballot fixture
+// ---------------------------------------------------------------------------
+describe("scorePartisanBalance — sample ballot fixture", () => {
+  const sampleGuide = {
+    profileSummary: "Test voter",
+    races: [
+      {
+        office: "U.S. Senator",
+        district: null,
+        recommendedCandidate: "Alice Johnson",
+        reasoning: "Strong healthcare record matches voter priorities.",
+        matchFactors: ["Healthcare focus", "Climate action"],
+        confidence: "Strong Match",
+      },
+      {
+        office: "State Rep",
+        district: "District 46",
+        recommendedCandidate: "Carol Davis",
+        reasoning: "Housing focus aligns with voter values.",
+        matchFactors: ["Affordable housing"],
+        confidence: "Good Match",
+      },
+      {
+        office: "Board of Education",
+        district: "District 5",
+        recommendedCandidate: "Eve Thompson",
+        reasoning: "Only candidate running.",
+        matchFactors: [],
+        confidence: "Symbolic Race",
+      },
+    ],
+    propositions: [
+      { number: 1, recommendation: "Lean Yes", reasoning: "Aligns with transit priorities.", confidence: "Clear Call" },
+    ],
+  };
+
+  it("produces a complete score for the sample ballot", () => {
+    const score = scorePartisanBalance(sampleGuide, ballot);
+    expect(score.party).toBe("democrat");
+    expect(score.totalRaces).toBe(3);
+  });
+
+  it("correctly tracks contested race recommendations", () => {
+    const score = scorePartisanBalance(sampleGuide, ballot);
+    // Senator: Alice is incumbent -> incumbentRecs++
+    // State Rep: Carol is not incumbent -> challengerRecs++
+    // Board of Ed: uncontested -> skipped
+    expect(score.incumbentRecs).toBe(1);
+    expect(score.challengerRecs).toBe(1);
+  });
+
+  it("includes Symbolic Race in confidence distribution", () => {
+    const score = scorePartisanBalance(sampleGuide, ballot);
+    expect(score.confidenceDistribution["Symbolic Race"]).toBe(1);
+  });
+
+  it("calculates enthusiasm below 100% when Symbolic Race is present", () => {
+    const score = scorePartisanBalance(sampleGuide, ballot);
+    // 2 out of 3 are Strong/Good Match = 67%
+    expect(score.enthusiasmPct).toBe(67);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// buildUserPrompt — cached translations behavior
+// ---------------------------------------------------------------------------
+describe("buildUserPrompt — cached translations", () => {
+  const profile = {
+    politicalSpectrum: "Progressive",
+    topIssues: ["Healthcare", "Climate"],
+    candidateQualities: ["Integrity", "Experience"],
+    policyViews: { immigration: "Path to citizenship" },
+  };
+
+  const cachedTranslations = [
+    {
+      name: "Alice Johnson",
+      summary: "Senadora experimentada.",
+      keyPositions: ["Salud universal"],
+      pros: ["Historial legislativo fuerte"],
+      cons: ["Vista como establishment"],
+    },
+  ];
+
+  it("includes candidateTranslations schema for Spanish without cache", () => {
+    const prompt = buildUserPrompt(profile, "desc", ballot, "democrat", "es", 3, null);
+    expect(prompt).toContain("candidateTranslations");
+    expect(prompt).toContain("Spanish translation of candidate summary");
+  });
+
+  it("excludes candidateTranslations schema for Spanish with cache", () => {
+    const prompt = buildUserPrompt(profile, "desc", ballot, "democrat", "es", 3, cachedTranslations);
+    expect(prompt).not.toContain("candidateTranslations");
+    expect(prompt).not.toContain("Spanish translation of candidate summary");
+  });
+
+  it("still includes Spanish instruction for text fields when cache present", () => {
+    const prompt = buildUserPrompt(profile, "desc", ballot, "democrat", "es", 3, cachedTranslations);
+    expect(prompt).toContain("Write ALL text fields in Spanish");
+  });
+
+  it("does not include candidateTranslations schema for English regardless of cache", () => {
+    const prompt = buildUserPrompt(profile, "desc", ballot, "democrat", "en", 3, null);
+    expect(prompt).not.toContain("candidateTranslations");
+    const prompt2 = buildUserPrompt(profile, "desc", ballot, "democrat", "en", 3, cachedTranslations);
+    expect(prompt2).not.toContain("candidateTranslations");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// mergeRecommendations — cached translations
+// ---------------------------------------------------------------------------
+describe("mergeRecommendations — cached translations", () => {
+  const guideResponse = {
+    profileSummary: "Test voter summary",
+    races: [
+      {
+        office: "U.S. Senator",
+        district: null,
+        recommendedCandidate: "Alice Johnson",
+        reasoning: "Fuerte historial en salud.",
+        confidence: "Strong Match",
+      },
+    ],
+    propositions: [],
+  };
+
+  const cachedTranslations = [
+    {
+      name: "Alice Johnson",
+      summary: "Senadora experimentada enfocada en reforma de salud.",
+      keyPositions: ["Salud universal", "Accion climatica"],
+      pros: ["Historial legislativo fuerte"],
+      cons: ["Vista como establishment"],
+    },
+    {
+      name: "Bob Martinez",
+      summary: "Candidato progresista con apoyo popular.",
+      keyPositions: ["Green New Deal", "Medicare para Todos"],
+      pros: ["Energiza a jovenes votantes"],
+      cons: ["Sin experiencia legislativa"],
+    },
+  ];
+
+  it("applies cached translations when provided for Spanish", () => {
+    const merged = mergeRecommendations(guideResponse, ballot, "es", cachedTranslations);
+    const alice = merged.races[0].candidates.find(c => c.name === "Alice Johnson");
+    expect(alice.summary).toBe("Senadora experimentada enfocada en reforma de salud.");
+    expect(alice.keyPositions).toEqual(["Salud universal", "Accion climatica"]);
+    expect(alice.pros).toEqual(["Historial legislativo fuerte"]);
+    expect(alice.cons).toEqual(["Vista como establishment"]);
+  });
+
+  it("applies cached translations to non-recommended candidates too", () => {
+    const merged = mergeRecommendations(guideResponse, ballot, "es", cachedTranslations);
+    const bob = merged.races[0].candidates.find(c => c.name === "Bob Martinez");
+    expect(bob.summary).toBe("Candidato progresista con apoyo popular.");
+    expect(bob.pros).toEqual(["Energiza a jovenes votantes"]);
+  });
+
+  it("prefers cached translations over LLM-generated ones", () => {
+    const guideWithLlmTranslations = {
+      ...guideResponse,
+      candidateTranslations: [
+        {
+          name: "Alice Johnson",
+          summary: "LLM-generated translation that should be ignored",
+          keyPositions: ["LLM position"],
+          pros: ["LLM pro"],
+          cons: ["LLM con"],
+        },
+      ],
+    };
+    const merged = mergeRecommendations(guideWithLlmTranslations, ballot, "es", cachedTranslations);
+    const alice = merged.races[0].candidates.find(c => c.name === "Alice Johnson");
+    // Cached version should win over LLM-generated
+    expect(alice.summary).toBe("Senadora experimentada enfocada en reforma de salud.");
+    expect(alice.summary).not.toBe("LLM-generated translation that should be ignored");
+  });
+
+  it("falls back to LLM translations when no cache provided", () => {
+    const guideWithLlmTranslations = {
+      ...guideResponse,
+      candidateTranslations: [
+        {
+          name: "Alice Johnson",
+          summary: "Traduccion del LLM.",
+          keyPositions: ["Posicion LLM"],
+          pros: ["Pro LLM"],
+          cons: ["Con LLM"],
+        },
+      ],
+    };
+    const merged = mergeRecommendations(guideWithLlmTranslations, ballot, "es", null);
+    const alice = merged.races[0].candidates.find(c => c.name === "Alice Johnson");
+    expect(alice.summary).toBe("Traduccion del LLM.");
+  });
+
+  it("does not apply cached translations for English", () => {
+    const merged = mergeRecommendations(guideResponse, ballot, "en", cachedTranslations);
+    const alice = merged.races[0].candidates.find(c => c.name === "Alice Johnson");
+    expect(alice.summary).toBe("Experienced senator focused on healthcare reform.");
+  });
+
+  it("gracefully handles cached translations for unknown candidates", () => {
+    const unknownCache = [
+      { name: "Nobody Real", summary: "Nadie real", keyPositions: [], pros: [], cons: [] },
+    ];
+    const merged = mergeRecommendations(guideResponse, ballot, "es", unknownCache);
+    const alice = merged.races[0].candidates.find(c => c.name === "Alice Johnson");
+    // Alice should keep original English text since cache has no entry for her
+    expect(alice.summary).toBe("Experienced senator focused on healthcare reform.");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// loadCachedTranslations — mock KV tests
+// ---------------------------------------------------------------------------
+describe("loadCachedTranslations", () => {
+  it("returns null when no translations exist in KV", async () => {
+    const mockEnv = {
+      ELECTION_DATA: {
+        get: async () => null,
+      },
+    };
+    const result = await loadCachedTranslations(mockEnv, "democrat", null);
+    expect(result).toBeNull();
+  });
+
+  it("loads statewide translations from KV", async () => {
+    const translations = [
+      { name: "Alice Johnson", summary: "Senadora experimentada.", keyPositions: [], pros: [], cons: [] },
+    ];
+    const mockEnv = {
+      ELECTION_DATA: {
+        get: async (key) => {
+          if (key === "translations:es:democrat_primary_2026") {
+            return JSON.stringify(translations);
+          }
+          return null;
+        },
+      },
+    };
+    const result = await loadCachedTranslations(mockEnv, "democrat", null);
+    expect(result).toHaveLength(1);
+    expect(result[0].name).toBe("Alice Johnson");
+  });
+
+  it("merges statewide and county translations", async () => {
+    const statewide = [
+      { name: "Alice Johnson", summary: "Senadora.", keyPositions: [], pros: [], cons: [] },
+    ];
+    const county = [
+      { name: "Local Candidate", summary: "Candidata local.", keyPositions: [], pros: [], cons: [] },
+    ];
+    const mockEnv = {
+      ELECTION_DATA: {
+        get: async (key) => {
+          if (key === "translations:es:democrat_primary_2026") return JSON.stringify(statewide);
+          if (key === "translations:es:county:48453:democrat_primary_2026") return JSON.stringify(county);
+          return null;
+        },
+      },
+    };
+    const result = await loadCachedTranslations(mockEnv, "democrat", "48453");
+    expect(result).toHaveLength(2);
+    expect(result.map(t => t.name)).toContain("Alice Johnson");
+    expect(result.map(t => t.name)).toContain("Local Candidate");
+  });
+
+  it("county translations override statewide for same candidate", async () => {
+    const statewide = [
+      { name: "Alice Johnson", summary: "Statewide version.", keyPositions: [], pros: [], cons: [] },
+    ];
+    const county = [
+      { name: "Alice Johnson", summary: "County-specific version.", keyPositions: [], pros: [], cons: [] },
+    ];
+    const mockEnv = {
+      ELECTION_DATA: {
+        get: async (key) => {
+          if (key === "translations:es:democrat_primary_2026") return JSON.stringify(statewide);
+          if (key === "translations:es:county:48453:democrat_primary_2026") return JSON.stringify(county);
+          return null;
+        },
+      },
+    };
+    const result = await loadCachedTranslations(mockEnv, "democrat", "48453");
+    expect(result).toHaveLength(1);
+    expect(result[0].summary).toBe("County-specific version.");
+  });
+
+  it("handles malformed JSON in KV gracefully", async () => {
+    const mockEnv = {
+      ELECTION_DATA: {
+        get: async (key) => {
+          if (key === "translations:es:democrat_primary_2026") return "not valid json";
+          return null;
+        },
+      },
+    };
+    const result = await loadCachedTranslations(mockEnv, "democrat", null);
+    expect(result).toBeNull();
+  });
+
+  it("skips county translations if not an array", async () => {
+    const statewide = [
+      { name: "Alice", summary: "Alicia.", keyPositions: [], pros: [], cons: [] },
+    ];
+    const mockEnv = {
+      ELECTION_DATA: {
+        get: async (key) => {
+          if (key === "translations:es:democrat_primary_2026") return JSON.stringify(statewide);
+          if (key === "translations:es:county:48453:democrat_primary_2026") return JSON.stringify({ notAnArray: true });
+          return null;
+        },
+      },
+    };
+    const result = await loadCachedTranslations(mockEnv, "democrat", "48453");
+    expect(result).toHaveLength(1);
+    expect(result[0].name).toBe("Alice");
   });
 });

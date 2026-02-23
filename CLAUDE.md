@@ -37,6 +37,7 @@ npx wrangler secret put ADMIN_SECRET -c wrangler.txvotes.toml
 - **worker/src/county-seeder.js** — Data population pipeline for county races/info via Claude + web_search
 - **worker/src/updater.js** — Daily updater cron (runs on atxvotes-api only)
 - **worker/src/audit-runner.js** — Automated AI audit runner (submits methodology export to ChatGPT, Gemini, Grok, Claude APIs for bias scoring)
+- **worker/src/balance-check.js** — API balance/quota checker (`/api/balance-check` endpoint)
 
 ## Testing
 
@@ -44,18 +45,19 @@ npx wrangler secret put ADMIN_SECRET -c wrangler.txvotes.toml
 cd worker && npx vitest run
 ```
 
-551 tests across 10 test files:
+1075 tests across 13+ test files:
 
-- **interview-flow.test.js** (96) — Interview flow UI tests (happy-dom + vitest)
-- **index-helpers.test.js** (86) — Helper functions, route patterns, candidate profiles, data quality
-- **pwa-guide.test.js** (68) — Guide generation, prompt building, ballot filtering, merging
-- **routes.test.js** (57) — Slug generation, sparse candidates, escaping, routing
-- **audit-runner.test.js** (49) — AI audit score parsing, provider calls, validation
-- **audit-export.test.js** (46) — Audit export sources, completeness, nonpartisan safeguards
-- **interview-edge-cases.test.js** (46) — Edge cases for reading levels, state init, navigation
-- **updater.test.js** (38) — Daily update validation, election day cutoff, source extraction
-- **bias-test.test.js** (33) — Prompt symmetry, loaded language, cross-party treatment
-- **county-seeder.test.js** (32) — County info seeding, ballot seeding, precinct maps
+- **interview-flow.test.js** — Interview flow UI tests (happy-dom + vitest)
+- **index-helpers.test.js** — Helper functions, route patterns, candidate profiles, data quality
+- **pwa-guide.test.js** — Guide generation, prompt building, ballot filtering, merging
+- **routes.test.js** — Slug generation, sparse candidates, escaping, routing
+- **audit-runner.test.js** — AI audit score parsing, provider calls, validation
+- **audit-export.test.js** — Audit export sources, completeness, nonpartisan safeguards
+- **interview-edge-cases.test.js** — Edge cases for reading levels, state init, navigation
+- **updater.test.js** — Daily update validation, election day cutoff, source extraction
+- **bias-test.test.js** — Prompt symmetry, loaded language, cross-party treatment
+- **county-seeder.test.js** — County info seeding, ballot seeding, precinct maps
+- Plus additional test files for balance-check, caching, and easter egg features
 
 ## Key Patterns
 
@@ -64,4 +66,29 @@ cd worker && npx vitest run
 - Translations use a `TR` dictionary with `t(key)` function; `lang=es` for Spanish
 - Guide generation piggybacks candidate translations onto the same Claude API call when `lang=es`
 - Interview flow: Phase 0=auto-advance, 1=Tone, 2=Issues, 3=Spectrum, 4=DeepDives, 5=Qualities, 6=Freeform, 7=Address, 8=Building
-- Reading level 1-5 maps to tone instructions in pwa-guide.js; level 6 is the Swedish Chef easter egg; level 7 is the Texas cowboy easter egg
+- Reading level 1-5 maps to tone instructions in pwa-guide.js; level 6 is the Swedish Chef easter egg; level 7 is the Texas Cowboy easter egg; level 8 is the President Trump easter egg
+- Easter egg triggers: keyboard shortcuts ("bork" for Chef, "yeehaw"/"cowboy" for Cowboy, "trump"/"maga" for Trump), 7-tap secret menu on "Powered by Claude" text, vanity URLs (/cowboy, /chef, /trump)
+- Novelty tones (6/7/8) show a warning banner on the ballot page reminding users it's a fun mode
+- Guide response caching: SHA-256 hash of inputs, 1-hour TTL in KV, `?nocache=1` query param bypasses cache
+- max_tokens for guide: 2048 English, 4096 Spanish cached, 8192 Spanish fresh
+- KV reads in handlePWA_Guide are parallelized via `Promise.all()`
+- Uncontested races are stripped of detailed descriptions in ballot data
+
+## Footer Consistency
+
+- There are two sets of footers: static pages (index.js) and PWA app (pwa.js)
+- When changing footer styling (colors, links, layout), BOTH must be updated
+- Static page footers are in `handleXxx()` functions in index.js
+- PWA footer is in the APP_JS string array in pwa.js
+
+## County Seeder
+
+- Error classification system categorizes failures for retry logic
+- KV-based progress tracking allows resuming interrupted batch seeds
+- 150/254 Texas counties enriched; ~104 still on template data
+
+## Audit System
+
+- Audit runner supports 4 providers: ChatGPT, Gemini, Claude, Grok
+- After deploying, always check `/data-quality` and `/audit` pages for regressions
+- Cron automations stop after election day
