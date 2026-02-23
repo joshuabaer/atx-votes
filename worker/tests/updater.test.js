@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { runDailyUpdate, validateBallot } from "../src/updater.js";
+import { runDailyUpdate, validateBallot, extractSourcesFromResponse, mergeSources } from "../src/updater.js";
 
 // ---------------------------------------------------------------------------
 // Since mergeRaceUpdates and validateRaceUpdate are not exported, we test
@@ -425,7 +425,11 @@ describe("runDailyUpdate — merge and validation behavior", () => {
     );
     expect(alice.polling).toBe("Leading 55%");
     expect(alice.fundraising).toBe("$2M");
-    expect(alice.endorsements).toEqual(["A", "B", "D"]);
+    expect(alice.endorsements).toEqual([
+      { name: "A", type: null },
+      { name: "B", type: null },
+      { name: "D", type: null },
+    ]);
 
     // Bob should be unchanged
     const bob = storedBallot.races[0].candidates.find(
@@ -792,6 +796,423 @@ describe("runDailyUpdate — merge and validation behavior", () => {
     await runDailyUpdate(mockEnv, { parties: ["democrat"] });
 
     expect(mockDelete).toHaveBeenCalledWith("candidates_index");
+
+    vi.useRealTimers();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// extractSourcesFromResponse
+// ---------------------------------------------------------------------------
+describe("extractSourcesFromResponse", () => {
+  it("extracts URLs from web_search_tool_result blocks", () => {
+    const blocks = [
+      {
+        type: "web_search_tool_result",
+        content: [
+          { type: "web_search_result", url: "https://example.com/a", title: "Article A" },
+          { type: "web_search_result", url: "https://example.com/b", title: "Article B" },
+        ],
+      },
+      { type: "text", text: "Some text" },
+    ];
+    const sources = extractSourcesFromResponse(blocks);
+    expect(sources).toHaveLength(2);
+    expect(sources[0].url).toBe("https://example.com/a");
+    expect(sources[0].title).toBe("Article A");
+    expect(sources[1].url).toBe("https://example.com/b");
+  });
+
+  it("extracts citations from text blocks", () => {
+    const blocks = [
+      {
+        type: "text",
+        text: "Some text with citations",
+        citations: [
+          { url: "https://example.com/cite1", title: "Citation 1", cited_text: "blah" },
+          { url: "https://example.com/cite2", title: "Citation 2", cited_text: "blah" },
+        ],
+      },
+    ];
+    const sources = extractSourcesFromResponse(blocks);
+    expect(sources).toHaveLength(2);
+    expect(sources[0].url).toBe("https://example.com/cite1");
+    expect(sources[1].title).toBe("Citation 2");
+  });
+
+  it("deduplicates URLs across blocks", () => {
+    const blocks = [
+      {
+        type: "web_search_tool_result",
+        content: [
+          { type: "web_search_result", url: "https://example.com/dup", title: "First" },
+        ],
+      },
+      {
+        type: "text",
+        text: "text",
+        citations: [
+          { url: "https://example.com/dup", title: "Second" },
+        ],
+      },
+    ];
+    const sources = extractSourcesFromResponse(blocks);
+    expect(sources).toHaveLength(1);
+    expect(sources[0].title).toBe("First"); // first occurrence wins
+  });
+
+  it("returns empty array for null/undefined input", () => {
+    expect(extractSourcesFromResponse(null)).toEqual([]);
+    expect(extractSourcesFromResponse(undefined)).toEqual([]);
+    expect(extractSourcesFromResponse([])).toEqual([]);
+  });
+
+  it("skips items without URLs", () => {
+    const blocks = [
+      {
+        type: "web_search_tool_result",
+        content: [
+          { type: "web_search_result", url: null, title: "No URL" },
+          { type: "web_search_result", url: "https://example.com/good", title: "Good" },
+        ],
+      },
+    ];
+    const sources = extractSourcesFromResponse(blocks);
+    expect(sources).toHaveLength(1);
+    expect(sources[0].url).toBe("https://example.com/good");
+  });
+
+  it("uses URL as title when title is missing", () => {
+    const blocks = [
+      {
+        type: "web_search_tool_result",
+        content: [
+          { type: "web_search_result", url: "https://example.com/notitle" },
+        ],
+      },
+    ];
+    const sources = extractSourcesFromResponse(blocks);
+    expect(sources[0].title).toBe("https://example.com/notitle");
+  });
+
+  it("includes accessDate as today", () => {
+    const blocks = [
+      {
+        type: "web_search_tool_result",
+        content: [
+          { type: "web_search_result", url: "https://example.com/a", title: "A" },
+        ],
+      },
+    ];
+    const sources = extractSourcesFromResponse(blocks);
+    expect(sources[0].accessDate).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// mergeSources
+// ---------------------------------------------------------------------------
+describe("mergeSources", () => {
+  it("merges new sources into existing", () => {
+    const existing = [{ url: "https://a.com", title: "A", accessDate: "2026-01-01" }];
+    const incoming = [{ url: "https://b.com", title: "B", accessDate: "2026-02-01" }];
+    const merged = mergeSources(existing, incoming);
+    expect(merged).toHaveLength(2);
+    expect(merged[0].url).toBe("https://a.com");
+    expect(merged[1].url).toBe("https://b.com");
+  });
+
+  it("deduplicates by URL", () => {
+    const existing = [{ url: "https://a.com", title: "A", accessDate: "2026-01-01" }];
+    const incoming = [
+      { url: "https://a.com", title: "A updated", accessDate: "2026-02-01" },
+      { url: "https://b.com", title: "B", accessDate: "2026-02-01" },
+    ];
+    const merged = mergeSources(existing, incoming);
+    expect(merged).toHaveLength(2);
+    expect(merged[0].title).toBe("A"); // existing wins
+  });
+
+  it("limits to max 20 sources", () => {
+    const existing = Array.from({ length: 18 }, (_, i) => ({
+      url: `https://existing${i}.com`,
+      title: `E${i}`,
+      accessDate: "2026-01-01",
+    }));
+    const incoming = Array.from({ length: 5 }, (_, i) => ({
+      url: `https://new${i}.com`,
+      title: `N${i}`,
+      accessDate: "2026-02-01",
+    }));
+    const merged = mergeSources(existing, incoming);
+    expect(merged).toHaveLength(20);
+  });
+
+  it("handles null existing", () => {
+    const incoming = [{ url: "https://a.com", title: "A", accessDate: "2026-01-01" }];
+    const merged = mergeSources(null, incoming);
+    expect(merged).toHaveLength(1);
+  });
+
+  it("handles null incoming", () => {
+    const existing = [{ url: "https://a.com", title: "A", accessDate: "2026-01-01" }];
+    const merged = mergeSources(existing, null);
+    expect(merged).toHaveLength(1);
+    expect(merged[0].url).toBe("https://a.com");
+  });
+
+  it("handles both null", () => {
+    const merged = mergeSources(null, null);
+    expect(merged).toEqual([]);
+  });
+
+  it("skips incoming items without URL", () => {
+    const incoming = [
+      { url: "", title: "No URL", accessDate: "2026-01-01" },
+      { url: "https://good.com", title: "Good", accessDate: "2026-01-01" },
+    ];
+    const merged = mergeSources([], incoming);
+    expect(merged).toHaveLength(1);
+    expect(merged[0].url).toBe("https://good.com");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Source validation (tested via runDailyUpdate end-to-end)
+// ---------------------------------------------------------------------------
+describe("source validation in updates", () => {
+  beforeEach(() => {
+    vi.useFakeTimers({ now: new Date("2026-02-20T12:00:00Z") });
+  });
+
+  it("caps sources at 20 when Claude returns more than 20", async () => {
+    const sources25 = Array.from({ length: 25 }, (_, i) => ({
+      url: `https://src${i}.com`,
+      title: `Source ${i}`,
+    }));
+    const ballot = {
+      id: "test",
+      party: "democrat",
+      races: [
+        {
+          office: "Governor",
+          district: null,
+          isContested: true,
+          candidates: [
+            { name: "Alice", summary: "Test", endorsements: ["A"], keyPositions: ["X"] },
+            { name: "Bob", summary: "Test", endorsements: ["B"], keyPositions: ["Y"] },
+          ],
+        },
+      ],
+    };
+
+    const kvStore = {};
+    const mockEnv = {
+      ELECTION_DATA: {
+        get: vi.fn((key) => {
+          if (kvStore[key]) return kvStore[key];
+          if (key.includes("ballot:statewide:democrat")) return JSON.stringify(ballot);
+          return null;
+        }),
+        put: vi.fn((key, value) => {
+          kvStore[key] = value;
+        }),
+        delete: vi.fn(),
+      },
+      ANTHROPIC_API_KEY: "test-key",
+    };
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() =>
+        Promise.resolve({
+          ok: true,
+          status: 200,
+          json: () =>
+            Promise.resolve({
+              content: [
+                {
+                  type: "text",
+                  text: JSON.stringify({
+                    candidates: [
+                      { name: "Alice", polling: null, fundraising: null, endorsements: null, keyPositions: null, pros: null, cons: null, summary: null, background: null, sources: sources25 },
+                      { name: "Bob", polling: null, fundraising: null, endorsements: null, keyPositions: null, pros: null, cons: null, summary: null, background: null, sources: null },
+                    ],
+                  }),
+                },
+              ],
+            }),
+        })
+      )
+    );
+
+    // mergeSources caps at 20, so it should pass validation and be stored
+    const result = await runDailyUpdate(mockEnv, { parties: ["democrat"] });
+
+    expect(result.updated).toContain("democrat");
+    const stored = JSON.parse(kvStore["ballot:statewide:democrat_primary_2026"]);
+    const alice = stored.races[0].candidates.find((c) => c.name === "Alice");
+    expect(alice.sources).toHaveLength(20);
+
+    vi.useRealTimers();
+  });
+
+  it("successfully merges sources from API response into candidates", async () => {
+    const ballot = {
+      id: "test",
+      party: "democrat",
+      races: [
+        {
+          office: "Governor",
+          district: null,
+          isContested: true,
+          candidates: [
+            { name: "Alice", summary: "Gov candidate", endorsements: ["A"], keyPositions: ["X"] },
+            { name: "Bob", summary: "Gov candidate", endorsements: ["B"], keyPositions: ["Y"] },
+          ],
+        },
+      ],
+    };
+
+    const kvStore = {};
+    const mockEnv = {
+      ELECTION_DATA: {
+        get: vi.fn((key) => {
+          if (kvStore[key]) return kvStore[key];
+          if (key.includes("ballot:statewide:democrat")) return JSON.stringify(ballot);
+          return null;
+        }),
+        put: vi.fn((key, value) => {
+          kvStore[key] = value;
+        }),
+        delete: vi.fn(),
+      },
+      ANTHROPIC_API_KEY: "test-key",
+    };
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() =>
+        Promise.resolve({
+          ok: true,
+          status: 200,
+          json: () =>
+            Promise.resolve({
+              content: [
+                {
+                  type: "web_search_tool_result",
+                  content: [
+                    { type: "web_search_result", url: "https://texastribune.org/alice", title: "Alice profile" },
+                    { type: "web_search_result", url: "https://ballotpedia.org/bob", title: "Bob profile" },
+                  ],
+                },
+                {
+                  type: "text",
+                  text: JSON.stringify({
+                    candidates: [
+                      { name: "Alice", polling: "55%", fundraising: null, endorsements: null, keyPositions: null, pros: null, cons: null, summary: null, background: null, sources: [{ url: "https://alice-campaign.com", title: "Alice Campaign" }] },
+                      { name: "Bob", polling: null, fundraising: null, endorsements: null, keyPositions: null, pros: null, cons: null, summary: null, background: null, sources: null },
+                    ],
+                  }),
+                },
+              ],
+            }),
+        })
+      )
+    );
+
+    const result = await runDailyUpdate(mockEnv, { parties: ["democrat"] });
+
+    expect(result.updated).toContain("democrat");
+    const stored = JSON.parse(kvStore["ballot:statewide:democrat_primary_2026"]);
+    const alice = stored.races[0].candidates.find((c) => c.name === "Alice");
+    // Alice should have her candidate-level source + API-level sources
+    expect(alice.sources).toBeDefined();
+    expect(alice.sources.length).toBeGreaterThanOrEqual(1);
+    expect(alice.sources.some((s) => s.url === "https://alice-campaign.com")).toBe(true);
+    expect(alice.sources.some((s) => s.url === "https://texastribune.org/alice")).toBe(true);
+    expect(alice.sourcesUpdatedAt).toBeDefined();
+
+    // Bob should have API-level sources as fallback
+    const bob = stored.races[0].candidates.find((c) => c.name === "Bob");
+    expect(bob.sources).toBeDefined();
+    expect(bob.sources.some((s) => s.url === "https://texastribune.org/alice")).toBe(true);
+
+    vi.useRealTimers();
+  });
+
+  it("preserves existing sources when no new sources provided", async () => {
+    const ballot = {
+      id: "test",
+      party: "democrat",
+      races: [
+        {
+          office: "Governor",
+          district: null,
+          isContested: true,
+          candidates: [
+            {
+              name: "Alice",
+              summary: "Gov candidate",
+              endorsements: ["A"],
+              keyPositions: ["X"],
+              sources: [{ url: "https://existing.com", title: "Existing", accessDate: "2026-01-01" }],
+            },
+            { name: "Bob", summary: "Gov candidate", endorsements: ["B"], keyPositions: ["Y"] },
+          ],
+        },
+      ],
+    };
+
+    const kvStore = {};
+    const mockEnv = {
+      ELECTION_DATA: {
+        get: vi.fn((key) => {
+          if (kvStore[key]) return kvStore[key];
+          if (key.includes("ballot:statewide:democrat")) return JSON.stringify(ballot);
+          return null;
+        }),
+        put: vi.fn((key, value) => {
+          kvStore[key] = value;
+        }),
+        delete: vi.fn(),
+      },
+      ANTHROPIC_API_KEY: "test-key",
+    };
+
+    // No web_search_tool_result blocks, no sources from Claude
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() =>
+        Promise.resolve({
+          ok: true,
+          status: 200,
+          json: () =>
+            Promise.resolve({
+              content: [
+                {
+                  type: "text",
+                  text: JSON.stringify({
+                    candidates: [
+                      { name: "Alice", polling: "60%", fundraising: null, endorsements: null, keyPositions: null, pros: null, cons: null, summary: null, background: null, sources: null },
+                      { name: "Bob", polling: null, fundraising: null, endorsements: null, keyPositions: null, pros: null, cons: null, summary: null, background: null, sources: null },
+                    ],
+                  }),
+                },
+              ],
+            }),
+        })
+      )
+    );
+
+    const result = await runDailyUpdate(mockEnv, { parties: ["democrat"] });
+
+    expect(result.updated).toContain("democrat");
+    const stored = JSON.parse(kvStore["ballot:statewide:democrat_primary_2026"]);
+    const alice = stored.races[0].candidates.find((c) => c.name === "Alice");
+    // Existing sources should be preserved
+    expect(alice.sources).toEqual([{ url: "https://existing.com", title: "Existing", accessDate: "2026-01-01" }]);
+    expect(alice.polling).toBe("60%");
 
     vi.useRealTimers();
   });

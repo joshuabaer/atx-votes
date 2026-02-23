@@ -234,7 +234,10 @@ function buildCondensedBallotDescription(ballot) {
         lines.push("    Positions: " + c.keyPositions.join("; "));
       }
       if (c.endorsements && c.endorsements.length) {
-        lines.push("    Endorsements: " + c.endorsements.join("; "));
+        lines.push("    Endorsements: " + c.endorsements.map(e => {
+          if (typeof e === "string") return e;
+          return e.type ? `${e.name} (${e.type})` : e.name;
+        }).join("; "));
       }
       if (c.pros && c.pros.length) {
         lines.push("    Pros: " + c.pros.join("; "));

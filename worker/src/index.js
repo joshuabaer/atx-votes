@@ -356,7 +356,6 @@ function handleLandingPage() {
   <p class="page-footer">
     <a href="/candidates">Candidates</a> &middot;
     <a href="/nonpartisan" data-t="Nonpartisan by Design">Nonpartisan by Design</a> &middot;
-    <a href="/data-quality" data-t="Data Quality">Data Quality</a> &middot;
     <a href="/privacy" data-t="Privacy">Privacy</a> &middot;
     <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a>
   </p>
@@ -469,6 +468,7 @@ function handleNonpartisan() {
 
     <h2>Verified Candidate Data</h2>
     <p>All candidates are cross-referenced against official filings from the Texas Secretary of State, county clerks, and Ballotpedia. Candidate data includes positions, endorsements, strengths, and concerns — presented with equal depth for every candidate in a race.</p>
+    <p>Endorsements include context labels identifying the type of each endorsing organization (e.g., labor union, editorial board, advocacy group, elected official). This helps voters understand who is behind each endorsement without having to research each organization separately.</p>
     <p>A daily automated updater re-verifies candidate data using AI-powered web research. Each ballot page and candidate profile displays a "Data last verified" timestamp so you can see exactly when the information was last checked.</p>
 
     <h2>Limited Data Transparency</h2>
@@ -492,7 +492,10 @@ function handleNonpartisan() {
     <h2>Independent AI Audit</h2>
     <p>We've submitted our full AI prompts, data pipeline, and methodology to four independent AI systems (ChatGPT, Gemini, Grok, and Claude) for bias review. Audit findings directly informed improvements, including normalizing all deep-dive answer labels to use neutral, descriptive language with symmetric phrasing across opposing positions. <a href="/audit">Read the full audit results and methodology export.</a></p>
 
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/open-source">Open Source</a> &middot; <a href="/data-quality">Data Quality</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <h2>Data Transparency</h2>
+    <p>Our <a href="/data-quality">Data Quality Dashboard</a> shows live metrics on ballot coverage, candidate completeness, and county data availability. See exactly how fresh and complete our election data is at any time.</p>
+
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
 </body>
 </html>`;
@@ -772,7 +775,7 @@ Return ONLY this JSON:
   "background": "Professional background",
   "education": "Educational background",
   "keyPositions": ["Position 1", "Position 2", "Position 3"],
-  "endorsements": ["Endorser 1", "Endorser 2"],
+  "endorsements": [{"name": "Endorser 1", "type": "labor union"}, {"name": "Endorser 2", "type": "editorial board"}],
   "pros": ["Strength 1", "Strength 2"],
   "cons": ["Concern 1", "Concern 2"],
   "polling": "Latest polling data or null",
@@ -800,7 +803,7 @@ Return ONLY this JSON:
 
     <p style="margin-top:1.5rem">See our <a href="/data-quality">Data Quality Dashboard</a> for live metrics on ballot coverage, candidate completeness, and county data availability.</p>
 
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/data-quality">Data Quality</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
 </body>
 </html>`;
@@ -871,11 +874,13 @@ function buildAuditExportData() {
         background: "Professional and personal background",
         education: "Educational background",
         keyPositions: "Array of policy positions from campaign materials",
-        endorsements: "Array of notable endorsements",
+        endorsements: "Array of {name, type} objects — type is one of: labor union, editorial board, advocacy group, business group, elected official, political organization, professional association, community organization, public figure",
         pros: "Array of strengths/arguments in their favor",
         cons: "Array of concerns/arguments against",
         polling: "Latest polling data if available, or null",
         fundraising: "Fundraising totals if available, or null",
+        sources: "Array of {url, title, accessDate} objects — source citations for claims about this candidate, captured from Claude web_search API responses",
+        sourcesUpdatedAt: "ISO timestamp of when sources were last updated",
       },
       equalTreatment: "Every candidate in a race receives the same structured fields. The same prompt is used for all candidates in all races regardless of party, incumbency, or polling position.",
     },
@@ -884,7 +889,7 @@ function buildAuditExportData() {
       description: "An automated daily cron job re-researches each contested race for new endorsements, polling, fundraising, and news. Updates are validated before being applied. Runs on the atxvotes-api worker; txvotes-api reads the same shared KV namespace.",
       model: "Claude Sonnet (claude-sonnet-4-20250514) with web_search tool (max 5 searches per race)",
       systemPrompt: "You are a nonpartisan election data researcher. Use web_search to find verified, factual updates about candidates. Return ONLY valid JSON. Never fabricate information \u2014 if you cannot verify something, use null.",
-      raceResearchPromptTemplate: "Research the latest updates for this {party} primary race in the March 3, 2026 Texas Primary Election:\n\nRACE: {office} \u2014 {district}\n\nCURRENT DATA:\n  {candidateDescriptions}\n\nSearch for updates since February 15, 2026. Look for:\n1. New endorsements\n2. New polling data\n3. Updated fundraising numbers\n4. Significant news or position changes\n\nReturn a JSON object with this exact structure (use null for any field with no update):\n{\n  \"candidates\": [\n    {\n      \"name\": \"exact candidate name\",\n      \"polling\": \"updated polling string or null\",\n      \"fundraising\": \"updated fundraising string or null\",\n      \"endorsements\": [\"full updated list\"] or null,\n      \"keyPositions\": [\"full updated list\"] or null,\n      \"pros\": [\"full updated list\"] or null,\n      \"cons\": [\"full updated list\"] or null,\n      \"summary\": \"updated summary or null\",\n      \"background\": \"updated background or null\"\n    }\n  ]\n}\n\nIMPORTANT:\n- Return ONLY valid JSON, no markdown or explanation\n- Use null for any field where you found no new information\n- Candidate names must match exactly as provided\n- For arrays: return the FULL updated list (existing + new), not just additions\n- Only update fields where you found verifiable new information",
+      raceResearchPromptTemplate: "Research the latest updates for this {party} primary race in the March 3, 2026 Texas Primary Election:\n\nRACE: {office} \u2014 {district}\n\nCURRENT DATA:\n  {candidateDescriptions}\n\nSearch for updates since February 15, 2026. Look for:\n1. New endorsements\n2. New polling data\n3. Updated fundraising numbers\n4. Significant news or position changes\n\nReturn a JSON object with this exact structure (use null for any field with no update):\n{\n  \"candidates\": [\n    {\n      \"name\": \"exact candidate name\",\n      \"polling\": \"updated polling string or null\",\n      \"fundraising\": \"updated fundraising string or null\",\n      \"endorsements\": [{\"name\": \"Endorser Name\", \"type\": \"type category\"}] or null,\n      \"keyPositions\": [\"full updated list\"] or null,\n      \"pros\": [\"full updated list\"] or null,\n      \"cons\": [\"full updated list\"] or null,\n      \"summary\": \"updated summary or null\",\n      \"background\": \"updated background or null\"\n    }\n  ]\n}\n\nIMPORTANT:\n- Return ONLY valid JSON, no markdown or explanation\n- Use null for any field where you found no new information\n- Candidate names must match exactly as provided\n- For arrays: return the FULL updated list (existing + new), not just additions\n- Only update fields where you found verifiable new information\n- Endorsement type must be one of: labor union, editorial board, advocacy group, business group, elected official, political organization, professional association, community organization, public figure",
       validationRules: [
         "Candidate count must remain the same (no additions or removals)",
         "Candidate names must match exactly (no renaming)",
@@ -892,8 +897,9 @@ function buildAuditExportData() {
         "No empty strings in key fields (name, summary)",
         "Party cannot change between updates",
         "Empty arrays are rejected \u2014 prevents accidental data wipe",
+        "Sources must have valid URLs, no duplicate URLs, max 20 per candidate",
       ],
-      mergeStrategy: "Non-null fields from Claude's response overwrite existing values. Null fields are skipped (existing data preserved). Each race is updated independently with 5-second delays between API calls to avoid rate limits.",
+      mergeStrategy: "Non-null fields from Claude's response overwrite existing values. Null fields are skipped (existing data preserved). Each race is updated independently with 5-second delays between API calls to avoid rate limits. Source citations are captured from Claude web_search API response blocks and merged with deduplication.",
       kvKeys: {
         statewide: "ballot:statewide:{party}_primary_2026",
         legacy: "ballot:{party}_primary_2026 (fallback during migration)",
@@ -911,11 +917,16 @@ function buildAuditExportData() {
         background: "Served 6 years in the Texas House representing District 45.",
         education: "UT Austin, BA in Government; Harvard Kennedy School, MPA",
         keyPositions: ["Increase education funding", "Property tax reform", "Border security"],
-        endorsements: ["Texas Teachers Association", "Former Governor Smith"],
+        endorsements: [{ name: "Texas Teachers Association", type: "professional association" }, { name: "Former Governor Smith", type: "elected official" }],
         pros: ["Deep legislative experience", "Strong fundraising", "Bipartisan track record"],
         cons: ["Limited executive experience", "Some positions have shifted over time"],
         polling: "Leading with 35% in latest University of Texas poll",
         fundraising: "$2.1M raised as of Q4 2025",
+        sources: [
+          { url: "https://www.texastribune.org/2026/01/15/jane-doe-governor-race/", title: "Jane Doe enters governor's race with education platform", accessDate: "2026-02-22" },
+          { url: "https://www.ballotpedia.org/Jane_Doe", title: "Jane Doe - Ballotpedia", accessDate: "2026-02-22" },
+        ],
+        sourcesUpdatedAt: "2026-02-22T14:30:00Z",
       },
       sampleProposition: {
         number: 1,
@@ -1293,7 +1304,7 @@ function handleSupport() {
       <p>Please <a href="mailto:howdy@txvotes.app">email us</a> with details and we'll correct it as quickly as possible.</p>
     </div>
 
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/open-source">Open Source</a> &middot; <a href="/data-quality">Data Quality</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
 </body>
 </html>`;
@@ -1366,7 +1377,7 @@ function handlePrivacyPolicy() {
     <h2>Contact</h2>
     <p>Questions? Email <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
 
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/open-source">Open Source</a> &middot; <a href="/data-quality">Data Quality</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
 </body>
 </html>`;
@@ -1463,7 +1474,7 @@ function handleOpenSource() {
     <p>Texas Votes is released under the <strong>MIT License</strong>. This means you're free to use, modify, and distribute the code for any purpose — including building your own voting guide for another state or city. The only requirement is that you include the original license notice.</p>
     <p style="font-size:0.9rem;color:var(--text2)">We chose MIT because civic tech should have the fewest possible barriers to reuse. If this code helps more people vote informed, it's doing its job.</p>
 
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/data-quality">Data Quality</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
 </body>
 </html>`;
@@ -1865,7 +1876,7 @@ async function handleCandidateProfile(slug, env) {
     <h1>Candidate Not Found</h1>
     <p class="subtitle">We couldn't find a candidate matching "${escapeHtml(slug)}". The candidate may not be in our database yet, or the URL may be incorrect.</p>
     <a class="back" href="/candidates">&larr; Browse all candidates</a>
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/open-source">Open Source</a> &middot; <a href="/data-quality">Data Quality</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
 </body>
 </html>`;
@@ -1976,6 +1987,20 @@ async function handleCandidateProfile(slug, env) {
     sections.push(`<h2>Fundraising</h2><p>${escapeHtml(fundraising)}</p>`);
   }
 
+  // Sources
+  if (c.sources && c.sources.length) {
+    const sourceItems = c.sources
+      .filter(s => s && s.url)
+      .map(s => {
+        const title = escapeHtml(s.title || s.url);
+        const url = escapeHtml(s.url);
+        const dateStr = s.accessDate ? ` <span style="color:var(--text2);font-size:0.85rem">(${escapeHtml(s.accessDate)})</span>` : "";
+        return `<li style="margin-bottom:0.35rem"><a href="${url}" target="_blank" rel="noopener noreferrer" style="word-break:break-all">${title}</a>${dateStr}</li>`;
+      })
+      .join("");
+    sections.push(`<h2>Sources <span style="font-size:0.85rem;font-weight:400;color:var(--text2)">(${c.sources.length})</span></h2><ul style="padding-left:1.25rem">${sourceItems}</ul>`);
+  }
+
   const ogDescription = rawSummary
     ? rawSummary.slice(0, 160) + (rawSummary.length > 160 ? "..." : "")
     : `${c.name} is running for ${entry.race} in the 2026 Texas ${partyLabel} Primary.`;
@@ -2005,9 +2030,9 @@ async function handleCandidateProfile(slug, env) {
       </div>
     </div>
     ${sections.join("\n    ")}
-    ${dataUpdatedAt ? `<p style="margin-top:2rem;font-size:0.85rem;color:var(--text2)">Data last verified: ${new Date(dataUpdatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</p>` : ""}
+    ${dataUpdatedAt ? `<p style="margin-top:2rem;font-size:0.85rem;color:var(--text2)">Data last verified: ${new Date(dataUpdatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}${c.sources && c.sources.length ? ` &middot; ${c.sources.length} source${c.sources.length === 1 ? "" : "s"} cited` : ""}</p>` : ""}
     <p style="margin-top:${dataUpdatedAt ? "0.5rem" : "2rem"};font-size:0.9rem;color:var(--text2)">See something wrong? <a href="mailto:howdy@txvotes.app?subject=Data correction: ${encodeURIComponent(c.name)}">Let us know</a> and we'll fix it.</p>
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/open-source">Open Source</a> &middot; <a href="/data-quality">Data Quality</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
 </body>
 </html>`;
@@ -2101,7 +2126,7 @@ async function handleCandidatesIndex(env) {
     <h1 style="margin-top:1rem">All Candidates</h1>
     <p class="subtitle">2026 Texas Primary Election — March 3, 2026</p>
     ${raceSections}
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/open-source">Open Source</a> &middot; <a href="/data-quality">Data Quality</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
 </body>
 </html>`;
@@ -2392,7 +2417,7 @@ async function handleDataQuality(env) {
       <li><a href="/candidates">Candidate Profiles</a> — Browse all candidates with detailed information</li>
     </ul>
 
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/open-source">Open Source</a> &middot; <a href="/data-quality">Data Quality</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
   <script>
   (function(){

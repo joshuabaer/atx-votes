@@ -229,7 +229,7 @@ Return a JSON object with this exact structure (use null for any field with no u
       "name": "exact candidate name",
       "polling": "updated polling string or null",
       "fundraising": "updated fundraising string or null",
-      "endorsements": ["full updated list"] or null,
+      "endorsements": [{"name": "Endorser Name", "type": "labor union|editorial board|advocacy group|business group|elected official|political organization|professional association|community organization|public figure"}] or null,
       "keyPositions": ["full updated list"] or null,
       "pros": ["full updated list"] or null,
       "cons": ["full updated list"] or null,
@@ -246,7 +246,8 @@ IMPORTANT:
 - Candidate names must match exactly as provided
 - For endorsements, keyPositions, pros, and cons: return the FULL updated list (existing + new), not just additions
 - Only update fields where you found verifiable new information
-- For sources: include URLs of articles and official pages you referenced for THIS candidate`;
+- For sources: include URLs of articles and official pages you referenced for THIS candidate
+- For endorsements: each entry must be an object with "name" (endorser name) and "type" (one of: labor union, editorial board, advocacy group, business group, elected official, political organization, professional association, community organization, public figure)`;
 
   const body = {
     model: "claude-sonnet-4-20250514",
@@ -363,7 +364,14 @@ function mergeRaceUpdates(race, updates) {
         if (update[field] === "") continue;
         if (Array.isArray(update[field]) && update[field].length === 0)
           continue;
-        candidate[field] = update[field];
+        // Normalize endorsements: convert any plain strings to { name, type } objects
+        if (field === "endorsements" && Array.isArray(update[field])) {
+          candidate[field] = update[field].map(e =>
+            typeof e === "string" ? { name: e, type: null } : e
+          );
+        } else {
+          candidate[field] = update[field];
+        }
       }
     }
 

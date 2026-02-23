@@ -705,6 +705,7 @@ var APP_JS = [
     "'Endorsements':'Respaldos'," +
     "'Fundraising':'Recaudaci\\u00F3n de fondos'," +
     "'Polling':'Encuestas'," +
+    "'Sources':'Fuentes'," +
     "'Show Less':'Ver menos'," +
     "'Show Details':'Ver detalles'," +
     "'Learn More':'Saber m\\u00E1s'," +
@@ -2135,6 +2136,13 @@ var APP_JS = [
         "if(c.endorsements&&c.endorsements.length){h+='<div class=\"cand-section\"><h5>'+t('Endorsements')+'</h5><ul>';for(var j=0;j<c.endorsements.length;j++){var en=c.endorsements[j];var eName=typeof en==='string'?en:(en.name||'');var eType=typeof en==='object'&&en.type?' <span style=\"color:var(--text2);font-size:0.85em\">('+esc(en.type)+')</span>':'';h+='<li>'+esc(eName)+eType+'</li>';}h+='</ul></div>'}" +
         "if(c.fundraising){h+='<div class=\"cand-section\"><h5>'+t('Fundraising')+'</h5><p>'+esc(c.fundraising)+'</p></div>'}" +
         "if(c.polling){h+='<div class=\"cand-section\"><h5>'+t('Polling')+'</h5><p>'+esc(c.polling)+'</p></div>'}" +
+        "if(c.sources&&c.sources.length){" +
+          "var srcId='src-'+c.id;" +
+          "var srcOpen=S.expanded[srcId];" +
+          "h+='<div class=\"cand-section\"><h5 style=\"cursor:pointer\" data-action=\"toggle-expand\" data-id=\"'+srcId+'\">'+t('Sources')+' <span style=\"font-size:0.85em;color:var(--text2)\">('+c.sources.length+')</span> <span style=\"font-size:0.75em\">'+(srcOpen?'\\u25B2':'\\u25BC')+'</span></h5>';" +
+          "if(srcOpen){h+='<ul style=\"font-size:13px\">';for(var k=0;k<c.sources.length;k++){var src=c.sources[k];h+='<li style=\"margin-bottom:4px\"><a href=\"'+esc(src.url)+'\" target=\"_blank\" rel=\"noopener noreferrer\" style=\"word-break:break-all\">'+esc(src.title||src.url)+'</a>'+(src.accessDate?' <span style=\"color:var(--text2)\">('+esc(src.accessDate)+')</span>':'')+'</li>';}h+='</ul>'}" +
+          "h+='</div>'" +
+        "}" +
         "h+='</div>'" +
       "}" +
       "h+='<button class=\"expand-toggle\" data-action=\"toggle-expand\" data-id=\"'+eid+'\" aria-expanded=\"'+!!isOpen+'\">'+(isOpen?t('Show Less'):t('Show Details'))+'</button>';" +

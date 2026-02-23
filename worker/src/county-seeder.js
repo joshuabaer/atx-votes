@@ -4,6 +4,8 @@
 // Run via: POST /api/election/seed-county with ADMIN_SECRET auth
 // Body: { countyFips: "48453", countyName: "Travis", party: "republican" }
 
+import { extractSourcesFromResponse, mergeSources } from "./updater.js";
+
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // Top 30 Texas counties by population (covers ~75% of TX voters)
@@ -147,7 +149,7 @@ Return ONLY this JSON:
           "summary": "1-2 sentence summary",
           "background": "Brief background",
           "keyPositions": ["Position 1", "Position 2"],
-          "endorsements": ["Endorsement 1"],
+          "endorsements": [{"name": "Endorser Name", "type": "labor union|editorial board|advocacy group|business group|elected official|political organization|professional association|community organization|public figure"}],
           "pros": ["Strength 1"],
           "cons": ["Concern 1"]
         }
@@ -161,6 +163,7 @@ IMPORTANT:
 - Return ONLY valid JSON
 - Only include races that are actually on the ${partyLabel} primary ballot
 - Use exact candidate names from official filings
+- For endorsements: each entry must be an object with "name" (endorser name) and "type" (one of: labor union, editorial board, advocacy group, business group, elected official, political organization, professional association, community organization, public figure)
 - If you cannot find any local races for this county/party, return {"races": [], "propositions": []}`;
 
   const result = await callClaudeWithSearch(env, prompt);
@@ -242,6 +245,10 @@ async function callClaudeWithSearch(env, userPrompt) {
     }
 
     const result = await response.json();
+
+    // Extract source URLs from raw API response before filtering to text blocks
+    const apiSources = extractSourcesFromResponse(result.content);
+
     const textBlocks = (result.content || [])
       .filter((b) => b.type === "text")
       .map((b) => b.text);
@@ -261,7 +268,19 @@ async function callClaudeWithSearch(env, userPrompt) {
     }
 
     try {
-      return JSON.parse(cleaned);
+      const parsed = JSON.parse(cleaned);
+      // Attach API-level sources to candidates in ballot data
+      if (parsed.races && Array.isArray(parsed.races) && apiSources.length > 0) {
+        for (const race of parsed.races) {
+          if (race.candidates && Array.isArray(race.candidates)) {
+            for (const cand of race.candidates) {
+              cand.sources = mergeSources(cand.sources, apiSources);
+              cand.sourcesUpdatedAt = new Date().toISOString();
+            }
+          }
+        }
+      }
+      return parsed;
     } catch {
       throw new Error(`Failed to parse response as JSON`);
     }
