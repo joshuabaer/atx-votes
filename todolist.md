@@ -27,18 +27,18 @@ _Latest audit: ChatGPT 7.5, Gemini 8.0, Claude 7.6, Grok 7.5 (avg 7.7/10). Remai
 
 _From automated code review of "Add automated AI audit runner" (interview-flow-tests branch)._
 
-- [ ] **[P0]** Fix `_pickedIssues`/`_pickedQuals` restoration bug — on page reload, `load()` pads `S.issues` with all remaining issues before computing `S._pickedIssues = Math.min(5, S.issues.length)`, so a user who picked 2 issues sees 5 "top priority" slots filled. Fix: persist `_pickedIssues`/`_pickedQuals` in `save()` or compute from saved array before padding. (`worker/src/pwa.js`)
-- [ ] **[P1]** Update CLAUDE.md test count — says "108 tests total: 71 interview flow + 37 pwa-guide" but actual count is 518 tests across 9 test files
-- [ ] **[P1]** Add `audit-runner.js` to CLAUDE.md Architecture section — new 480-line module imported in index.js is not listed alongside the other worker/src files
-- [ ] **[P1]** Add new test files to CLAUDE.md — audit-runner.test.js, audit-export.test.js, routes.test.js (plus county-seeder.test.js, index-helpers.test.js, interview-edge-cases.test.js, updater.test.js) are not documented
-- [ ] **[P1]** Update CLAUDE.md reading level docs — says "level 6 is the Swedish Chef easter egg" but level 7 (Texas cowboy) now exists in pwa-guide.js
-- [ ] **[P2]** Fix county seeder source attribution — `county-seeder.js` applies all API search sources to all candidates indiscriminately, unlike `updater.js` which scopes per-candidate. Every candidate in a race gets attributed with every search result regardless of relevance
-- [ ] **[P2]** Remove dead code in `validateRaceUpdate` — duplicate-URL check and `sources.length > 20` check can never trigger because `mergeSources` already deduplicates and caps at 20 before validation runs
-- [ ] **[P2]** County seeder bypasses `validateRaceUpdate` — writes candidate data with sources directly to KV without malformed-URL or duplicate-URL validation that the updater path enforces
-- [ ] **[P3]** Election Day cache invalidation timing — `runDailyUpdate` invalidates `candidates_index` on every successful update, including Election Day when traffic peaks and cache rebuilds are most costly
+- [x] **[P0]** Fix `_pickedIssues`/`_pickedQuals` restoration bug — persist picked counts in save(), restore before padding in load()
+- [x] **[P1]** Update CLAUDE.md test count — updated to 581 tests across 10 files with per-file breakdown
+- [x] **[P1]** Add `audit-runner.js` to CLAUDE.md Architecture section
+- [x] **[P1]** Add new test files to CLAUDE.md — all 10 test files listed with counts
+- [x] **[P1]** Update CLAUDE.md reading level docs — added level 7 (Texas cowboy)
+- [x] **[P2]** Fix county seeder source attribution — scoped per-candidate, matching updater.js pattern
+- [x] **[P2]** Remove dead code in `validateRaceUpdate` — removed unreachable dedup/cap checks
+- [x] **[P2]** County seeder bypasses `validateRaceUpdate` — now validates before KV writes
+- [x] **[P3]** Election Day cache invalidation timing — skip cache invalidation on Election Day to avoid peak-load rebuilds
 
 ### PWA Bugs
-- [ ] Back button on first "Talk to Me" page doesn't work — back button on the initial interview screen (Phase 1, issues picker) is non-functional
+- [x] Back button on first "Talk to Me" page doesn't work — Phase 0 now renders welcome screen, back from Phase 1 returns to it
 
 ### Technical Debt
 - [ ] Comprehensive memory management review — audit localStorage usage, service worker cache lifecycle, KV data retention, and state cleanup
