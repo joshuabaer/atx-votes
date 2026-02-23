@@ -1500,8 +1500,8 @@ var APP_JS = [
   "function save(){" +
     "try{" +
     "localStorage.setItem('tx_votes_profile',JSON.stringify({" +
-      "topIssues:S.issues,politicalSpectrum:S.spectrum,policyViews:S.policyViews," +
-      "candidateQualities:S.qualities,freeform:S.freeform,address:S.address,summaryText:S.summary,districts:S.districts," +
+      "topIssues:S.issues,pickedIssues:S._pickedIssues,politicalSpectrum:S.spectrum,policyViews:S.policyViews," +
+      "candidateQualities:S.qualities,pickedQuals:S._pickedQuals,freeform:S.freeform,address:S.address,summaryText:S.summary,districts:S.districts," +
       "readingLevel:S.readingLevel" +
     "}));" +
     "if(S.repBallot)localStorage.setItem('tx_votes_ballot_republican',JSON.stringify(S.repBallot));" +
@@ -1518,10 +1518,12 @@ var APP_JS = [
     "var p=localStorage.getItem('tx_votes_profile');" +
     "if(p){p=JSON.parse(p);S.issues=p.topIssues||[];S.spectrum=p.politicalSpectrum||null;" +
     "S.policyViews=p.policyViews||{};S.qualities=p.candidateQualities||[];S.freeform=p.freeform||'';" +
+    "if(typeof p.pickedIssues==='number')S._pickedIssues=p.pickedIssues;" +
+    "else if(S.issues.length>0)S._pickedIssues=Math.min(5,S.issues.length);" +
     "var allIV=ISSUES.map(function(x){return x.v});if(S.issues.length>0&&S.issues.length<allIV.length){S.issues=S.issues.concat(allIV.filter(function(v){return S.issues.indexOf(v)===-1}))}" +
-    "if(S.issues.length>0)S._pickedIssues=Math.min(5,S.issues.length);" +
+    "if(typeof p.pickedQuals==='number')S._pickedQuals=p.pickedQuals;" +
+    "else if(S.qualities.length>0)S._pickedQuals=Math.min(3,S.qualities.length);" +
     "if(S.qualities.length>0&&S.qualities.length<QUALITIES.length){S.qualities=S.qualities.concat(QUALITIES.filter(function(v){return S.qualities.indexOf(v)===-1}))}" +
-    "if(S.qualities.length>0)S._pickedQuals=Math.min(3,S.qualities.length);" +
     "S.address=p.address||{street:'',city:'',state:'TX',zip:''};" +
     "S.summary=p.summaryText||null;S.districts=p.districts||null;" +
     "S.readingLevel=p.readingLevel||1}" +
@@ -1588,7 +1590,7 @@ var APP_JS = [
 
   // ============ INTERVIEW VIEWS ============
   "function renderInterview(){" +
-    "if(S.phase===0){S.phase=1;save()}" +
+    "if(S.phase===0)return renderWelcome();" +
     "if(S.phase===8)return renderBuilding();" +
     "var step=S.phase;var total=7;" +
     "if(S.phase===4){step=4};" +
@@ -2741,7 +2743,7 @@ var APP_JS = [
   "document.getElementById('app').addEventListener('click',function(e){" +
     "var el=e.target.closest('[data-action]');if(!el)return;e.preventDefault();" +
     "var action=el.dataset.action;" +
-    "if(action==='start'){S.phase=1;S._iStart=Date.now();trk('interview_start');render()}" +
+    "if(action==='start'){S.phase=1;S._iStart=Date.now();trk('interview_start');save();render()}" +
     "else if(action==='back'){" +
       "if(S.phase===4&&S.ddIndex>0){S.ddIndex--;render()}" +
       "else if(S.phase===5&&S.ddQuestions.length>0){S.phase=4;S.ddIndex=S.ddQuestions.length-1;render()}" +

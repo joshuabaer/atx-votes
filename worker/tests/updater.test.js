@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { runDailyUpdate, validateBallot, extractSourcesFromResponse, mergeSources } from "../src/updater.js";
+import { runDailyUpdate, validateBallot, validateRaceUpdate, extractSourcesFromResponse, mergeSources, ELECTION_DAY } from "../src/updater.js";
 
 // ---------------------------------------------------------------------------
-// Since mergeRaceUpdates and validateRaceUpdate are not exported, we test
-// them indirectly through runDailyUpdate. We also test validateBallot and
-// runDailyUpdate directly since they are exported.
+// mergeRaceUpdates is not exported, so we test it indirectly through
+// runDailyUpdate. validateBallot, validateRaceUpdate, and runDailyUpdate
+// are exported and tested directly.
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
@@ -796,6 +796,76 @@ describe("runDailyUpdate — merge and validation behavior", () => {
     await runDailyUpdate(mockEnv, { parties: ["democrat"] });
 
     expect(mockDelete).toHaveBeenCalledWith("candidates_index");
+
+    vi.useRealTimers();
+  });
+
+  it("skips candidates_index invalidation on Election Day to avoid peak-load cache rebuilds", async () => {
+    // Set clock to Election Day itself
+    vi.useRealTimers();
+    vi.useFakeTimers({ now: new Date(ELECTION_DAY + "T14:00:00Z") });
+
+    const ballot = {
+      id: "test",
+      party: "democrat",
+      races: [
+        {
+          office: "Governor",
+          district: null,
+          isContested: true,
+          candidates: [
+            { name: "Alice", summary: "Test", endorsements: ["A"], keyPositions: ["X"] },
+            { name: "Bob", summary: "Test", endorsements: ["B"], keyPositions: ["Y"] },
+          ],
+        },
+      ],
+    };
+
+    const mockDelete = vi.fn();
+    const mockEnv = {
+      ELECTION_DATA: {
+        get: vi.fn((key) => {
+          if (key.includes("ballot:statewide:democrat")) return JSON.stringify(ballot);
+          return null;
+        }),
+        put: vi.fn(),
+        delete: mockDelete,
+      },
+      ANTHROPIC_API_KEY: "test-key",
+    };
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() =>
+        Promise.resolve({
+          ok: true,
+          status: 200,
+          json: () =>
+            Promise.resolve({
+              content: [
+                {
+                  type: "text",
+                  text: JSON.stringify({
+                    candidates: [
+                      { name: "Alice", polling: "60%", fundraising: null, endorsements: null, keyPositions: null, pros: null, cons: null, summary: null, background: null },
+                      { name: "Bob", polling: null, fundraising: null, endorsements: null, keyPositions: null, pros: null, cons: null, summary: null, background: null },
+                    ],
+                  }),
+                },
+              ],
+            }),
+        })
+      )
+    );
+
+    const result = await runDailyUpdate(mockEnv, { parties: ["democrat"] });
+
+    // Update should still succeed — data is written to KV
+    expect(result.updated).toContain("democrat");
+    expect(mockEnv.ELECTION_DATA.put).toHaveBeenCalled();
+
+    // But candidates_index should NOT be invalidated on Election Day
+    expect(mockDelete).not.toHaveBeenCalledWith("candidates_index");
 
     vi.useRealTimers();
   });

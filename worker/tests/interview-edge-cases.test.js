@@ -103,6 +103,8 @@ beforeEach(() => {
   vi.stubGlobal("confirm", vi.fn(() => true));
 
   bootApp();
+  // Advance past welcome screen to phase 1 (tone picker)
+  clickAction("start");
 });
 
 // ---------------------------------------------------------------------------
@@ -218,7 +220,7 @@ describe("State initialization", () => {
     expect(S().address.zip).toBe("");
   });
 
-  it("initializes with phase 1 (auto-advanced from 0)", () => {
+  it("initializes with phase 1 (after clicking start from welcome)", () => {
     expect(S().phase).toBe(1);
   });
 

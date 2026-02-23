@@ -61,6 +61,8 @@ export function mergeSources(existing, incoming) {
   return merged.slice(0, 20);
 }
 
+export const ELECTION_DAY = "2026-03-03"; // Texas Primary Election Day
+
 const PARTIES = ["republican", "democrat"];
 const BALLOT_KEYS = {
   republican: "ballot:statewide:republican_primary_2026",
@@ -81,9 +83,9 @@ const LEGACY_BALLOT_KEYS = {
  * @returns {{ updated: string[], errors: string[] }}
  */
 export async function runDailyUpdate(env, options = {}) {
-  // Stop updating after election day (March 3, 2026)
-  if (new Date() > new Date("2026-03-04T00:00:00Z")) {
-    return { skipped: true, reason: "Past election day (March 3, 2026)" };
+  // Stop updating after election day
+  if (new Date() > new Date(ELECTION_DAY + "T23:59:59Z")) {
+    return { skipped: true, reason: `Past election day (${ELECTION_DAY})` };
   }
 
   const parties = options.parties || PARTIES;
@@ -166,8 +168,12 @@ export async function runDailyUpdate(env, options = {}) {
     }
   }
 
-  // Invalidate candidates_index cache if any ballot changed
-  if (updated.length > 0 && !dryRun) {
+  // Invalidate candidates_index cache if any ballot changed — but skip on
+  // Election Day itself when traffic peaks and cache rebuilds are most costly.
+  // Data shouldn't be changing while voting is in progress.
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const isElectionDay = todayStr === ELECTION_DAY;
+  if (updated.length > 0 && !dryRun && !isElectionDay) {
     try { await env.ELECTION_DATA.delete("candidates_index"); } catch { /* non-fatal */ }
   }
 
@@ -396,7 +402,7 @@ function mergeRaceUpdates(race, updates) {
  * Validates that an update doesn't break structural invariants.
  * Returns an error string, or null if valid.
  */
-function validateRaceUpdate(original, updated) {
+export function validateRaceUpdate(original, updated) {
   if (!original || !updated) return "missing race data";
 
   // Candidate count must match
@@ -432,12 +438,8 @@ function validateRaceUpdate(original, updated) {
     if (cand.name === "") return "empty candidate name";
     if (cand.summary === "") return `${cand.name} has empty summary`;
 
-    // Validate sources if present
+    // Validate sources if present (dedup and cap at 20 are handled by mergeSources)
     if (cand.sources && Array.isArray(cand.sources)) {
-      if (cand.sources.length > 20) {
-        return `${cand.name} has too many sources (${cand.sources.length}, max 20)`;
-      }
-      const urls = new Set();
       for (const src of cand.sources) {
         if (!src.url || typeof src.url !== "string") {
           return `${cand.name} has a source with invalid URL`;
@@ -447,10 +449,6 @@ function validateRaceUpdate(original, updated) {
         } catch {
           return `${cand.name} has a source with malformed URL: ${src.url}`;
         }
-        if (urls.has(src.url)) {
-          return `${cand.name} has duplicate source URL: ${src.url}`;
-        }
-        urls.add(src.url);
       }
     }
   }

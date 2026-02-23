@@ -4,7 +4,7 @@
 // Run via: POST /api/election/seed-county with ADMIN_SECRET auth
 // Body: { countyFips: "48453", countyName: "Travis", party: "republican" }
 
-import { extractSourcesFromResponse, mergeSources } from "./updater.js";
+import { extractSourcesFromResponse, mergeSources, validateRaceUpdate } from "./updater.js";
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -169,6 +169,35 @@ IMPORTANT:
   const result = await callClaudeWithSearch(env, prompt);
   if (!result) return { error: "No response from Claude" };
 
+  // Scope source attribution per-candidate (matching updater.js pattern)
+  const apiSources = result._apiSources || [];
+  delete result._apiSources;
+  if (result.races && Array.isArray(result.races)) {
+    for (const race of result.races) {
+      if (race.candidates && Array.isArray(race.candidates)) {
+        for (const cand of race.candidates) {
+          // Use candidate-level sources if present, fall back to API-level sources
+          const candidateSources = Array.isArray(cand.sources) ? cand.sources : [];
+          const today = new Date().toISOString().slice(0, 10);
+          const normalizedCandSources = candidateSources
+            .filter((s) => s && s.url)
+            .map((s) => ({ url: s.url, title: s.title || s.url, accessDate: s.accessDate || today }));
+          const allIncoming = [...normalizedCandSources, ...apiSources];
+          if (allIncoming.length > 0) {
+            cand.sources = mergeSources(cand.sources, allIncoming);
+            cand.sourcesUpdatedAt = new Date().toISOString();
+          }
+        }
+
+        // Validate race before writing to KV (same checks the updater enforces)
+        const validationError = validateRaceUpdate(race, race);
+        if (validationError) {
+          return { error: `Validation failed for ${race.office}: ${validationError}` };
+        }
+      }
+    }
+  }
+
   const key = `ballot:county:${countyFips}:${party}_primary_2026`;
   await env.ELECTION_DATA.put(key, JSON.stringify(result));
   // Invalidate candidates_index cache so it rebuilds with new county data
@@ -278,16 +307,9 @@ async function callClaudeWithSearch(env, userPrompt) {
 
     try {
       const parsed = JSON.parse(cleaned);
-      // Attach API-level sources to candidates in ballot data
+      // Attach API-level sources for per-candidate scoping by the caller
       if (parsed.races && Array.isArray(parsed.races) && apiSources.length > 0) {
-        for (const race of parsed.races) {
-          if (race.candidates && Array.isArray(race.candidates)) {
-            for (const cand of race.candidates) {
-              cand.sources = mergeSources(cand.sources, apiSources);
-              cand.sourcesUpdatedAt = new Date().toISOString();
-            }
-          }
-        }
+        parsed._apiSources = apiSources;
       }
       return parsed;
     } catch {

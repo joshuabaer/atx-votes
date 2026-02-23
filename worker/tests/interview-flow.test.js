@@ -141,14 +141,24 @@ beforeEach(() => {
   vi.stubGlobal("confirm", vi.fn(() => true));
 
   bootApp();
+  // Advance past welcome screen to phase 1 (tone picker)
+  clickAction("start");
 });
 
 // ---------------------------------------------------------------------------
-// Phase 0 → 1: Welcome → Tone
+// Phase 0: Welcome screen
 // ---------------------------------------------------------------------------
-describe("Phase 0: Welcome (skipped)", () => {
-  it("auto-advances to phase 1 (tone picker) on load", () => {
-    // Welcome screen is skipped; app goes straight to tone picker
+describe("Phase 0: Welcome", () => {
+  it("shows welcome screen on initial load", () => {
+    // Re-boot without clicking start to test welcome screen
+    // Safe: resetting test DOM, not user content
+    document.documentElement.innerHTML = "<head></head><body></body>";
+    bootApp();
+    expect(S().phase).toBe(0);
+    expect(getApp()).toContain("Build My Guide");
+  });
+
+  it("advances to phase 1 (tone picker) when start is clicked", () => {
     expect(S().phase).toBe(1);
     expect(getApp()).toContain("Talk to me like");
   });
@@ -702,6 +712,7 @@ describe("Phase 7: Geolocation", () => {
     vi.stubGlobal("confirm", vi.fn(() => true));
 
     bootApp();
+    clickAction("start");
 
     // Navigate to phase 7
     passTone();
@@ -1102,7 +1113,11 @@ describe("Progress bar", () => {
 describe("Back button visibility", () => {
   it("phase 1 has a back button to return to welcome", () => {
     expect(S().phase).toBe(1);
-    expect(document.querySelector('[data-action="back"]')).not.toBeNull();
+    const backBtn = document.querySelector('[data-action="back"]');
+    expect(backBtn).not.toBeNull();
+    backBtn.click();
+    expect(S().phase).toBe(0);
+    expect(getApp()).toContain("Build My Guide");
   });
 
   it("phase 2 has a back button", () => {
