@@ -6,26 +6,36 @@
 
 ### Data & Content
 - [ ] Enrich county_info for remaining ~120 counties — elections websites, phone numbers, vote center status for smallest/rural counties
-- [ ] Seed county ballots for top 30 counties — local races for both parties via Claude + web_search (running now, script at docs/scripts/seed_county_ballots.js)
+- [ ] Seed county ballots for top 30 counties — local races for both parties via Claude + web_search (script at docs/scripts/seed_county_ballots.js)
+- [ ] Fix seeding script error handling — script marks 401 auth errors as "completed" in progress tracker, so re-running skips those counties instead of retrying them. Also shows 77 errors from a previous run with an expired API key even though current run skips everything. Need to: (1) not mark failed steps as completed, (2) clear stale errors from progress file, (3) add a `--reset` flag to clear progress
 - [ ] Fill sparse candidate data — endorsements (43% missing), Democrat polling (55% missing), Democrat fundraising (35% missing)
 - [ ] Candidate contact outreach — for each candidate, identify the best contact name and email address for asking them to review their candidate info on our website (research done, see docs/plans/candidate_contacts.md)
 
 ### Features
 - [ ] Make city/region support self-service — configuration-driven approach so any city/region can set up their own voting guide without code changes
 - [ ] Create versions for runoffs and general election — support multiple election cycles beyond the primary (detailed plan at docs/plans/plan_runoff_general_election.md, 4-phase timeline March-October)
-- [ ] Make easter egg emoji bursts bigger — double the size of the emojis that fly up when triggering the cowboy ("yeehaw") and Swedish Chef ("bork") easter eggs
-- [ ] Make "I Voted" animation look like fireworks — replace the current emoji burst with a fireworks-style animation when the user taps "I Voted"
-- [ ] Sample ballot on home page — "Show me a sample" button that instantly displays a pre-generated example ballot, clearly watermarked as a sample, skipping the full interview. Very fast first impression for new visitors. Should look like the real PWA ballot with R/D party switcher, fully filled out race cards, match percentages, and expandable candidate details.
+- [ ] Add Related Links sections to transparency pages — add "Nonpartisan by Design" link to bottom of Data Quality page, and replicate the Data Quality page's Related Links section on AI Audit, Nonpartisan, and Open Source pages (cross-linking between all transparency pages)
 - [ ] Integrate DeepSeek model — add as another LLM option like Claude/GPT/Gemini/Grok for guide generation, vanity URL, audit provider. Must include a prominent persistent warning banner: "This is a Chinese open-source model, available for research/comparison purposes only. No personal information is shared with China — all processing runs through US-hosted API infrastructure."
 - [ ] Create new txvotes repo in GitHub — fresh copy of the code without all the dev history
 
 ### Audit Score Improvements
-_Latest audit: ChatGPT 7.5, Gemini 8.0, Claude 7.6 (avg 7.7/10). Remaining items:_
+_Latest audit: ChatGPT 7.5, Gemini 8.0, Claude 7.6, Grok 7.5 (avg 7.7/10). Remaining:_
 
 - [ ] Implement automated bias test suite — same voter profile with swapped party ballots, measure recommendation shifts and flag asymmetries. Publishable evidence of fairness.
-- [ ] Add "why this confidence level" explanations — show which specific voter answers drove each recommendation, not just a narrative summary.
-- [ ] Document and enforce a source ranking policy — official source priority rules (SOS filing > county office > campaign site > local news), allowlist/denylist for web_search results.
-- [ ] Add issue list completeness review — evaluate interview topics against politically salient issues not currently covered (criminal justice, energy/oil & gas, LGBTQ policy, voting & elections).
+
+### Code Review Findings (PR #2)
+
+_From automated code review of "Add automated AI audit runner" (interview-flow-tests branch)._
+
+- [ ] **[P0]** Fix `_pickedIssues`/`_pickedQuals` restoration bug — on page reload, `load()` pads `S.issues` with all remaining issues before computing `S._pickedIssues = Math.min(5, S.issues.length)`, so a user who picked 2 issues sees 5 "top priority" slots filled. Fix: persist `_pickedIssues`/`_pickedQuals` in `save()` or compute from saved array before padding. (`worker/src/pwa.js`)
+- [ ] **[P1]** Update CLAUDE.md test count — says "108 tests total: 71 interview flow + 37 pwa-guide" but actual count is 518 tests across 9 test files
+- [ ] **[P1]** Add `audit-runner.js` to CLAUDE.md Architecture section — new 480-line module imported in index.js is not listed alongside the other worker/src files
+- [ ] **[P1]** Add new test files to CLAUDE.md — audit-runner.test.js, audit-export.test.js, routes.test.js (plus county-seeder.test.js, index-helpers.test.js, interview-edge-cases.test.js, updater.test.js) are not documented
+- [ ] **[P1]** Update CLAUDE.md reading level docs — says "level 6 is the Swedish Chef easter egg" but level 7 (Texas cowboy) now exists in pwa-guide.js
+- [ ] **[P2]** Fix county seeder source attribution — `county-seeder.js` applies all API search sources to all candidates indiscriminately, unlike `updater.js` which scopes per-candidate. Every candidate in a race gets attributed with every search result regardless of relevance
+- [ ] **[P2]** Remove dead code in `validateRaceUpdate` — duplicate-URL check and `sources.length > 20` check can never trigger because `mergeSources` already deduplicates and caps at 20 before validation runs
+- [ ] **[P2]** County seeder bypasses `validateRaceUpdate` — writes candidate data with sources directly to KV without malformed-URL or duplicate-URL validation that the updater path enforces
+- [ ] **[P3]** Election Day cache invalidation timing — `runDailyUpdate` invalidates `candidates_index` on every successful update, including Election Day when traffic peaks and cache rebuilds are most costly
 
 ### Technical Debt
 - [ ] Comprehensive memory management review — audit localStorage usage, service worker cache lifecycle, KV data retention, and state cleanup
@@ -151,8 +161,14 @@ _Latest audit: ChatGPT 7.5, Gemini 8.0, Claude 7.6 (avg 7.7/10). Remaining items
 </details>
 
 <details>
-<summary>Features (18 resolved)</summary>
+<summary>Features (24 resolved)</summary>
 
+- [x] Bigger easter egg emoji bursts — doubled font-size (40-88px) for cowboy/bork
+- [x] Fireworks "I Voted" animation — 8 staggered shells, patriotic colors, burst particles
+- [x] Sample ballot page — /sample with R/D switcher, 12 race cards, propositions, SAMPLE watermark
+- [x] Confidence explanations — "Why this match?" matchFactors per candidate
+- [x] Source ranking policy — 7-tier hierarchy in AI prompts, documented publicly
+- [x] Issue list expansion — added Criminal Justice, Energy & Oil/Gas, LGBTQ+ Rights, Voting & Elections (21 total)
 - [x] LLM choice — URL flags for alternate LLMs (?gemini, ?grok, ?chatgpt) + hidden debug/comparison view
 - [x] Cowboy & Swedish Chef easter eggs — type "yeehaw" for Cowboy, "bork" for Swedish Chef on profile page
 - [x] Remove Candidates link from footer — contextual links per page (4-6 links, no self-links)

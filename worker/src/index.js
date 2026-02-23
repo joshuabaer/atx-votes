@@ -41,6 +41,9 @@ li{font-size:1rem;color:var(--text);margin-bottom:0.75rem}
 .back{display:inline-block;margin-top:1.5rem;font-size:0.95rem}
 .page-footer{margin-top:2rem;font-size:0.85rem;color:var(--text2);text-align:center}
 .page-footer a{color:var(--text2);text-decoration:none}
+.related-links{list-style:none;padding:0;margin:0}
+.related-links li{margin-bottom:0.75rem}
+.related-links a{font-weight:600;font-size:0.95rem}
 </style>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.svg">`;
@@ -1207,6 +1210,13 @@ function handleNonpartisan() {
     <h2>Data Transparency</h2>
     <p>Our <a href="/data-quality">Data Quality Dashboard</a> shows live metrics on ballot coverage, candidate completeness, and county data availability. See exactly how fresh and complete our election data is at any time.</p>
 
+    <h2>Related</h2>
+    <ul class="related-links">
+      <li><a href="/audit">AI Bias Audit</a> — Independent review by four AI systems</li>
+      <li><a href="/data-quality">Data Quality Dashboard</a> — Live metrics on ballot coverage and candidate completeness</li>
+      <li><a href="/open-source">Open Source</a> — Source code, architecture, and independent code reviews</li>
+    </ul>
+
     <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/audit">AI Audit</a> &middot; <a href="/data-quality">Data Quality</a> &middot; <a href="/open-source">Open Source</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
 </body>
@@ -1540,7 +1550,13 @@ CONFLICT RESOLUTION: If sources disagree, trust official filings over campaign c
     <h2>Ongoing Commitment</h2>
     <p>This audit is not a one-time event. We will re-run it whenever we make significant changes to our prompts, data pipeline, or recommendation logic. The methodology export at <a href="/api/audit/export">/api/audit/export</a> always reflects the current production code.</p>
 
-    <p style="margin-top:1.5rem">See our <a href="/data-quality">Data Quality Dashboard</a> for live metrics on ballot coverage, candidate completeness, and county data availability.</p>
+    <h2>Related</h2>
+    <ul class="related-links">
+      <li><a href="/data-quality">Data Quality Dashboard</a> — Live metrics on ballot coverage and candidate completeness</li>
+      <li><a href="/open-source">Open Source</a> — Source code, architecture, and independent code reviews</li>
+      <li><a href="/nonpartisan">Nonpartisan by Design</a> — How we ensure fairness for all voters</li>
+      <li><a href="/api/audit/export">Methodology Export</a> — Full transparency of all AI prompts and data pipelines</li>
+    </ul>
 
     <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/data-quality">Data Quality</a> &middot; <a href="/open-source">Open Source</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
@@ -2280,6 +2296,13 @@ function handleOpenSource() {
     <h2>License</h2>
     <p>Texas Votes is released under the <strong>MIT License</strong>. This means you're free to use, modify, and distribute the code for any purpose — including building your own voting guide for another state or city. The only requirement is that you include the original license notice.</p>
     <p style="font-size:0.9rem;color:var(--text2)">We chose MIT because civic tech should have the fewest possible barriers to reuse. If this code helps more people vote informed, it's doing its job.</p>
+
+    <h2>Related</h2>
+    <ul class="related-links">
+      <li><a href="/audit">AI Bias Audit</a> — Independent review by four AI systems</li>
+      <li><a href="/data-quality">Data Quality Dashboard</a> — Live metrics on ballot coverage and candidate completeness</li>
+      <li><a href="/nonpartisan">Nonpartisan by Design</a> — How we ensure fairness for all voters</li>
+    </ul>
 
     <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/audit">AI Audit</a> &middot; <a href="/data-quality">Data Quality</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
@@ -3217,10 +3240,11 @@ async function handleDataQuality(env) {
     ${updateHtml}
 
     <h2>Related</h2>
-    <ul class="dq-links">
+    <ul class="dq-links related-links">
       <li><a href="/audit">AI Bias Audit</a> — Independent review by four AI systems</li>
       <li><a href="/api/audit/export">Methodology Export</a> — Full transparency of all AI prompts and data pipelines</li>
       <li><a href="/open-source">Open Source</a> — Source code, architecture, and independent code reviews</li>
+      <li><a href="/nonpartisan">Nonpartisan by Design</a> — How we ensure fairness for all voters</li>
       <li><a href="/candidates">Candidate Profiles</a> — Browse all candidates with detailed information</li>
     </ul>
 
