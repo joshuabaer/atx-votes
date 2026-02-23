@@ -22,6 +22,7 @@
 - [x] URL flags for alternate LLMs — `?gemini`, `?grok`, and `?chatgpt` query params that tell the app to use that LLM for generating recommendations instead of Claude. Routes to OpenAI gpt-4o, Gemini 2.5 Flash, or Grok 3. API keys already set from audit runner.
 - [x] Hidden LLM debug/comparison view — 5-tap version number in footer → `#/debug/compare`. Race-by-race and agreement summary views, cached in localStorage. Vanity URLs `/gemini`, `/grok`, `/chatgpt` with branded link previews. "Powered by" badge on loading screen and ballot header.
 - [x] Cowboy & Swedish Chef easter eggs — triple-tap "Reading Level" on profile unlocks Swedish Chef (tone 6), type "yeehaw" unlocks Cowboy (tone 7). Both trigger emoji burst, haptic feedback, and immediate guide recalculation.
+- [ ] Make priority list removal more obvious — add a visible "−" button on selected items in the two-zone picker (issues & qualities) to complement the "+" on pool items, so it's clear you can click to remove
 - [ ] Change Swedish Chef easter egg trigger — switch from triple-tap "Reading Level" label to typing "bork" on the profile page (matches the "yeehaw" pattern for Cowboy)
 - [ ] Sample ballot on home page — "Show me a sample" button that instantly displays a pre-generated example ballot, clearly watermarked as a sample, skipping the full interview. Very fast first impression for new visitors.
 - [ ] Create new txvotes repo in GitHub — fresh copy of the code without all the dev history
