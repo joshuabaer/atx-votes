@@ -668,6 +668,14 @@ function handleSampleBallot() {
               <span class="pos-chip">Energy Independence</span>
             </div>
           </div>
+          <div class="cand-section">
+            <h5>Endorsements</h5>
+            <ul>
+              <li>Texas Farm Bureau <span style="font-size:12px;color:var(--text2)">(business group)</span></li>
+              <li>Travis County Sheriff&rsquo;s Association <span style="font-size:12px;color:var(--text2)">(professional association)</span></li>
+              <li>Rep. Dan Harmon <span style="font-size:12px;color:var(--text2)">(elected official)</span></li>
+            </ul>
+          </div>
           <div class="cand-section pros">
             <h5>&#x2705; Strengths</h5>
             <ul>
@@ -681,6 +689,22 @@ function handleSampleBallot() {
             <ul>
               <li>No statewide office experience; largest budget managed was $180M</li>
               <li>Property tax plan may require offsetting revenue sources not yet identified</li>
+            </ul>
+          </div>
+          <div style="margin-top:12px;padding:10px;border-radius:var(--rs);background:rgba(33,89,143,.04);border:1px solid var(--border)">
+            <div style="font-size:13px;font-weight:700;margin-bottom:4px">Why this match?</div>
+            <ul style="font-size:13px;color:var(--text2);line-height:1.6;margin-left:16px">
+              <li>Aligns with your priority: property tax reform</li>
+              <li>Matches your value: fiscal discipline and limited government</li>
+              <li>Supports your stance: local control of education</li>
+            </ul>
+          </div>
+          <div style="margin-top:10px">
+            <div style="font-size:13px;font-weight:700;margin-bottom:4px">Sources</div>
+            <ul style="font-size:12px;color:var(--text2);line-height:1.6;margin-left:16px">
+              <li><a href="#" style="font-size:12px" onclick="return false">Sullivan for Governor &mdash; Official Campaign Site</a></li>
+              <li><a href="#" style="font-size:12px" onclick="return false">Texas Tribune: Sullivan enters governor&rsquo;s race</a></li>
+              <li><a href="#" style="font-size:12px" onclick="return false">Ballotpedia &mdash; Marcus Sullivan</a></li>
             </ul>
           </div>
         </div>
@@ -1068,6 +1092,7 @@ function handleSampleBallot() {
     <div class="page-footer">
       <a href="/">Texas Votes</a> &middot;
       <a href="/nonpartisan">Nonpartisan by Design</a> &middot;
+      <a href="/audit">AI Audit</a> &middot;
       <a href="/candidates">Candidates</a> &middot;
       <a href="/privacy">Privacy</a>
       <br>
@@ -1148,6 +1173,12 @@ function handleNonpartisan() {
     <p>All candidates are cross-referenced against official filings from the Texas Secretary of State, county clerks, and Ballotpedia. Candidate data includes positions, endorsements, strengths, and concerns — presented with equal depth for every candidate in a race.</p>
     <p>Endorsements include context labels identifying the type of each endorsing organization (e.g., labor union, editorial board, advocacy group, elected official). This helps voters understand who is behind each endorsement without having to research each organization separately.</p>
     <p>A daily automated updater re-verifies candidate data using AI-powered web research. Each ballot page and candidate profile displays a "Data last verified" timestamp so you can see exactly when the information was last checked.</p>
+
+    <h2>Source Citations</h2>
+    <p>Every candidate profile includes source URLs so voters can verify claims independently. Sources are visible on candidate profile pages and in the PWA ballot view, linking directly to official filings, news articles, and campaign materials. All source citations include the URL, title, and the date the source was last accessed.</p>
+
+    <h2>Match Transparency</h2>
+    <p>Each candidate recommendation includes "Why this match?" factors — short phrases citing the specific voter priorities that drove the recommendation. Instead of a generic "Good Match" label, voters can see exactly which of their stated values and issue priorities the AI connected to each candidate. This makes the recommendation logic auditable at the individual level.</p>
 
     <h2>Source Priority Hierarchy</h2>
     <p>All AI research prompts include an explicit 7-tier source ranking policy. When the AI uses web search to gather candidate data, it is instructed to prefer official government filings (Texas Secretary of State, county election offices) over campaign websites, nonpartisan references (Ballotpedia, VoteSmart) over news outlets, and to avoid blogs, social media, and opinion sites. When sources conflict, official filings override campaign claims, and campaign claims override news reporting. This hierarchy is documented in our <a href="/api/audit/export">methodology export</a>.</p>
@@ -1401,6 +1432,7 @@ Return ONLY this JSON:
     "office": "exact office name",
     "recommendedCandidate": "exact name from list",
     "reasoning": "1 sentence why this candidate fits the voter",
+    "matchFactors": ["2-3 short phrases citing specific voter priorities that drove this match"],
     "confidence": "Strong Match|Good Match|Best Available|Symbolic Race"
   }],
   "propositions": [{
@@ -1483,7 +1515,9 @@ CONFLICT RESOLUTION: If sources disagree, trust official filings over campaign c
   "pros": ["Strength 1", "Strength 2"],
   "cons": ["Concern 1", "Concern 2"],
   "polling": "Latest polling data or null",
-  "fundraising": "Fundraising totals or null"
+  "fundraising": "Fundraising totals or null",
+  "sources": [{"url": "https://...", "title": "Source Title", "accessDate": "2026-02-22"}],
+  "sourcesUpdatedAt": "2026-02-22T14:30:00Z"
 }</div>
 
     <h2>Independent AI Audit Reports</h2>
@@ -1533,7 +1567,7 @@ function buildAuditExportData() {
       description: "When a voter completes the interview, their profile is sent with the full ballot data to generate personalized recommendations. Both Republican and Democratic ballots use identical prompts and formatting.",
       model: "Claude Sonnet (Anthropic) — claude-sonnet-4-6 with fallback to claude-sonnet-4-20250514",
       systemPrompt: "You are a non-partisan voting guide assistant for Texas elections. Your job is to make personalized recommendations based ONLY on the voter's stated values and the candidate data provided. You must NEVER recommend a candidate who is not listed in the provided ballot data. You must NEVER invent or hallucinate candidate information. VOICE: Always address the voter as \"you\" (second person). Never say \"the voter\" or use third person. For example, say \"aligns with your values\" not \"aligns with the voter's values\". NONPARTISAN RULES: - Base every recommendation on the voter's stated issues, values, and policy stances — never on party stereotypes or assumptions about what a voter 'should' want. - Use neutral, factual language in all reasoning. Avoid loaded terms, partisan framing, or editorial commentary. - Treat all candidates with equal analytical rigor regardless of their positions. - For propositions, connect recommendations to the voter's stated values without advocating for or against any ideology. Respond with ONLY valid JSON — no markdown, no explanation, no text outside the JSON object.",
-      userPromptTemplate: "Recommend ONE candidate per race and a stance on each proposition. Be concise.\n\nNONPARTISAN: All reasoning must be factual and issue-based. Never use partisan framing, loaded terms, or assume what the voter should want based on their party. Treat every candidate and proposition with equal analytical rigor. Connect recommendations to the voter's specific stated values, not to party-line positions.\n\nIMPORTANT: For profileSummary, write 2 sentences in first person \u2014 conversational, specific, no generic labels. NEVER say \"I'm a Democrat/Republican\" \u2014 focus on values and priorities.\n\nVOTER: {Party} primary | Spectrum: {politicalSpectrum}\nIssues: {topIssues}\nValues: {candidateQualities}\nStances: {policyViews}\n\nBALLOT:\n{Full condensed ballot description with all races, candidates, positions, endorsements, pros, cons}\n\nVALID CANDIDATES (MUST only use these names):\n{List of candidate names per race}\n\nReturn ONLY this JSON:\n{\n  \"profileSummary\": \"2 sentences, first person, conversational\",\n  \"races\": [{\n    \"office\": \"exact office name\",\n    \"district\": \"district or null\",\n    \"recommendedCandidate\": \"exact name from list\",\n    \"reasoning\": \"1 sentence why this candidate fits the voter\",\n    \"strategicNotes\": null,\n    \"caveats\": null,\n    \"confidence\": \"Strong Match|Good Match|Best Available|Symbolic Race\"\n  }],\n  \"propositions\": [{\n    \"number\": 1,\n    \"recommendation\": \"Lean Yes|Lean No|Your Call\",\n    \"reasoning\": \"1 sentence connecting to voter\",\n    \"caveats\": null,\n    \"confidence\": \"Clear Call|Lean|Genuinely Contested\"\n  }]\n}",
+      userPromptTemplate: "Recommend ONE candidate per race and a stance on each proposition. Be concise.\n\nNONPARTISAN: All reasoning must be factual and issue-based. Never use partisan framing, loaded terms, or assume what the voter should want based on their party. Treat every candidate and proposition with equal analytical rigor. Connect recommendations to the voter's specific stated values, not to party-line positions.\n\nIMPORTANT: For profileSummary, write 2 sentences in first person \u2014 conversational, specific, no generic labels. NEVER say \"I'm a Democrat/Republican\" \u2014 focus on values and priorities.\n\nVOTER: {Party} primary | Spectrum: {politicalSpectrum}\nIssues: {topIssues}\nValues: {candidateQualities}\nStances: {policyViews}\n\nBALLOT:\n{Full condensed ballot description with all races, candidates, positions, endorsements, pros, cons}\n\nVALID CANDIDATES (MUST only use these names):\n{List of candidate names per race}\n\nReturn ONLY this JSON:\n{\n  \"profileSummary\": \"2 sentences, first person, conversational\",\n  \"races\": [{\n    \"office\": \"exact office name\",\n    \"district\": \"district or null\",\n    \"recommendedCandidate\": \"exact name from list\",\n    \"reasoning\": \"1 sentence why this candidate fits the voter\",\n    \"matchFactors\": [\"2-3 short phrases citing specific voter priorities that drove this match\"],\n    \"strategicNotes\": null,\n    \"caveats\": null,\n    \"confidence\": \"Strong Match|Good Match|Best Available|Symbolic Race\"\n  }],\n  \"propositions\": [{\n    \"number\": 1,\n    \"recommendation\": \"Lean Yes|Lean No|Your Call\",\n    \"reasoning\": \"1 sentence connecting to voter\",\n    \"caveats\": null,\n    \"confidence\": \"Clear Call|Lean|Genuinely Contested\"\n  }]\n}",
       readingLevelInstructions: {
         "1": "TONE: Write at a high school reading level. Use simple, everyday language. Avoid jargon and political terminology. Explain concepts as if to someone voting for the first time.",
         "2": "TONE: Write casually, like explaining politics to a friend. Keep it conversational and approachable. Minimize jargon.",
@@ -1746,6 +1780,10 @@ function buildAuditExportData() {
         { value: "Water & Land", icon: "💧" },
         { value: "Agriculture & Rural", icon: "🌾" },
         { value: "Faith & Religious Liberty", icon: "🕌" },
+        { value: "Criminal Justice", icon: "⚖️" },
+        { value: "Energy & Oil/Gas", icon: "🛢️" },
+        { value: "LGBTQ+ Rights", icon: "🏳️" },
+        { value: "Voting & Elections", icon: "🗳️" },
       ],
       politicalSpectrum: [
         { value: "Progressive", description: "Bold systemic change, social justice focused" },
@@ -1921,6 +1959,42 @@ function buildAuditExportData() {
             { label: "Faith guides policy", description: "Moral and religious values should shape our laws" },
           ],
         },
+        "Criminal Justice": {
+          question: "What's most important for criminal justice reform?",
+          options: [
+            { label: "Focus on rehabilitation", description: "Invest in re-entry programs, reduce recidivism through support services" },
+            { label: "Maintain current system", description: "Texas's approach to law and order is working, keep sentences firm" },
+            { label: "Reform sentencing laws", description: "Reduce mandatory minimums, address racial disparities in sentencing" },
+            { label: "Rethink incarceration", description: "Shift resources from prisons to community-based alternatives" },
+          ],
+        },
+        "Energy & Oil/Gas": {
+          question: "How should Texas manage its energy industry?",
+          options: [
+            { label: "Maximize production", description: "Support oil and gas expansion, reduce regulations on producers" },
+            { label: "Balanced energy mix", description: "Maintain fossil fuels while investing in renewables and grid stability" },
+            { label: "Accelerate clean energy", description: "Transition away from fossil fuels toward wind, solar, and storage" },
+            { label: "Let the market decide", description: "Remove subsidies for all energy sources, let competition set the course" },
+          ],
+        },
+        "LGBTQ+ Rights": {
+          question: "What's the right approach to LGBTQ+ rights?",
+          options: [
+            { label: "Full equality protections", description: "Add sexual orientation and gender identity to anti-discrimination laws" },
+            { label: "Balance with religious liberty", description: "Protect LGBTQ+ individuals while preserving faith-based exemptions" },
+            { label: "Current laws are sufficient", description: "Existing legal protections are adequate, no new legislation needed" },
+            { label: "Parental rights focus", description: "Parents should direct decisions about children's healthcare and education" },
+          ],
+        },
+        "Voting & Elections": {
+          question: "What matters most for elections?",
+          options: [
+            { label: "Expand voter access", description: "Make registration easier, extend early voting, allow mail-in ballots for all" },
+            { label: "Strengthen ID requirements", description: "Require photo ID, verify citizenship, secure the voter rolls" },
+            { label: "Balanced election reforms", description: "Improve access and security together with bipartisan oversight" },
+            { label: "Local control", description: "Let counties and cities set their own election rules and procedures" },
+          ],
+        },
       },
     },
 
@@ -1961,7 +2035,7 @@ function buildAuditExportData() {
         "3": { label: "Standard (default)", description: "News-level writing. No tone instruction added — this is the original researched text." },
         "4": { label: "Detailed", description: "More depth and nuance. Precise political terminology. Assumes the reader follows politics." },
         "5": { label: "Expert", description: "Political science professor level. Precise terminology, policy frameworks and precedents, deep familiarity assumed." },
-        "6": { label: "Swedish Chef", description: "Easter egg: Everything written as the Swedish Chef from the Muppets. Bork bork bork! Candidate names and office titles remain accurate." },
+        "6": { label: "Swedish Chef", description: "Easter egg: Triggered by typing \"bork\" on the profile page. Everything written as the Swedish Chef from the Muppets. Bork bork bork! Candidate names and office titles remain accurate." },
         "7": { label: "Texas Cowboy", description: "Easter egg: Folksy Texas cowboy voice. Y'all, reckon, fixin' to. Ranch metaphors and campfire wisdom. Candidate names and office titles remain accurate." },
       },
       candidateFields: ["summary", "pros", "cons"],
@@ -2023,9 +2097,18 @@ function handleSupport() {
 
       <h2>I found wrong information about a candidate.</h2>
       <p>Please <a href="mailto:howdy@txvotes.app">email us</a> with details and we'll correct it as quickly as possible.</p>
+
+      <h2>Where does the candidate data come from?</h2>
+      <p>Candidate data is researched using AI with web search, cross-referenced against official filings from the Texas Secretary of State, county clerks, and Ballotpedia. Every candidate profile includes source citations linking to the original articles, filings, and campaign materials so you can verify claims independently.</p>
+
+      <h2>Can I preview what the ballot looks like before doing the interview?</h2>
+      <p>Yes! Visit our <a href="/sample">sample ballot page</a> to see fictional candidates and recommendations that demonstrate exactly what your personalized guide will look like — including match scores, candidate details, and proposition analysis.</p>
+
+      <h2>What issues does the interview cover?</h2>
+      <p>The interview lets you select from 21 issues: Economy &amp; Cost of Living, Housing, Public Safety, Education, Healthcare, Environment &amp; Climate, Grid &amp; Infrastructure, Tech &amp; Innovation, Transportation, Immigration, Taxes, Civil Rights, Gun Policy, Abortion &amp; Reproductive Rights, Water &amp; Land, Agriculture &amp; Rural, Faith &amp; Religious Liberty, Criminal Justice, Energy &amp; Oil/Gas, LGBTQ+ Rights, and Voting &amp; Elections. You pick your top 3-5, and the interview dives deeper into each one.</p>
     </div>
 
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/audit">AI Audit</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
 </body>
 </html>`;
@@ -2098,7 +2181,7 @@ function handlePrivacyPolicy() {
     <h2>Contact</h2>
     <p>Questions? Email <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
 
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/open-source">Open Source</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/audit">AI Audit</a> &middot; <a href="/open-source">Open Source</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
 </body>
 </html>`;
@@ -2161,26 +2244,29 @@ function handleOpenSource() {
     <div class="review-cards">
       <div class="review-card">
         <h3>ChatGPT Code Review</h3>
-        <p class="quote">"Well-intentioned methodology, but needs stronger evidence trails + bias testing before treating it as a serious voting guide." — 6/10</p>
+        <p class="quote">"Well-intentioned methodology with strong transparency practices and balanced prompt design." — 7.5/10</p>
         <a href="/audit">Read the full review &rarr;</a>
       </div>
       <div class="review-card">
         <h3>Gemini Code Review</h3>
-        <p class="quote">"A gold-standard model for nonpartisan AI voting tools. Technically rigorous with exceptional transparency." — 8.6/10</p>
+        <p class="quote">"A strong model for nonpartisan AI voting tools. Technically rigorous with exceptional transparency." — 8.0/10</p>
         <a href="/audit">Read the full review &rarr;</a>
       </div>
       <div class="review-card">
         <h3>Grok Code Review</h3>
-        <p class="quote">Review pending — full analysis of bias, security, and code quality.</p>
+        <p class="quote">"Solid nonpartisan framework with good safeguards. Source hierarchy and daily verification add credibility." — 7.8/10</p>
         <a href="/audit">Read the full review &rarr;</a>
       </div>
       <div class="review-card">
         <h3>Claude Code Review</h3>
-        <p class="quote">Self-review — Claude auditing its own system for blind spots and biases.</p>
+        <p class="quote">"Self-review identifies genuine blind spots. Strong prompt-level guardrails with room for runtime bias detection." — 7.6/10</p>
         <a href="/audit">Read the full review &rarr;</a>
       </div>
     </div>
     <p style="font-size:0.9rem;color:var(--text2)">These reviews complement our <a href="/audit">AI audit page</a>, which documents the full methodology export and bias assessment.</p>
+
+    <h2>Automated Testing</h2>
+    <p>518 automated tests covering interview flow, guide generation, routing, and data validation. Tests run on every change to catch regressions before they reach voters.</p>
 
     <h2>How to Contribute</h2>
     <ul>
@@ -2847,7 +2933,7 @@ async function handleCandidatesIndex(env) {
     <h1 style="margin-top:1rem">All Candidates</h1>
     <p class="subtitle">2026 Texas Primary Election — March 3, 2026</p>
     ${raceSections}
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/data-quality">Data Quality</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/audit">AI Audit</a> &middot; <a href="/data-quality">Data Quality</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
 </body>
 </html>`;

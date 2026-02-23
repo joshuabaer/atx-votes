@@ -480,6 +480,10 @@ async function main() {
       process.exit(1);
     }
   }
+  if (process.argv.includes("--reverse")) {
+    counties = [...counties].reverse();
+    console.log("Running in REVERSE order");
+  }
 
   // Determine which parties to process
   let parties = PARTIES;
