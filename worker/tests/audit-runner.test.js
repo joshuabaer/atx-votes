@@ -4,6 +4,7 @@ import {
   buildAuditPrompt,
   parseAuditScores,
   validateScores,
+  repairTruncatedJson,
   callProvider,
   runAudit,
   DIMENSION_KEYS,
@@ -142,6 +143,92 @@ Fairness of Framing: -5/10
     const result = parseAuditScores(text);
     expect(result.success).toBe(false);
     expect(result.error).toBeTruthy();
+  });
+
+  it("repairs truncated JSON from a code fence that was cut off", () => {
+    const text = `Here is my audit report. Great app overall.
+
+\`\`\`json
+{"overallScore": 8.6, "dimensions": {"partisanBias": 9, "factualAccuracy": 8, "fairnessOfFraming": 8, "balanceOfProsCons": 8, "transparency": 10}, "topStrength": "Excellent transparency", "topWeak`;
+    const result = parseAuditScores(text);
+    expect(result.success).toBe(true);
+    expect(result.scores.overallScore).toBe(8.6);
+    expect(result.scores.dimensions.partisanBias).toBe(9);
+    expect(result.scores.dimensions.transparency).toBe(10);
+    expect(result.scores.topStrength).toBe("Excellent transparency");
+    expect(result.method).toBe("json_repaired");
+  });
+
+  it("repairs truncated JSON missing closing braces entirely", () => {
+    const text = `Report done.
+\`\`\`json
+{"overallScore": 7.0, "dimensions": {"partisanBias": 7, "factualAccuracy": 6, "fairnessOfFraming": 7, "balanceOfProsCons": 7, "transparency": 8`;
+    const result = parseAuditScores(text);
+    expect(result.success).toBe(true);
+    expect(result.scores.overallScore).toBe(7.0);
+    expect(result.scores.dimensions.factualAccuracy).toBe(6);
+    expect(result.method).toBe("json_repaired");
+  });
+
+  it("repairs bare truncated JSON without code fence", () => {
+    const text = `My scores: {"overallScore": 9.0, "dimensions": {"partisanBias": 9, "factualAccuracy": 9, "fairnessOfFraming": 9, "balanceOfProsCons": 8, "transparency": 10}, "topStre`;
+    const result = parseAuditScores(text);
+    expect(result.success).toBe(true);
+    expect(result.scores.overallScore).toBe(9.0);
+    expect(result.scores.dimensions.balanceOfProsCons).toBe(8);
+    expect(result.method).toBe("json_repaired");
+  });
+
+  it("extracts scores from markdown table format using pipe regex", () => {
+    const text = `
+| Dimension | Score |
+|-----------|-------|
+| Partisan Bias | 8/10 |
+| Factual Accuracy | 7/10 |
+| Fairness of Framing | 8/10 |
+| Balance of Pros/Cons | 7/10 |
+| Transparency | 9/10 |
+`;
+    const result = parseAuditScores(text);
+    expect(result.success).toBe(true);
+    expect(result.scores.dimensions.partisanBias).toBe(8);
+    expect(result.scores.dimensions.transparency).toBe(9);
+    expect(result.method).toBe("regex");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// repairTruncatedJson tests
+// ---------------------------------------------------------------------------
+describe("repairTruncatedJson", () => {
+  it("returns null when no overallScore is found", () => {
+    const result = repairTruncatedJson("Just some text with no JSON.");
+    expect(result).toBeNull();
+  });
+
+  it("returns null when dimensions block is empty or missing", () => {
+    const text = '{"overallScore": 8.0, "dimensions": {';
+    const result = repairTruncatedJson(text);
+    expect(result).toBeNull();
+  });
+
+  it("extracts all fields from a nearly-complete truncated JSON", () => {
+    const text = '```json\n{"overallScore": 7.5, "dimensions": {"partisanBias": 8, "factualAccuracy": 7}, "topStrength": "Good design", "topWeakness": "Needs more`';
+    const result = repairTruncatedJson(text);
+    expect(result).not.toBeNull();
+    expect(result.overallScore).toBe(7.5);
+    expect(result.dimensions.partisanBias).toBe(8);
+    expect(result.dimensions.factualAccuracy).toBe(7);
+    expect(result.topStrength).toBe("Good design");
+    // topWeakness is truncated so should not be present
+    expect(result.topWeakness).toBeUndefined();
+  });
+
+  it("returns parsed object for valid complete JSON", () => {
+    const text = '```json\n{"overallScore": 8.0, "dimensions": {"partisanBias": 8}, "topStrength": "OK", "topWeakness": "OK"}\n```';
+    const result = repairTruncatedJson(text);
+    expect(result).not.toBeNull();
+    expect(result.overallScore).toBe(8.0);
   });
 });
 
@@ -331,11 +418,17 @@ describe("buildAuditPrompt", () => {
 
   it("includes structured JSON output instruction", () => {
     const prompt = buildAuditPrompt({ test: true });
-    expect(prompt).toContain("STRUCTURED SCORES (REQUIRED)");
+    expect(prompt).toContain("OUTPUT FORMAT");
     expect(prompt).toContain("overallScore");
     expect(prompt).toContain("partisanBias");
     expect(prompt).toContain("topStrength");
     expect(prompt).toContain("topWeakness");
+  });
+
+  it("includes conciseness instruction", () => {
+    const prompt = buildAuditPrompt({ test: true });
+    expect(prompt).toContain("concise");
+    expect(prompt).toContain("FIRST");
   });
 
   it("accepts string input directly", () => {

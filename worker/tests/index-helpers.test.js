@@ -669,6 +669,49 @@ describe("Data quality dashboard", () => {
     expect(dqBlock).toContain("Data Freshness");
     expect(dqBlock).toContain("manifest");
   });
+
+  it("includes pros/cons balance section", () => {
+    const dqBlock = indexSrc.slice(
+      indexSrc.indexOf("async function handleDataQuality"),
+      indexSrc.indexOf("// MARK: - Admin Coverage")
+    );
+    expect(dqBlock).toContain("Pros/Cons Balance");
+    expect(dqBlock).toContain("checkBallotBalance");
+    expect(dqBlock).toContain("balanceHtml");
+    expect(dqBlock).toContain("balance score");
+  });
+
+  it("links to balance check JSON API", () => {
+    const dqBlock = indexSrc.slice(
+      indexSrc.indexOf("async function handleDataQuality"),
+      indexSrc.indexOf("// MARK: - Admin Coverage")
+    );
+    expect(dqBlock).toContain("/api/balance-check");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Balance check API
+// ---------------------------------------------------------------------------
+describe("Balance check API", () => {
+  it("has /api/balance-check route", () => {
+    expect(indexSrc).toContain('url.pathname === "/api/balance-check"');
+    expect(indexSrc).toContain("handleBalanceCheck");
+  });
+
+  it("imports checkBallotBalance from balance-check module", () => {
+    expect(indexSrc).toContain('import { checkBallotBalance, formatBalanceSummary } from "./balance-check.js"');
+  });
+
+  it("computes combined score across both parties", () => {
+    const block = indexSrc.slice(
+      indexSrc.indexOf("async function handleBalanceCheck"),
+      indexSrc.indexOf("// MARK: - Election Data Endpoints")
+    );
+    expect(block).toContain("combinedScore");
+    expect(block).toContain("republican");
+    expect(block).toContain("democrat");
+  });
 });
 
 // ---------------------------------------------------------------------------

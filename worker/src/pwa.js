@@ -407,6 +407,22 @@ var CSS = [
   ".share-cta-body{font-size:14px;color:var(--text2);line-height:1.5;margin-bottom:14px}",
   ".share-cta-btn{display:inline-block;width:auto;padding:12px 28px;font-size:16px}",
 
+  // Report issue modal
+  ".report-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:10000;display:flex;align-items:center;justify-content:center;padding:24px;animation:fadeIn .3s ease}",
+  ".report-card{background:var(--card);border-radius:16px;padding:24px;max-width:400px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,.2);max-height:90vh;overflow-y:auto}",
+  ".report-card h3{font-size:18px;font-weight:800;margin:0 0 4px}",
+  ".report-card .report-subtext{font-size:13px;color:var(--text2);margin:0 0 16px;line-height:1.4}",
+  ".report-card .report-radio{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}",
+  ".report-card .report-radio label{display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;padding:8px 10px;border-radius:var(--rs);border:1.5px solid var(--border2);transition:border-color .2s}",
+  ".report-card .report-radio label:has(input:checked){border-color:var(--blue);background:rgba(33,89,143,.06)}",
+  ".report-card .report-radio input[type=radio]{margin:0;accent-color:var(--blue)}",
+  ".report-card textarea{width:100%;min-height:80px;padding:10px;border:1.5px solid var(--border2);border-radius:var(--rs);font-size:14px;font-family:inherit;background:var(--bg);color:var(--text);resize:vertical;line-height:1.4;box-sizing:border-box}",
+  ".report-card textarea:focus{outline:none;border-color:var(--blue)}",
+  ".report-card .report-actions{display:flex;gap:10px;margin-top:16px}",
+  ".report-card .report-actions button{flex:1;padding:10px;border-radius:var(--rs);font-size:14px;font-weight:600;cursor:pointer;border:none;font-family:inherit}",
+  ".report-link{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--text2);cursor:pointer;border:none;background:none;padding:4px 0;margin-top:6px;font-family:inherit;transition:color .2s}",
+  ".report-link:hover{color:var(--blue)}",
+
   // Form
   ".form-group{margin-bottom:16px}",
   ".form-group label{display:block;font-size:14px;font-weight:600;margin-bottom:6px}",
@@ -1195,7 +1211,21 @@ var APP_JS = [
     "'Local races for':'Carreras locales para'," +
     "'County are not yet available. Your ballot shows statewide and district races only.':'no est\\u00E1n disponibles a\\u00FAn. Tu boleta muestra solo las carreras estatales y de distrito.'," +
     "'Local races not yet available for this county.':'Carreras locales a\\u00FAn no disponibles para este condado.'," +
-    "'Why this match?':'\\u00BFPor qu\\u00E9 esta recomendaci\\u00F3n?'" +
+    "'Why this match?':'\\u00BFPor qu\\u00E9 esta recomendaci\\u00F3n?'," +
+    // Report issue
+    "'Flag this info':'Reportar esta informaci\\u00F3n'," +
+    "'Report an Issue':'Reportar un problema'," +
+    "'Help us improve. Select the type of issue and add details if you can.':'Ay\\u00FAdanos a mejorar. Selecciona el tipo de problema y agrega detalles si puedes.'," +
+    "'Incorrect info':'Informaci\\u00F3n incorrecta'," +
+    "'Perceived bias':'Sesgo percibido'," +
+    "'Missing info':'Informaci\\u00F3n faltante'," +
+    "'Other':'Otro'," +
+    "'Details (optional)':'Detalles (opcional)'," +
+    "'Describe the issue...':'Describe el problema...'," +
+    "'Submit Report':'Enviar reporte'," +
+    "'Cancel':'Cancelar'," +
+    "'Thank you! Your report has been sent.':'\\u00A1Gracias! Tu reporte ha sido enviado.'," +
+    "'Please select an issue type.':'Por favor selecciona un tipo de problema.'" +
   "};",
   "function t(s){return LANG==='es'&&TR[s]||s}",
 
@@ -1590,7 +1620,7 @@ var APP_JS = [
 
   // ============ INTERVIEW VIEWS ============
   "function renderInterview(){" +
-    "if(S.phase===0)return renderWelcome();" +
+    "if(S.phase===0){location.href='/';return''}" +
     "if(S.phase===8)return renderBuilding();" +
     "var step=S.phase;var total=7;" +
     "if(S.phase===4){step=4};" +
@@ -1606,7 +1636,7 @@ var APP_JS = [
     "return'';" +
   "}",
 
-  // Welcome
+  // Phase 0 redirects to landing page (/) — renderWelcome removed
   "function renderWelcome(){" +
     "return '<div class=\"hero\">" +
       "<div class=\"hero-icon\"><svg width=\"64\" height=\"72\" viewBox=\"0 0 512 576\"><defs><clipPath id=\"hs\"><path d=\"M56 48h400c10 0 16 6 16 16v256c0 108-200 148-216 156C240 468 40 428 40 320V64c0-10 6-16 16-16Z\"/></clipPath></defs><g clip-path=\"url(#hs)\"><rect x=\"40\" y=\"48\" width=\"432\" height=\"440\" fill=\"var(--blue)\"/><rect x=\"210\" y=\"48\" width=\"270\" height=\"86\" fill=\"#FFF\"/><rect x=\"210\" y=\"134\" width=\"270\" height=\"86\" fill=\"var(--red)\"/><rect x=\"210\" y=\"220\" width=\"270\" height=\"86\" fill=\"#FFF\"/><rect x=\"210\" y=\"306\" width=\"270\" height=\"86\" fill=\"var(--red)\"/><rect x=\"210\" y=\"392\" width=\"270\" height=\"86\" fill=\"#FFF\"/></g><path d=\"M125 166 L140 209 L186 210 L150 238 L163 282 L125 256 L87 282 L100 238 L64 210 L110 209Z\" fill=\"#FFF\"/></svg></div>" +
@@ -2194,6 +2224,21 @@ var APP_JS = [
         "for(var mf=0;mf<rec.matchFactors.length;mf++){h+='<li>'+esc(rec.matchFactors[mf])+'</li>'}" +
         "h+='</ul></div>'" +
       "}" +
+      "var _rc=candidates.find(function(c){return c.isRecommended});" +
+      "if(_rc&&_rc.pros&&_rc.pros.length){" +
+        "h+='<div style=\"margin-top:8px;padding:8px 10px;background:rgba(90,180,90,.08);border-radius:8px\">';" +
+        "h+='<div style=\"font-size:12px;font-weight:700;color:var(--ok);margin-bottom:4px\">\u2705 '+t('Strengths')+'</div>';" +
+        "h+='<ul style=\"margin:0;padding-left:18px;font-size:13px;color:var(--text);line-height:1.5\">';" +
+        "for(var si=0;si<_rc.pros.length;si++){h+='<li>'+esc(tp(_rc.pros[si]))+'</li>'}" +
+        "h+='</ul></div>'" +
+      "}" +
+      "if(_rc&&_rc.cons&&_rc.cons.length){" +
+        "h+='<div style=\"margin-top:8px;padding:8px 10px;background:rgba(220,120,60,.08);border-radius:8px\">';" +
+        "h+='<div style=\"font-size:12px;font-weight:700;color:var(--bad);margin-bottom:4px\">\u26A0\uFE0F '+t('Concerns')+'</div>';" +
+        "h+='<ul style=\"margin:0;padding-left:18px;font-size:13px;color:var(--text);line-height:1.5\">';" +
+        "for(var ci2=0;ci2<_rc.cons.length;ci2++){h+='<li>'+esc(tp(_rc.cons[ci2]))+'</li>'}" +
+        "h+='</ul></div>'" +
+      "}" +
       "if(rec.strategicNotes)h+='<p style=\"margin-top:6px\"><b>'+t('Strategy:')+'</b> '+esc(rec.strategicNotes)+'</p>';" +
       "if(rec.caveats)h+='<p style=\"margin-top:6px\"><b>'+t('Note:')+'</b> '+esc(rec.caveats)+'</p>';" +
       "h+='</div>'" +
@@ -2242,6 +2287,9 @@ var APP_JS = [
         "h+='</div>'" +
       "}" +
       "h+='<button class=\"expand-toggle\" data-action=\"toggle-expand\" data-id=\"'+eid+'\" aria-expanded=\"'+!!isOpen+'\">'+(isOpen?t('Show Less'):t('Show Details'))+'</button>';" +
+      "h+='<button class=\"report-link\" data-action=\"report-issue\" data-candidate=\"'+esc(c.name)+'\" data-race=\"'+esc(race.office+(race.district?' \\u2014 '+race.district:''))+'\">" +
+        "&#9873; '+t('Flag this info')+'" +
+      "</button>';" +
       "h+='</div>'" +
     "}" +
     // Share this race button
@@ -2825,6 +2873,7 @@ var APP_JS = [
     "else if(action==='share'){shareGuide()}" +
     "else if(action==='share-app'){trk('share_app');shareApp()}" +
     "else if(action==='share-race'){trk('share_race',{d1:el.dataset.idx});shareRace(parseInt(el.dataset.idx))}" +
+    "else if(action==='report-issue'){trk('report_issue',{d1:el.dataset.candidate});showReportModal(el.dataset.candidate,el.dataset.race)}" +
     "else if(action==='regen-summary'){regenerateSummary()}" +
     "else if(action==='reprocess-guide'){reprocessGuide()}" +
     "else if(action==='debug-tap'){debugTaps++;if(debugTaps>=5){debugTaps=0;location.hash='#/debug/compare'}}" +
@@ -3101,6 +3150,54 @@ var APP_JS = [
     "}" +
   "}",
 
+  // ============ REPORT ISSUE ============
+  "function showReportModal(candidateName,raceName){" +
+    "var d=document.createElement('div');" +
+    "d.className='report-overlay';" +
+    "d.innerHTML='<div class=\"report-card\">" +
+      "<h3>'+t('Report an Issue')+'</h3>" +
+      "<p class=\"report-subtext\">'+t('Help us improve. Select the type of issue and add details if you can.')+'</p>" +
+      "<div style=\"font-size:13px;color:var(--text2);margin-bottom:12px;padding:8px 10px;background:rgba(128,128,128,.08);border-radius:8px\">" +
+        "<strong>'+esc(candidateName)+'</strong> &mdash; '+esc(raceName)+'" +
+      "</div>" +
+      "<div class=\"report-radio\">" +
+        "<label><input type=\"radio\" name=\"report-type\" value=\"incorrect\"> '+t('Incorrect info')+'</label>" +
+        "<label><input type=\"radio\" name=\"report-type\" value=\"bias\"> '+t('Perceived bias')+'</label>" +
+        "<label><input type=\"radio\" name=\"report-type\" value=\"missing\"> '+t('Missing info')+'</label>" +
+        "<label><input type=\"radio\" name=\"report-type\" value=\"other\"> '+t('Other')+'</label>" +
+      "</div>" +
+      "<textarea id=\"report-details\" placeholder=\"'+esc(t('Describe the issue...'))+'\"></textarea>" +
+      "<div class=\"report-actions\">" +
+        "<button class=\"btn btn-secondary\" data-action=\"report-cancel\">'+t('Cancel')+'</button>" +
+        "<button class=\"btn btn-primary\" data-action=\"report-submit\">'+t('Submit Report')+'</button>" +
+      "</div>" +
+    "</div>';" +
+    "document.body.appendChild(d);" +
+    "d.addEventListener('click',function(e){" +
+      "var btn=e.target.closest('[data-action]');" +
+      "if(btn&&btn.dataset.action==='report-submit'){" +
+        "var checked=d.querySelector('input[name=report-type]:checked');" +
+        "if(!checked){alert(t('Please select an issue type.'));return}" +
+        "var details=d.querySelector('#report-details').value||'';" +
+        "var typeLabels={incorrect:t('Incorrect info'),bias:t('Perceived bias'),missing:t('Missing info'),other:t('Other')};" +
+        "var subject=encodeURIComponent('Issue Report: '+candidateName+' - '+raceName);" +
+        "var body=encodeURIComponent(" +
+          "'Candidate: '+candidateName+'\\n'+" +
+          "'Race: '+raceName+'\\n'+" +
+          "'Issue Type: '+typeLabels[checked.value]+'\\n'+" +
+          "'Details: '+(details||'(none)')+'\\n\\n'+" +
+          "'Reported from Texas Votes app'" +
+        ");" +
+        "window.open('mailto:flagged@txvotes.app?subject='+subject+'&body='+body,'_self');" +
+        "trk('report_submitted',{d1:checked.value,d2:candidateName});" +
+        "d.remove();" +
+        "setTimeout(function(){alert(t('Thank you! Your report has been sent.'))},300)" +
+      "}else if((btn&&btn.dataset.action==='report-cancel')||e.target===d){" +
+        "d.remove()" +
+      "}" +
+    "})" +
+  "}",
+
   // ============ SHARE STICKER ============
   "function shareStickerImage(){" +
     "var W=440,H=330;" +
@@ -3314,6 +3411,7 @@ var APP_JS = [
 
   // ============ INIT ============
   "load();",
+  "(function(){if(location.search.indexOf('start=1')!==-1&&S.phase===0){S.phase=1;S._iStart=Date.now();save()}}());",
   "(function(){var m=location.search.match(/tone=(\\d+)/);if(m&&!S.guideComplete){S.readingLevel=parseInt(m[1]);if(S.phase<2)S.phase=2;save()}}());",
   "(function(){var s=location.search.toLowerCase();var llms=['gemini','grok','chatgpt'];for(var i=0;i<llms.length;i++){if(s.indexOf(llms[i])!==-1){window._llmOverride=llms[i];break}}}());",
   "if(location.search)history.replaceState(null,'',location.pathname+location.hash);",

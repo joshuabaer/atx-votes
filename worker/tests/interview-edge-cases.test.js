@@ -7,10 +7,14 @@ import { APP_JS } from "../src/pwa.js";
 // Note: bootApp uses document.body.innerHTML which is safe in test context
 // (only setting trusted test markup, no user input)
 // ---------------------------------------------------------------------------
-function bootApp() {
+function bootApp(opts = {}) {
   // Safe: only setting trusted static test markup, not user input
   document.body.innerHTML =
     '<div id="topnav"></div><main id="app"></main><div id="tabs"></div>';
+  // Set ?start=1 to auto-advance past Phase 0 (which redirects to landing page)
+  if (opts.start) {
+    history.replaceState(null, "", "/app?start=1");
+  }
   const indirectEval = eval;
   indirectEval(APP_JS);
 }
@@ -102,9 +106,7 @@ beforeEach(() => {
 
   vi.stubGlobal("confirm", vi.fn(() => true));
 
-  bootApp();
-  // Advance past welcome screen to phase 1 (tone picker)
-  clickAction("start");
+  bootApp({ start: true });
 });
 
 // ---------------------------------------------------------------------------
@@ -220,7 +222,7 @@ describe("State initialization", () => {
     expect(S().address.zip).toBe("");
   });
 
-  it("initializes with phase 1 (after clicking start from welcome)", () => {
+  it("initializes with phase 1 (auto-advanced via ?start=1)", () => {
     expect(S().phase).toBe(1);
   });
 

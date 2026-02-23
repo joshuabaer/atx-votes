@@ -166,13 +166,14 @@ Evaluate whether candidate strengths and weaknesses are presented with equal dep
 Evaluate whether the app is genuinely transparent about how it works and what its limitations are.
 
 ## OUTPUT FORMAT
-Please structure your response with: Overall Assessment, Scores table (1-10 per dimension), Detailed Findings per dimension (Strengths, Weaknesses, Recommendations), Critical Issues, and Conclusion.
+IMPORTANT: Keep your response concise — aim for 1500 words or fewer. Use brief bullet points for findings, not lengthy paragraphs. Prioritize the structured JSON scores over lengthy prose.
 
-## STRUCTURED SCORES (REQUIRED)
-After your full report, you MUST include a JSON block with your scores in exactly this format:
+**FIRST**, output this JSON block with your scores (this is the most critical part):
 \`\`\`json
 {"overallScore": 7.5, "dimensions": {"partisanBias": 8, "factualAccuracy": 7, "fairnessOfFraming": 8, "balanceOfProsCons": 7, "transparency": 9}, "topStrength": "one sentence", "topWeakness": "one sentence"}
-\`\`\``;
+\`\`\`
+
+**THEN**, provide your analysis with: Overall Assessment, Scores table (1-10 per dimension), brief Findings per dimension (Strengths, Weaknesses, Recommendations), Critical Issues (if any), and Conclusion.`;
 }
 
 // ---------------------------------------------------------------------------
@@ -206,14 +207,36 @@ function parseAuditScores(responseText) {
     } catch { /* fall through */ }
   }
 
+  // Tier 2b: Repair truncated JSON — find opening { with overallScore and extract fields
+  const truncatedResult = repairTruncatedJson(responseText);
+  if (truncatedResult) {
+    const validated = validateScores(truncatedResult);
+    if (validated) return { success: true, scores: validated, method: "json_repaired" };
+  }
+
   // Tier 3: Regex extraction from prose
   const dimensions = {};
   const dimPatterns = [
-    { key: "partisanBias", patterns: [/partisan\s*bias[:\s]*(\d+(?:\.\d+)?)\s*(?:\/\s*10|out of 10)?/i] },
-    { key: "factualAccuracy", patterns: [/factual\s*accuracy[^:]*[:\s]*(\d+(?:\.\d+)?)\s*(?:\/\s*10|out of 10)?/i] },
-    { key: "fairnessOfFraming", patterns: [/fairness\s*of\s*framing[:\s]*(\d+(?:\.\d+)?)\s*(?:\/\s*10|out of 10)?/i] },
-    { key: "balanceOfProsCons", patterns: [/balance\s*of\s*pros[^:]*[:\s]*(\d+(?:\.\d+)?)\s*(?:\/\s*10|out of 10)?/i] },
-    { key: "transparency", patterns: [/transparency[^:]*[:\s]*(\d+(?:\.\d+)?)\s*(?:\/\s*10|out of 10)?/i] },
+    { key: "partisanBias", patterns: [
+      /partisan\s*bias[:\s]*(\d+(?:\.\d+)?)\s*(?:\/\s*10|out of 10)?/i,
+      /partisan\s*bias[^|\n]*?\|\s*(\d+(?:\.\d+)?)\s*(?:\/\s*10)?/i,
+    ] },
+    { key: "factualAccuracy", patterns: [
+      /factual\s*accuracy[^:]*[:\s]*(\d+(?:\.\d+)?)\s*(?:\/\s*10|out of 10)?/i,
+      /factual\s*accuracy[^|\n]*?\|\s*(\d+(?:\.\d+)?)\s*(?:\/\s*10)?/i,
+    ] },
+    { key: "fairnessOfFraming", patterns: [
+      /fairness\s*(?:of\s*)?framing[:\s]*(\d+(?:\.\d+)?)\s*(?:\/\s*10|out of 10)?/i,
+      /fairness\s*(?:of\s*)?framing[^|\n]*?\|\s*(\d+(?:\.\d+)?)\s*(?:\/\s*10)?/i,
+    ] },
+    { key: "balanceOfProsCons", patterns: [
+      /balance\s*(?:of\s*)?pros[^:]*[:\s]*(\d+(?:\.\d+)?)\s*(?:\/\s*10|out of 10)?/i,
+      /balance\s*(?:of\s*)?pros[^|\n]*?\|\s*(\d+(?:\.\d+)?)\s*(?:\/\s*10)?/i,
+    ] },
+    { key: "transparency", patterns: [
+      /transparency[^:|\n]*[:\s]*(\d+(?:\.\d+)?)\s*(?:\/\s*10|out of 10)?/i,
+      /transparency[^|\n]*?\|\s*(\d+(?:\.\d+)?)\s*(?:\/\s*10)?/i,
+    ] },
   ];
 
   for (const dim of dimPatterns) {
@@ -240,6 +263,77 @@ function parseAuditScores(responseText) {
   }
 
   return { success: false, error: "Could not extract scores from response" };
+}
+
+// ---------------------------------------------------------------------------
+// Truncated JSON repair — handles responses cut off mid-JSON
+// ---------------------------------------------------------------------------
+
+function repairTruncatedJson(text) {
+  // Find the start of the JSON object containing overallScore
+  let jsonStart = -1;
+
+  // Check for ```json fence that wasn't closed
+  const fenceStart = text.match(/```json\s*/);
+  if (fenceStart) {
+    jsonStart = fenceStart.index + fenceStart[0].length;
+  }
+
+  // Also try to find a bare { before "overallScore"
+  if (jsonStart === -1) {
+    const bareMatch = text.match(/\{\s*"overallScore"/);
+    if (bareMatch) {
+      jsonStart = bareMatch.index;
+    }
+  }
+
+  if (jsonStart === -1) return null;
+
+  let fragment = text.slice(jsonStart).trim();
+  // Remove trailing markdown fence if partially present
+  fragment = fragment.replace(/`*$/, "").trim();
+
+  // Try parsing as-is first (maybe it's valid)
+  try {
+    return JSON.parse(fragment);
+  } catch { /* need repair */ }
+
+  // Extract what we can from the truncated JSON using regex on the fragment
+  const result = {};
+
+  // Extract overallScore
+  const overallMatch = fragment.match(/"overallScore"\s*:\s*(\d+(?:\.\d+)?)/);
+  if (overallMatch) {
+    result.overallScore = parseFloat(overallMatch[1]);
+  } else {
+    return null;
+  }
+
+  // Extract dimensions
+  const dimsMatch = fragment.match(/"dimensions"\s*:\s*\{([^}]*)/);
+  if (dimsMatch) {
+    const dimsText = dimsMatch[1];
+    result.dimensions = {};
+    const dimRegex = /"(\w+)"\s*:\s*(\d+(?:\.\d+)?)/g;
+    let m;
+    while ((m = dimRegex.exec(dimsText)) !== null) {
+      const score = parseFloat(m[2]);
+      if (score >= 1 && score <= 10) {
+        result.dimensions[m[1]] = score;
+      }
+    }
+  }
+
+  if (!result.dimensions || Object.keys(result.dimensions).length === 0) return null;
+
+  // Extract topStrength and topWeakness if present
+  const strengthMatch = fragment.match(/"topStrength"\s*:\s*"([^"]*)"/);
+  if (strengthMatch) result.topStrength = strengthMatch[1];
+
+  const weaknessMatch = fragment.match(/"topWeakness"\s*:\s*"([^"]*)"/);
+  if (weaknessMatch) result.topWeakness = weaknessMatch[1];
+
+  return result;
 }
 
 function validateScores(parsed) {
@@ -477,4 +571,4 @@ async function runAudit(env, options = {}) {
   return { success: true, summary, results };
 }
 
-export { PROVIDERS, buildAuditPrompt, parseAuditScores, validateScores, callProvider, runAudit, DIMENSION_KEYS };
+export { PROVIDERS, buildAuditPrompt, parseAuditScores, validateScores, repairTruncatedJson, callProvider, runAudit, DIMENSION_KEYS };

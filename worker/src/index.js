@@ -3,6 +3,7 @@ import { handlePWA, handlePWA_SW, handlePWA_Manifest, handlePWA_Clear } from "./
 import { handlePWA_Guide, handlePWA_Summary } from "./pwa-guide.js";
 import { seedFullCounty, seedCountyInfo, seedCountyBallot, seedPrecinctMap } from "./county-seeder.js";
 import { runAudit } from "./audit-runner.js";
+import { checkBallotBalance, formatBalanceSummary } from "./balance-check.js";
 
 // Shared CSS for static pages — matches app design tokens from pwa.js
 const PAGE_CSS = `<meta name="theme-color" content="rgb(33,89,143)" media="(prefers-color-scheme:light)"><meta name="theme-color" content="rgb(28,28,31)" media="(prefers-color-scheme:dark)">
@@ -358,6 +359,7 @@ function handleLandingPage() {
     <button id="lang-toggle" style="font-size:14px;color:var(--text2);background:none;border:none;cursor:pointer;font-family:inherit"></button>
   </div>
   <p class="page-footer">
+    <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot;
     <a href="/nonpartisan" data-t="Nonpartisan by Design">Nonpartisan by Design</a> &middot;
     <a href="/audit" data-t="AI Audit">AI Audit</a> &middot;
     <a href="/data-quality" data-t="Data Quality">Data Quality</a> &middot;
@@ -1133,6 +1135,103 @@ function handleSampleBallot() {
   });
 }
 
+function handleHowItWorks() {
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How It Works — Texas Votes</title>
+  <meta name="description" content="A plain-language explanation of how Texas Votes uses AI to help you find candidates that match your values.">
+  ${PAGE_CSS}
+  <style>
+    .step{display:flex;gap:1rem;align-items:flex-start;margin-bottom:1.25rem}
+    .step-num{flex-shrink:0;width:2.25rem;height:2.25rem;background:var(--blue);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1rem}
+    .step-text{flex:1}
+    .step-text strong{display:block;margin-bottom:0.15rem}
+    .promise-list{list-style:none;padding:0}
+    .promise-list li{padding:0.5rem 0;border-bottom:1px solid var(--border);font-size:1rem}
+    .promise-list li:last-child{border-bottom:none}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>How It Works</h1>
+    <p class="subtitle">Texas Votes is a free tool that helps you figure out which candidates on your ballot match your values. Here's how it works, in plain language.</p>
+
+    <h2>What Does This App Do?</h2>
+    <p>Texas Votes asks you a few questions about what matters to you — things like education, public safety, the economy, or healthcare. Then it looks at the candidates running in your area and suggests which ones are the best fit based on your answers.</p>
+    <p>Think of it like a matchmaker, but for elections. You tell it what you care about, and it connects you with candidates who share those priorities.</p>
+
+    <h2>How Does the AI Part Work?</h2>
+    <p>The app uses artificial intelligence (the same kind of technology behind tools like ChatGPT) to read through candidate information and compare it to your answers. Here's the process, step by step:</p>
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-text"><strong>You answer a short interview</strong>It takes about 5 minutes. You pick the issues you care about, how you lean politically, and what qualities matter to you in a candidate.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-text"><strong>The AI reads candidate profiles</strong>It looks at each candidate's positions, endorsements, track record, and public statements — information gathered from official government sources, news outlets, and nonpartisan references.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-text"><strong>It finds your best matches</strong>The AI compares what you said you care about with what each candidate stands for, then ranks them as a Strong Match, Good Match, or Best Available.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-text"><strong>You get a personalized ballot</strong>You see your matches with short explanations of <em>why</em> each candidate was recommended. You can print it as a cheat sheet to bring to the polls.</div>
+    </div>
+
+    <h2>Where Does the Candidate Information Come From?</h2>
+    <p>All candidate data is gathered from public sources, prioritized in this order:</p>
+    <ul>
+      <li><strong>Official government records</strong> — filings with the Texas Secretary of State, county election offices</li>
+      <li><strong>Nonpartisan references</strong> — Ballotpedia, VoteSmart, and similar databases</li>
+      <li><strong>News coverage</strong> — reporting from established news organizations</li>
+      <li><strong>Campaign materials</strong> — candidates' own websites and public statements</li>
+    </ul>
+    <p>The data is automatically re-checked every day to stay current. When sources disagree, official government records take priority.</p>
+
+    <h2>What This App Does NOT Do</h2>
+    <ul class="promise-list">
+      <li><strong>It does not tell you who to vote for.</strong> It shows you matches and explains why, but the final choice is always yours.</li>
+      <li><strong>It does not store your personal information.</strong> Your answers stay on your phone or computer. They are never sent to our servers or saved anywhere we can see them.</li>
+      <li><strong>It does not track you.</strong> No cookies, no ad tracking, no personal data collection. We count anonymous page views to improve the app — that's it.</li>
+      <li><strong>It does not favor any political party.</strong> The AI is given strict instructions to be neutral. Candidates are shuffled randomly so no one gets an unfair advantage from being listed first. <a href="/nonpartisan">Learn more about our nonpartisan design.</a></li>
+      <li><strong>It does not replace your own research.</strong> This is a starting point to help you explore candidates. We always encourage you to verify information on your own.</li>
+    </ul>
+
+    <h2>How Can I Trust It?</h2>
+    <p>We've built this app to be as transparent as possible:</p>
+    <ul>
+      <li>The entire source code is public — anyone can inspect it</li>
+      <li>Four independent AI systems reviewed our code and methodology for bias</li>
+      <li>Every recommendation tells you <em>why</em> a candidate was matched to you</li>
+      <li>Every candidate profile includes links to original sources so you can check for yourself</li>
+      <li>A live dashboard shows how complete and up-to-date our data is</li>
+    </ul>
+    <p>If you want the technical details, the pages below go deeper:</p>
+
+    <h2>Related</h2>
+    <ul class="related-links">
+      <li><a href="/nonpartisan">Nonpartisan by Design</a> — How we keep the app fair for all voters</li>
+      <li><a href="/audit">AI Bias Audit</a> — Independent review of our AI by four different systems</li>
+      <li><a href="/data-quality">Data Quality Dashboard</a> — Live metrics on how complete our data is</li>
+      <li><a href="/open-source">Open Source</a> — Source code, architecture, and independent code reviews</li>
+      <li><a href="/privacy">Privacy Policy</a> — What data we collect (almost none) and why</li>
+    </ul>
+
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/audit">AI Audit</a> &middot; <a href="/data-quality">Data Quality</a> &middot; <a href="/open-source">Open Source</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+  </div>
+</body>
+</html>`;
+
+  return new Response(html, {
+    headers: { "Content-Type": "text/html;charset=utf-8" },
+  });
+}
+
 function handleNonpartisan() {
   const html = `<!DOCTYPE html>
 <html lang="en">
@@ -1212,12 +1311,13 @@ function handleNonpartisan() {
 
     <h2>Related</h2>
     <ul class="related-links">
+      <li><a href="/how-it-works">How It Works</a> — Plain-language explanation for non-technical users</li>
       <li><a href="/audit">AI Bias Audit</a> — Independent review by four AI systems</li>
       <li><a href="/data-quality">Data Quality Dashboard</a> — Live metrics on ballot coverage and candidate completeness</li>
       <li><a href="/open-source">Open Source</a> — Source code, architecture, and independent code reviews</li>
     </ul>
 
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/audit">AI Audit</a> &middot; <a href="/data-quality">Data Quality</a> &middot; <a href="/open-source">Open Source</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/audit">AI Audit</a> &middot; <a href="/data-quality">Data Quality</a> &middot; <a href="/open-source">Open Source</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
 </body>
 </html>`;
@@ -1552,13 +1652,14 @@ CONFLICT RESOLUTION: If sources disagree, trust official filings over campaign c
 
     <h2>Related</h2>
     <ul class="related-links">
+      <li><a href="/how-it-works">How It Works</a> — Plain-language explanation for non-technical users</li>
       <li><a href="/data-quality">Data Quality Dashboard</a> — Live metrics on ballot coverage and candidate completeness</li>
       <li><a href="/open-source">Open Source</a> — Source code, architecture, and independent code reviews</li>
       <li><a href="/nonpartisan">Nonpartisan by Design</a> — How we ensure fairness for all voters</li>
       <li><a href="/api/audit/export">Methodology Export</a> — Full transparency of all AI prompts and data pipelines</li>
     </ul>
 
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/data-quality">Data Quality</a> &middot; <a href="/open-source">Open Source</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/data-quality">Data Quality</a> &middot; <a href="/open-source">Open Source</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
 </body>
 </html>`;
@@ -2299,18 +2400,48 @@ function handleOpenSource() {
 
     <h2>Related</h2>
     <ul class="related-links">
+      <li><a href="/how-it-works">How It Works</a> — Plain-language explanation for non-technical users</li>
       <li><a href="/audit">AI Bias Audit</a> — Independent review by four AI systems</li>
       <li><a href="/data-quality">Data Quality Dashboard</a> — Live metrics on ballot coverage and candidate completeness</li>
       <li><a href="/nonpartisan">Nonpartisan by Design</a> — How we ensure fairness for all voters</li>
     </ul>
 
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/audit">AI Audit</a> &middot; <a href="/data-quality">Data Quality</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/audit">AI Audit</a> &middot; <a href="/data-quality">Data Quality</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
 </body>
 </html>`;
 
   return new Response(html, {
     headers: { "Content-Type": "text/html;charset=utf-8" },
+  });
+}
+
+/// MARK: - Balance Check API
+
+async function handleBalanceCheck(env) {
+  const parties = ["republican", "democrat"];
+  const results = {};
+
+  for (const party of parties) {
+    let raw = await env.ELECTION_DATA.get(`ballot:statewide:${party}_primary_2026`);
+    if (!raw) raw = await env.ELECTION_DATA.get(`ballot:${party}_primary_2026`);
+    if (!raw) {
+      results[party] = { error: "No ballot data" };
+      continue;
+    }
+    const ballot = JSON.parse(raw);
+    results[party] = checkBallotBalance(ballot);
+  }
+
+  // Combined score: average of both party scores
+  const scores = Object.values(results).filter(r => r.summary).map(r => r.summary.score);
+  const combinedScore = scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : null;
+
+  return jsonResponse({
+    combinedScore,
+    parties: results,
+  }, 200, {
+    "Cache-Control": "public, max-age=3600",
   });
 }
 
@@ -3105,6 +3236,72 @@ async function handleDataQuality(env) {
 
   const completenessPercent = totalFieldsPossible > 0 ? Math.round((totalFieldsFilled / totalFieldsPossible) * 100) : 0;
 
+  // --- Pros/Cons Balance ---
+  let balanceHtml = "";
+  const balanceReports = {};
+  let combinedBalanceScore = null;
+  const balanceScores = [];
+  for (const party of parties) {
+    if (!ballots[party]) continue;
+    const report = checkBallotBalance(ballots[party]);
+    balanceReports[party] = report;
+    balanceScores.push(report.summary.score);
+  }
+  if (balanceScores.length > 0) {
+    combinedBalanceScore = Math.round(balanceScores.reduce((a, b) => a + b, 0) / balanceScores.length);
+  }
+
+  let balanceCards = "";
+  for (const party of parties) {
+    const report = balanceReports[party];
+    if (!report) continue;
+    const s = report.summary;
+    const label = party === "republican" ? "Republican" : "Democrat";
+    let scoreColor = "var(--blue)";
+    if (s.score >= 90) scoreColor = "#16a34a";
+    else if (s.score >= 70) scoreColor = "#b45309";
+    else scoreColor = "#dc2626";
+    balanceCards += `<div class="dq-card"><div class="dq-card-label">${label}</div><div class="dq-card-value" style="color:${scoreColor}">${s.score}<span class="dq-unit">/100</span></div><div class="dq-card-detail">${s.totalFlags} flag${s.totalFlags === 1 ? "" : "s"}: ${s.criticalCount} critical, ${s.warningCount} warning, ${s.infoCount} info</div></div>`;
+  }
+
+  let balanceFlagRows = "";
+  for (const party of parties) {
+    const report = balanceReports[party];
+    if (!report) continue;
+    const pLabel = party === "republican" ? "R" : "D";
+    for (const race of report.races) {
+      if (race.flagCount === 0) continue;
+      for (const f of race.raceFlags) {
+        const sevClass = f.severity === "critical" ? "cov-no" : f.severity === "warning" ? "cov-partial" : "cov-yes";
+        balanceFlagRows += `<tr><td>${pLabel}</td><td>${race.label}</td><td>\u2014</td><td class="${sevClass}">${f.severity}</td><td>${f.detail}</td></tr>`;
+      }
+      for (const c of race.candidates) {
+        for (const f of c.flags) {
+          const sevClass = f.severity === "critical" ? "cov-no" : f.severity === "warning" ? "cov-partial" : "cov-yes";
+          balanceFlagRows += `<tr><td>${pLabel}</td><td>${race.label}</td><td>${c.name}</td><td class="${sevClass}">${f.severity}</td><td>${f.detail}</td></tr>`;
+        }
+      }
+    }
+  }
+
+  if (balanceFlagRows) {
+    balanceHtml = `
+    <div class="dq-card-grid">${balanceCards}</div>
+    <details style="margin-top:0.75rem">
+      <summary style="cursor:pointer;font-weight:600;font-size:0.95rem;color:var(--blue)">View flag details</summary>
+      <div style="overflow-x:auto;margin-top:0.5rem">
+      <table style="font-size:0.85rem;width:100%;border-collapse:collapse">
+        <tr style="background:var(--blue);color:#fff"><th style="padding:4px 8px">Party</th><th style="padding:4px 8px">Race</th><th style="padding:4px 8px">Candidate</th><th style="padding:4px 8px">Severity</th><th style="padding:4px 8px">Detail</th></tr>
+        ${balanceFlagRows}
+      </table>
+      </div>
+    </details>`;
+  } else {
+    balanceHtml = `
+    <div class="dq-card-grid">${balanceCards}</div>
+    <p class="dq-note">No balance issues detected. All candidates have symmetric pros/cons coverage.</p>`;
+  }
+
   // --- County Coverage ---
   const BATCH = 50;
   const countyInfoResults = {};
@@ -3185,9 +3382,12 @@ async function handleDataQuality(env) {
     .dq-note{font-size:0.85rem;color:var(--text2);margin-top:0.5rem}
     .dq-progress{background:var(--border);border-radius:99px;height:12px;overflow:hidden;margin:0.75rem 0}
     .dq-progress-bar{height:100%;border-radius:99px;background:var(--blue);transition:width .3s}
-    .dq-checker{margin-top:1rem}
-    .dq-checker input{width:100%;padding:0.75rem 1rem;border:1px solid var(--border);border-radius:var(--rs);font-size:1rem;background:var(--card);color:var(--text);font-family:inherit}
-    .dq-checker input::placeholder{color:var(--text2)}
+    .dq-checker-hero{background:var(--card);border:2px solid var(--blue);border-radius:var(--rs);padding:1.5rem;margin-bottom:2rem}
+    .dq-checker-title{margin:0 0 0.25rem 0;font-size:1.3rem;font-weight:800;color:var(--blue);text-align:center}
+    .dq-checker-subtitle{margin:0 0 1rem 0;font-size:0.95rem;color:var(--text2);text-align:center}
+    .dq-checker-hero input{width:100%;padding:0.85rem 1rem;border:2px solid var(--blue);border-radius:var(--rs);font-size:1.1rem;background:var(--bg);color:var(--text);font-family:inherit;box-sizing:border-box}
+    .dq-checker-hero input::placeholder{color:var(--text2)}
+    .dq-checker-hero input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(59,130,246,.2)}
     .dq-checker-result{margin-top:0.75rem;padding:1rem;border-radius:var(--rs);display:none;font-size:0.95rem}
     .dq-checker-result.visible{display:block}
     .dq-checker-result.found{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3)}
@@ -3196,12 +3396,23 @@ async function handleDataQuality(env) {
     .dq-links{list-style:none;padding:0;margin:0}
     .dq-links li{margin-bottom:0.75rem}
     .dq-links a{font-weight:600;font-size:0.95rem}
+    .cov-yes{background:rgba(34,197,94,.15);color:#16a34a;text-align:center;font-weight:600}
+    .cov-no{background:rgba(239,68,68,.12);color:#dc2626;text-align:center}
+    .cov-partial{background:rgba(234,179,8,.15);color:#b45309;text-align:center}
+    details table td,details table th{border:1px solid var(--border);padding:4px 8px;text-align:left}
   </style>
 </head>
 <body>
   <div class="container" style="max-width:720px">
     <h1>Data Quality Dashboard</h1>
     <p class="subtitle">Live transparency report on the completeness and freshness of our election data. Updated daily via automated research pipeline.</p>
+
+    <div class="dq-checker-hero">
+      <div class="dq-checker-title">Check Your County</div>
+      <p class="dq-checker-subtitle">See what local election data is available for your county</p>
+      <input type="text" id="county-input" placeholder="Type a county name (e.g., Travis, Harris, Bexar)..." autocomplete="off">
+      <div id="county-result" class="dq-checker-result"></div>
+    </div>
 
     <h2>Data Freshness</h2>
     <div class="dq-card-grid">
@@ -3224,16 +3435,22 @@ async function handleDataQuality(env) {
       <p class="dq-note">Candidates with limited public information are clearly labeled throughout the app.</p>
     </div>
 
+    <h2>Pros/Cons Balance</h2>
+    <div class="dq-card" style="text-align:left;margin-bottom:1.5rem">
+      <div style="display:flex;align-items:baseline;gap:0.75rem;margin-bottom:0.25rem">
+        <span style="font-size:2rem;font-weight:800;color:${combinedBalanceScore !== null && combinedBalanceScore >= 90 ? "#16a34a" : combinedBalanceScore !== null && combinedBalanceScore >= 70 ? "#b45309" : combinedBalanceScore !== null ? "#dc2626" : "var(--blue)"}">${combinedBalanceScore !== null ? combinedBalanceScore : "N/A"}<span class="dq-unit">/100</span></span>
+        <span style="font-size:0.95rem;color:var(--text2)">balance score</span>
+      </div>
+      <p style="font-size:0.9rem;color:var(--text);margin:0.5rem 0">Measures symmetry of strengths and concerns across candidates: equal count, similar detail level, and consistent coverage within each race.</p>
+      ${balanceHtml}
+      <p class="dq-note" style="margin-top:0.75rem">Balance checks run automatically. <a href="/api/balance-check">View raw JSON report</a>.</p>
+    </div>
+
     <h2>County Coverage</h2>
     <div class="dq-card-grid">
       <div class="dq-card"><div class="dq-card-value">${infoPresent}<span class="dq-unit"> / 254</span></div><div class="dq-card-label">Counties with voting info</div></div>
       <div class="dq-card"><div class="dq-card-value">${repPresent}<span class="dq-unit"> / 254</span></div><div class="dq-card-label">Republican local ballots</div></div>
       <div class="dq-card"><div class="dq-card-value">${demPresent}<span class="dq-unit"> / 254</span></div><div class="dq-card-label">Democrat local ballots</div></div>
-    </div>
-    <div class="dq-checker">
-      <label for="county-input" style="font-size:0.9rem;font-weight:600;display:block;margin-bottom:0.5rem">Check your county</label>
-      <input type="text" id="county-input" placeholder="Type a county name (e.g., Travis, Harris, Bexar)..." autocomplete="off">
-      <div id="county-result" class="dq-checker-result"></div>
     </div>
 
     <h2 style="margin-top:2rem">Today's Update Activity</h2>
@@ -3241,6 +3458,7 @@ async function handleDataQuality(env) {
 
     <h2>Related</h2>
     <ul class="dq-links related-links">
+      <li><a href="/how-it-works">How It Works</a> — Plain-language explanation for non-technical users</li>
       <li><a href="/audit">AI Bias Audit</a> — Independent review by four AI systems</li>
       <li><a href="/api/audit/export">Methodology Export</a> — Full transparency of all AI prompts and data pipelines</li>
       <li><a href="/open-source">Open Source</a> — Source code, architecture, and independent code reviews</li>
@@ -3248,7 +3466,7 @@ async function handleDataQuality(env) {
       <li><a href="/candidates">Candidate Profiles</a> — Browse all candidates with detailed information</li>
     </ul>
 
-    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/audit">AI Audit</a> &middot; <a href="/open-source">Open Source</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/audit">AI Audit</a> &middot; <a href="/open-source">Open Source</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
   <script>
   (function(){
@@ -3647,6 +3865,9 @@ export default {
       if (url.pathname === "/support") {
         return handleSupport();
       }
+      if (url.pathname === "/how-it-works") {
+        return handleHowItWorks();
+      }
       if (url.pathname === "/nonpartisan") {
         return handleNonpartisan();
       }
@@ -3685,6 +3906,9 @@ export default {
       }
       if (url.pathname === "/candidate") {
         return Response.redirect(new URL("/candidates", url.origin).toString(), 302);
+      }
+      if (url.pathname === "/api/balance-check") {
+        return handleBalanceCheck(env);
       }
       if (url.pathname === "/api/election/manifest") {
         return handleManifest(env);

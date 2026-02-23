@@ -6,11 +6,19 @@ import { APP_JS } from "../src/pwa.js";
 // Helpers
 // ---------------------------------------------------------------------------
 
-/** Boot the app by evaluating APP_JS inside the current happy-dom document. */
-function bootApp() {
+/** Boot the app by evaluating APP_JS inside the current happy-dom document.
+ *  @param {Object} [opts]
+ *  @param {boolean} [opts.start] - if true, simulate ?start=1 so Phase 0 auto-advances to Phase 1
+ */
+function bootApp(opts = {}) {
   // Minimal DOM structure the app expects
   document.body.innerHTML =
     '<div id="topnav"></div><main id="app"></main><div id="tabs"></div>';
+
+  // Set ?start=1 to auto-advance past Phase 0 (which redirects to landing page)
+  if (opts.start) {
+    history.replaceState(null, "", "/app?start=1");
+  }
 
   // Evaluate the app code in the global scope.
   // Script tags don't auto-execute in happy-dom, so we use indirect eval.
@@ -140,25 +148,23 @@ beforeEach(() => {
   // Stub confirm (used by reset action)
   vi.stubGlobal("confirm", vi.fn(() => true));
 
-  bootApp();
-  // Advance past welcome screen to phase 1 (tone picker)
-  clickAction("start");
+  bootApp({ start: true });
 });
 
 // ---------------------------------------------------------------------------
-// Phase 0: Welcome screen
+// Phase 0: Redirects to landing page
 // ---------------------------------------------------------------------------
-describe("Phase 0: Welcome", () => {
-  it("shows welcome screen on initial load", () => {
-    // Re-boot without clicking start to test welcome screen
-    // Safe: resetting test DOM, not user content
+describe("Phase 0: Landing page redirect", () => {
+  it("redirects to landing page on initial load (phase 0)", () => {
+    // Re-boot without ?start=1 to test phase 0 redirect
     document.documentElement.innerHTML = "<head></head><body></body>";
     bootApp();
     expect(S().phase).toBe(0);
-    expect(getApp()).toContain("Build My Guide");
+    // Phase 0 triggers location.href='/' redirect to landing page
+    expect(location.pathname).toBe("/");
   });
 
-  it("advances to phase 1 (tone picker) when start is clicked", () => {
+  it("auto-advances to phase 1 with ?start=1 param", () => {
     expect(S().phase).toBe(1);
     expect(getApp()).toContain("Talk to me like");
   });
@@ -711,8 +717,7 @@ describe("Phase 7: Geolocation", () => {
     ));
     vi.stubGlobal("confirm", vi.fn(() => true));
 
-    bootApp();
-    clickAction("start");
+    bootApp({ start: true });
 
     // Navigate to phase 7
     passTone();
@@ -1044,7 +1049,7 @@ describe("Back navigation preserves state", () => {
 // ---------------------------------------------------------------------------
 describe("Full interview happy path", () => {
   it("walks through all phases to guide building", () => {
-    // Phase 1 (welcome skipped, auto-advanced)
+    // Phase 1 (auto-advanced from phase 0 via ?start=1)
     expect(S().phase).toBe(1);
 
     // Phase 1: Tone (default readingLevel=3, just click Continue)
@@ -1111,13 +1116,13 @@ describe("Progress bar", () => {
 // All interview phases have a back button
 // ---------------------------------------------------------------------------
 describe("Back button visibility", () => {
-  it("phase 1 has a back button to return to welcome", () => {
+  it("phase 1 back button sets phase to 0 (triggers landing page redirect)", () => {
     expect(S().phase).toBe(1);
     const backBtn = document.querySelector('[data-action="back"]');
     expect(backBtn).not.toBeNull();
     backBtn.click();
+    // Phase 0 triggers location.href='/' redirect to landing page
     expect(S().phase).toBe(0);
-    expect(getApp()).toContain("Build My Guide");
   });
 
   it("phase 2 has a back button", () => {

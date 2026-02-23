@@ -6,6 +6,19 @@
 
 Add DeepSeek as another LLM option alongside Claude, GPT, Gemini, and Grok for guide generation, vanity URL, and AI audit.
 
+## Privacy & Security
+
+**Requirement: DeepSeek model must run on US-hosted infrastructure only.**
+
+DeepSeek is a Chinese company (Hangzhou). Guide generation sends sensitive political preference data (ranked issues, political spectrum, address, freeform text). To ensure no user data reaches Chinese-controlled infrastructure:
+
+- **Use Together AI or Fireworks AI** to host the DeepSeek model (open-source weights running on US servers)
+- **Do NOT use DeepSeek's own API endpoints** — even their US endpoint is owned by a Chinese company subject to Chinese data laws
+- The model weights are open-source and do not phone home — only the API endpoint matters
+- With US-hosted providers, DeepSeek the company never sees any user data
+
+This allows the warning banner to honestly state "No personal information is shared with China."
+
 ## Requirements
 
 - Vanity URL: `/deepseek` entry point
@@ -19,8 +32,9 @@ Add DeepSeek as another LLM option alongside Claude, GPT, Gemini, and Grok for g
 
 ### 1. LLM Router (pwa-guide.js)
 - Add `deepseek` to `VALID_LLMS`
-- Add DeepSeek API endpoint and model name
-- Route through US-hosted API (e.g., Together AI, Fireworks, or DeepSeek's US endpoint)
+- Add Together AI or Fireworks AI endpoint with DeepSeek model name (e.g., `deepseek-ai/DeepSeek-V3` on Together)
+- **Must use US-hosted provider** — Together AI (`api.together.xyz`) or Fireworks AI (`api.fireworks.ai`)
+- API key: provider's key (Together/Fireworks), NOT DeepSeek's own key
 
 ### 2. PWA (pwa.js)
 - Add `deepseek` to query param detection
@@ -33,7 +47,7 @@ Add DeepSeek as another LLM option alongside Claude, GPT, Gemini, and Grok for g
 
 ### 4. Audit Runner (audit-runner.js)
 - Add DeepSeek as 5th audit provider
-- Configure API key via `DEEPSEEK_API_KEY` secret
+- Route through same US-hosted provider
 
 ### 5. Warning Banner Design
 - Sticky banner at top of viewport
@@ -43,14 +57,15 @@ Add DeepSeek as another LLM option alongside Claude, GPT, Gemini, and Grok for g
 
 ## Files to Modify
 
-- `worker/src/pwa-guide.js` — LLM router, API call
+- `worker/src/pwa-guide.js` — LLM router, API call via Together/Fireworks
 - `worker/src/pwa.js` — query param, badges, warning banner
 - `worker/src/index.js` — vanity URL, OG tags
 - `worker/src/audit-runner.js` — audit provider
-- `worker/wrangler.txvotes.toml` — DEEPSEEK_API_KEY secret
+- `worker/wrangler.txvotes.toml` — API key secret for US provider
 
 ## API Key
 
 ```bash
-cd worker && npx wrangler secret put DEEPSEEK_API_KEY -c wrangler.txvotes.toml
+# Together AI or Fireworks AI key (NOT DeepSeek's own key)
+cd worker && npx wrangler secret put TOGETHER_API_KEY -c wrangler.txvotes.toml
 ```
