@@ -22,8 +22,29 @@
 - [x] URL flags for alternate LLMs — `?gemini`, `?grok`, and `?chatgpt` query params that tell the app to use that LLM for generating recommendations instead of Claude. Routes to OpenAI gpt-4o, Gemini 2.5 Flash, or Grok 3. API keys already set from audit runner.
 - [x] Hidden LLM debug/comparison view — 5-tap version number in footer → `#/debug/compare`. Race-by-race and agreement summary views, cached in localStorage. Vanity URLs `/gemini`, `/grok`, `/chatgpt` with branded link previews. "Powered by" badge on loading screen and ballot header.
 - [x] Cowboy & Swedish Chef easter eggs — triple-tap "Reading Level" on profile unlocks Swedish Chef (tone 6), type "yeehaw" unlocks Cowboy (tone 7). Both trigger emoji burst, haptic feedback, and immediate guide recalculation.
+- [ ] Change Swedish Chef easter egg trigger — switch from triple-tap "Reading Level" label to typing "bork" on the profile page (matches the "yeehaw" pattern for Cowboy)
 - [ ] Sample ballot on home page — "Show me a sample" button that instantly displays a pre-generated example ballot, clearly watermarked as a sample, skipping the full interview. Very fast first impression for new visitors.
 - [ ] Create new txvotes repo in GitHub — fresh copy of the code without all the dev history
+
+### Audit Score Improvements
+_From AI audit synthesis (ChatGPT 6/10, Gemini 8.6/10, Claude 7.8/10). Ranked by impact x feasibility._
+
+#### Tier 1: High Impact, Low Effort
+- [ ] Add "limited data" badge for low-information candidates — check field completeness at render time, show a visible badge on candidate cards when pros/cons/endorsements are sparse. Prevents information asymmetry from looking like favoritism. (Flagged by: ChatGPT + Gemini, affects Balance of Pros/Cons score)
+- [ ] Normalize loaded interview option labels — editorial pass on deep dive answer wording to reduce rhetorical heat ("Don't overreact," "Second Amendment is non-negotiable," "Tax the wealthy more") while preserving meaning. Use strictly descriptive, symmetric language. (Flagged by: ChatGPT, affects Fairness of Framing score)
+- [ ] Add "Data Last Verified" timestamp per candidate — show when each candidate's data was last updated by the daily updater. Already tracked in the pipeline, just needs display. (Flagged by: Gemini, affects Factual Accuracy score)
+- [ ] Expand county coverage labeling — in-product indicator when local race data is incomplete for the user's county ("Local races not yet available for your county"). Sets honest expectations instead of silent omission. (Flagged by: ChatGPT + Gemini, affects Factual Accuracy + Balance scores)
+
+#### Tier 2: High Impact, More Effort
+- [ ] Add source citations per candidate field — require a `sources` array per candidate with URL + access date for key claims (endorsements, positions, polling). The single biggest trust improvement identified by both audits. (Flagged by: ChatGPT + Gemini, affects Factual Accuracy + Transparency scores)
+- [ ] Implement automated bias test suite — same voter profile with swapped party ballots, measure recommendation shifts and flag asymmetries. Publishable evidence of fairness. (Flagged by: ChatGPT + Gemini, affects Partisan Bias score)
+- [ ] Add "why this confidence level" explanations — show which specific voter answers drove each recommendation, not just a narrative summary. (Flagged by: Gemini, affects Transparency score)
+- [ ] Add endorsement context labels — short neutral descriptor for each endorsement (e.g., "industry group," "labor org," "editorial board") so users understand what each endorsement means. (Flagged by: ChatGPT, affects Balance of Pros/Cons score)
+
+#### Tier 3: Nice to Have
+- [ ] Publish a data quality dashboard (public) — last-updated per race, source counts, completeness indicators visible to voters. (Flagged by: ChatGPT, affects Transparency score)
+- [ ] Document and enforce a source ranking policy — official source priority rules (SOS filing > county office > campaign site > local news), allowlist/denylist for web_search results. (Flagged by: ChatGPT, affects Factual Accuracy score)
+- [ ] Add issue list completeness review — evaluate interview topics against politically salient issues not currently covered (election administration, energy/oil & gas, spending/debt, criminal justice specifics, LGBTQ policy). Publish rubric with public feedback intake. (Flagged by: ChatGPT + Gemini, affects Partisan Bias + Fairness scores)
 
 ### Technical Debt
 - [x] AI audit execution — automated daily cron calls ChatGPT, Gemini, and Grok APIs; results on /audit page; stops after election day

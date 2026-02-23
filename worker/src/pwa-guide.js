@@ -53,6 +53,7 @@ export async function handlePWA_Guide(request, env) {
     var ballot = JSON.parse(raw);
 
     // Merge county-specific races if countyFips provided
+    var countyBallotAvailable = false;
     if (countyFips) {
       var countyRaw = await env.ELECTION_DATA.get(
         "ballot:county:" + countyFips + ":" + party + "_primary_2026"
@@ -64,6 +65,7 @@ export async function handlePWA_Guide(request, env) {
           if (countyBallot.propositions) {
             ballot.propositions = (ballot.propositions || []).concat(countyBallot.propositions);
           }
+          countyBallotAvailable = true;
         } catch (e) { /* use statewide-only if merge fails */ }
       }
     }
@@ -84,10 +86,24 @@ export async function handlePWA_Guide(request, env) {
     var guideResponse = parseResponse(responseText);
     var mergedBallot = mergeRecommendations(guideResponse, ballot, lang);
 
+    // Load manifest for data freshness timestamp
+    var dataUpdatedAt = null;
+    try {
+      var manifestRaw = await env.ELECTION_DATA.get("manifest");
+      if (manifestRaw) {
+        var manifest = JSON.parse(manifestRaw);
+        if (manifest[party] && manifest[party].updatedAt) {
+          dataUpdatedAt = manifest[party].updatedAt;
+        }
+      }
+    } catch (e) { /* non-fatal */ }
+
     return json({
       ballot: mergedBallot,
       profileSummary: guideResponse.profileSummary,
       llm: llm || "claude",
+      countyBallotAvailable: countyFips ? countyBallotAvailable : null,
+      dataUpdatedAt: dataUpdatedAt,
     });
   } catch (err) {
     console.error("Guide generation error:", err);

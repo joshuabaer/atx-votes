@@ -53,6 +53,19 @@ function nameToSlug(name) {
 }
 
 /**
+ * Returns true if a candidate has sparse data (fewer than 2 of:
+ * pros, cons, endorsements, keyPositions populated).
+ */
+function isSparseCandidate(c) {
+  let filled = 0;
+  if (c.pros && (Array.isArray(c.pros) ? c.pros.length : true)) filled++;
+  if (c.cons && (Array.isArray(c.cons) ? c.cons.length : true)) filled++;
+  if (c.endorsements && (Array.isArray(c.endorsements) ? c.endorsements.length : true)) filled++;
+  if (c.keyPositions && c.keyPositions.length) filled++;
+  return filled < 2;
+}
+
+/**
  * Load all candidates from statewide ballot data across both parties.
  * Returns array of { candidate, race, party, slug } objects.
  *
@@ -433,7 +446,7 @@ function handleNonpartisan() {
     <p>Recommendations are based on your stated issues, priorities, and candidate qualities — not party registration.</p>
 
     <h2>Neutral Interview Questions</h2>
-    <p>Every question is framed neutrally. Answer options are shuffled. The spectrum picker says "No wrong answers."</p>
+    <p>Every question is framed neutrally. Answer options are shuffled. The spectrum picker says "No wrong answers." All deep-dive policy labels use strictly descriptive, symmetric language — reviewed and normalized through independent AI audits to eliminate rhetorical heat from both sides of every issue.</p>
 
     <h2>Six-Point Political Spectrum</h2>
     <p>Goes beyond left/right: Progressive, Liberal, Moderate, Conservative, Libertarian, and Independent. Moderate and Independent voters are never auto-assigned a party.</p>
@@ -446,6 +459,13 @@ function handleNonpartisan() {
 
     <h2>Verified Candidate Data</h2>
     <p>All candidates are cross-referenced against official filings from the Texas Secretary of State, county clerks, and Ballotpedia. Candidate data includes positions, endorsements, strengths, and concerns — presented with equal depth for every candidate in a race.</p>
+    <p>A daily automated updater re-verifies candidate data using AI-powered web research. Each ballot page and candidate profile displays a "Data last verified" timestamp so you can see exactly when the information was last checked.</p>
+
+    <h2>Limited Data Transparency</h2>
+    <p>When a candidate has sparse public information — fewer than two of key positions, endorsements, strengths, or concerns populated — the app displays a "Limited public info" label. This prevents information asymmetry from looking like favoritism: if one candidate has a detailed profile and another doesn't, the label makes it clear the gap is a data limitation, not an editorial choice.</p>
+
+    <h2>County Coverage Transparency</h2>
+    <p>Texas has 254 counties, and local race data is added county by county. When a voter's county doesn't yet have local race data, the app clearly labels this: "Local races for [County] County are not yet available. Your ballot shows statewide and district races only." This appears on both the ballot page and the printable cheat sheet, so voters always know the scope of their guide — rather than silently omitting races and leaving voters unaware.</p>
 
     <h2>Nonpartisan Translations</h2>
     <p>All Spanish translations are reviewed for partisan bias. Proposition titles and descriptions use identical grammatical structures for both parties. Data terms (candidate names, positions) stay in English for accuracy; only the display layer is translated.</p>
@@ -460,7 +480,7 @@ function handleNonpartisan() {
     <p>The full prompt sent to the AI and every design decision is documented. Nothing is hidden. <a href="/open-source">View the source code, architecture details, and independent AI code reviews.</a></p>
 
     <h2>Independent AI Audit</h2>
-    <p>We've submitted our full AI prompts, data pipeline, and methodology to four independent AI systems (ChatGPT, Gemini, Grok, and Claude) for bias review. <a href="/audit">Read the full audit results and methodology export.</a></p>
+    <p>We've submitted our full AI prompts, data pipeline, and methodology to four independent AI systems (ChatGPT, Gemini, Grok, and Claude) for bias review. Audit findings directly informed improvements, including normalizing all deep-dive answer labels to use neutral, descriptive language with symmetric phrasing across opposing positions. <a href="/audit">Read the full audit results and methodology export.</a></p>
 
     <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/open-source">Open Source</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
@@ -726,7 +746,7 @@ Return ONLY this JSON:
     <p>Every layer of the system includes explicit nonpartisan constraints:</p>
     <ul>
       <li><strong>Prompt-level:</strong> Every AI prompt includes a NONPARTISAN instruction block prohibiting partisan framing, loaded terms, and party-line assumptions</li>
-      <li><strong>Data-level:</strong> Both parties' ballots are generated with identical prompts and formatting. Every candidate gets the same structured fields (pros and cons, endorsements, key positions)</li>
+      <li><strong>Data-level:</strong> Both parties' ballots are generated with identical prompts and formatting. Every candidate gets the same structured fields (pros and cons, endorsements, key positions). Candidates with sparse data are labeled "Limited public info" so information gaps are transparent rather than misleading</li>
       <li><strong>UI-level:</strong> Candidate order randomized on every page load. Party labels hidden from candidate cards. Interview answer options shuffled. Confidence levels prevent false certainty</li>
       <li><strong>Validation-level:</strong> The daily updater validates that candidate counts and names don't change unexpectedly, endorsement lists can't shrink by more than 50%, and no empty fields are introduced</li>
       <li><strong>Translation-level:</strong> Spanish translations use identical grammatical structures for both parties. Candidate names and data terms stay in English for accuracy</li>
@@ -759,6 +779,11 @@ Return ONLY this JSON:
 
     <h2>Why Four Different AIs?</h2>
     <p>Texas Votes uses Claude (by Anthropic) to generate recommendations. By asking four AI systems — ChatGPT, Gemini, Grok, and Claude itself — to review our methodology, we get a range of independent assessments. Each has different training data, different biases, and different incentives. Including Claude as an auditor of its own system adds a self-review dimension — it knows its own capabilities and limitations better than anyone, but may also have blind spots about its own biases. If all four find our process fair, that's meaningful. If any identifies bias, we'll address it and publish the fix.</p>
+
+    <h2>Changes Made from Audit Findings</h2>
+    <ul>
+      <li><strong>County coverage labeling:</strong> Both ChatGPT and Gemini flagged that silently omitting local races when county data is unavailable could mislead voters about their ballot's completeness. We now display an in-product info banner — "Local races for [County] County are not yet available" — on both the ballot page and the printable cheat sheet whenever a voter's county lacks local race data. This ensures voters always understand the scope of their guide.</li>
+    </ul>
 
     <h2>Ongoing Commitment</h2>
     <p>This audit is not a one-time event. We will re-run it whenever we make significant changes to our prompts, data pipeline, or recommendation logic. The methodology export at <a href="/api/audit/export">/api/audit/export</a> always reflects the current production code.</p>
@@ -1846,6 +1871,18 @@ async function handleCandidateProfile(slug, env) {
   const pros = resolveToneArray(c.pros);
   const cons = resolveToneArray(c.cons);
 
+  // Load manifest for data freshness timestamp
+  let dataUpdatedAt = null;
+  try {
+    const manifestRaw = await env.ELECTION_DATA.get("manifest");
+    if (manifestRaw) {
+      const manifest = JSON.parse(manifestRaw);
+      if (manifest[entry.party] && manifest[entry.party].updatedAt) {
+        dataUpdatedAt = manifest[entry.party].updatedAt;
+      }
+    }
+  } catch { /* non-fatal */ }
+
   // Build sections conditionally
   const sections = [];
 
@@ -1867,6 +1904,9 @@ async function handleCandidateProfile(slug, env) {
   }
   if (c.withdrawn) {
     sections.push(`<div style="background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:0.75rem 1rem;margin-bottom:1.5rem;font-size:0.95rem"><strong>This candidate has withdrawn</strong> from the race and will not appear on the ballot.</div>`);
+  }
+  if (isSparseCandidate(c)) {
+    sections.push(`<div style="background:rgba(128,128,128,.08);border:1px solid var(--border);border-radius:8px;padding:0.75rem 1rem;margin-bottom:1.5rem;font-size:0.9rem;color:var(--text2)"><strong>Limited public information</strong> is available for this candidate. If you have corrections or additional data, please <a href="mailto:howdy@txvotes.app?subject=Data%20for%20${encodeURIComponent(c.name)}">let us know</a>.</div>`);
   }
 
   // Summary
@@ -1949,7 +1989,8 @@ async function handleCandidateProfile(slug, env) {
       </div>
     </div>
     ${sections.join("\n    ")}
-    <p style="margin-top:2rem;font-size:0.9rem;color:var(--text2)">See something wrong? <a href="mailto:howdy@txvotes.app?subject=Data correction: ${encodeURIComponent(c.name)}">Let us know</a> and we'll fix it.</p>
+    ${dataUpdatedAt ? `<p style="margin-top:2rem;font-size:0.85rem;color:var(--text2)">Data last verified: ${new Date(dataUpdatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</p>` : ""}
+    <p style="margin-top:${dataUpdatedAt ? "0.5rem" : "2rem"};font-size:0.9rem;color:var(--text2)">See something wrong? <a href="mailto:howdy@txvotes.app?subject=Data correction: ${encodeURIComponent(c.name)}">Let us know</a> and we'll fix it.</p>
     <p class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/candidates">Candidates</a> &middot; <a href="/nonpartisan">Nonpartisan by Design</a> &middot; <a href="/open-source">Open Source</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
   </div>
 </body>
@@ -1983,11 +2024,12 @@ async function handleCandidatesIndex(env) {
       const isWithdrawn = e.candidate.withdrawn;
       const incumbentBadge = isIncumbent ? ' <span style="font-size:0.8rem;color:var(--text2)">(incumbent)</span>' : "";
       const withdrawnBadge = isWithdrawn ? ' <span style="font-size:0.8rem;color:#c62626;font-style:italic">(withdrawn)</span>' : "";
+      const limitedBadge = isSparseCandidate(e.candidate) ? ' <span style="font-size:0.75rem;color:var(--text2);font-style:italic">(limited info)</span>' : "";
       const nameStyle = isWithdrawn ? ' style="color:var(--text2);text-decoration:line-through"' : "";
       const initials = e.candidate.name.split(' ').map(w => w[0]).join('').slice(0, 2);
       const placeholder = `<span style="display:none;width:32px;height:32px;border-radius:50%;background:var(--border);vertical-align:middle;margin-right:8px;line-height:32px;text-align:center;font-size:12px;color:var(--text2)">${escapeHtml(initials)}</span>`;
       const headshot = `<img src="/headshots/${escapeHtml(e.slug)}.jpg?v=2" alt="" style="width:32px;height:32px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:8px;border:1px solid var(--border)${isWithdrawn ? ";opacity:0.5" : ""}" onerror="if(this.src.indexOf('.jpg')!==-1){this.src=this.src.replace('.jpg','.png')}else{this.style.display='none';this.nextElementSibling.style.display='inline-block'}">`;
-      return `<li style="list-style:none;margin-bottom:0.5rem">${headshot}${placeholder}<a href="/candidate/${escapeHtml(e.slug)}"${nameStyle}>${escapeHtml(e.candidate.name)}</a>${incumbentBadge}${withdrawnBadge}</li>`;
+      return `<li style="list-style:none;margin-bottom:0.5rem">${headshot}${placeholder}<a href="/candidate/${escapeHtml(e.slug)}"${nameStyle}>${escapeHtml(e.candidate.name)}</a>${incumbentBadge}${withdrawnBadge}${limitedBadge}</li>`;
     }).join("")}</ul>`;
   }
 
