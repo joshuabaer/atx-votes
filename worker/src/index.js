@@ -56,6 +56,88 @@ li{font-size:1rem;color:var(--text);margin-bottom:0.75rem}
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.svg">`;
 
+// Shared i18n script for static pages — detects language, applies data-t translations, adds toggle button.
+// Each page passes its own TR dictionary merged with PAGE_TR_COMMON via pageI18n(pageTR).
+const PAGE_TR_COMMON = {
+  // Back link
+  'Texas Votes': 'Texas Votes',
+  // Footer
+  'How It Works': 'C\u00F3mo Funciona',
+  'Privacy': 'Privacidad',
+  'Built in Texas': 'Hecho en Texas',
+  // CTA banner
+  'Build My Voting Guide': 'Crear mi gu\u00EDa de votaci\u00F3n',
+  '5-minute personalized ballot': 'Boleta personalizada en 5 minutos',
+  // Related section
+  'Related': 'Relacionado',
+  // Common page names used in Related links
+  'Nonpartisan by Design': 'Apartidista por Dise\u00F1o',
+  'AI Bias Audit': 'Auditor\u00EDa de Sesgo de IA',
+  'Data Quality Dashboard': 'Panel de Calidad de Datos',
+  'Open Source': 'C\u00F3digo Abierto',
+  'Privacy Policy': 'Pol\u00EDtica de Privacidad',
+  'All Candidates': 'Todos los Candidatos',
+  'Sample Ballot': 'Boleta de Ejemplo',
+  'Candidate Profiles': 'Perfiles de Candidatos',
+  'Methodology Export': 'Exportaci\u00F3n de Metodolog\u00EDa',
+  // Common related link descriptions
+  'Plain-language explanation for non-technical users': 'Explicaci\u00F3n en lenguaje sencillo para usuarios no t\u00E9cnicos',
+  'Plain-language explanation of the app and AI': 'Explicaci\u00F3n en lenguaje sencillo de la app y la IA',
+  'How we keep the app fair for all voters': 'C\u00F3mo mantenemos la app justa para todos los votantes',
+  'How we ensure fairness for all voters': 'C\u00F3mo aseguramos la equidad para todos los votantes',
+  'Independent review by four AI systems': 'Revisi\u00F3n independiente por cuatro sistemas de IA',
+  'Independent review of our AI by four different systems': 'Revisi\u00F3n independiente de nuestra IA por cuatro sistemas diferentes',
+  'Live metrics on ballot coverage and candidate completeness': 'M\u00E9tricas en vivo sobre cobertura de boletas y datos de candidatos',
+  'Live metrics on how complete our data is': 'M\u00E9tricas en vivo sobre qu\u00E9 tan completos son nuestros datos',
+  'Source code, architecture, and independent code reviews': 'C\u00F3digo fuente, arquitectura y revisiones independientes de c\u00F3digo',
+  'Browse every candidate with detailed profiles': 'Explora todos los candidatos con perfiles detallados',
+  'See what a personalized ballot looks like': 'Mira c\u00F3mo se ve una boleta personalizada',
+  'Full transparency of all AI prompts and data pipelines': 'Transparencia total de todos los prompts de IA y pipelines de datos',
+};
+
+/**
+ * Returns the closing <script> block for a static page's i18n support.
+ * @param {Object} pageTR — page-specific translations (merged with PAGE_TR_COMMON at runtime)
+ */
+function pageI18n(pageTR) {
+  const merged = Object.assign({}, PAGE_TR_COMMON, pageTR);
+  const trJson = JSON.stringify(merged);
+  return `
+  <div style="text-align:center;margin-top:8px;margin-bottom:8px">
+    <button id="lang-toggle" style="font-size:14px;color:var(--text2);background:none;border:none;cursor:pointer;font-family:inherit"></button>
+  </div>
+  <script>
+  (function(){
+    var TR=${trJson};
+    var lang=localStorage.getItem('tx_votes_lang')||localStorage.getItem('atx_votes_lang')||((navigator.language||'').slice(0,2)==='es'?'es':'en');
+    function apply(){
+      document.documentElement.lang=lang;
+      document.querySelectorAll('[data-t]').forEach(function(el){
+        var key=el.getAttribute('data-t');
+        var text=lang==='es'?(TR[key]||key):key;
+        var a=el.querySelector('a');
+        if(a&&!el.querySelector('a+a')){a.textContent=text}
+        else if(!a){el.textContent=text}
+        else{
+          // Multiple links: translate text nodes only
+          el.childNodes.forEach(function(n){if(n.nodeType===3){var k=n.textContent.trim();if(TR[k])n.textContent=n.textContent.replace(k,TR[k])}});
+          el.querySelectorAll('a').forEach(function(a2){var k2=a2.textContent.trim();if(TR[k2])a2.textContent=TR[k2]});
+        }
+      });
+      var btn=document.getElementById('lang-toggle');
+      if(btn)btn.textContent=lang==='es'?'Switch to English':'Cambiar a Espa\\u00F1ol';
+    }
+    var btn=document.getElementById('lang-toggle');
+    if(btn)btn.addEventListener('click',function(){
+      lang=lang==='es'?'en':'es';
+      localStorage.setItem('tx_votes_lang',lang);
+      apply();
+    });
+    apply();
+  })();
+  <\/script>`;
+}
+
 // MARK: - Candidate Profile Helpers
 
 /**
@@ -603,7 +685,7 @@ function handleSampleBallot() {
   </style>
 </head>
 <body>
-  <div class="sample-banner">SAMPLE BALLOT &mdash; Fictional candidates &amp; recommendations for demonstration</div>
+  <div class="sample-banner" data-t="SAMPLE BALLOT — Fictional candidates and recommendations for demonstration">SAMPLE BALLOT &mdash; Fictional candidates &amp; recommendations for demonstration</div>
   <div class="sample-watermark">SAMPLE</div>
 
   <div class="ballot-container">
@@ -611,8 +693,8 @@ function handleSampleBallot() {
 
     <!-- Party switcher -->
     <div class="party-row">
-      <button class="party-btn party-rep on" id="btn-rep" onclick="setParty('republican')">&#x1F418; Republican</button>
-      <button class="party-btn party-dem" id="btn-dem" onclick="setParty('democrat')">&#x1FACF; Democrat</button>
+      <button class="party-btn party-rep on" id="btn-rep" onclick="setParty('republican')" data-t="Republican">&#x1F418; Republican</button>
+      <button class="party-btn party-dem" id="btn-dem" onclick="setParty('democrat')" data-t="Democrat">&#x1FACF; Democrat</button>
     </div>
 
     <!-- Election info header -->
@@ -635,7 +717,7 @@ function handleSampleBallot() {
       </div>
     </div>
 
-    <div class="cta-banner"><a class="cta-btn" href="/app?start=1">Build My Voting Guide &rarr;</a><p class="cta-sub">5-minute personalized ballot</p></div>
+    <div class="cta-banner"><a class="cta-btn" href="/app?start=1" data-t="Build My Voting Guide">Build My Voting Guide &rarr;</a><p class="cta-sub" data-t="5-minute personalized ballot">5-minute personalized ballot</p></div>
 
     <!-- ==================== REPUBLICAN BALLOT ==================== -->
     <div data-party="republican">
@@ -1108,18 +1190,18 @@ function handleSampleBallot() {
     <!-- Share CTA -->
     <div class="share-cta">
       <div style="font-size:32px;margin-bottom:8px">&#x1F4E3;</div>
-      <div class="share-cta-title">Build Your Own Guide</div>
-      <div class="share-cta-body">This sample shows what a personalized ballot looks like. Answer a few questions about your values and priorities, and Texas Votes will match you with candidates in your actual races.</div>
-      <a class="btn btn-primary btn-inline" href="/app?start=1">Get Your Personalized Ballot</a>
+      <div class="share-cta-title" data-t="Build Your Own Guide">Build Your Own Guide</div>
+      <div class="share-cta-body" data-t="This sample shows what a personalized ballot looks like. Answer a few questions about your values and priorities, and Texas Votes will match you with candidates in your actual races.">This sample shows what a personalized ballot looks like. Answer a few questions about your values and priorities, and Texas Votes will match you with candidates in your actual races.</div>
+      <a class="btn btn-primary btn-inline" href="/app?start=1" data-t="Get Your Personalized Ballot">Get Your Personalized Ballot</a>
     </div>
 
     <!-- Footer -->
     <div class="page-footer">
-      <a href="/">Texas Votes</a> &middot;
-      <a href="/how-it-works">How It Works</a> &middot;
-      <a href="/privacy">Privacy</a>
+      <a href="/" data-t="Texas Votes">Texas Votes</a> &middot;
+      <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot;
+      <a href="/privacy" data-t="Privacy">Privacy</a>
       <br>
-      <span style="color:var(--red)">&starf;</span> Built in Texas &middot;
+      <span style="color:var(--red)">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot;
       <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a>
     </div>
 
@@ -1145,6 +1227,14 @@ function handleSampleBallot() {
     window.scrollTo({top:0,behavior:'smooth'});
   }
   </script>
+  ${pageI18n({
+    'SAMPLE BALLOT \\u2014 Fictional candidates and recommendations for demonstration': 'BOLETA DE EJEMPLO \\u2014 Candidatos ficticios y recomendaciones para demostraci\u00F3n',
+    'Republican': 'Republicano',
+    'Democrat': 'Dem\u00F3crata',
+    'Build Your Own Guide': 'Crea Tu Propia Gu\u00EDa',
+    'This sample shows what a personalized ballot looks like. Answer a few questions about your values and priorities, and Texas Votes will match you with candidates in your actual races.': 'Este ejemplo muestra c\u00F3mo se ve una boleta personalizada. Responde algunas preguntas sobre tus valores y prioridades, y Texas Votes te emparejar\u00E1 con candidatos en tus carreras reales.',
+    'Get Your Personalized Ballot': 'Obt\u00E9n Tu Boleta Personalizada',
+  })}
 </body>
 </html>`;
 
@@ -1175,79 +1265,119 @@ function handleHowItWorks() {
 <body>
   <div class="container">
     <a href="/" class="back-top">&larr; Texas Votes</a>
-    <h1>How It Works</h1>
-    <p class="subtitle">Texas Votes is a free tool that helps you figure out which candidates on your ballot match your values. Here's how it works, in plain language.</p>
+    <h1 data-t="How It Works">How It Works</h1>
+    <p class="subtitle" data-t="Texas Votes is a free tool that helps you figure out which candidates on your ballot match your values. Here's how it works, in plain language.">Texas Votes is a free tool that helps you figure out which candidates on your ballot match your values. Here's how it works, in plain language.</p>
 
-    <div class="cta-banner"><a class="cta-btn" href="/app?start=1">Build My Voting Guide &rarr;</a><p class="cta-sub">5-minute personalized ballot</p></div>
+    <div class="cta-banner"><a class="cta-btn" href="/app?start=1" data-t="Build My Voting Guide">Build My Voting Guide</a><p class="cta-sub" data-t="5-minute personalized ballot">5-minute personalized ballot</p></div>
 
-    <h2>What Does This App Do?</h2>
-    <p>Texas Votes asks you a few questions about what matters to you — things like education, public safety, the economy, or healthcare. Then it looks at the candidates running in your area and suggests which ones are the best fit based on your answers.</p>
-    <p>Think of it like a matchmaker, but for elections. You tell it what you care about, and it connects you with candidates who share those priorities.</p>
+    <h2 data-t="What Does This App Do?">What Does This App Do?</h2>
+    <p data-t="Texas Votes asks you a few questions about what matters to you — things like education, public safety, the economy, or healthcare. Then it looks at the candidates running in your area and suggests which ones are the best fit based on your answers.">Texas Votes asks you a few questions about what matters to you — things like education, public safety, the economy, or healthcare. Then it looks at the candidates running in your area and suggests which ones are the best fit based on your answers.</p>
+    <p data-t="Think of it like a matchmaker, but for elections. You tell it what you care about, and it connects you with candidates who share those priorities.">Think of it like a matchmaker, but for elections. You tell it what you care about, and it connects you with candidates who share those priorities.</p>
 
-    <h2>How Does the AI Part Work?</h2>
-    <p>The app uses artificial intelligence (the same kind of technology behind tools like ChatGPT) to read through candidate information and compare it to your answers. Here's the process, step by step:</p>
+    <h2 data-t="How Does the AI Part Work?">How Does the AI Part Work?</h2>
+    <p data-t="The app uses artificial intelligence (the same kind of technology behind tools like ChatGPT) to read through candidate information and compare it to your answers. Here's the process, step by step:">The app uses artificial intelligence (the same kind of technology behind tools like ChatGPT) to read through candidate information and compare it to your answers. Here's the process, step by step:</p>
 
     <div class="step">
       <div class="step-num">1</div>
-      <div class="step-text"><strong>You answer a short interview</strong>It takes about 5 minutes. You pick the issues you care about, how you lean politically, and what qualities matter to you in a candidate.</div>
+      <div class="step-text"><strong data-t="You answer a short interview">You answer a short interview</strong><span data-t="It takes about 5 minutes. You pick the issues you care about, how you lean politically, and what qualities matter to you in a candidate.">It takes about 5 minutes. You pick the issues you care about, how you lean politically, and what qualities matter to you in a candidate.</span></div>
     </div>
     <div class="step">
       <div class="step-num">2</div>
-      <div class="step-text"><strong>The AI reads candidate profiles</strong>It looks at each candidate's positions, endorsements, track record, and public statements — information gathered from official government sources, news outlets, and nonpartisan references.</div>
+      <div class="step-text"><strong data-t="The AI reads candidate profiles">The AI reads candidate profiles</strong><span data-t="It looks at each candidate's positions, endorsements, track record, and public statements — information gathered from official government sources, news outlets, and nonpartisan references.">It looks at each candidate's positions, endorsements, track record, and public statements — information gathered from official government sources, news outlets, and nonpartisan references.</span></div>
     </div>
     <div class="step">
       <div class="step-num">3</div>
-      <div class="step-text"><strong>It finds your best matches</strong>The AI compares what you said you care about with what each candidate stands for, then ranks them as a Strong Match, Good Match, or Best Available.</div>
+      <div class="step-text"><strong data-t="It finds your best matches">It finds your best matches</strong><span data-t="The AI compares what you said you care about with what each candidate stands for, then ranks them as a Strong Match, Good Match, or Best Available.">The AI compares what you said you care about with what each candidate stands for, then ranks them as a Strong Match, Good Match, or Best Available.</span></div>
     </div>
     <div class="step">
       <div class="step-num">4</div>
-      <div class="step-text"><strong>You get a personalized ballot</strong>You see your matches with short explanations of <em>why</em> each candidate was recommended. You can print it as a cheat sheet to bring to the polls.</div>
+      <div class="step-text"><strong data-t="You get a personalized ballot">You get a personalized ballot</strong><span data-t="You see your matches with short explanations of why each candidate was recommended. You can print it as a cheat sheet to bring to the polls.">You see your matches with short explanations of why each candidate was recommended. You can print it as a cheat sheet to bring to the polls.</span></div>
     </div>
 
-    <h2>Where Does the Candidate Information Come From?</h2>
-    <p>All candidate data is gathered from public sources, prioritized in this order:</p>
+    <h2 data-t="Where Does the Candidate Information Come From?">Where Does the Candidate Information Come From?</h2>
+    <p data-t="All candidate data is gathered from public sources, prioritized in this order:">All candidate data is gathered from public sources, prioritized in this order:</p>
     <ul>
-      <li><strong>Official government records</strong> — filings with the Texas Secretary of State, county election offices</li>
-      <li><strong>Nonpartisan references</strong> — Ballotpedia, VoteSmart, and similar databases</li>
-      <li><strong>News coverage</strong> — reporting from established news organizations</li>
-      <li><strong>Campaign materials</strong> — candidates' own websites and public statements</li>
+      <li data-t="Official government records — filings with the Texas Secretary of State, county election offices">Official government records — filings with the Texas Secretary of State, county election offices</li>
+      <li data-t="Nonpartisan references — Ballotpedia, VoteSmart, and similar databases">Nonpartisan references — Ballotpedia, VoteSmart, and similar databases</li>
+      <li data-t="News coverage — reporting from established news organizations">News coverage — reporting from established news organizations</li>
+      <li data-t="Campaign materials — candidates' own websites and public statements">Campaign materials — candidates' own websites and public statements</li>
     </ul>
-    <p>The data is automatically re-checked every day to stay current. When sources disagree, official government records take priority.</p>
+    <p data-t="The data is automatically re-checked every day to stay current. When sources disagree, official government records take priority.">The data is automatically re-checked every day to stay current. When sources disagree, official government records take priority.</p>
 
-    <h2>What This App Does NOT Do</h2>
+    <h2 data-t="What This App Does NOT Do">What This App Does NOT Do</h2>
     <ul class="promise-list">
-      <li><strong>It does not tell you who to vote for.</strong> It shows you matches and explains why, but the final choice is always yours.</li>
-      <li><strong>It does not store your personal information.</strong> Your answers stay on your phone or computer. They are never sent to our servers or saved anywhere we can see them.</li>
-      <li><strong>It does not track you.</strong> No cookies, no ad tracking, no personal data collection. We count anonymous page views to improve the app — that's it.</li>
-      <li><strong>It does not favor any political party.</strong> The AI is given strict instructions to be neutral. Candidates are shuffled randomly so no one gets an unfair advantage from being listed first. <a href="/nonpartisan">Learn more about our nonpartisan design.</a></li>
-      <li><strong>It does not replace your own research.</strong> This is a starting point to help you explore candidates. We always encourage you to verify information on your own.</li>
+      <li data-t="It does not tell you who to vote for. It shows you matches and explains why, but the final choice is always yours.">It does not tell you who to vote for. It shows you matches and explains why, but the final choice is always yours.</li>
+      <li data-t="It does not store your personal information. Your answers stay on your phone or computer. They are never sent to our servers or saved anywhere we can see them.">It does not store your personal information. Your answers stay on your phone or computer. They are never sent to our servers or saved anywhere we can see them.</li>
+      <li data-t="It does not track you. No cookies, no ad tracking, no personal data collection. We count anonymous page views to improve the app — that's it.">It does not track you. No cookies, no ad tracking, no personal data collection. We count anonymous page views to improve the app — that's it.</li>
+      <li data-t="It does not favor any political party. The AI is given strict instructions to be neutral. Candidates are shuffled randomly so no one gets an unfair advantage from being listed first.">It does not favor any political party. The AI is given strict instructions to be neutral. Candidates are shuffled randomly so no one gets an unfair advantage from being listed first. <a href="/nonpartisan">Learn more about our nonpartisan design.</a></li>
+      <li data-t="It does not replace your own research. This is a starting point to help you explore candidates. We always encourage you to verify information on your own.">It does not replace your own research. This is a starting point to help you explore candidates. We always encourage you to verify information on your own.</li>
     </ul>
 
-    <h2>How Can I Trust It?</h2>
-    <p>We've built this app to be as transparent as possible:</p>
+    <h2 data-t="How Can I Trust It?">How Can I Trust It?</h2>
+    <p data-t="We've built this app to be as transparent as possible:">We've built this app to be as transparent as possible:</p>
     <ul>
-      <li>The entire source code is public — anyone can inspect it</li>
-      <li>Four independent AI systems reviewed our code and methodology for bias</li>
-      <li>Every recommendation tells you <em>why</em> a candidate was matched to you</li>
-      <li>Every candidate profile includes links to original sources so you can check for yourself</li>
-      <li>A live dashboard shows how complete and up-to-date our data is</li>
-      <li>You can flag any candidate information that looks biased or inaccurate using the "Flag this info" button — reports go directly to our team for review</li>
-      <li>Automated balance checks ensure every candidate gets equal analytical treatment — no one gets more praise or criticism than their opponents</li>
+      <li data-t="The entire source code is public — anyone can inspect it">The entire source code is public — anyone can inspect it</li>
+      <li data-t="Four independent AI systems reviewed our code and methodology for bias">Four independent AI systems reviewed our code and methodology for bias</li>
+      <li data-t="Every recommendation tells you why a candidate was matched to you">Every recommendation tells you <em>why</em> a candidate was matched to you</li>
+      <li data-t="Every candidate profile includes links to original sources so you can check for yourself">Every candidate profile includes links to original sources so you can check for yourself</li>
+      <li data-t="A live dashboard shows how complete and up-to-date our data is">A live dashboard shows how complete and up-to-date our data is</li>
+      <li data-t="You can flag any candidate information that looks biased or inaccurate using the Flag this info button — reports go directly to our team for review">You can flag any candidate information that looks biased or inaccurate using the "Flag this info" button — reports go directly to our team for review</li>
+      <li data-t="Automated balance checks ensure every candidate gets equal analytical treatment — no one gets more praise or criticism than their opponents">Automated balance checks ensure every candidate gets equal analytical treatment — no one gets more praise or criticism than their opponents</li>
     </ul>
-    <p>If you want the technical details, the pages below go deeper:</p>
+    <p data-t="If you want the technical details, the pages below go deeper:">If you want the technical details, the pages below go deeper:</p>
 
-    <h2>Related</h2>
+    <h2 data-t="Related">Related</h2>
     <ul class="related-links">
-      <li><a href="/nonpartisan">Nonpartisan by Design</a> — How we keep the app fair for all voters</li>
-      <li><a href="/audit">AI Bias Audit</a> — Independent review of our AI by four different systems</li>
-      <li><a href="/data-quality">Data Quality Dashboard</a> — Live metrics on how complete our data is</li>
-      <li><a href="/open-source">Open Source</a> — Source code, architecture, and independent code reviews</li>
-      <li><a href="/privacy">Privacy Policy</a> — What data we collect (almost none) and why</li>
-      <li><a href="/candidates">All Candidates</a> — Browse every candidate with detailed profiles</li>
+      <li><a href="/nonpartisan" data-t="Nonpartisan by Design">Nonpartisan by Design</a> — <span data-t="How we keep the app fair for all voters">How we keep the app fair for all voters</span></li>
+      <li><a href="/audit" data-t="AI Bias Audit">AI Bias Audit</a> — <span data-t="Independent review of our AI by four different systems">Independent review of our AI by four different systems</span></li>
+      <li><a href="/data-quality" data-t="Data Quality Dashboard">Data Quality Dashboard</a> — <span data-t="Live metrics on how complete our data is">Live metrics on how complete our data is</span></li>
+      <li><a href="/open-source" data-t="Open Source">Open Source</a> — <span data-t="Source code, architecture, and independent code reviews">Source code, architecture, and independent code reviews</span></li>
+      <li><a href="/privacy" data-t="Privacy Policy">Privacy Policy</a> — <span data-t="What data we collect (almost none) and why">What data we collect (almost none) and why</span></li>
+      <li><a href="/candidates" data-t="All Candidates">All Candidates</a> — <span data-t="Browse every candidate with detailed profiles">Browse every candidate with detailed profiles</span></li>
     </ul>
 
-    <div class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> Built in Texas &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
+    <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
   </div>
+  ${pageI18n({
+    'Texas Votes is a free tool that helps you figure out which candidates on your ballot match your values. Here\\'s how it works, in plain language.': 'Texas Votes es una herramienta gratuita que te ayuda a descubrir qu\u00E9 candidatos en tu boleta coinciden con tus valores. As\u00ED funciona, en palabras sencillas.',
+    'What Does This App Do?': '\u00BFQu\u00E9 Hace Esta App?',
+    'Texas Votes asks you a few questions about what matters to you \\u2014 things like education, public safety, the economy, or healthcare. Then it looks at the candidates running in your area and suggests which ones are the best fit based on your answers.': 'Texas Votes te hace algunas preguntas sobre lo que te importa \\u2014 como educaci\u00F3n, seguridad p\u00FAblica, la econom\u00EDa o salud. Luego revisa los candidatos en tu \u00E1rea y sugiere cu\u00E1les son los m\u00E1s compatibles seg\u00FAn tus respuestas.',
+    'Think of it like a matchmaker, but for elections. You tell it what you care about, and it connects you with candidates who share those priorities.': 'Pi\u00E9nsalo como un servicio de compatibilidad, pero para elecciones. T\u00FA dices lo que te importa y te conecta con candidatos que comparten esas prioridades.',
+    'How Does the AI Part Work?': '\u00BFC\u00F3mo Funciona la Parte de IA?',
+    'The app uses artificial intelligence (the same kind of technology behind tools like ChatGPT) to read through candidate information and compare it to your answers. Here\\'s the process, step by step:': 'La app usa inteligencia artificial (la misma tecnolog\u00EDa detr\u00E1s de herramientas como ChatGPT) para leer la informaci\u00F3n de candidatos y compararla con tus respuestas. As\u00ED funciona el proceso, paso a paso:',
+    'You answer a short interview': 'Respondes una entrevista corta',
+    'It takes about 5 minutes. You pick the issues you care about, how you lean politically, and what qualities matter to you in a candidate.': 'Toma unos 5 minutos. Eliges los temas que te importan, tu inclinaci\u00F3n pol\u00EDtica y qu\u00E9 cualidades valoras en un candidato.',
+    'The AI reads candidate profiles': 'La IA lee los perfiles de candidatos',
+    'It looks at each candidate\\'s positions, endorsements, track record, and public statements \\u2014 information gathered from official government sources, news outlets, and nonpartisan references.': 'Revisa las posiciones, respaldos, historial y declaraciones p\u00FAblicas de cada candidato \\u2014 informaci\u00F3n recopilada de fuentes gubernamentales oficiales, medios de comunicaci\u00F3n y referencias apartidistas.',
+    'It finds your best matches': 'Encuentra tus mejores coincidencias',
+    'The AI compares what you said you care about with what each candidate stands for, then ranks them as a Strong Match, Good Match, or Best Available.': 'La IA compara lo que dijiste que te importa con lo que representa cada candidato, y los clasifica como Coincidencia Fuerte, Buena Coincidencia o Mejor Disponible.',
+    'You get a personalized ballot': 'Recibes una boleta personalizada',
+    'You see your matches with short explanations of why each candidate was recommended. You can print it as a cheat sheet to bring to the polls.': 'Ves tus coincidencias con explicaciones cortas de por qu\u00E9 se recomend\u00F3 cada candidato. Puedes imprimirla como gu\u00EDa r\u00E1pida para llevar a las urnas.',
+    'Where Does the Candidate Information Come From?': '\u00BFDe D\u00F3nde Viene la Informaci\u00F3n de los Candidatos?',
+    'All candidate data is gathered from public sources, prioritized in this order:': 'Todos los datos de candidatos se recopilan de fuentes p\u00FAblicas, priorizados en este orden:',
+    'Official government records \\u2014 filings with the Texas Secretary of State, county election offices': 'Registros gubernamentales oficiales \\u2014 archivos del Secretario de Estado de Texas, oficinas electorales del condado',
+    'Nonpartisan references \\u2014 Ballotpedia, VoteSmart, and similar databases': 'Referencias apartidistas \\u2014 Ballotpedia, VoteSmart y bases de datos similares',
+    'News coverage \\u2014 reporting from established news organizations': 'Cobertura de noticias \\u2014 reportajes de organizaciones de noticias establecidas',
+    'Campaign materials \\u2014 candidates\\' own websites and public statements': 'Materiales de campa\u00F1a \\u2014 sitios web y declaraciones p\u00FAblicas de los candidatos',
+    'The data is automatically re-checked every day to stay current. When sources disagree, official government records take priority.': 'Los datos se verifican autom\u00E1ticamente todos los d\u00EDas para mantenerse actualizados. Cuando las fuentes no coinciden, los registros gubernamentales oficiales tienen prioridad.',
+    'What This App Does NOT Do': 'Lo Que Esta App NO Hace',
+    'It does not tell you who to vote for. It shows you matches and explains why, but the final choice is always yours.': 'No te dice por qui\u00E9n votar. Te muestra coincidencias y explica por qu\u00E9, pero la decisi\u00F3n final siempre es tuya.',
+    'It does not store your personal information. Your answers stay on your phone or computer. They are never sent to our servers or saved anywhere we can see them.': 'No almacena tu informaci\u00F3n personal. Tus respuestas permanecen en tu tel\u00E9fono o computadora. Nunca se env\u00EDan a nuestros servidores ni se guardan donde podamos verlas.',
+    'It does not track you. No cookies, no ad tracking, no personal data collection. We count anonymous page views to improve the app \\u2014 that\\'s it.': 'No te rastrea. Sin cookies, sin seguimiento publicitario, sin recolecci\u00F3n de datos personales. Contamos visitas an\u00F3nimas para mejorar la app \\u2014 eso es todo.',
+    'It does not favor any political party. The AI is given strict instructions to be neutral. Candidates are shuffled randomly so no one gets an unfair advantage from being listed first.': 'No favorece a ning\u00FAn partido pol\u00EDtico. La IA tiene instrucciones estrictas de ser neutral. Los candidatos se mezclan al azar para que nadie tenga ventaja por aparecer primero.',
+    'It does not replace your own research. This is a starting point to help you explore candidates. We always encourage you to verify information on your own.': 'No reemplaza tu propia investigaci\u00F3n. Es un punto de partida para explorar candidatos. Siempre te animamos a verificar la informaci\u00F3n por tu cuenta.',
+    'How Can I Trust It?': '\u00BFC\u00F3mo Puedo Confiar en Esto?',
+    'We\\'ve built this app to be as transparent as possible:': 'Hemos construido esta app para ser lo m\u00E1s transparente posible:',
+    'The entire source code is public \\u2014 anyone can inspect it': 'Todo el c\u00F3digo fuente es p\u00FAblico \\u2014 cualquiera puede inspeccionarlo',
+    'Four independent AI systems reviewed our code and methodology for bias': 'Cuatro sistemas de IA independientes revisaron nuestro c\u00F3digo y metodolog\u00EDa en busca de sesgo',
+    'Every recommendation tells you why a candidate was matched to you': 'Cada recomendaci\u00F3n te dice por qu\u00E9 un candidato fue emparejado contigo',
+    'Every candidate profile includes links to original sources so you can check for yourself': 'Cada perfil de candidato incluye enlaces a fuentes originales para que puedas verificar',
+    'A live dashboard shows how complete and up-to-date our data is': 'Un panel en vivo muestra qu\u00E9 tan completos y actualizados est\u00E1n nuestros datos',
+    'You can flag any candidate information that looks biased or inaccurate using the Flag this info button \\u2014 reports go directly to our team for review': 'Puedes reportar cualquier informaci\u00F3n de candidatos que parezca sesgada o inexacta usando el bot\u00F3n "Reportar esta info" \\u2014 los reportes van directamente a nuestro equipo para revisi\u00F3n',
+    'Automated balance checks ensure every candidate gets equal analytical treatment \\u2014 no one gets more praise or criticism than their opponents': 'Verificaciones autom\u00E1ticas de equilibrio aseguran que cada candidato reciba el mismo tratamiento anal\u00EDtico \\u2014 nadie recibe m\u00E1s elogios o cr\u00EDticas que sus oponentes',
+    'If you want the technical details, the pages below go deeper:': 'Si quieres los detalles t\u00E9cnicos, las p\u00E1ginas a continuaci\u00F3n profundizan m\u00E1s:',
+    'What data we collect (almost none) and why': 'Qu\u00E9 datos recopilamos (casi ninguno) y por qu\u00E9',
+  })}
 </body>
 </html>`;
 
@@ -1269,90 +1399,139 @@ function handleNonpartisan() {
 <body>
   <div class="container">
     <a href="/" class="back-top">&larr; Texas Votes</a>
-    <h1>Nonpartisan by Design</h1>
-    <p class="subtitle">Texas Votes matches candidates to your values, not your party. Every design decision is made to keep the experience fair for all voters — regardless of where you fall on the political spectrum.</p>
+    <h1 data-t="Nonpartisan by Design">Nonpartisan by Design</h1>
+    <p class="subtitle" data-t="Texas Votes matches candidates to your values, not your party. Every design decision is made to keep the experience fair for all voters.">Texas Votes matches candidates to your values, not your party. Every design decision is made to keep the experience fair for all voters — regardless of where you fall on the political spectrum.</p>
 
-    <div class="cta-banner"><a class="cta-btn" href="/app?start=1">Build My Voting Guide &rarr;</a><p class="cta-sub">5-minute personalized ballot</p></div>
+    <div class="cta-banner"><a class="cta-btn" href="/app?start=1" data-t="Build My Voting Guide">Build My Voting Guide</a><p class="cta-sub" data-t="5-minute personalized ballot">5-minute personalized ballot</p></div>
 
-    <h2>Randomized Candidate Order</h2>
-    <p>Candidates and answer options are shuffled every time so position on screen never creates bias.</p>
+    <h2 data-t="Randomized Candidate Order">Randomized Candidate Order</h2>
+    <p data-t="Candidates and answer options are shuffled every time so position on screen never creates bias.">Candidates and answer options are shuffled every time so position on screen never creates bias.</p>
 
-    <h2>Both Ballots Generated Equally</h2>
-    <p>Republican and Democratic ballots are generated simultaneously with identical AI prompts and formatting. For undecided voters, even the loading order is randomized.</p>
+    <h2 data-t="Both Ballots Generated Equally">Both Ballots Generated Equally</h2>
+    <p data-t="Republican and Democratic ballots are generated simultaneously with identical AI prompts and formatting.">Republican and Democratic ballots are generated simultaneously with identical AI prompts and formatting. For undecided voters, even the loading order is randomized.</p>
 
-    <h2>No Party Labels on Candidates</h2>
-    <p>Party affiliation is intentionally hidden from candidate cards so you evaluate candidates on their positions, not partisan identity.</p>
+    <h2 data-t="No Party Labels on Candidates">No Party Labels on Candidates</h2>
+    <p data-t="Party affiliation is intentionally hidden from candidate cards so you evaluate candidates on their positions, not partisan identity.">Party affiliation is intentionally hidden from candidate cards so you evaluate candidates on their positions, not partisan identity.</p>
 
-    <h2>Values-Based Matching</h2>
-    <p>Recommendations are based on your stated issues, priorities, and candidate qualities — not party registration.</p>
+    <h2 data-t="Values-Based Matching">Values-Based Matching</h2>
+    <p data-t="Recommendations are based on your stated issues, priorities, and candidate qualities — not party registration.">Recommendations are based on your stated issues, priorities, and candidate qualities — not party registration.</p>
 
-    <h2>Neutral Interview Questions</h2>
-    <p>Every question is framed neutrally. Answer options are shuffled. The spectrum picker says "No wrong answers." All deep-dive policy labels use strictly descriptive, symmetric language — reviewed and normalized through independent AI audits to eliminate rhetorical heat from both sides of every issue.</p>
+    <h2 data-t="Neutral Interview Questions">Neutral Interview Questions</h2>
+    <p data-t="Every question is framed neutrally. Answer options are shuffled.">Every question is framed neutrally. Answer options are shuffled. The spectrum picker says "No wrong answers." All deep-dive policy labels use strictly descriptive, symmetric language — reviewed and normalized through independent AI audits to eliminate rhetorical heat from both sides of every issue.</p>
 
-    <h2>Six-Point Political Spectrum</h2>
-    <p>Goes beyond left/right: Progressive, Liberal, Moderate, Conservative, Libertarian, and Independent. Moderate and Independent voters are never auto-assigned a party.</p>
+    <h2 data-t="Six-Point Political Spectrum">Six-Point Political Spectrum</h2>
+    <p data-t="Goes beyond left/right: Progressive, Liberal, Moderate, Conservative, Libertarian, and Independent.">Goes beyond left/right: Progressive, Liberal, Moderate, Conservative, Libertarian, and Independent. Moderate and Independent voters are never auto-assigned a party.</p>
 
-    <h2>Balanced Proposition Coverage</h2>
-    <p>Every proposition shows supporters AND opponents, fiscal impact, outcomes if it passes or fails, and includes a "Your Call" option for genuinely contested issues.</p>
+    <h2 data-t="Balanced Proposition Coverage">Balanced Proposition Coverage</h2>
+    <p data-t="Every proposition shows supporters AND opponents, fiscal impact, outcomes if it passes or fails.">Every proposition shows supporters AND opponents, fiscal impact, outcomes if it passes or fails, and includes a "Your Call" option for genuinely contested issues.</p>
 
-    <h2>AI Transparency &amp; Guardrails</h2>
-    <p>Every AI prompt includes an explicit NONPARTISAN instruction block requiring: factual, issue-based reasoning only; no partisan framing or loaded terms; equal analytical rigor for all candidates regardless of position; and recommendations connected to the voter's specific stated values — never to party-line assumptions. Disclaimers appear on every recommendation screen. Confidence levels (Strong Match, Good Match, Best Available) prevent false certainty.</p>
+    <h2 data-t="AI Transparency and Guardrails">AI Transparency &amp; Guardrails</h2>
+    <p data-t="Every AI prompt includes an explicit NONPARTISAN instruction block.">Every AI prompt includes an explicit NONPARTISAN instruction block requiring: factual, issue-based reasoning only; no partisan framing or loaded terms; equal analytical rigor for all candidates regardless of position; and recommendations connected to the voter's specific stated values — never to party-line assumptions. Disclaimers appear on every recommendation screen. Confidence levels (Strong Match, Good Match, Best Available) prevent false certainty.</p>
 
-    <h2>Verified Candidate Data</h2>
-    <p>All candidates are cross-referenced against official filings from the Texas Secretary of State, county clerks, and Ballotpedia. Candidate data includes positions, endorsements, strengths, and concerns — presented with equal depth for every candidate in a race.</p>
-    <p>Endorsements include context labels identifying the type of each endorsing organization (e.g., labor union, editorial board, advocacy group, elected official). This helps voters understand who is behind each endorsement without having to research each organization separately.</p>
-    <p>A daily automated updater re-verifies candidate data using AI-powered web research. Each ballot page and candidate profile displays a "Data last verified" timestamp so you can see exactly when the information was last checked.</p>
+    <h2 data-t="Verified Candidate Data">Verified Candidate Data</h2>
+    <p data-t="All candidates are cross-referenced against official filings.">All candidates are cross-referenced against official filings from the Texas Secretary of State, county clerks, and Ballotpedia. Candidate data includes positions, endorsements, strengths, and concerns — presented with equal depth for every candidate in a race.</p>
+    <p data-t="Endorsements include context labels identifying the type of each endorsing organization.">Endorsements include context labels identifying the type of each endorsing organization (e.g., labor union, editorial board, advocacy group, elected official). This helps voters understand who is behind each endorsement without having to research each organization separately.</p>
+    <p data-t="A daily automated updater re-verifies candidate data using AI-powered web research.">A daily automated updater re-verifies candidate data using AI-powered web research. Each ballot page and candidate profile displays a "Data last verified" timestamp so you can see exactly when the information was last checked.</p>
 
-    <h2>Source Citations</h2>
-    <p>Every candidate profile includes per-candidate source URLs so voters can verify claims independently — sources are attributed to individual candidates, not just per-race, ensuring every claim can be traced to its origin. Sources are visible on candidate profile pages and in the PWA ballot view, linking directly to official filings, news articles, and campaign materials. All source citations include the URL, title, and the date the source was last accessed.</p>
+    <h2 data-t="Source Citations">Source Citations</h2>
+    <p data-t="Every candidate profile includes per-candidate source URLs so voters can verify claims independently.">Every candidate profile includes per-candidate source URLs so voters can verify claims independently — sources are attributed to individual candidates, not just per-race, ensuring every claim can be traced to its origin. Sources are visible on candidate profile pages and in the PWA ballot view, linking directly to official filings, news articles, and campaign materials. All source citations include the URL, title, and the date the source was last accessed.</p>
 
-    <h2>Match Transparency</h2>
-    <p>Each candidate recommendation includes "Why this match?" factors — short phrases citing the specific voter priorities that drove the recommendation. Instead of a generic "Good Match" label, voters can see exactly which of their stated values and issue priorities the AI connected to each candidate. This makes the recommendation logic auditable at the individual level.</p>
+    <h2 data-t="Match Transparency">Match Transparency</h2>
+    <p data-t="Each candidate recommendation includes Why this match factors.">Each candidate recommendation includes "Why this match?" factors — short phrases citing the specific voter priorities that drove the recommendation. Instead of a generic "Good Match" label, voters can see exactly which of their stated values and issue priorities the AI connected to each candidate. This makes the recommendation logic auditable at the individual level.</p>
 
-    <h2>Source Priority Hierarchy</h2>
-    <p>All AI research prompts include an explicit 7-tier source ranking policy. When the AI uses web search to gather candidate data, it is instructed to prefer official government filings (Texas Secretary of State, county election offices) over campaign websites, nonpartisan references (Ballotpedia, VoteSmart) over news outlets, and to avoid blogs, social media, and opinion sites. When sources conflict, official filings override campaign claims, and campaign claims override news reporting. This hierarchy is documented in our <a href="/api/audit/export">methodology export</a>.</p>
+    <h2 data-t="Source Priority Hierarchy">Source Priority Hierarchy</h2>
+    <p data-t="All AI research prompts include an explicit 7-tier source ranking policy.">All AI research prompts include an explicit 7-tier source ranking policy. When the AI uses web search to gather candidate data, it is instructed to prefer official government filings (Texas Secretary of State, county election offices) over campaign websites, nonpartisan references (Ballotpedia, VoteSmart) over news outlets, and to avoid blogs, social media, and opinion sites. When sources conflict, official filings override campaign claims, and campaign claims override news reporting. This hierarchy is documented in our <a href="/api/audit/export">methodology export</a>.</p>
 
-    <h2>Limited Data Transparency</h2>
-    <p>When a candidate has sparse public information — fewer than two of key positions, endorsements, strengths, or concerns populated — the app displays a "Limited public info" label. This prevents information asymmetry from looking like favoritism: if one candidate has a detailed profile and another doesn't, the label makes it clear the gap is a data limitation, not an editorial choice.</p>
+    <h2 data-t="Limited Data Transparency">Limited Data Transparency</h2>
+    <p data-t="When a candidate has sparse public information, the app displays a Limited public info label.">When a candidate has sparse public information — fewer than two of key positions, endorsements, strengths, or concerns populated — the app displays a "Limited public info" label. This prevents information asymmetry from looking like favoritism: if one candidate has a detailed profile and another doesn't, the label makes it clear the gap is a data limitation, not an editorial choice.</p>
 
-    <h2>County Coverage Transparency</h2>
-    <p>Texas has 254 counties, and local race data is added county by county. When a voter's county doesn't yet have local race data, the app clearly labels this: "Local races for [County] County are not yet available. Your ballot shows statewide and district races only." This appears on both the ballot page and the printable cheat sheet, so voters always know the scope of their guide — rather than silently omitting races and leaving voters unaware.</p>
+    <h2 data-t="County Coverage Transparency">County Coverage Transparency</h2>
+    <p data-t="Texas has 254 counties, and local race data is added county by county.">Texas has 254 counties, and local race data is added county by county. When a voter's county doesn't yet have local race data, the app clearly labels this: "Local races for [County] County are not yet available. Your ballot shows statewide and district races only." This appears on both the ballot page and the printable cheat sheet, so voters always know the scope of their guide — rather than silently omitting races and leaving voters unaware.</p>
 
-    <h2>Nonpartisan Translations</h2>
-    <p>All Spanish translations are reviewed for partisan bias. Proposition titles and descriptions use identical grammatical structures for both parties. Data terms (candidate names, positions) stay in English for accuracy; only the display layer is translated.</p>
+    <h2 data-t="Nonpartisan Translations">Nonpartisan Translations</h2>
+    <p data-t="All Spanish translations are reviewed for partisan bias.">All Spanish translations are reviewed for partisan bias. Proposition titles and descriptions use identical grammatical structures for both parties. Data terms (candidate names, positions) stay in English for accuracy; only the display layer is translated.</p>
 
-    <h2>Encouraging Independent Research</h2>
-    <p>Every screen says "Do your own research before voting." The app is a starting point, not the final word.</p>
+    <h2 data-t="Encouraging Independent Research">Encouraging Independent Research</h2>
+    <p data-t="Every screen says Do your own research before voting. The app is a starting point, not the final word.">Every screen says "Do your own research before voting." The app is a starting point, not the final word.</p>
 
-    <h2>Privacy-First Design</h2>
-    <p>All data stays on your device. We collect only anonymous page-view counts (via Cloudflare Web Analytics — no cookies, no personal data) and anonymous usage event counts (like "guide generated") to improve the app. No tracking, no ads. Your political views are never stored on our servers.</p>
+    <h2 data-t="Privacy-First Design">Privacy-First Design</h2>
+    <p data-t="All data stays on your device. No tracking, no ads. Your political views are never stored on our servers.">All data stays on your device. We collect only anonymous page-view counts (via Cloudflare Web Analytics — no cookies, no personal data) and anonymous usage event counts (like "guide generated") to improve the app. No tracking, no ads. Your political views are never stored on our servers.</p>
 
-    <h2>Open Source Approach</h2>
-    <p>The full prompt sent to the AI and every design decision is documented. Nothing is hidden. <a href="/open-source">View the source code, architecture details, and independent AI code reviews.</a></p>
+    <h2 data-t="Open Source Approach">Open Source Approach</h2>
+    <p data-t="The full prompt sent to the AI and every design decision is documented. Nothing is hidden.">The full prompt sent to the AI and every design decision is documented. Nothing is hidden. <a href="/open-source">View the source code, architecture details, and independent AI code reviews.</a></p>
 
-    <h2>Independent AI Audit</h2>
-    <p>We've submitted our full AI prompts, data pipeline, and methodology to four independent AI systems (ChatGPT, Gemini, Grok, and Claude) for bias review. Audit findings directly informed improvements, including normalizing all deep-dive answer labels to use neutral, descriptive language with symmetric phrasing across opposing positions. <a href="/audit">Read the full audit results and methodology export.</a></p>
+    <h2 data-t="Independent AI Audit">Independent AI Audit</h2>
+    <p data-t="We've submitted our full AI prompts, data pipeline, and methodology to four independent AI systems for bias review.">We've submitted our full AI prompts, data pipeline, and methodology to four independent AI systems (ChatGPT, Gemini, Grok, and Claude) for bias review. Audit findings directly informed improvements, including normalizing all deep-dive answer labels to use neutral, descriptive language with symmetric phrasing across opposing positions. <a href="/audit">Read the full audit results and methodology export.</a></p>
 
-    <h2>Automated Balance Checks</h2>
-    <p>An automated balance check system scores the symmetry of pros and cons across all candidates in every race. If one candidate has significantly more strengths listed than their opponent, or if the detail level is uneven, the system flags it for review. Balance scores are published on the <a href="/data-quality">Data Quality Dashboard</a> and available as a <a href="/api/balance-check">public API</a>. This ensures no candidate receives disproportionate praise or criticism.</p>
+    <h2 data-t="Automated Balance Checks">Automated Balance Checks</h2>
+    <p data-t="An automated balance check system scores the symmetry of pros and cons across all candidates in every race.">An automated balance check system scores the symmetry of pros and cons across all candidates in every race. If one candidate has significantly more strengths listed than their opponent, or if the detail level is uneven, the system flags it for review. Balance scores are published on the <a href="/data-quality">Data Quality Dashboard</a> and available as a <a href="/api/balance-check">public API</a>. This ensures no candidate receives disproportionate praise or criticism.</p>
 
-    <h2>Flag This Info</h2>
-    <p>Every candidate card in the app includes a "Flag this info" button. If you spot something that looks biased, inaccurate, or outdated, you can report it directly. Reports are sent to <a href="mailto:flagged@txvotes.app">flagged@txvotes.app</a> and reviewed by our team. This voter-driven accountability mechanism ensures the data stays honest even when automated checks miss something.</p>
+    <h2 data-t="Flag This Info">Flag This Info</h2>
+    <p data-t="Every candidate card in the app includes a Flag this info button.">Every candidate card in the app includes a "Flag this info" button. If you spot something that looks biased, inaccurate, or outdated, you can report it directly. Reports are sent to <a href="mailto:flagged@txvotes.app">flagged@txvotes.app</a> and reviewed by our team. This voter-driven accountability mechanism ensures the data stays honest even when automated checks miss something.</p>
 
-    <h2>Data Transparency</h2>
-    <p>Our <a href="/data-quality">Data Quality Dashboard</a> shows live metrics on ballot coverage, candidate completeness, and county data availability. See exactly how fresh and complete our election data is at any time.</p>
+    <h2 data-t="Data Transparency">Data Transparency</h2>
+    <p data-t="Our Data Quality Dashboard shows live metrics on ballot coverage, candidate completeness, and county data availability.">Our <a href="/data-quality">Data Quality Dashboard</a> shows live metrics on ballot coverage, candidate completeness, and county data availability. See exactly how fresh and complete our election data is at any time.</p>
 
-    <h2>Related</h2>
+    <h2 data-t="Related">Related</h2>
     <ul class="related-links">
-      <li><a href="/how-it-works">How It Works</a> — Plain-language explanation for non-technical users</li>
-      <li><a href="/audit">AI Bias Audit</a> — Independent review by four AI systems</li>
-      <li><a href="/data-quality">Data Quality Dashboard</a> — Live metrics on ballot coverage and candidate completeness</li>
-      <li><a href="/open-source">Open Source</a> — Source code, architecture, and independent code reviews</li>
-      <li><a href="/candidates">All Candidates</a> — Browse every candidate with detailed profiles</li>
+      <li><a href="/how-it-works" data-t="How It Works">How It Works</a> — <span data-t="Plain-language explanation for non-technical users">Plain-language explanation for non-technical users</span></li>
+      <li><a href="/audit" data-t="AI Bias Audit">AI Bias Audit</a> — <span data-t="Independent review by four AI systems">Independent review by four AI systems</span></li>
+      <li><a href="/data-quality" data-t="Data Quality Dashboard">Data Quality Dashboard</a> — <span data-t="Live metrics on ballot coverage and candidate completeness">Live metrics on ballot coverage and candidate completeness</span></li>
+      <li><a href="/open-source" data-t="Open Source">Open Source</a> — <span data-t="Source code, architecture, and independent code reviews">Source code, architecture, and independent code reviews</span></li>
+      <li><a href="/candidates" data-t="All Candidates">All Candidates</a> — <span data-t="Browse every candidate with detailed profiles">Browse every candidate with detailed profiles</span></li>
     </ul>
 
-    <div class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> Built in Texas &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
+    <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
   </div>
+  ${pageI18n({
+    'Texas Votes matches candidates to your values, not your party. Every design decision is made to keep the experience fair for all voters.': 'Texas Votes empareja candidatos con tus valores, no con tu partido. Cada decisi\u00F3n de dise\u00F1o se toma para mantener la experiencia justa para todos los votantes.',
+    'Randomized Candidate Order': 'Orden Aleatorio de Candidatos',
+    'Candidates and answer options are shuffled every time so position on screen never creates bias.': 'Los candidatos y opciones de respuesta se mezclan cada vez para que la posici\u00F3n en pantalla nunca cree sesgo.',
+    'Both Ballots Generated Equally': 'Ambas Boletas Generadas por Igual',
+    'Republican and Democratic ballots are generated simultaneously with identical AI prompts and formatting.': 'Las boletas Republicana y Dem\u00F3crata se generan simult\u00E1neamente con prompts de IA y formato id\u00E9nticos.',
+    'No Party Labels on Candidates': 'Sin Etiquetas de Partido en los Candidatos',
+    'Party affiliation is intentionally hidden from candidate cards so you evaluate candidates on their positions, not partisan identity.': 'La afiliaci\u00F3n partidista se oculta intencionalmente de las tarjetas de candidatos para que eval\u00FAes a los candidatos por sus posiciones, no por identidad partidista.',
+    'Values-Based Matching': 'Coincidencia Basada en Valores',
+    'Recommendations are based on your stated issues, priorities, and candidate qualities \\u2014 not party registration.': 'Las recomendaciones se basan en tus temas, prioridades y cualidades de candidatos \\u2014 no en registro de partido.',
+    'Neutral Interview Questions': 'Preguntas de Entrevista Neutrales',
+    'Every question is framed neutrally. Answer options are shuffled.': 'Cada pregunta se formula de manera neutral. Las opciones de respuesta se mezclan.',
+    'Six-Point Political Spectrum': 'Espectro Pol\u00EDtico de Seis Puntos',
+    'Goes beyond left/right: Progressive, Liberal, Moderate, Conservative, Libertarian, and Independent.': 'Va m\u00E1s all\u00E1 de izquierda/derecha: Progresista, Liberal, Moderado, Conservador, Libertario e Independiente.',
+    'Balanced Proposition Coverage': 'Cobertura Equilibrada de Proposiciones',
+    'Every proposition shows supporters AND opponents, fiscal impact, outcomes if it passes or fails.': 'Cada proposici\u00F3n muestra partidarios Y opositores, impacto fiscal, resultados si se aprueba o no.',
+    'AI Transparency and Guardrails': 'Transparencia y Salvaguardas de IA',
+    'Every AI prompt includes an explicit NONPARTISAN instruction block.': 'Cada prompt de IA incluye un bloque expl\u00EDcito de instrucciones APARTIDISTAS.',
+    'Verified Candidate Data': 'Datos de Candidatos Verificados',
+    'All candidates are cross-referenced against official filings.': 'Todos los candidatos se verifican contra archivos oficiales.',
+    'Endorsements include context labels identifying the type of each endorsing organization.': 'Los respaldos incluyen etiquetas de contexto que identifican el tipo de cada organizaci\u00F3n que respalda.',
+    'A daily automated updater re-verifies candidate data using AI-powered web research.': 'Un actualizador autom\u00E1tico diario re-verifica los datos de candidatos usando investigaci\u00F3n web impulsada por IA.',
+    'Source Citations': 'Citas de Fuentes',
+    'Every candidate profile includes per-candidate source URLs so voters can verify claims independently.': 'Cada perfil de candidato incluye URLs de fuentes por candidato para que los votantes puedan verificar afirmaciones independientemente.',
+    'Match Transparency': 'Transparencia de Coincidencias',
+    'Each candidate recommendation includes Why this match factors.': 'Cada recomendaci\u00F3n de candidato incluye factores de "Por qu\u00E9 esta coincidencia".',
+    'Source Priority Hierarchy': 'Jerarqu\u00EDa de Prioridad de Fuentes',
+    'All AI research prompts include an explicit 7-tier source ranking policy.': 'Todos los prompts de investigaci\u00F3n de IA incluyen una pol\u00EDtica expl\u00EDcita de clasificaci\u00F3n de fuentes de 7 niveles.',
+    'Limited Data Transparency': 'Transparencia de Datos Limitados',
+    'When a candidate has sparse public information, the app displays a Limited public info label.': 'Cuando un candidato tiene informaci\u00F3n p\u00FAblica escasa, la app muestra una etiqueta de "Informaci\u00F3n p\u00FAblica limitada".',
+    'County Coverage Transparency': 'Transparencia de Cobertura por Condado',
+    'Texas has 254 counties, and local race data is added county by county.': 'Texas tiene 254 condados, y los datos de carreras locales se agregan condado por condado.',
+    'Nonpartisan Translations': 'Traducciones Apartidistas',
+    'All Spanish translations are reviewed for partisan bias.': 'Todas las traducciones al espa\u00F1ol son revisadas para detectar sesgo partidista.',
+    'Encouraging Independent Research': 'Fomentando la Investigaci\u00F3n Independiente',
+    'Every screen says Do your own research before voting. The app is a starting point, not the final word.': 'Cada pantalla dice "Haz tu propia investigaci\u00F3n antes de votar." La app es un punto de partida, no la \u00FAltima palabra.',
+    'Privacy-First Design': 'Dise\u00F1o con Privacidad Primero',
+    'All data stays on your device. No tracking, no ads. Your political views are never stored on our servers.': 'Todos los datos permanecen en tu dispositivo. Sin seguimiento, sin anuncios. Tus opiniones pol\u00EDticas nunca se almacenan en nuestros servidores.',
+    'Open Source Approach': 'Enfoque de C\u00F3digo Abierto',
+    'The full prompt sent to the AI and every design decision is documented. Nothing is hidden.': 'El prompt completo enviado a la IA y cada decisi\u00F3n de dise\u00F1o est\u00E1 documentado. Nada est\u00E1 oculto.',
+    'Independent AI Audit': 'Auditor\u00EDa Independiente de IA',
+    'We\\'ve submitted our full AI prompts, data pipeline, and methodology to four independent AI systems for bias review.': 'Hemos enviado nuestros prompts de IA completos, pipeline de datos y metodolog\u00EDa a cuatro sistemas de IA independientes para revisi\u00F3n de sesgo.',
+    'Automated Balance Checks': 'Verificaciones Autom\u00E1ticas de Equilibrio',
+    'An automated balance check system scores the symmetry of pros and cons across all candidates in every race.': 'Un sistema autom\u00E1tico de verificaci\u00F3n de equilibrio eval\u00FAa la simetr\u00EDa de pros y contras entre todos los candidatos en cada carrera.',
+    'Flag This Info': 'Reportar Esta Info',
+    'Every candidate card in the app includes a Flag this info button.': 'Cada tarjeta de candidato en la app incluye un bot\u00F3n "Reportar esta info".',
+    'Data Transparency': 'Transparencia de Datos',
+    'Our Data Quality Dashboard shows live metrics on ballot coverage, candidate completeness, and county data availability.': 'Nuestro Panel de Calidad de Datos muestra m\u00E9tricas en vivo sobre cobertura de boletas, datos completos de candidatos y disponibilidad de datos por condado.',
+  })}
 </body>
 </html>`;
 
@@ -1485,12 +1664,12 @@ async function handleAuditPage(env) {
 <body>
   <div class="container">
     <a href="/" class="back-top">&larr; Texas Votes</a>
-    <h1 style="margin-top:1rem">AI Audit</h1>
-    <p class="subtitle">Texas Votes uses AI to generate personalized voting guides. To prove our process is fair and nonpartisan, we publish our complete methodology and have submitted it to four independent AI systems for bias review.</p>
+    <h1 style="margin-top:1rem" data-t="AI Audit">AI Audit</h1>
+    <p class="subtitle" data-t="Texas Votes uses AI to generate personalized voting guides. To prove our process is fair and nonpartisan, we publish our complete methodology.">Texas Votes uses AI to generate personalized voting guides. To prove our process is fair and nonpartisan, we publish our complete methodology and have submitted it to four independent AI systems for bias review.</p>
 
-    <div class="cta-banner"><a class="cta-btn" href="/app?start=1">Build My Voting Guide &rarr;</a><p class="cta-sub">5-minute personalized ballot</p></div>
+    <div class="cta-banner"><a class="cta-btn" href="/app?start=1" data-t="Build My Voting Guide">Build My Voting Guide</a><p class="cta-sub" data-t="5-minute personalized ballot">5-minute personalized ballot</p></div>
 
-    <h2 style="margin-top:1.5rem">Independent AI Audit Scores</h2>
+    <h2 style="margin-top:1.5rem" data-t="Independent AI Audit Scores">Independent AI Audit Scores</h2>
     <p>We submitted our complete methodology to four independent AI systems. Each scored our process across five dimensions: partisan bias, factual accuracy, fairness of framing, balance of pros/cons, and transparency.</p>
     ${lastRunHtml}
     ${auditCardsHtml}
@@ -1541,8 +1720,8 @@ async function handleAuditPage(env) {
     }
     </script>
 
-    <h2>How We Generate Recommendations</h2>
-    <p>When a voter uses Texas Votes, the process works as follows:</p>
+    <h2 data-t="How We Generate Recommendations">How We Generate Recommendations</h2>
+    <p data-t="When a voter uses Texas Votes, the process works as follows:">When a voter uses Texas Votes, the process works as follows:</p>
     <ol style="padding-left:1.5rem;margin-bottom:0.75rem">
       <li style="margin-bottom:0.5rem"><strong>Interview:</strong> The voter answers questions about their top issues, political spectrum, policy stances, and what qualities they value in candidates. All questions are neutrally framed and answer options are shuffled.</li>
       <li style="margin-bottom:0.5rem"><strong>District lookup:</strong> Their address is sent to the U.S. Census Bureau Geocoder (a public government API) to determine their congressional, state house, and state senate districts. This filters the ballot to only races they can vote in.</li>
@@ -1550,8 +1729,8 @@ async function handleAuditPage(env) {
       <li style="margin-bottom:0.5rem"><strong>Local storage:</strong> The generated guide is stored only on the voter's device. Nothing is saved on our servers.</li>
     </ol>
 
-    <h2>Our Prompts</h2>
-    <p>These are the exact AI prompts used in production. Nothing is paraphrased or summarized.</p>
+    <h2 data-t="Our Prompts">Our Prompts</h2>
+    <p data-t="These are the exact AI prompts used in production. Nothing is paraphrased or summarized.">These are the exact AI prompts used in production. Nothing is paraphrased or summarized.</p>
 
     <details>
       <summary>Guide Generation System Prompt</summary>
@@ -1633,7 +1812,7 @@ SOURCE PRIORITY: When evaluating web_search results, prefer sources in this orde
 CONFLICT RESOLUTION: If sources disagree, trust official filings over campaign claims, and campaign claims over news reporting.</div>
     </details>
 
-    <h2>Data Sources</h2>
+    <h2 data-t="Data Sources">Data Sources</h2>
     <ul>
       <li><strong>Candidate filings:</strong> Texas Secretary of State official filing lists</li>
       <li><strong>Candidate profiles:</strong> Researched via Claude with web_search tool, cross-referenced against Ballotpedia, campaign websites, and local news. Each candidate gets the same fields: summary, background, key positions, endorsements, strengths (pros), and concerns (cons).</li>
@@ -1643,7 +1822,7 @@ CONFLICT RESOLUTION: If sources disagree, trust official filings over campaign c
     </ul>
     <p class="note">All AI research prompts include a 7-tier source priority hierarchy: TX SOS filings &gt; county offices &gt; campaign sites &gt; nonpartisan references &gt; established news &gt; wire services &gt; avoid blogs/social. When sources conflict, official filings take precedence. See <a href="/api/audit/export">the methodology export</a> for full details.</p>
 
-    <h2>Bias Safeguards</h2>
+    <h2 data-t="Bias Safeguards">Bias Safeguards</h2>
     <p>Every layer of the system includes explicit nonpartisan constraints:</p>
     <ul>
       <li><strong>Prompt-level:</strong> Every AI prompt includes a NONPARTISAN instruction block prohibiting partisan framing, loaded terms, and party-line assumptions</li>
@@ -1654,7 +1833,7 @@ CONFLICT RESOLUTION: If sources disagree, trust official filings over campaign c
       <li><strong>Output constraints:</strong> The AI must return structured JSON with specific fields. It cannot recommend candidates not in the ballot data. It cannot invent candidate information. Reasoning must cite the voter's specific stated values.</li>
     </ul>
 
-    <h2>Sample Data Structure</h2>
+    <h2 data-t="Sample Data Structure">Sample Data Structure</h2>
     <p>Every candidate in our database has this structure (equal depth for all candidates):</p>
     <div class="prompt-box">{
   "name": "Candidate Name",
@@ -1672,10 +1851,10 @@ CONFLICT RESOLUTION: If sources disagree, trust official filings over campaign c
   "sourcesUpdatedAt": "2026-02-22T14:30:00Z"
 }</div>
 
-    <h2>Why Four Different AIs?</h2>
+    <h2 data-t="Why Four Different AIs?">Why Four Different AIs?</h2>
     <p>Texas Votes uses Claude (by Anthropic) to generate recommendations. By asking four AI systems — ChatGPT, Gemini, Grok, and Claude itself — to review our methodology, we get a range of independent assessments. Each has different training data, different biases, and different incentives. Including Claude as an auditor of its own system adds a self-review dimension — it knows its own capabilities and limitations better than anyone, but may also have blind spots about its own biases. If all four find our process fair, that's meaningful. If any identifies bias, we'll address it and publish the fix.</p>
 
-    <h2>Changes Made from Audit Findings</h2>
+    <h2 data-t="Changes Made from Audit Findings">Changes Made from Audit Findings</h2>
     <ul>
       <li><strong>County coverage labeling:</strong> Both ChatGPT and Gemini flagged that silently omitting local races when county data is unavailable could mislead voters about their ballot's completeness. We now display an in-product info banner — "Local races for [County] County are not yet available" — on both the ballot page and the printable cheat sheet whenever a voter's county lacks local race data. This ensures voters always understand the scope of their guide.</li>
       <li><strong>Source ranking policy:</strong> ChatGPT's audit recommended documenting an explicit source priority hierarchy for AI web research. We now embed a 7-tier SOURCE PRIORITY block in every research prompt — ranking Texas SOS filings highest and blogs/social media lowest — along with a CONFLICT RESOLUTION rule: official filings override campaign claims, which override news reporting. Full details are in the <a href="/api/audit/export">methodology export</a> under <code>sourceRankingPolicy</code>.</li>
@@ -1685,21 +1864,37 @@ CONFLICT RESOLUTION: If sources disagree, trust official filings over campaign c
       <li><strong>Per-candidate source validation:</strong> Each candidate profile now includes individually attributed source citations with URLs, titles, and access dates — not just per-race sources. The county seeder validates sources during data population.</li>
     </ul>
 
-    <h2>Ongoing Commitment</h2>
-    <p>This audit is not a one-time event. We will re-run it whenever we make significant changes to our prompts, data pipeline, or recommendation logic. The methodology export at <a href="/api/audit/export">/api/audit/export</a> always reflects the current production code.</p>
+    <h2 data-t="Ongoing Commitment">Ongoing Commitment</h2>
+    <p data-t="This audit is not a one-time event.">This audit is not a one-time event. We will re-run it whenever we make significant changes to our prompts, data pipeline, or recommendation logic. The methodology export at <a href="/api/audit/export">/api/audit/export</a> always reflects the current production code.</p>
 
-    <h2>Related</h2>
+    <h2 data-t="Related">Related</h2>
     <ul class="related-links">
-      <li><a href="/how-it-works">How It Works</a> — Plain-language explanation for non-technical users</li>
-      <li><a href="/data-quality">Data Quality Dashboard</a> — Live metrics on ballot coverage and candidate completeness</li>
-      <li><a href="/open-source">Open Source</a> — Source code, architecture, and independent code reviews</li>
-      <li><a href="/nonpartisan">Nonpartisan by Design</a> — How we ensure fairness for all voters</li>
-      <li><a href="/api/audit/export">Methodology Export</a> — Full transparency of all AI prompts and data pipelines</li>
-      <li><a href="/candidates">All Candidates</a> — Browse every candidate with detailed profiles</li>
+      <li><a href="/how-it-works" data-t="How It Works">How It Works</a> — <span data-t="Plain-language explanation for non-technical users">Plain-language explanation for non-technical users</span></li>
+      <li><a href="/data-quality" data-t="Data Quality Dashboard">Data Quality Dashboard</a> — <span data-t="Live metrics on ballot coverage and candidate completeness">Live metrics on ballot coverage and candidate completeness</span></li>
+      <li><a href="/open-source" data-t="Open Source">Open Source</a> — <span data-t="Source code, architecture, and independent code reviews">Source code, architecture, and independent code reviews</span></li>
+      <li><a href="/nonpartisan" data-t="Nonpartisan by Design">Nonpartisan by Design</a> — <span data-t="How we ensure fairness for all voters">How we ensure fairness for all voters</span></li>
+      <li><a href="/api/audit/export" data-t="Methodology Export">Methodology Export</a> — <span data-t="Full transparency of all AI prompts and data pipelines">Full transparency of all AI prompts and data pipelines</span></li>
+      <li><a href="/candidates" data-t="All Candidates">All Candidates</a> — <span data-t="Browse every candidate with detailed profiles">Browse every candidate with detailed profiles</span></li>
     </ul>
 
-    <div class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> Built in Texas &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
+    <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
   </div>
+  ${pageI18n({
+    'AI Audit': 'Auditor\u00EDa de IA',
+    'Texas Votes uses AI to generate personalized voting guides. To prove our process is fair and nonpartisan, we publish our complete methodology.': 'Texas Votes usa IA para generar gu\u00EDas de votaci\u00F3n personalizadas. Para demostrar que nuestro proceso es justo y apartidista, publicamos nuestra metodolog\u00EDa completa.',
+    'Independent AI Audit Scores': 'Puntuaciones Independientes de Auditor\u00EDa de IA',
+    'How We Generate Recommendations': 'C\u00F3mo Generamos Recomendaciones',
+    'When a voter uses Texas Votes, the process works as follows:': 'Cuando un votante usa Texas Votes, el proceso funciona as\u00ED:',
+    'Our Prompts': 'Nuestros Prompts',
+    'These are the exact AI prompts used in production. Nothing is paraphrased or summarized.': 'Estos son los prompts exactos de IA usados en producci\u00F3n. Nada est\u00E1 parafraseado ni resumido.',
+    'Data Sources': 'Fuentes de Datos',
+    'Bias Safeguards': 'Salvaguardas contra Sesgo',
+    'Sample Data Structure': 'Estructura de Datos de Ejemplo',
+    'Why Four Different AIs?': '\u00BFPor Qu\u00E9 Cuatro IAs Diferentes?',
+    'Changes Made from Audit Findings': 'Cambios Realizados por Hallazgos de Auditor\u00EDa',
+    'Ongoing Commitment': 'Compromiso Continuo',
+    'This audit is not a one-time event.': 'Esta auditor\u00EDa no es un evento \u00FAnico.',
+  })}
 </body>
 </html>`;
 
@@ -2262,56 +2457,82 @@ function handleSupport() {
 <body>
   <div class="container">
     <a href="/" class="back-top">&larr; Texas Votes</a>
-    <h1>Support</h1>
-    <p class="subtitle">We're here to help.</p>
+    <h1 data-t="Support">Support</h1>
+    <p class="subtitle" data-t="We're here to help.">We're here to help.</p>
 
-    <div class="cta-banner"><a class="cta-btn" href="/app?start=1">Build My Voting Guide &rarr;</a><p class="cta-sub">5-minute personalized ballot</p></div>
+    <div class="cta-banner"><a class="cta-btn" href="/app?start=1" data-t="Build My Voting Guide">Build My Voting Guide</a><p class="cta-sub" data-t="5-minute personalized ballot">5-minute personalized ballot</p></div>
 
-    <a class="email-btn" href="mailto:howdy@txvotes.app">Email Us</a>
+    <a class="email-btn" href="mailto:howdy@txvotes.app" data-t="Email Us">Email Us</a>
 
     <div class="faq">
-      <h2>Frequently Asked Questions</h2>
+      <h2 data-t="Frequently Asked Questions">Frequently Asked Questions</h2>
 
-      <h2>How do I reset my voting guide?</h2>
-      <p>Go to the Profile tab and tap "Start Over" at the bottom. This erases your profile and recommendations so you can retake the interview.</p>
+      <h2 data-t="How do I reset my voting guide?">How do I reset my voting guide?</h2>
+      <p data-t="Go to the Profile tab and tap Start Over at the bottom. This erases your profile and recommendations so you can retake the interview.">Go to the Profile tab and tap "Start Over" at the bottom. This erases your profile and recommendations so you can retake the interview.</p>
 
-      <h2>Are the recommendations accurate?</h2>
-      <p>Recommendations are generated by AI based on real candidate data and your stated preferences. They're a starting point — we always encourage doing your own research. The app includes a disclaimer on every screen.</p>
+      <h2 data-t="Are the recommendations accurate?">Are the recommendations accurate?</h2>
+      <p data-t="Recommendations are generated by AI based on real candidate data and your stated preferences. They're a starting point — we always encourage doing your own research. The app includes a disclaimer on every screen.">Recommendations are generated by AI based on real candidate data and your stated preferences. They're a starting point — we always encourage doing your own research. The app includes a disclaimer on every screen.</p>
 
-      <h2>Where is my data stored?</h2>
-      <p>Everything stays on your device (and in your iCloud account if you have iCloud enabled). We don't store your data on our servers. See our <a href="/privacy">privacy policy</a> for details.</p>
+      <h2 data-t="Where is my data stored?">Where is my data stored?</h2>
+      <p data-t="Everything stays on your device. We don't store your data on our servers.">Everything stays on your device (and in your iCloud account if you have iCloud enabled). We don't store your data on our servers. See our <a href="/privacy">privacy policy</a> for details.</p>
 
-      <h2>Which elections are covered?</h2>
-      <p>Texas Votes covers the March 3, 2026 Texas Primary Election for all Texas voters, including both Republican and Democratic primaries.</p>
+      <h2 data-t="Which elections are covered?">Which elections are covered?</h2>
+      <p data-t="Texas Votes covers the March 3, 2026 Texas Primary Election for all Texas voters, including both Republican and Democratic primaries.">Texas Votes covers the March 3, 2026 Texas Primary Election for all Texas voters, including both Republican and Democratic primaries.</p>
 
-      <h2>I found wrong information about a candidate.</h2>
-      <p>Use the "Flag this info" button on any candidate card in the app to report inaccuracies or bias — your report goes directly to <a href="mailto:flagged@txvotes.app">flagged@txvotes.app</a> for review. You can also <a href="mailto:howdy@txvotes.app">email us</a> directly with details and we'll correct it as quickly as possible.</p>
+      <h2 data-t="I found wrong information about a candidate.">I found wrong information about a candidate.</h2>
+      <p data-t="Use the Flag this info button on any candidate card in the app to report inaccuracies or bias. You can also email us directly and we'll correct it as quickly as possible.">Use the "Flag this info" button on any candidate card in the app to report inaccuracies or bias — your report goes directly to <a href="mailto:flagged@txvotes.app">flagged@txvotes.app</a> for review. You can also <a href="mailto:howdy@txvotes.app">email us</a> directly with details and we'll correct it as quickly as possible.</p>
 
-      <h2>Where does the candidate data come from?</h2>
-      <p>Candidate data is researched using AI with web search, cross-referenced against official filings from the Texas Secretary of State, county clerks, and Ballotpedia. Every candidate profile includes source citations linking to the original articles, filings, and campaign materials so you can verify claims independently.</p>
+      <h2 data-t="Where does the candidate data come from?">Where does the candidate data come from?</h2>
+      <p data-t="Candidate data is researched using AI with web search, cross-referenced against official filings from the Texas Secretary of State, county clerks, and Ballotpedia.">Candidate data is researched using AI with web search, cross-referenced against official filings from the Texas Secretary of State, county clerks, and Ballotpedia. Every candidate profile includes source citations linking to the original articles, filings, and campaign materials so you can verify claims independently.</p>
 
-      <h2>Can I preview what the ballot looks like before doing the interview?</h2>
-      <p>Yes! Visit our <a href="/sample">sample ballot page</a> to see fictional candidates and recommendations that demonstrate exactly what your personalized guide will look like — including match scores, candidate details, and proposition analysis.</p>
+      <h2 data-t="Can I preview what the ballot looks like before doing the interview?">Can I preview what the ballot looks like before doing the interview?</h2>
+      <p data-t="Yes! Visit our sample ballot page to see fictional candidates and recommendations that demonstrate exactly what your personalized guide will look like.">Yes! Visit our <a href="/sample">sample ballot page</a> to see fictional candidates and recommendations that demonstrate exactly what your personalized guide will look like — including match scores, candidate details, and proposition analysis.</p>
 
-      <h2>How do you ensure candidates are treated equally?</h2>
-      <p>We run automated balance checks that score the symmetry of pros/cons across all candidates in every race. Imbalances are flagged at critical, warning, and info severity levels and displayed on our <a href="/data-quality">Data Quality Dashboard</a>. You can also view the raw balance report at <a href="/api/balance-check">/api/balance-check</a>.</p>
+      <h2 data-t="How do you ensure candidates are treated equally?">How do you ensure candidates are treated equally?</h2>
+      <p data-t="We run automated balance checks that score the symmetry of pros/cons across all candidates in every race.">We run automated balance checks that score the symmetry of pros/cons across all candidates in every race. Imbalances are flagged at critical, warning, and info severity levels and displayed on our <a href="/data-quality">Data Quality Dashboard</a>. You can also view the raw balance report at <a href="/api/balance-check">/api/balance-check</a>.</p>
 
-      <h2>What are the strengths and concerns on my ballot?</h2>
-      <p>Each candidate's strengths (green boxes) and concerns (orange boxes) are displayed directly on your ballot recommendation cards. These give you a quick, balanced view of each candidate's key advantages and potential drawbacks — all generated with the same analytical rigor for every candidate in a race.</p>
+      <h2 data-t="What are the strengths and concerns on my ballot?">What are the strengths and concerns on my ballot?</h2>
+      <p data-t="Each candidate's strengths and concerns are displayed directly on your ballot recommendation cards.">Each candidate's strengths (green boxes) and concerns (orange boxes) are displayed directly on your ballot recommendation cards. These give you a quick, balanced view of each candidate's key advantages and potential drawbacks — all generated with the same analytical rigor for every candidate in a race.</p>
 
-      <h2>What issues does the interview cover?</h2>
-      <p>The interview lets you select from 21 issues: Economy &amp; Cost of Living, Housing, Public Safety, Education, Healthcare, Environment &amp; Climate, Grid &amp; Infrastructure, Tech &amp; Innovation, Transportation, Immigration, Taxes, Civil Rights, Gun Policy, Abortion &amp; Reproductive Rights, Water &amp; Land, Agriculture &amp; Rural, Faith &amp; Religious Liberty, Criminal Justice, Energy &amp; Oil/Gas, LGBTQ+ Rights, and Voting &amp; Elections. You pick your top 3-5, and the interview dives deeper into each one.</p>
+      <h2 data-t="What issues does the interview cover?">What issues does the interview cover?</h2>
+      <p data-t="The interview lets you select from 21 issues. You pick your top 3-5, and the interview dives deeper into each one.">The interview lets you select from 21 issues: Economy &amp; Cost of Living, Housing, Public Safety, Education, Healthcare, Environment &amp; Climate, Grid &amp; Infrastructure, Tech &amp; Innovation, Transportation, Immigration, Taxes, Civil Rights, Gun Policy, Abortion &amp; Reproductive Rights, Water &amp; Land, Agriculture &amp; Rural, Faith &amp; Religious Liberty, Criminal Justice, Energy &amp; Oil/Gas, LGBTQ+ Rights, and Voting &amp; Elections. You pick your top 3-5, and the interview dives deeper into each one.</p>
     </div>
 
-    <h2>Related</h2>
+    <h2 data-t="Related">Related</h2>
     <ul class="related-links">
-      <li><a href="/how-it-works">How It Works</a> — Plain-language explanation of the app and AI</li>
-      <li><a href="/nonpartisan">Nonpartisan by Design</a> — How we keep the app fair for all voters</li>
-      <li><a href="/candidates">All Candidates</a> — Browse every candidate with detailed profiles</li>
+      <li><a href="/how-it-works" data-t="How It Works">How It Works</a> — <span data-t="Plain-language explanation of the app and AI">Plain-language explanation of the app and AI</span></li>
+      <li><a href="/nonpartisan" data-t="Nonpartisan by Design">Nonpartisan by Design</a> — <span data-t="How we keep the app fair for all voters">How we keep the app fair for all voters</span></li>
+      <li><a href="/candidates" data-t="All Candidates">All Candidates</a> — <span data-t="Browse every candidate with detailed profiles">Browse every candidate with detailed profiles</span></li>
     </ul>
 
-    <div class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> Built in Texas &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
+    <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
   </div>
+  ${pageI18n({
+    'Support': 'Soporte',
+    'We\\'re here to help.': 'Estamos aqu\u00ED para ayudarte.',
+    'Email Us': 'Env\u00EDanos un Correo',
+    'Frequently Asked Questions': 'Preguntas Frecuentes',
+    'How do I reset my voting guide?': '\u00BFC\u00F3mo reinicio mi gu\u00EDa de votaci\u00F3n?',
+    'Go to the Profile tab and tap Start Over at the bottom. This erases your profile and recommendations so you can retake the interview.': 'Ve a la pesta\u00F1a de Perfil y toca "Empezar de Nuevo" en la parte inferior. Esto borra tu perfil y recomendaciones para que puedas retomar la entrevista.',
+    'Are the recommendations accurate?': '\u00BFSon precisas las recomendaciones?',
+    'Recommendations are generated by AI based on real candidate data and your stated preferences. They\\'re a starting point \\u2014 we always encourage doing your own research. The app includes a disclaimer on every screen.': 'Las recomendaciones son generadas por IA basadas en datos reales de candidatos y tus preferencias. Son un punto de partida \\u2014 siempre recomendamos hacer tu propia investigaci\u00F3n. La app incluye un aviso en cada pantalla.',
+    'Where is my data stored?': '\u00BFD\u00F3nde se almacenan mis datos?',
+    'Everything stays on your device. We don\\'t store your data on our servers.': 'Todo permanece en tu dispositivo. No almacenamos tus datos en nuestros servidores.',
+    'Which elections are covered?': '\u00BFQu\u00E9 elecciones est\u00E1n cubiertas?',
+    'Texas Votes covers the March 3, 2026 Texas Primary Election for all Texas voters, including both Republican and Democratic primaries.': 'Texas Votes cubre la Elecci\u00F3n Primaria de Texas del 3 de marzo de 2026 para todos los votantes de Texas, incluyendo las primarias Republicana y Dem\u00F3crata.',
+    'I found wrong information about a candidate.': 'Encontr\u00E9 informaci\u00F3n incorrecta sobre un candidato.',
+    'Use the Flag this info button on any candidate card in the app to report inaccuracies or bias. You can also email us directly and we\\'ll correct it as quickly as possible.': 'Usa el bot\u00F3n "Reportar esta info" en cualquier tarjeta de candidato en la app para reportar inexactitudes o sesgo. Tambi\u00E9n puedes enviarnos un correo directamente y lo corregiremos lo m\u00E1s r\u00E1pido posible.',
+    'Where does the candidate data come from?': '\u00BFDe d\u00F3nde vienen los datos de los candidatos?',
+    'Candidate data is researched using AI with web search, cross-referenced against official filings from the Texas Secretary of State, county clerks, and Ballotpedia.': 'Los datos de candidatos se investigan usando IA con b\u00FAsqueda web, verificados contra archivos oficiales del Secretario de Estado de Texas, secretarios del condado y Ballotpedia.',
+    'Can I preview what the ballot looks like before doing the interview?': '\u00BFPuedo ver c\u00F3mo se ve la boleta antes de hacer la entrevista?',
+    'Yes! Visit our sample ballot page to see fictional candidates and recommendations that demonstrate exactly what your personalized guide will look like.': '\u00A1S\u00ED! Visita nuestra p\u00E1gina de boleta de ejemplo para ver candidatos ficticios y recomendaciones que demuestran exactamente c\u00F3mo se ver\u00E1 tu gu\u00EDa personalizada.',
+    'How do you ensure candidates are treated equally?': '\u00BFC\u00F3mo aseguran que los candidatos sean tratados por igual?',
+    'We run automated balance checks that score the symmetry of pros/cons across all candidates in every race.': 'Ejecutamos verificaciones autom\u00E1ticas de equilibrio que eval\u00FAan la simetr\u00EDa de pros y contras entre todos los candidatos en cada carrera.',
+    'What are the strengths and concerns on my ballot?': '\u00BFQu\u00E9 son las fortalezas y preocupaciones en mi boleta?',
+    'Each candidate\\'s strengths and concerns are displayed directly on your ballot recommendation cards.': 'Las fortalezas y preocupaciones de cada candidato se muestran directamente en tus tarjetas de recomendaci\u00F3n de boleta.',
+    'What issues does the interview cover?': '\u00BFQu\u00E9 temas cubre la entrevista?',
+    'The interview lets you select from 21 issues. You pick your top 3-5, and the interview dives deeper into each one.': 'La entrevista te permite seleccionar entre 21 temas. Eliges tus 3-5 principales y la entrevista profundiza en cada uno.',
+  })}
 </body>
 </html>`;
 
@@ -2332,72 +2553,106 @@ function handlePrivacyPolicy() {
 <body>
   <div class="container">
     <a href="/" class="back-top">&larr; Texas Votes</a>
-    <h1>Privacy Policy</h1>
-    <p class="updated">Last updated: February 22, 2026</p>
+    <h1 data-t="Privacy Policy">Privacy Policy</h1>
+    <p class="updated" data-t="Last updated: February 22, 2026">Last updated: February 22, 2026</p>
 
-    <div class="cta-banner"><a class="cta-btn" href="/app?start=1">Build My Voting Guide &rarr;</a><p class="cta-sub">5-minute personalized ballot</p></div>
+    <div class="cta-banner"><a class="cta-btn" href="/app?start=1" data-t="Build My Voting Guide">Build My Voting Guide</a><p class="cta-sub" data-t="5-minute personalized ballot">5-minute personalized ballot</p></div>
 
-    <p>Texas Votes (<a href="https://txvotes.app">txvotes.app</a>) is a free voting guide website for Texas elections. Your privacy matters — here's exactly what happens with your data.</p>
+    <p data-t="Texas Votes is a free voting guide website for Texas elections. Your privacy matters — here's exactly what happens with your data.">Texas Votes (<a href="https://txvotes.app">txvotes.app</a>) is a free voting guide website for Texas elections. Your privacy matters — here's exactly what happens with your data.</p>
 
-    <h2>What we collect</h2>
-    <p>We collect only what you provide during the interview:</p>
+    <h2 data-t="What we collect">What we collect</h2>
+    <p data-t="We collect only what you provide during the interview:">We collect only what you provide during the interview:</p>
     <ul>
-      <li><strong>Voter preferences</strong> — your top issues, political outlook, policy views, and candidate qualities</li>
-      <li><strong>Street address</strong> — used once to look up your voting districts</li>
+      <li data-t="Voter preferences — your top issues, political outlook, policy views, and candidate qualities">Voter preferences — your top issues, political outlook, policy views, and candidate qualities</li>
+      <li data-t="Street address — used once to look up your voting districts">Street address — used once to look up your voting districts</li>
     </ul>
 
-    <h2>How we use it</h2>
+    <h2 data-t="How we use it">How we use it</h2>
     <ul>
-      <li>Your preferences are sent to our server to generate personalized ballot recommendations using AI (Claude by Anthropic)</li>
-      <li>Your address is sent to the U.S. Census Bureau Geocoder API to determine your congressional, state house, and state senate districts</li>
-      <li>After generating your guide, your profile and ballot are stored locally in your browser</li>
+      <li data-t="Your preferences are sent to our server to generate personalized ballot recommendations using AI">Your preferences are sent to our server to generate personalized ballot recommendations using AI (Claude by Anthropic)</li>
+      <li data-t="Your address is sent to the U.S. Census Bureau Geocoder API to determine your districts">Your address is sent to the U.S. Census Bureau Geocoder API to determine your congressional, state house, and state senate districts</li>
+      <li data-t="After generating your guide, your profile and ballot are stored locally in your browser">After generating your guide, your profile and ballot are stored locally in your browser</li>
     </ul>
 
-    <h2>What we don't do</h2>
+    <h2 data-t="What we don't do">What we don't do</h2>
     <ul>
-      <li>We do <strong>not</strong> store your data on our servers — the API proxy processes requests and discards them</li>
-      <li>We do <strong>not</strong> sell, share, or rent your personal information to anyone</li>
-      <li>We use <strong>Cloudflare Web Analytics</strong> for anonymous page-view counts only — no cookies, no personal data, no tracking across sites</li>
-      <li>We count anonymous usage events (like "guide generated" or "cheat sheet printed") to improve the app. These counts contain no personal information, no IP addresses, and no way to identify individual users.</li>
-      <li>We do <strong>not</strong> use tracking pixels or advertising SDKs</li>
-      <li>We do <strong>not</strong> collect device identifiers, IP addresses, or usage data</li>
+      <li data-t="We do not store your data on our servers">We do <strong>not</strong> store your data on our servers — the API proxy processes requests and discards them</li>
+      <li data-t="We do not sell, share, or rent your personal information to anyone">We do <strong>not</strong> sell, share, or rent your personal information to anyone</li>
+      <li data-t="We use Cloudflare Web Analytics for anonymous page-view counts only — no cookies, no personal data">We use <strong>Cloudflare Web Analytics</strong> for anonymous page-view counts only — no cookies, no personal data, no tracking across sites</li>
+      <li data-t="We count anonymous usage events to improve the app. These counts contain no personal information.">We count anonymous usage events (like "guide generated" or "cheat sheet printed") to improve the app. These counts contain no personal information, no IP addresses, and no way to identify individual users.</li>
+      <li data-t="We do not use tracking pixels or advertising SDKs">We do <strong>not</strong> use tracking pixels or advertising SDKs</li>
+      <li data-t="We do not collect device identifiers, IP addresses, or usage data">We do <strong>not</strong> collect device identifiers, IP addresses, or usage data</li>
     </ul>
 
-    <h2>Local storage</h2>
-    <p>Your voter profile and ballot are saved in your browser's local storage so they persist between visits. This data never leaves your device unless you generate a new guide. Clearing your browser data will remove it.</p>
+    <h2 data-t="Local storage">Local storage</h2>
+    <p data-t="Your voter profile and ballot are saved in your browser's local storage so they persist between visits. This data never leaves your device unless you generate a new guide.">Your voter profile and ballot are saved in your browser's local storage so they persist between visits. This data never leaves your device unless you generate a new guide. Clearing your browser data will remove it.</p>
 
-    <h2>Third-party services</h2>
+    <h2 data-t="Third-party services">Third-party services</h2>
     <ul>
-      <li><strong>Anthropic (Claude API)</strong> — processes your voter profile to generate recommendations. Subject to <a href="https://www.anthropic.com/privacy">Anthropic's privacy policy</a>.</li>
-      <li><strong>U.S. Census Bureau Geocoder</strong> — receives your address to return district information. A public government API.</li>
-      <li><strong>Cloudflare Workers</strong> — our API proxy runs on Cloudflare. Requests are processed in memory and not logged or stored.</li>
-      <li><strong>Cloudflare Web Analytics</strong> — collects anonymous page-view counts. No cookies, no personal data, no cross-site tracking. Subject to <a href="https://www.cloudflare.com/privacypolicy/">Cloudflare's privacy policy</a>.</li>
+      <li data-t="Anthropic (Claude API) — processes your voter profile to generate recommendations.">Anthropic (Claude API) — processes your voter profile to generate recommendations. Subject to <a href="https://www.anthropic.com/privacy">Anthropic's privacy policy</a>.</li>
+      <li data-t="U.S. Census Bureau Geocoder — receives your address to return district information.">U.S. Census Bureau Geocoder — receives your address to return district information. A public government API.</li>
+      <li data-t="Cloudflare Workers — our API proxy runs on Cloudflare. Requests are processed in memory and not stored.">Cloudflare Workers — our API proxy runs on Cloudflare. Requests are processed in memory and not logged or stored.</li>
+      <li data-t="Cloudflare Web Analytics — collects anonymous page-view counts. No cookies, no personal data.">Cloudflare Web Analytics — collects anonymous page-view counts. No cookies, no personal data, no cross-site tracking. Subject to <a href="https://www.cloudflare.com/privacypolicy/">Cloudflare's privacy policy</a>.</li>
     </ul>
 
-    <h2>Data deletion</h2>
-    <p>Click "Start Over" in the Profile tab to erase all local data at any time. Since we don't store anything on our servers, there's nothing else to delete.</p>
+    <h2 data-t="Data deletion">Data deletion</h2>
+    <p data-t="Click Start Over in the Profile tab to erase all local data at any time. Since we don't store anything on our servers, there's nothing else to delete.">Click "Start Over" in the Profile tab to erase all local data at any time. Since we don't store anything on our servers, there's nothing else to delete.</p>
 
-    <h2>Children's privacy</h2>
-    <p>This site is not directed at children under 13 and does not knowingly collect information from children.</p>
+    <h2 data-t="Children's privacy">Children's privacy</h2>
+    <p data-t="This site is not directed at children under 13 and does not knowingly collect information from children.">This site is not directed at children under 13 and does not knowingly collect information from children.</p>
 
-    <h2>Changes</h2>
-    <p>If this policy changes, we'll update the date above and publish the new version at this URL.</p>
+    <h2 data-t="Changes">Changes</h2>
+    <p data-t="If this policy changes, we'll update the date above and publish the new version at this URL.">If this policy changes, we'll update the date above and publish the new version at this URL.</p>
 
-    <h2>Contact</h2>
-    <p>Questions? Email <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <h2 data-t="Contact">Contact</h2>
+    <p data-t="Questions? Email us">Questions? Email <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
 
-    <h2>Related</h2>
+    <h2 data-t="Related">Related</h2>
     <ul class="related-links">
-      <li><a href="/how-it-works">How It Works</a> — Plain-language explanation of the app and AI</li>
-      <li><a href="/nonpartisan">Nonpartisan by Design</a> — How we keep the app fair for all voters</li>
-      <li><a href="/audit">AI Bias Audit</a> — Independent review of our AI by four different systems</li>
-      <li><a href="/data-quality">Data Quality Dashboard</a> — Live metrics on how complete our data is</li>
-      <li><a href="/open-source">Open Source</a> — Source code, architecture, and independent code reviews</li>
-      <li><a href="/candidates">All Candidates</a> — Browse every candidate with detailed profiles</li>
+      <li><a href="/how-it-works" data-t="How It Works">How It Works</a> — <span data-t="Plain-language explanation of the app and AI">Plain-language explanation of the app and AI</span></li>
+      <li><a href="/nonpartisan" data-t="Nonpartisan by Design">Nonpartisan by Design</a> — <span data-t="How we keep the app fair for all voters">How we keep the app fair for all voters</span></li>
+      <li><a href="/audit" data-t="AI Bias Audit">AI Bias Audit</a> — <span data-t="Independent review of our AI by four different systems">Independent review of our AI by four different systems</span></li>
+      <li><a href="/data-quality" data-t="Data Quality Dashboard">Data Quality Dashboard</a> — <span data-t="Live metrics on how complete our data is">Live metrics on how complete our data is</span></li>
+      <li><a href="/open-source" data-t="Open Source">Open Source</a> — <span data-t="Source code, architecture, and independent code reviews">Source code, architecture, and independent code reviews</span></li>
+      <li><a href="/candidates" data-t="All Candidates">All Candidates</a> — <span data-t="Browse every candidate with detailed profiles">Browse every candidate with detailed profiles</span></li>
     </ul>
 
-    <div class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> Built in Texas &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
+    <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
   </div>
+  ${pageI18n({
+    'Last updated: February 22, 2026': '\u00DAltima actualizaci\u00F3n: 22 de febrero de 2026',
+    'Texas Votes is a free voting guide website for Texas elections. Your privacy matters \\u2014 here\\'s exactly what happens with your data.': 'Texas Votes es un sitio web gratuito de gu\u00EDa de votaci\u00F3n para las elecciones de Texas. Tu privacidad importa \\u2014 aqu\u00ED est\u00E1 exactamente lo que pasa con tus datos.',
+    'What we collect': 'Lo que recopilamos',
+    'We collect only what you provide during the interview:': 'Solo recopilamos lo que proporcionas durante la entrevista:',
+    'Voter preferences \\u2014 your top issues, political outlook, policy views, and candidate qualities': 'Preferencias del votante \\u2014 tus temas principales, perspectiva pol\u00EDtica, opiniones sobre pol\u00EDticas y cualidades de candidatos',
+    'Street address \\u2014 used once to look up your voting districts': 'Direcci\u00F3n \\u2014 utilizada una vez para buscar tus distritos electorales',
+    'How we use it': 'C\u00F3mo lo usamos',
+    'Your preferences are sent to our server to generate personalized ballot recommendations using AI': 'Tus preferencias se env\u00EDan a nuestro servidor para generar recomendaciones personalizadas de boleta usando IA',
+    'Your address is sent to the U.S. Census Bureau Geocoder API to determine your districts': 'Tu direcci\u00F3n se env\u00EDa a la API del Geocodificador del Censo de EE.UU. para determinar tus distritos',
+    'After generating your guide, your profile and ballot are stored locally in your browser': 'Despu\u00E9s de generar tu gu\u00EDa, tu perfil y boleta se almacenan localmente en tu navegador',
+    'What we don\\'t do': 'Lo que NO hacemos',
+    'We do not store your data on our servers': 'NO almacenamos tus datos en nuestros servidores',
+    'We do not sell, share, or rent your personal information to anyone': 'NO vendemos, compartimos ni alquilamos tu informaci\u00F3n personal a nadie',
+    'We use Cloudflare Web Analytics for anonymous page-view counts only \\u2014 no cookies, no personal data': 'Usamos Cloudflare Web Analytics solo para conteos an\u00F3nimos de visitas \\u2014 sin cookies, sin datos personales',
+    'We count anonymous usage events to improve the app. These counts contain no personal information.': 'Contamos eventos de uso an\u00F3nimos para mejorar la app. Estos conteos no contienen informaci\u00F3n personal.',
+    'We do not use tracking pixels or advertising SDKs': 'NO usamos p\u00EDxeles de seguimiento ni SDKs publicitarios',
+    'We do not collect device identifiers, IP addresses, or usage data': 'NO recopilamos identificadores de dispositivo, direcciones IP ni datos de uso',
+    'Local storage': 'Almacenamiento local',
+    'Your voter profile and ballot are saved in your browser\\'s local storage so they persist between visits. This data never leaves your device unless you generate a new guide.': 'Tu perfil de votante y boleta se guardan en el almacenamiento local de tu navegador para que persistan entre visitas. Estos datos nunca salen de tu dispositivo a menos que generes una nueva gu\u00EDa.',
+    'Third-party services': 'Servicios de terceros',
+    'Anthropic (Claude API) \\u2014 processes your voter profile to generate recommendations.': 'Anthropic (Claude API) \\u2014 procesa tu perfil de votante para generar recomendaciones.',
+    'U.S. Census Bureau Geocoder \\u2014 receives your address to return district information.': 'Geocodificador del Censo de EE.UU. \\u2014 recibe tu direcci\u00F3n para devolver informaci\u00F3n de distritos.',
+    'Cloudflare Workers \\u2014 our API proxy runs on Cloudflare. Requests are processed in memory and not stored.': 'Cloudflare Workers \\u2014 nuestro proxy API se ejecuta en Cloudflare. Las solicitudes se procesan en memoria y no se almacenan.',
+    'Cloudflare Web Analytics \\u2014 collects anonymous page-view counts. No cookies, no personal data.': 'Cloudflare Web Analytics \\u2014 recopila conteos an\u00F3nimos de visitas. Sin cookies, sin datos personales.',
+    'Data deletion': 'Eliminaci\u00F3n de datos',
+    'Click Start Over in the Profile tab to erase all local data at any time. Since we don\\'t store anything on our servers, there\\'s nothing else to delete.': 'Haz clic en "Empezar de Nuevo" en la pesta\u00F1a de Perfil para borrar todos los datos locales en cualquier momento. Como no almacenamos nada en nuestros servidores, no hay nada m\u00E1s que eliminar.',
+    'Children\\'s privacy': 'Privacidad de menores',
+    'This site is not directed at children under 13 and does not knowingly collect information from children.': 'Este sitio no est\u00E1 dirigido a menores de 13 a\u00F1os y no recopila intencionalmente informaci\u00F3n de menores.',
+    'Changes': 'Cambios',
+    'If this policy changes, we\\'ll update the date above and publish the new version at this URL.': 'Si esta pol\u00EDtica cambia, actualizaremos la fecha arriba y publicaremos la nueva versi\u00F3n en esta URL.',
+    'Contact': 'Contacto',
+    'Questions? Email us': '\u00BFPreguntas? Env\u00EDanos un correo',
+  })}
 </body>
 </html>`;
 
@@ -2429,23 +2684,23 @@ function handleOpenSource() {
 <body>
   <div class="container">
     <a href="/" class="back-top">&larr; Texas Votes</a>
-    <h1>Texas Votes is Open Source</h1>
-    <p class="subtitle">This app is built transparently. Every line of code, every AI prompt, every design decision is public. We believe voting tools should be accountable to the voters who use them.</p>
+    <h1 data-t="Texas Votes is Open Source">Texas Votes is Open Source</h1>
+    <p class="subtitle" data-t="This app is built transparently. Every line of code, every AI prompt, every design decision is public.">This app is built transparently. Every line of code, every AI prompt, every design decision is public. We believe voting tools should be accountable to the voters who use them.</p>
 
-    <div class="cta-banner"><a class="cta-btn" href="/app?start=1">Build My Voting Guide &rarr;</a><p class="cta-sub">5-minute personalized ballot</p></div>
+    <div class="cta-banner"><a class="cta-btn" href="/app?start=1" data-t="Build My Voting Guide">Build My Voting Guide</a><p class="cta-sub" data-t="5-minute personalized ballot">5-minute personalized ballot</p></div>
 
-    <h2>Why Open Source?</h2>
+    <h2 data-t="Why Open Source?">Why Open Source?</h2>
     <ul>
-      <li><strong>Trust through transparency</strong> — voters can verify there's no hidden bias in the code, the AI prompts, or the data pipeline. You don't have to take our word for it.</li>
-      <li><strong>Community contribution</strong> — anyone can suggest improvements, report issues, or help improve candidate data accuracy.</li>
-      <li><strong>Replicability</strong> — other states and cities can fork this project and adapt it for their own elections. Democracy works better when good tools are shared.</li>
+      <li data-t="Trust through transparency — voters can verify there's no hidden bias.">Trust through transparency — voters can verify there's no hidden bias in the code, the AI prompts, or the data pipeline. You don't have to take our word for it.</li>
+      <li data-t="Community contribution — anyone can suggest improvements or report issues.">Community contribution — anyone can suggest improvements, report issues, or help improve candidate data accuracy.</li>
+      <li data-t="Replicability — other states and cities can fork this project for their own elections.">Replicability — other states and cities can fork this project and adapt it for their own elections. Democracy works better when good tools are shared.</li>
     </ul>
 
-    <h2>The Code</h2>
+    <h2 data-t="The Code">The Code</h2>
     <!-- TODO: Update URL when GitHub repo is created (see todolist) -->
-    <p>The full source code is available on GitHub: <a href="https://github.com/txvotes/txvotes">github.com/txvotes/txvotes</a> <span style="font-size:0.85rem;color:var(--text2)">(repo pending — coming soon)</span></p>
+    <p data-t="The full source code is available on GitHub.">The full source code is available on GitHub: <a href="https://github.com/txvotes/txvotes">github.com/txvotes/txvotes</a> <span style="font-size:0.85rem;color:var(--text2)">(repo pending — coming soon)</span></p>
 
-    <p>Texas Votes is a single-file progressive web app served directly from a Cloudflare Worker. There's no build step, no framework, no bundler. The entire app — HTML, CSS, and JavaScript — is generated server-side and delivered as one response.</p>
+    <p data-t="Texas Votes is a single-file progressive web app served directly from a Cloudflare Worker.">Texas Votes is a single-file progressive web app served directly from a Cloudflare Worker. There's no build step, no framework, no bundler. The entire app — HTML, CSS, and JavaScript — is generated server-side and delivered as one response.</p>
 
     <ul class="tech-list">
       <li><strong>JavaScript</strong> — vanilla JS, no frameworks</li>
@@ -2456,60 +2711,86 @@ function handleOpenSource() {
       <li><strong>PWA</strong> — works offline, installable</li>
     </ul>
 
-    <h2>Independent AI Code Reviews</h2>
-    <p>We submitted our full codebase — including all AI prompts, the data pipeline, and our methodology — to four independent AI systems for review. Each was asked to evaluate the code for partisan bias, security issues, and overall code quality.</p>
+    <h2 data-t="Independent AI Code Reviews">Independent AI Code Reviews</h2>
+    <p data-t="We submitted our full codebase to four independent AI systems for review.">We submitted our full codebase — including all AI prompts, the data pipeline, and our methodology — to four independent AI systems for review. Each was asked to evaluate the code for partisan bias, security issues, and overall code quality.</p>
 
     <div class="review-cards">
       <div class="review-card">
-        <h3>ChatGPT Code Review</h3>
+        <h3 data-t="ChatGPT Code Review">ChatGPT Code Review</h3>
         <p class="quote">"Well-intentioned methodology with strong transparency practices and balanced prompt design." — 7.5/10</p>
-        <a href="/audit">Read the full review &rarr;</a>
+        <a href="/audit" data-t="Read the full review">Read the full review &rarr;</a>
       </div>
       <div class="review-card">
-        <h3>Gemini Code Review</h3>
+        <h3 data-t="Gemini Code Review">Gemini Code Review</h3>
         <p class="quote">"A strong model for nonpartisan AI voting tools. Technically rigorous with exceptional transparency." — 8.0/10</p>
-        <a href="/audit">Read the full review &rarr;</a>
+        <a href="/audit" data-t="Read the full review">Read the full review &rarr;</a>
       </div>
       <div class="review-card">
-        <h3>Grok Code Review</h3>
+        <h3 data-t="Grok Code Review">Grok Code Review</h3>
         <p class="quote">"Solid nonpartisan framework with good safeguards. Source hierarchy and daily verification add credibility." — 7.8/10</p>
-        <a href="/audit">Read the full review &rarr;</a>
+        <a href="/audit" data-t="Read the full review">Read the full review &rarr;</a>
       </div>
       <div class="review-card">
-        <h3>Claude Code Review</h3>
+        <h3 data-t="Claude Code Review">Claude Code Review</h3>
         <p class="quote">"Self-review identifies genuine blind spots. Strong prompt-level guardrails with room for runtime bias detection." — 7.6/10</p>
-        <a href="/audit">Read the full review &rarr;</a>
+        <a href="/audit" data-t="Read the full review">Read the full review &rarr;</a>
       </div>
     </div>
-    <p style="font-size:0.9rem;color:var(--text2)">These reviews complement our <a href="/audit">AI audit page</a>, which documents the full methodology export and bias assessment.</p>
 
-    <h2>Automated Testing</h2>
-    <p>648 automated tests across 11 test files covering interview flow, guide generation, routing, data validation, balance checks, bias testing, and audit automation. Tests run on every change to catch regressions before they reach voters.</p>
+    <h2 data-t="Automated Testing">Automated Testing</h2>
+    <p data-t="648 automated tests covering interview flow, guide generation, routing, data validation, and more.">648 automated tests across 11 test files covering interview flow, guide generation, routing, data validation, balance checks, bias testing, and audit automation. Tests run on every change to catch regressions before they reach voters.</p>
 
-    <h2>How to Contribute</h2>
+    <h2 data-t="How to Contribute">How to Contribute</h2>
     <ul>
-      <li><strong>Report issues</strong> — found a bug or incorrect candidate data? <a href="https://github.com/txvotes/txvotes/issues">Open an issue on GitHub</a> or <a href="mailto:howdy@txvotes.app">email us</a>.</li>
-      <li><strong>Submit pull requests</strong> — code improvements, accessibility fixes, and new features are welcome.</li>
-      <li><strong>Help expand to other states</strong> — the architecture is designed to be forked. If you want to build a voting guide for your state, we'll help you get started.</li>
-      <li><strong>Spread the word</strong> — share <a href="https://txvotes.app">txvotes.app</a> with fellow Texas voters.</li>
+      <li data-t="Report issues — found a bug or incorrect candidate data?">Report issues — found a bug or incorrect candidate data? <a href="https://github.com/txvotes/txvotes/issues">Open an issue on GitHub</a> or <a href="mailto:howdy@txvotes.app">email us</a>.</li>
+      <li data-t="Submit pull requests — code improvements and new features are welcome.">Submit pull requests — code improvements, accessibility fixes, and new features are welcome.</li>
+      <li data-t="Help expand to other states — the architecture is designed to be forked.">Help expand to other states — the architecture is designed to be forked. If you want to build a voting guide for your state, we'll help you get started.</li>
+      <li data-t="Spread the word — share txvotes.app with fellow Texas voters.">Spread the word — share <a href="https://txvotes.app">txvotes.app</a> with fellow Texas voters.</li>
     </ul>
-    <p>Contact us anytime: <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
+    <p data-t="Contact us anytime">Contact us anytime: <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></p>
 
-    <h2>License</h2>
-    <p>Texas Votes is released under the <strong>MIT License</strong>. This means you're free to use, modify, and distribute the code for any purpose — including building your own voting guide for another state or city. The only requirement is that you include the original license notice.</p>
-    <p style="font-size:0.9rem;color:var(--text2)">We chose MIT because civic tech should have the fewest possible barriers to reuse. If this code helps more people vote informed, it's doing its job.</p>
+    <h2 data-t="License">License</h2>
+    <p data-t="Texas Votes is released under the MIT License.">Texas Votes is released under the <strong>MIT License</strong>. This means you're free to use, modify, and distribute the code for any purpose — including building your own voting guide for another state or city. The only requirement is that you include the original license notice.</p>
 
-    <h2>Related</h2>
+    <h2 data-t="Related">Related</h2>
     <ul class="related-links">
-      <li><a href="/how-it-works">How It Works</a> — Plain-language explanation for non-technical users</li>
-      <li><a href="/audit">AI Bias Audit</a> — Independent review by four AI systems</li>
-      <li><a href="/data-quality">Data Quality Dashboard</a> — Live metrics on ballot coverage and candidate completeness</li>
-      <li><a href="/nonpartisan">Nonpartisan by Design</a> — How we ensure fairness for all voters</li>
-      <li><a href="/candidates">All Candidates</a> — Browse every candidate with detailed profiles</li>
+      <li><a href="/how-it-works" data-t="How It Works">How It Works</a> — <span data-t="Plain-language explanation for non-technical users">Plain-language explanation for non-technical users</span></li>
+      <li><a href="/audit" data-t="AI Bias Audit">AI Bias Audit</a> — <span data-t="Independent review by four AI systems">Independent review by four AI systems</span></li>
+      <li><a href="/data-quality" data-t="Data Quality Dashboard">Data Quality Dashboard</a> — <span data-t="Live metrics on ballot coverage and candidate completeness">Live metrics on ballot coverage and candidate completeness</span></li>
+      <li><a href="/nonpartisan" data-t="Nonpartisan by Design">Nonpartisan by Design</a> — <span data-t="How we ensure fairness for all voters">How we ensure fairness for all voters</span></li>
+      <li><a href="/candidates" data-t="All Candidates">All Candidates</a> — <span data-t="Browse every candidate with detailed profiles">Browse every candidate with detailed profiles</span></li>
     </ul>
 
-    <div class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> Built in Texas &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
+    <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
   </div>
+  ${pageI18n({
+    'Texas Votes is Open Source': 'Texas Votes es C\u00F3digo Abierto',
+    'This app is built transparently. Every line of code, every AI prompt, every design decision is public.': 'Esta app est\u00E1 construida con transparencia. Cada l\u00EDnea de c\u00F3digo, cada prompt de IA, cada decisi\u00F3n de dise\u00F1o es p\u00FAblica.',
+    'Why Open Source?': '\u00BFPor Qu\u00E9 C\u00F3digo Abierto?',
+    'Trust through transparency \\u2014 voters can verify there\\'s no hidden bias.': 'Confianza a trav\u00E9s de la transparencia \\u2014 los votantes pueden verificar que no hay sesgo oculto.',
+    'Community contribution \\u2014 anyone can suggest improvements or report issues.': 'Contribuci\u00F3n comunitaria \\u2014 cualquiera puede sugerir mejoras o reportar problemas.',
+    'Replicability \\u2014 other states and cities can fork this project for their own elections.': 'Replicabilidad \\u2014 otros estados y ciudades pueden bifurcar este proyecto para sus propias elecciones.',
+    'The Code': 'El C\u00F3digo',
+    'The full source code is available on GitHub.': 'El c\u00F3digo fuente completo est\u00E1 disponible en GitHub.',
+    'Texas Votes is a single-file progressive web app served directly from a Cloudflare Worker.': 'Texas Votes es una app web progresiva de un solo archivo servida directamente desde un Cloudflare Worker.',
+    'Independent AI Code Reviews': 'Revisiones Independientes de C\u00F3digo por IA',
+    'We submitted our full codebase to four independent AI systems for review.': 'Enviamos nuestro c\u00F3digo completo a cuatro sistemas de IA independientes para revisi\u00F3n.',
+    'ChatGPT Code Review': 'Revisi\u00F3n de C\u00F3digo por ChatGPT',
+    'Gemini Code Review': 'Revisi\u00F3n de C\u00F3digo por Gemini',
+    'Grok Code Review': 'Revisi\u00F3n de C\u00F3digo por Grok',
+    'Claude Code Review': 'Revisi\u00F3n de C\u00F3digo por Claude',
+    'Read the full review': 'Leer la revisi\u00F3n completa',
+    'Automated Testing': 'Pruebas Automatizadas',
+    '648 automated tests covering interview flow, guide generation, routing, data validation, and more.': '648 pruebas automatizadas cubriendo flujo de entrevista, generaci\u00F3n de gu\u00EDa, enrutamiento, validaci\u00F3n de datos y m\u00E1s.',
+    'How to Contribute': 'C\u00F3mo Contribuir',
+    'Report issues \\u2014 found a bug or incorrect candidate data?': 'Reportar problemas \\u2014 \u00BFencontraste un error o datos incorrectos de candidatos?',
+    'Submit pull requests \\u2014 code improvements and new features are welcome.': 'Enviar pull requests \\u2014 mejoras de c\u00F3digo y nuevas funciones son bienvenidas.',
+    'Help expand to other states \\u2014 the architecture is designed to be forked.': 'Ayudar a expandir a otros estados \\u2014 la arquitectura est\u00E1 dise\u00F1ada para ser bifurcada.',
+    'Spread the word \\u2014 share txvotes.app with fellow Texas voters.': 'Corre la voz \\u2014 comparte txvotes.app con otros votantes de Texas.',
+    'Contact us anytime': 'Cont\u00E1ctanos en cualquier momento',
+    'License': 'Licencia',
+    'Texas Votes is released under the MIT License.': 'Texas Votes est\u00E1 publicado bajo la Licencia MIT.',
+  })}
 </body>
 </html>`;
 
@@ -2936,11 +3217,15 @@ async function handleCandidateProfile(slug, env) {
 </head>
 <body>
   <div class="container">
-    <a href="/candidates" class="back-top">&larr; All Candidates</a>
-    <h1>Candidate Not Found</h1>
-    <p class="subtitle">We couldn't find a candidate matching "${escapeHtml(slug)}". The candidate may not be in our database yet, or the URL may be incorrect.</p>
-    <div class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> Built in Texas &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
+    <a href="/candidates" class="back-top">&larr; <span data-t="All Candidates">All Candidates</span></a>
+    <h1 data-t="Candidate Not Found">Candidate Not Found</h1>
+    <p class="subtitle" data-t="We couldn't find a candidate matching this URL.">We couldn't find a candidate matching "${escapeHtml(slug)}". The candidate may not be in our database yet, or the URL may be incorrect.</p>
+    <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
   </div>
+  ${pageI18n({
+    'Candidate Not Found': 'Candidato No Encontrado',
+    'We couldn\\'t find a candidate matching this URL.': 'No pudimos encontrar un candidato que coincida con esta URL.',
+  })}
 </body>
 </html>`;
     return new Response(html, {
@@ -3084,7 +3369,7 @@ async function handleCandidateProfile(slug, env) {
 </head>
 <body>
   <div class="container">
-    <a href="/candidates" class="back-top">&larr; All Candidates</a>
+    <a href="/candidates" class="back-top">&larr; <span data-t="All Candidates">All Candidates</span></a>
     <div style="display:flex;align-items:center;gap:1rem;margin-top:1rem">
       ${headshotImg}
       <div>
@@ -3093,23 +3378,37 @@ async function handleCandidateProfile(slug, env) {
       </div>
     </div>
 
-    <div class="cta-banner"><a class="cta-btn" href="/app?start=1">Build My Voting Guide &rarr;</a><p class="cta-sub">5-minute personalized ballot</p></div>
+    <div class="cta-banner"><a class="cta-btn" href="/app?start=1" data-t="Build My Voting Guide">Build My Voting Guide</a><p class="cta-sub" data-t="5-minute personalized ballot">5-minute personalized ballot</p></div>
 
     ${sections.join("\n    ")}
-    ${dataUpdatedAt ? `<p style="margin-top:2rem;font-size:0.85rem;color:var(--text2)">Data last verified: ${new Date(dataUpdatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}${c.sources && c.sources.length ? ` &middot; ${c.sources.length} source${c.sources.length === 1 ? "" : "s"} cited` : ""}</p>` : ""}
-    <p style="margin-top:${dataUpdatedAt ? "0.5rem" : "2rem"};font-size:0.9rem;color:var(--text2)">See something wrong? <a href="mailto:howdy@txvotes.app?subject=Data correction: ${encodeURIComponent(c.name)}">Let us know</a> and we'll fix it.</p>
+    ${dataUpdatedAt ? `<p style="margin-top:2rem;font-size:0.85rem;color:var(--text2)" data-t="Data last verified">Data last verified: ${new Date(dataUpdatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}${c.sources && c.sources.length ? ` &middot; ${c.sources.length} source${c.sources.length === 1 ? "" : "s"} cited` : ""}</p>` : ""}
+    <p style="margin-top:${dataUpdatedAt ? "0.5rem" : "2rem"};font-size:0.9rem;color:var(--text2)" data-t="See something wrong? Let us know and we'll fix it.">See something wrong? <a href="mailto:howdy@txvotes.app?subject=Data correction: ${encodeURIComponent(c.name)}">Let us know</a> and we'll fix it.</p>
 
-    <h2>Related</h2>
+    <h2 data-t="Related">Related</h2>
     <ul class="related-links">
-      <li><a href="/candidates">All Candidates</a> — Browse every candidate with detailed profiles</li>
-      <li><a href="/how-it-works">How It Works</a> — Plain-language explanation of the app and AI</li>
-      <li><a href="/sample-ballot">Sample Ballot</a> — See what a personalized ballot looks like</li>
-      <li><a href="/data-quality">Data Quality Dashboard</a> — Live metrics on ballot coverage and candidate completeness</li>
-      <li><a href="/nonpartisan">Nonpartisan by Design</a> — How we keep the app fair for all voters</li>
+      <li><a href="/candidates" data-t="All Candidates">All Candidates</a> — <span data-t="Browse every candidate with detailed profiles">Browse every candidate with detailed profiles</span></li>
+      <li><a href="/how-it-works" data-t="How It Works">How It Works</a> — <span data-t="Plain-language explanation of the app and AI">Plain-language explanation of the app and AI</span></li>
+      <li><a href="/sample-ballot" data-t="Sample Ballot">Sample Ballot</a> — <span data-t="See what a personalized ballot looks like">See what a personalized ballot looks like</span></li>
+      <li><a href="/data-quality" data-t="Data Quality Dashboard">Data Quality Dashboard</a> — <span data-t="Live metrics on ballot coverage and candidate completeness">Live metrics on ballot coverage and candidate completeness</span></li>
+      <li><a href="/nonpartisan" data-t="Nonpartisan by Design">Nonpartisan by Design</a> — <span data-t="How we keep the app fair for all voters">How we keep the app fair for all voters</span></li>
     </ul>
 
-    <div class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> Built in Texas &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
+    <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
   </div>
+  ${pageI18n({
+    'See something wrong? Let us know and we\\'ll fix it.': '\u00BFVes algo incorrecto? D\u00EDnoslo y lo corregiremos.',
+    'Data last verified': 'Datos verificados por \u00FAltima vez',
+    'About': 'Acerca de',
+    'Education': 'Educaci\u00F3n',
+    'Experience': 'Experiencia',
+    'Key Positions': 'Posiciones Clave',
+    'Strengths': 'Fortalezas',
+    'Concerns': 'Preocupaciones',
+    'Endorsements': 'Respaldos',
+    'Polling': 'Encuestas',
+    'Fundraising': 'Recaudaci\u00F3n de Fondos',
+    'Sources': 'Fuentes',
+  })}
 </body>
 </html>`;
 
@@ -3199,25 +3498,28 @@ async function handleCandidatesIndex(env) {
 <body>
   <div class="container">
     <a href="/" class="back-top">&larr; Texas Votes</a>
-    <h1 style="margin-top:1rem">All Candidates</h1>
-    <p class="subtitle">2026 Texas Primary Election — March 3, 2026</p>
+    <h1 style="margin-top:1rem" data-t="All Candidates">All Candidates</h1>
+    <p class="subtitle" data-t="2026 Texas Primary Election — March 3, 2026">2026 Texas Primary Election — March 3, 2026</p>
 
-    <div class="cta-banner"><a class="cta-btn" href="/app?start=1">Build My Voting Guide &rarr;</a><p class="cta-sub">5-minute personalized ballot</p></div>
+    <div class="cta-banner"><a class="cta-btn" href="/app?start=1" data-t="Build My Voting Guide">Build My Voting Guide</a><p class="cta-sub" data-t="5-minute personalized ballot">5-minute personalized ballot</p></div>
 
     ${raceSections}
 
-    <h2>Related</h2>
+    <h2 data-t="Related">Related</h2>
     <ul class="related-links">
-      <li><a href="/how-it-works">How It Works</a> — Plain-language explanation of the app and AI</li>
-      <li><a href="/sample-ballot">Sample Ballot</a> — See what a personalized ballot looks like</li>
-      <li><a href="/data-quality">Data Quality Dashboard</a> — Live metrics on ballot coverage and candidate completeness</li>
-      <li><a href="/nonpartisan">Nonpartisan by Design</a> — How we keep the app fair for all voters</li>
-      <li><a href="/audit">AI Bias Audit</a> — Independent review of our AI by four different systems</li>
-      <li><a href="/open-source">Open Source</a> — Source code, architecture, and independent code reviews</li>
+      <li><a href="/how-it-works" data-t="How It Works">How It Works</a> — <span data-t="Plain-language explanation of the app and AI">Plain-language explanation of the app and AI</span></li>
+      <li><a href="/sample-ballot" data-t="Sample Ballot">Sample Ballot</a> — <span data-t="See what a personalized ballot looks like">See what a personalized ballot looks like</span></li>
+      <li><a href="/data-quality" data-t="Data Quality Dashboard">Data Quality Dashboard</a> — <span data-t="Live metrics on ballot coverage and candidate completeness">Live metrics on ballot coverage and candidate completeness</span></li>
+      <li><a href="/nonpartisan" data-t="Nonpartisan by Design">Nonpartisan by Design</a> — <span data-t="How we keep the app fair for all voters">How we keep the app fair for all voters</span></li>
+      <li><a href="/audit" data-t="AI Bias Audit">AI Bias Audit</a> — <span data-t="Independent review of our AI by four different systems">Independent review of our AI by four different systems</span></li>
+      <li><a href="/open-source" data-t="Open Source">Open Source</a> — <span data-t="Source code, architecture, and independent code reviews">Source code, architecture, and independent code reviews</span></li>
     </ul>
 
-    <div class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> Built in Texas &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
+    <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
   </div>
+  ${pageI18n({
+    '2026 Texas Primary Election \\u2014 March 3, 2026': 'Elecci\u00F3n Primaria de Texas 2026 \\u2014 3 de marzo, 2026',
+  })}
 </body>
 </html>`;
 
@@ -3534,29 +3836,29 @@ async function handleDataQuality(env) {
 <body>
   <div class="container" style="max-width:720px">
     <a href="/" class="back-top">&larr; Texas Votes</a>
-    <h1>Data Quality Dashboard</h1>
-    <p class="subtitle">Live transparency report on the completeness and freshness of our election data. Updated daily via automated research pipeline.</p>
+    <h1 data-t="Data Quality Dashboard">Data Quality Dashboard</h1>
+    <p class="subtitle" data-t="Live transparency report on the completeness and freshness of our election data.">Live transparency report on the completeness and freshness of our election data. Updated daily via automated research pipeline.</p>
 
-    <div class="cta-banner"><a class="cta-btn" href="/app?start=1">Build My Voting Guide &rarr;</a><p class="cta-sub">5-minute personalized ballot</p></div>
+    <div class="cta-banner"><a class="cta-btn" href="/app?start=1" data-t="Build My Voting Guide">Build My Voting Guide</a><p class="cta-sub" data-t="5-minute personalized ballot">5-minute personalized ballot</p></div>
 
     <div class="dq-checker-hero">
-      <div class="dq-checker-title">Check Your County</div>
-      <p class="dq-checker-subtitle">See what local election data is available for your county</p>
+      <div class="dq-checker-title" data-t="Check Your County">Check Your County</div>
+      <p class="dq-checker-subtitle" data-t="See what local election data is available for your county">See what local election data is available for your county</p>
       <input type="text" id="county-input" placeholder="Type a county name (e.g., Travis, Harris, Bexar)..." autocomplete="off">
       <div id="county-result" class="dq-checker-result"></div>
     </div>
 
-    <h2>Data Freshness</h2>
+    <h2 data-t="Data Freshness">Data Freshness</h2>
     <div class="dq-card-grid">
       ${freshnessCards}
     </div>
 
-    <h2>Ballot Coverage</h2>
+    <h2 data-t="Ballot Coverage">Ballot Coverage</h2>
     <div class="dq-card-grid">
       ${coverageCards}
     </div>
 
-    <h2>Candidate Data Completeness</h2>
+    <h2 data-t="Candidate Data Completeness">Candidate Data Completeness</h2>
     <div class="dq-card" style="text-align:left;margin-bottom:1.5rem">
       <div style="display:flex;align-items:baseline;gap:0.75rem;margin-bottom:0.25rem">
         <span style="font-size:2rem;font-weight:800;color:var(--blue)">${completenessPercent}%</span>
@@ -3567,7 +3869,7 @@ async function handleDataQuality(env) {
       <p class="dq-note">Candidates with limited public information are clearly labeled throughout the app.</p>
     </div>
 
-    <h2>Pros/Cons Balance</h2>
+    <h2 data-t="Pros/Cons Balance">Pros/Cons Balance</h2>
     <div class="dq-card" style="text-align:left;margin-bottom:1.5rem">
       <div style="display:flex;align-items:baseline;gap:0.75rem;margin-bottom:0.25rem">
         <span style="font-size:2rem;font-weight:800;color:${combinedBalanceScore !== null && combinedBalanceScore >= 90 ? "#16a34a" : combinedBalanceScore !== null && combinedBalanceScore >= 70 ? "#b45309" : combinedBalanceScore !== null ? "#dc2626" : "var(--blue)"}">${combinedBalanceScore !== null ? combinedBalanceScore : "N/A"}<span class="dq-unit">/100</span></span>
@@ -3578,27 +3880,27 @@ async function handleDataQuality(env) {
       <p class="dq-note" style="margin-top:0.75rem">Balance checks run automatically. <a href="/api/balance-check">View raw JSON report</a>. Voters can also report bias directly using the "Flag this info" button on any candidate card — reports go to <a href="mailto:flagged@txvotes.app">flagged@txvotes.app</a> and feed back into data quality improvements.</p>
     </div>
 
-    <h2>County Coverage</h2>
+    <h2 data-t="County Coverage">County Coverage</h2>
     <div class="dq-card-grid">
-      <div class="dq-card"><div class="dq-card-value">${infoPresent}<span class="dq-unit"> / 254</span></div><div class="dq-card-label">Counties with voting info</div></div>
-      <div class="dq-card"><div class="dq-card-value">${repPresent}<span class="dq-unit"> / 254</span></div><div class="dq-card-label">Republican local ballots</div></div>
-      <div class="dq-card"><div class="dq-card-value">${demPresent}<span class="dq-unit"> / 254</span></div><div class="dq-card-label">Democrat local ballots</div></div>
+      <div class="dq-card"><div class="dq-card-value">${infoPresent}<span class="dq-unit"> / 254</span></div><div class="dq-card-label" data-t="Counties with voting info">Counties with voting info</div></div>
+      <div class="dq-card"><div class="dq-card-value">${repPresent}<span class="dq-unit"> / 254</span></div><div class="dq-card-label" data-t="Republican local ballots">Republican local ballots</div></div>
+      <div class="dq-card"><div class="dq-card-value">${demPresent}<span class="dq-unit"> / 254</span></div><div class="dq-card-label" data-t="Democrat local ballots">Democrat local ballots</div></div>
     </div>
 
-    <h2 style="margin-top:2rem">Today's Update Activity</h2>
+    <h2 style="margin-top:2rem" data-t="Today's Update Activity">Today's Update Activity</h2>
     ${updateHtml}
 
-    <h2>Related</h2>
+    <h2 data-t="Related">Related</h2>
     <ul class="dq-links related-links">
-      <li><a href="/how-it-works">How It Works</a> — Plain-language explanation for non-technical users</li>
-      <li><a href="/audit">AI Bias Audit</a> — Independent review by four AI systems</li>
-      <li><a href="/api/audit/export">Methodology Export</a> — Full transparency of all AI prompts and data pipelines</li>
-      <li><a href="/open-source">Open Source</a> — Source code, architecture, and independent code reviews</li>
-      <li><a href="/nonpartisan">Nonpartisan by Design</a> — How we ensure fairness for all voters</li>
-      <li><a href="/candidates">Candidate Profiles</a> — Browse all candidates with detailed information</li>
+      <li><a href="/how-it-works" data-t="How It Works">How It Works</a> — <span data-t="Plain-language explanation for non-technical users">Plain-language explanation for non-technical users</span></li>
+      <li><a href="/audit" data-t="AI Bias Audit">AI Bias Audit</a> — <span data-t="Independent review by four AI systems">Independent review by four AI systems</span></li>
+      <li><a href="/api/audit/export" data-t="Methodology Export">Methodology Export</a> — <span data-t="Full transparency of all AI prompts and data pipelines">Full transparency of all AI prompts and data pipelines</span></li>
+      <li><a href="/open-source" data-t="Open Source">Open Source</a> — <span data-t="Source code, architecture, and independent code reviews">Source code, architecture, and independent code reviews</span></li>
+      <li><a href="/nonpartisan" data-t="Nonpartisan by Design">Nonpartisan by Design</a> — <span data-t="How we ensure fairness for all voters">How we ensure fairness for all voters</span></li>
+      <li><a href="/candidates" data-t="Candidate Profiles">Candidate Profiles</a> — <span data-t="Browse all candidates with detailed information">Browse all candidates with detailed information</span></li>
     </ul>
 
-    <div class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/how-it-works">How It Works</a> &middot; <a href="/privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> Built in Texas &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
+    <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
   </div>
   <script>
   (function(){
@@ -3636,6 +3938,21 @@ async function handleDataQuality(env) {
     });
   })();
   </script>
+  ${pageI18n({
+    'Live transparency report on the completeness and freshness of our election data.': 'Informe de transparencia en vivo sobre la integridad y frescura de nuestros datos electorales.',
+    'Check Your County': 'Consulta Tu Condado',
+    'See what local election data is available for your county': 'Mira qu\u00E9 datos electorales locales est\u00E1n disponibles para tu condado',
+    'Data Freshness': 'Frescura de Datos',
+    'Ballot Coverage': 'Cobertura de Boletas',
+    'Candidate Data Completeness': 'Datos Completos de Candidatos',
+    'Pros/Cons Balance': 'Equilibrio de Pros/Contras',
+    'County Coverage': 'Cobertura por Condado',
+    'Counties with voting info': 'Condados con info de votaci\u00F3n',
+    'Republican local ballots': 'Boletas locales Republicanas',
+    'Democrat local ballots': 'Boletas locales Dem\u00F3cratas',
+    'Today\\'s Update Activity': 'Actividad de Actualizaci\u00F3n de Hoy',
+    'Browse all candidates with detailed information': 'Explora todos los candidatos con informaci\u00F3n detallada',
+  })}
 </body>
 </html>`;
 
@@ -3870,6 +4187,204 @@ async function handleAdminCoverage(env) {
   });
 }
 
+// MARK: - Admin Analytics Dashboard
+
+async function queryAnalyticsEngine(env, sql) {
+  const accountId = env.CF_ACCOUNT_ID;
+  const apiToken = env.CF_API_TOKEN;
+  if (!accountId || !apiToken) return null;
+  const resp = await fetch(
+    `https://api.cloudflare.com/client/v4/accounts/${accountId}/analytics_engine/sql`,
+    { method: "POST", headers: { Authorization: `Bearer ${apiToken}` }, body: sql }
+  );
+  if (!resp.ok) {
+    const text = await resp.text();
+    throw new Error(`Analytics query failed (${resp.status}): ${text}`);
+  }
+  return resp.json();
+}
+
+async function handleAdminAnalytics(env) {
+  if (!env.CF_ACCOUNT_ID || !env.CF_API_TOKEN) {
+    return new Response(`<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Analytics — Texas Votes Admin</title>${PAGE_CSS}<style>.container{max-width:900px}</style></head><body><div class="container"><a href="/" class="back-top">&larr; Texas Votes</a><h1>Analytics Dashboard</h1><p style="color:var(--text2)">Analytics Engine query credentials not configured.</p><p>Set these secrets:</p><pre style="background:var(--card);border:1px solid var(--border);padding:1rem;border-radius:var(--rs);overflow-x:auto">cd worker\nnpx wrangler secret put CF_ACCOUNT_ID -c wrangler.txvotes.toml\nnpx wrangler secret put CF_API_TOKEN -c wrangler.txvotes.toml</pre><p style="font-size:0.85rem;color:var(--text2)">The API token needs <strong>Account Analytics Read</strong> permission.</p></div></body></html>`, { headers: { "Content-Type": "text/html;charset=utf-8" } });
+  }
+
+  const ds = "txvotes_events";
+  const errors = [];
+  async function sq(label, sql) {
+    try { return await queryAnalyticsEngine(env, sql); }
+    catch (e) { errors.push(label + ": " + e.message); return { data: [] }; }
+  }
+
+  const [totalsR, dailyR, langR, timingR, toneR, abandonR, pagesR, partyR, errorsR, hourlyR] = await Promise.all([
+    sq("totals", "SELECT blob1 AS event, count() AS total, sum(double1) AS value_sum FROM " + ds + " WHERE timestamp > NOW() - INTERVAL '7' DAY GROUP BY event ORDER BY total DESC FORMAT JSON"),
+    sq("daily", "SELECT toDate(timestamp) AS day, blob1 AS event, count() AS total FROM " + ds + " WHERE timestamp > NOW() - INTERVAL '7' DAY GROUP BY day, event ORDER BY day ASC, total DESC FORMAT JSON"),
+    sq("language", "SELECT blob2 AS lang, count() AS total FROM " + ds + " WHERE timestamp > NOW() - INTERVAL '7' DAY GROUP BY lang ORDER BY total DESC FORMAT JSON"),
+    sq("timing", "SELECT blob1 AS event, count() AS total, avg(double2) AS avg_ms, min(double2) AS min_ms, max(double2) AS max_ms FROM " + ds + " WHERE timestamp > NOW() - INTERVAL '7' DAY AND blob1 IN ('guide_complete','interview_complete') AND double2 > 0 GROUP BY event FORMAT JSON"),
+    sq("tones", "SELECT blob3 AS tone_level, count() AS total FROM " + ds + " WHERE timestamp > NOW() - INTERVAL '7' DAY AND blob1 = 'tone_select' GROUP BY tone_level ORDER BY tone_level ASC FORMAT JSON"),
+    sq("abandon", "SELECT blob3 AS phase, count() AS total, avg(double2) AS avg_ms FROM " + ds + " WHERE timestamp > NOW() - INTERVAL '7' DAY AND blob1 = 'interview_abandon' GROUP BY phase ORDER BY total DESC FORMAT JSON"),
+    sq("pages", "SELECT blob3 AS page, count() AS total FROM " + ds + " WHERE timestamp > NOW() - INTERVAL '7' DAY AND blob1 = 'page_view' GROUP BY page ORDER BY total DESC LIMIT 20 FORMAT JSON"),
+    sq("party", "SELECT blob3 AS party, count() AS total FROM " + ds + " WHERE timestamp > NOW() - INTERVAL '7' DAY AND blob1 = 'party_switch' GROUP BY party ORDER BY total DESC FORMAT JSON"),
+    sq("errors", "SELECT blob3 AS error_msg, count() AS total FROM " + ds + " WHERE timestamp > NOW() - INTERVAL '7' DAY AND blob1 = 'guide_error' GROUP BY error_msg ORDER BY total DESC LIMIT 10 FORMAT JSON"),
+    sq("hourly", "SELECT toStartOfHour(timestamp) AS hour, count() AS total FROM " + ds + " WHERE timestamp > NOW() - INTERVAL '2' DAY GROUP BY hour ORDER BY hour ASC FORMAT JSON"),
+  ]);
+
+  const totals = totalsR.data || [];
+  const daily = dailyR.data || [];
+  const langs = langR.data || [];
+  const guideTiming = timingR.data || [];
+  const tones = toneR.data || [];
+  const abandons = abandonR.data || [];
+  const pagesList = pagesR.data || [];
+  const partySwitches = partyR.data || [];
+  const guideErrors = errorsR.data || [];
+  const hourly = hourlyR.data || [];
+
+  const evm = {};
+  for (const r of totals) evm[r.event] = Number(r.total) || 0;
+
+  const km = [
+    { l: "Page Views", v: evm.page_view || 0 },
+    { l: "Interviews Started", v: evm.interview_start || 0 },
+    { l: "Interviews Completed", v: evm.interview_complete || 0 },
+    { l: "Guides Generated", v: evm.guide_complete || 0 },
+    { l: "Guide Errors", v: evm.guide_error || 0 },
+    { l: "I Voted!", v: evm.i_voted || 0 },
+    { l: "Share App", v: evm.share_app || 0 },
+    { l: "Share Race", v: evm.share_race || 0 },
+    { l: "Share Voted", v: evm.share_voted || 0 },
+    { l: "Cheatsheet Prints", v: evm.cheatsheet_print || 0 },
+    { l: "Language Toggles", v: evm.lang_toggle || 0 },
+    { l: "Interview Abandons", v: evm.interview_abandon || 0 },
+  ];
+
+  const iStarts = evm.interview_start || 0;
+  const iCompletes = evm.interview_complete || 0;
+  const cr = iStarts > 0 ? ((iCompletes / iStarts) * 100).toFixed(1) : "N/A";
+
+  const statCards = km.map(m => `<div class="stat-card"><div class="num">${m.v.toLocaleString()}</div><div class="label">${m.l}</div></div>`).join("");
+  const crCard = `<div class="stat-card"><div class="num" style="color:${cr !== "N/A" && parseFloat(cr) >= 50 ? "#16a34a" : "var(--red)"}">${cr}${cr !== "N/A" ? "%" : ""}</div><div class="label">Interview Completion Rate</div></div>`;
+
+  const allEvRows = totals.map(r => `<tr><td><code>${escapeHtml(r.event)}</code></td><td style="text-align:right">${Number(r.total).toLocaleString()}</td></tr>`).join("") || '<tr><td colspan="2" style="color:var(--text2)">No data</td></tr>';
+
+  const dayMap = {};
+  for (const r of daily) { if (!dayMap[r.day]) dayMap[r.day] = {}; dayMap[r.day][r.event] = Number(r.total) || 0; }
+  const sortedDays = Object.keys(dayMap).sort();
+  const de = ["page_view","interview_start","interview_complete","guide_complete","guide_error","i_voted","share_app","interview_abandon"];
+  const dh = de.map(e => `<th>${e.replace(/_/g, " ")}</th>`).join("");
+  const db = sortedDays.map(d => `<tr><td style="font-weight:600">${d}</td>${de.map(e => `<td style="text-align:right">${(dayMap[d][e] || 0).toLocaleString()}</td>`).join("")}</tr>`).join("") || `<tr><td colspan="${de.length + 1}" style="color:var(--text2)">No data</td></tr>`;
+
+  const lr = langs.map(r => `<tr><td>${escapeHtml(r.lang || "(empty)")}</td><td style="text-align:right">${Number(r.total).toLocaleString()}</td></tr>`).join("") || '<tr><td colspan="2" style="color:var(--text2)">No data</td></tr>';
+  const tmr = guideTiming.map(r => `<tr><td><code>${escapeHtml(r.event)}</code></td><td style="text-align:right">${Number(r.total).toLocaleString()}</td><td style="text-align:right">${((Number(r.avg_ms)||0)/1000).toFixed(1)}s</td><td style="text-align:right">${((Number(r.min_ms)||0)/1000).toFixed(1)}s</td><td style="text-align:right">${((Number(r.max_ms)||0)/1000).toFixed(1)}s</td></tr>`).join("") || '<tr><td colspan="5" style="color:var(--text2)">No data</td></tr>';
+
+  const tl = {"1":"Just the Facts","2":"Simple & Clear","3":"Balanced","4":"Deep Dive","5":"Expert","6":"Swedish Chef","7":"Cowboy"};
+  const tn = tones.map(r => `<tr><td>${r.tone_level||"?"}</td><td>${tl[r.tone_level]||"Unknown"}</td><td style="text-align:right">${Number(r.total).toLocaleString()}</td></tr>`).join("") || '<tr><td colspan="3" style="color:var(--text2)">No data</td></tr>';
+
+  const ab = abandons.map(r => `<tr><td>${escapeHtml(r.phase||"?")}</td><td style="text-align:right">${Number(r.total).toLocaleString()}</td><td style="text-align:right">${((Number(r.avg_ms)||0)/1000).toFixed(1)}s</td></tr>`).join("") || '<tr><td colspan="3" style="color:var(--text2)">No data</td></tr>';
+  const pg = pagesList.map(r => `<tr><td>${escapeHtml(r.page||"(empty)")}</td><td style="text-align:right">${Number(r.total).toLocaleString()}</td></tr>`).join("") || '<tr><td colspan="2" style="color:var(--text2)">No data</td></tr>';
+  const psr = partySwitches.map(r => `<tr><td style="text-transform:capitalize">${escapeHtml(r.party||"?")}</td><td style="text-align:right">${Number(r.total).toLocaleString()}</td></tr>`).join("") || '<tr><td colspan="2" style="color:var(--text2)">No data</td></tr>';
+  const er = guideErrors.map(r => `<tr><td><code style="word-break:break-all">${escapeHtml(r.error_msg||"(empty)")}</code></td><td style="text-align:right">${Number(r.total).toLocaleString()}</td></tr>`).join("") || '<tr><td colspan="2" style="color:var(--text2)">No errors</td></tr>';
+
+  let sparkHtml = '<p style="color:var(--text2)">No hourly data</p>';
+  if (hourly.length > 0) {
+    const mx = Math.max(...hourly.map(h => Number(h.total) || 0), 1);
+    sparkHtml = '<div class="spark-container">' + hourly.map(h => {
+      const v = Number(h.total) || 0;
+      return `<div class="spark-bar" style="height:${Math.max((v/mx)*100,2)}%" title="${(h.hour||'').slice(11,16)}: ${v}"></div>`;
+    }).join("") + '</div><div style="display:flex;justify-content:space-between;font-size:0.7rem;color:var(--text2);margin-top:2px"><span>48h ago</span><span>Now</span></div>';
+  }
+
+  const errBanner = errors.length > 0
+    ? `<div style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:var(--rs);padding:0.75rem 1rem;margin-bottom:1.5rem;font-size:0.85rem;color:#dc2626"><strong>Query errors:</strong><ul style="margin:0.5rem 0 0;padding-left:1.25rem">${errors.map(e => '<li>' + escapeHtml(e) + '</li>').join("")}</ul></div>` : "";
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Analytics — Texas Votes Admin</title>
+  ${PAGE_CSS}
+  <style>
+    .container{max-width:1200px}
+    table{width:100%;border-collapse:collapse;margin-bottom:2rem;font-size:0.9rem}
+    th,td{padding:6px 10px;border:1px solid var(--border);text-align:left}
+    th{background:var(--blue);color:#fff;font-weight:600;font-size:0.85rem;position:sticky;top:0}
+    .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-bottom:2rem}
+    .stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:1rem;text-align:center}
+    .stat-card .num{font-size:2rem;font-weight:800;color:var(--blue)}
+    .stat-card .label{font-size:0.85rem;color:var(--text2)}
+    .scroll-table{max-height:400px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--rs);margin-bottom:2rem}
+    .scroll-table table{margin-bottom:0}
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:2rem}
+    @media(max-width:768px){.two-col{grid-template-columns:1fr}}
+    .spark-container{display:flex;align-items:flex-end;gap:1px;height:80px;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:8px;margin-bottom:0.25rem}
+    .spark-bar{flex:1;background:var(--blue);border-radius:2px 2px 0 0;min-width:2px;opacity:0.8;transition:opacity .15s}
+    .spark-bar:hover{opacity:1}
+    code{background:rgba(128,128,128,.1);padding:1px 4px;border-radius:3px;font-size:0.85em}
+    .section-note{font-size:0.8rem;color:var(--text2);margin-top:-1.5rem;margin-bottom:1rem}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="/" class="back-top">&larr; Texas Votes</a>
+    <h1>Analytics Dashboard</h1>
+    <p class="subtitle">Event tracking data from the last 7 days via Cloudflare Analytics Engine.</p>
+    ${errBanner}
+    <h2>Key Metrics (Last 7 Days)</h2>
+    <div class="stat-grid">
+      ${statCards}
+      ${crCard}
+    </div>
+    <h2>Activity (Last 48 Hours)</h2>
+    ${sparkHtml}
+    <h2>Daily Breakdown</h2>
+    <div class="scroll-table">
+    <table><tr><th>Date</th>${dh}</tr>${db}</table>
+    </div>
+    <div class="two-col">
+      <div>
+        <h2>All Events</h2>
+        <div class="scroll-table"><table><tr><th>Event</th><th style="text-align:right">Count</th></tr>${allEvRows}</table></div>
+      </div>
+      <div>
+        <h2>Top Pages</h2>
+        <div class="scroll-table"><table><tr><th>Page (Hash)</th><th style="text-align:right">Views</th></tr>${pg}</table></div>
+      </div>
+    </div>
+    <h2>Guide Generation Timing</h2>
+    <p class="section-note">Average, min, and max duration for completed interviews and guide builds.</p>
+    <table><tr><th>Event</th><th style="text-align:right">Count</th><th style="text-align:right">Avg</th><th style="text-align:right">Min</th><th style="text-align:right">Max</th></tr>${tmr}</table>
+    <div class="two-col">
+      <div>
+        <h2>Tone Distribution</h2>
+        <table><tr><th>Level</th><th>Name</th><th style="text-align:right">Selections</th></tr>${tn}</table>
+      </div>
+      <div>
+        <h2>Language Usage</h2>
+        <table><tr><th>Language</th><th style="text-align:right">Events</th></tr>${lr}</table>
+      </div>
+    </div>
+    <div class="two-col">
+      <div>
+        <h2>Interview Abandonment</h2>
+        <p class="section-note">Where users drop off and how long they spent.</p>
+        <table><tr><th>Phase</th><th style="text-align:right">Count</th><th style="text-align:right">Avg Time</th></tr>${ab}</table>
+      </div>
+      <div>
+        <h2>Party Switches</h2>
+        <table><tr><th>Switched To</th><th style="text-align:right">Count</th></tr>${psr}</table>
+      </div>
+    </div>
+    <h2>Guide Errors</h2>
+    <div class="scroll-table"><table><tr><th>Error Message</th><th style="text-align:right">Count</th></tr>${er}</table></div>
+    <div class="page-footer"><a href="/">Texas Votes</a> &middot; <a href="/admin/coverage">Coverage</a> &middot; <a href="/privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> Built in Texas &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
+  </div>
+</body>
+</html>`;
+
+  return new Response(html, { headers: { "Content-Type": "text/html;charset=utf-8" } });
+}
+
 async function hashString(str) {
   const data = new TextEncoder().encode(str);
   const hash = await crypto.subtle.digest("SHA-256", data);
@@ -4095,6 +4610,14 @@ export default {
           return new Response("Unauthorized", { status: 401 });
         }
         return handleAdminCoverage(env);
+      }
+      // Admin analytics dashboard (GET with Bearer auth)
+      if (url.pathname === "/admin/analytics") {
+        const auth = request.headers.get("Authorization");
+        if (!auth || auth !== `Bearer ${env.ADMIN_SECRET}`) {
+          return new Response("Unauthorized", { status: 401 });
+        }
+        return handleAdminAnalytics(env);
       }
       return handleLandingPage();
     }

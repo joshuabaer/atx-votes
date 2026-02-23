@@ -53,6 +53,9 @@ _From automated code review of "Add automated AI audit runner" (interview-flow-t
 - [ ] Design a post-Election Day site and have it ready to automatically switch when the polls close — currently the site shows stale "March 3, 2026" messaging with no post-election UX, no runoff messaging, no results
 - [ ] Put more accurate text for unseeded county polling hours — fallback shows Travis County hours for all unseeded counties, which is wrong for most of Texas
 
+### Monitoring & Alerts
+- [ ] Design a way to get notified about app problems — error alerting, uptime monitoring, KV health checks, failed cron runs, etc.
+
 ### Technical Debt
 - [ ] Comprehensive memory management review — audit localStorage usage, service worker cache lifecycle, KV data retention, and state cleanup
 - [ ] Comprehensive Claude API usage review — analyze token usage across guide generation, county seeding, tone variants, and candidate research; identify optimization opportunities
