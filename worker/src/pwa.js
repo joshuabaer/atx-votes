@@ -935,6 +935,7 @@ var APP_JS = [
     "'Election Day':'D\\u00EDa de elecciones'," +
     "'Early Voting':'Votaci\\u00F3n anticipada'," +
     "'Vote at any early voting location in your county.':'Vota en cualquier lugar de votaci\\u00F3n anticipada en tu condado.'," +
+    "'Early voting hours vary by county. Contact your county elections office for specific hours and locations.':'Los horarios de votaci\\u00F3n anticipada var\\u00EDan por condado. Contacta la oficina de elecciones de tu condado para horarios y ubicaciones espec\\u00EDficas.'," +
     "'Hours':'Horario'," +
     "'Open Primary:':'Primaria abierta:'," +
     "'Texas has open primaries \\u2014 tell the poll worker which party\\u2019s primary you want. You can only vote in one.':'Texas tiene primarias abiertas \\u2014 dile al trabajador electoral en cu\\u00E1l primaria quieres votar. Solo puedes votar en una.'," +
@@ -2685,10 +2686,8 @@ var APP_JS = [
         "evBody+='<div class=\"vi-row\"><span'+(isLast?' style=\"font-weight:600\"':'')+'>'+esc(evp.dates)+'</span><span'+(isLast?' style=\"font-weight:600\"':'')+'>'+esc(evp.hours)+'</span></div>'" +
       "}" +
     "}else{" +
-      "evBody+='<div class=\"vi-row\"><span>Feb 17 \\u2013 21</span><span>7:00 AM \\u2013 7:00 PM</span></div>';" +
-      "evBody+='<div class=\"vi-row\"><span>Feb 22 (Sunday)</span><span>12:00 PM \\u2013 6:00 PM</span></div>';" +
-      "evBody+='<div class=\"vi-row\"><span>Feb 23 \\u2013 25</span><span>7:00 AM \\u2013 7:00 PM</span></div>';" +
-      "evBody+='<div class=\"vi-row\"><span style=\"font-weight:600\">Feb 26 \\u2013 27</span><span style=\"font-weight:600\">7:00 AM \\u2013 10:00 PM</span></div>'" +
+      "evBody+='<div class=\"vi-row\" style=\"flex-direction:column;gap:4px\"><span>Feb 17 \\u2013 27, 2026</span></div>';" +
+      "evBody+='<p style=\"font-size:13px;color:var(--text2);margin-top:8px\">'+t('Early voting hours vary by county. Contact your county elections office for specific hours and locations.')+'</p>'" +
     "}" +
     "evBody+='<p style=\"font-size:13px;color:var(--text2);margin-top:8px\">'+t('Vote at any early voting location in your county.')+'</p>';" +
     "h+=accSection('vi-early','\u{1F552}',t('Early Voting'),evBody);" +

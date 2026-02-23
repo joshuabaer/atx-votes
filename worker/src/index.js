@@ -212,6 +212,7 @@ async function loadAllCandidates(env) {
           party,
           electionName: ballot.electionName || `${party} Primary 2026`,
           slug,
+          countyName: null,
         });
       }
     }
@@ -249,6 +250,7 @@ async function loadAllCandidates(env) {
           party,
           electionName: ballot.electionName || `${party} Primary 2026`,
           slug,
+          countyName: countyName || null,
         });
       }
     }
@@ -1567,8 +1569,8 @@ async function handleAuditPage(env) {
     if (!result) {
       return `<div class="audit-card">
       <h3>${displayName} Review</h3>
-      <span class="audit-score audit-pending">Pending</span>
-      <p style="margin-top:0.5rem;font-size:0.9rem;color:var(--text2)">Audit not yet run. Results will be published here when complete.</p>
+      <span class="audit-score audit-pending" data-t="Pending">Pending</span>
+      <p style="margin-top:0.5rem;font-size:0.9rem;color:var(--text2)" data-t="Audit not yet run. Results will be published here when complete.">Audit not yet run. Results will be published here when complete.</p>
     </div>`;
     }
 
@@ -1585,14 +1587,14 @@ async function handleAuditPage(env) {
       let dimRows = "";
       for (const [key, label] of Object.entries(dimLabels)) {
         if (key in dims) {
-          dimRows += `<tr><td style="padding:0.2rem 0.5rem 0.2rem 0;font-size:0.85rem">${label}</td><td style="padding:0.2rem 0;font-size:0.85rem;font-weight:600;text-align:right">${dims[key]} / 10</td></tr>`;
+          dimRows += `<tr><td style="padding:0.2rem 0.5rem 0.2rem 0;font-size:0.85rem" data-t="${label}">${label}</td><td style="padding:0.2rem 0;font-size:0.85rem;font-weight:600;text-align:right">${dims[key]} / 10</td></tr>`;
         }
       }
       const dimTable = dimRows ? `<table style="width:100%;margin:0.75rem 0;border-collapse:collapse">${dimRows}</table>` : "";
-      const summary = result.scores.topStrength ? `<p style="margin-top:0.5rem;font-size:0.85rem;color:var(--text2)"><strong>Strength:</strong> ${escapeHtml(result.scores.topStrength)}</p>` : "";
-      const weakness = result.scores.topWeakness ? `<p style="font-size:0.85rem;color:var(--text2)"><strong>Weakness:</strong> ${escapeHtml(result.scores.topWeakness)}</p>` : "";
-      const timestamp = result.timestamp ? `<p style="font-size:0.8rem;color:var(--text2);margin-top:0.5rem">Last run: ${new Date(result.timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}${model}</p>` : "";
-      const fullReport = result.responseText ? `<details style="margin-top:0.75rem"><summary style="font-size:0.85rem">View Full Report</summary><div class="prompt-box" style="margin-top:0.5rem">${escapeHtml(result.responseText)}</div></details>` : "";
+      const summary = result.scores.topStrength ? `<p style="margin-top:0.5rem;font-size:0.85rem;color:var(--text2)"><strong data-t="Strength:">Strength:</strong> ${escapeHtml(result.scores.topStrength)}</p>` : "";
+      const weakness = result.scores.topWeakness ? `<p style="font-size:0.85rem;color:var(--text2)"><strong data-t="Weakness:">Weakness:</strong> ${escapeHtml(result.scores.topWeakness)}</p>` : "";
+      const timestamp = result.timestamp ? `<p style="font-size:0.8rem;color:var(--text2);margin-top:0.5rem" data-t="Last run:">Last run: ${new Date(result.timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}${model}</p>` : "";
+      const fullReport = result.responseText ? `<details style="margin-top:0.75rem"><summary style="font-size:0.85rem" data-t="View Full Report">View Full Report</summary><div class="prompt-box" style="margin-top:0.5rem">${escapeHtml(result.responseText)}</div></details>` : "";
 
       return `<div class="audit-card">
       <h3>${displayName} Review</h3>
@@ -1604,17 +1606,17 @@ async function handleAuditPage(env) {
     if (result.status === "api_error") {
       return `<div class="audit-card">
       <h3>${displayName} Review</h3>
-      <span class="audit-score audit-pending">Error</span>
+      <span class="audit-score audit-pending" data-t="Error">Error</span>
       <p style="margin-top:0.5rem;font-size:0.9rem;color:var(--text2)">API error: ${escapeHtml(result.error || "Unknown error")}${model}</p>
     </div>`;
     }
 
     if (result.status === "parse_failed") {
-      const fullReport = result.responseText ? `<details style="margin-top:0.75rem"><summary style="font-size:0.85rem">View Raw Response</summary><div class="prompt-box" style="margin-top:0.5rem">${escapeHtml(result.responseText)}</div></details>` : "";
+      const fullReport = result.responseText ? `<details style="margin-top:0.75rem"><summary style="font-size:0.85rem" data-t="View Raw Response">View Raw Response</summary><div class="prompt-box" style="margin-top:0.5rem">${escapeHtml(result.responseText)}</div></details>` : "";
       return `<div class="audit-card">
       <h3>${displayName} Review</h3>
-      <span class="audit-score audit-pending">Score Parse Failed</span>
-      <p style="margin-top:0.5rem;font-size:0.9rem;color:var(--text2)">The AI returned a report but scores could not be extracted automatically.${model}</p>
+      <span class="audit-score audit-pending" data-t="Score Parse Failed">Score Parse Failed</span>
+      <p style="margin-top:0.5rem;font-size:0.9rem;color:var(--text2)" data-t="The AI returned a report but scores could not be extracted automatically.">The AI returned a report but scores could not be extracted automatically.${model}</p>
       ${fullReport}
     </div>`;
     }
@@ -1622,7 +1624,7 @@ async function handleAuditPage(env) {
     // Fallback for unknown status
     return `<div class="audit-card">
       <h3>${displayName} Review</h3>
-      <span class="audit-score audit-pending">Pending</span>
+      <span class="audit-score audit-pending" data-t="Pending">Pending</span>
       <p style="margin-top:0.5rem;font-size:0.9rem;color:var(--text2)">Status: ${escapeHtml(result.status || "unknown")}</p>
     </div>`;
   }
@@ -1670,23 +1672,23 @@ async function handleAuditPage(env) {
     <div class="cta-banner"><a class="cta-btn" href="/app?start=1" data-t="Build My Voting Guide">Build My Voting Guide</a><p class="cta-sub" data-t="5-minute personalized ballot">5-minute personalized ballot</p></div>
 
     <h2 style="margin-top:1.5rem" data-t="Independent AI Audit Scores">Independent AI Audit Scores</h2>
-    <p>We submitted our complete methodology to four independent AI systems. Each scored our process across five dimensions: partisan bias, factual accuracy, fairness of framing, balance of pros/cons, and transparency.</p>
+    <p data-t="We submitted our complete methodology to four independent AI systems. Each scored our process across five dimensions: partisan bias, factual accuracy, fairness of framing, balance of pros/cons, and transparency.">We submitted our complete methodology to four independent AI systems. Each scored our process across five dimensions: partisan bias, factual accuracy, fairness of framing, balance of pros/cons, and transparency.</p>
     ${lastRunHtml}
     ${auditCardsHtml}
-    <p class="note" style="margin-bottom:2rem">Each AI was given the same prompt with our full <a href="/api/audit/export">methodology export</a> embedded. Scores are extracted automatically from structured JSON responses. You can also <a href="/api/audit/results">view the raw results as JSON</a>.</p>
+    <p class="note" style="margin-bottom:2rem" data-t="Each AI was given the same prompt with our full methodology export embedded. Scores are extracted automatically from structured JSON responses.">Each AI was given the same prompt with our full <a href="/api/audit/export">methodology export</a> embedded. Scores are extracted automatically from structured JSON responses. You can also <a href="/api/audit/results">view the raw results as JSON</a>.</p>
 
     <div style="margin-bottom:2rem">
-      <a class="export-btn" href="/api/audit/export" target="_blank">Download Full Methodology Export (JSON)</a>
-      <p class="note">This JSON file contains every prompt, safeguard, and data pipeline used in the app. You can paste it into any AI system to verify our claims.</p>
+      <a class="export-btn" href="/api/audit/export" target="_blank" data-t="Download Full Methodology Export (JSON)">Download Full Methodology Export (JSON)</a>
+      <p class="note" data-t="This JSON file contains every prompt, safeguard, and data pipeline used in the app. You can paste it into any AI system to verify our claims.">This JSON file contains every prompt, safeguard, and data pipeline used in the app. You can paste it into any AI system to verify our claims.</p>
     </div>
 
-    <h2>Run the Audit Yourself</h2>
-    <p>Don't just take our word for it. Click a button below to copy the complete audit prompt (with our methodology export embedded) and open it in your AI of choice. Just paste and hit send.</p>
+    <h2 data-t="Run the Audit Yourself">Run the Audit Yourself</h2>
+    <p data-t="Don't just take our word for it. Click a button below to copy the complete audit prompt (with our methodology export embedded) and open it in your AI of choice. Just paste and hit send.">Don't just take our word for it. Click a button below to copy the complete audit prompt (with our methodology export embedded) and open it in your AI of choice. Just paste and hit send.</p>
     <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin:1rem 0">
-      <button class="export-btn" onclick="runAudit('https://chatgpt.com/')" style="border:none;cursor:pointer">Audit with ChatGPT</button>
-      <button class="export-btn" onclick="runAudit('https://gemini.google.com/app')" style="border:none;cursor:pointer">Audit with Gemini</button>
-      <button class="export-btn" onclick="runAudit('https://grok.x.ai/')" style="border:none;cursor:pointer">Audit with Grok</button>
-      <button class="export-btn" onclick="runAudit('https://claude.ai/')" style="border:none;cursor:pointer">Audit with Claude</button>
+      <button class="export-btn" onclick="runAudit('https://chatgpt.com/')" style="border:none;cursor:pointer" data-t="Audit with ChatGPT">Audit with ChatGPT</button>
+      <button class="export-btn" onclick="runAudit('https://gemini.google.com/app')" style="border:none;cursor:pointer" data-t="Audit with Gemini">Audit with Gemini</button>
+      <button class="export-btn" onclick="runAudit('https://grok.x.ai/')" style="border:none;cursor:pointer" data-t="Audit with Grok">Audit with Grok</button>
+      <button class="export-btn" onclick="runAudit('https://claude.ai/')" style="border:none;cursor:pointer" data-t="Audit with Claude">Audit with Claude</button>
     </div>
     <div id="audit-toast" style="display:none;background:#16a34a;color:#fff;padding:0.75rem 1.25rem;border-radius:var(--rs);font-weight:600;margin:0.75rem 0;text-align:center;font-size:0.95rem">Prompt copied! Paste it into the chat.</div>
     <script>
@@ -1723,22 +1725,22 @@ async function handleAuditPage(env) {
     <h2 data-t="How We Generate Recommendations">How We Generate Recommendations</h2>
     <p data-t="When a voter uses Texas Votes, the process works as follows:">When a voter uses Texas Votes, the process works as follows:</p>
     <ol style="padding-left:1.5rem;margin-bottom:0.75rem">
-      <li style="margin-bottom:0.5rem"><strong>Interview:</strong> The voter answers questions about their top issues, political spectrum, policy stances, and what qualities they value in candidates. All questions are neutrally framed and answer options are shuffled.</li>
-      <li style="margin-bottom:0.5rem"><strong>District lookup:</strong> Their address is sent to the U.S. Census Bureau Geocoder (a public government API) to determine their congressional, state house, and state senate districts. This filters the ballot to only races they can vote in.</li>
-      <li style="margin-bottom:0.5rem"><strong>Guide generation:</strong> The voter's profile (issues, spectrum, stances) is sent along with the full candidate data for their ballot to Claude (by Anthropic) with strict nonpartisan instructions. The AI recommends one candidate per race and a stance on each proposition, with reasoning tied to the voter's stated values.</li>
-      <li style="margin-bottom:0.5rem"><strong>Local storage:</strong> The generated guide is stored only on the voter's device. Nothing is saved on our servers.</li>
+      <li style="margin-bottom:0.5rem" data-t="Interview: The voter answers questions about their top issues, political spectrum, policy stances, and what qualities they value in candidates. All questions are neutrally framed and answer options are shuffled."><strong>Interview:</strong> The voter answers questions about their top issues, political spectrum, policy stances, and what qualities they value in candidates. All questions are neutrally framed and answer options are shuffled.</li>
+      <li style="margin-bottom:0.5rem" data-t="District lookup: Their address is sent to the U.S. Census Bureau Geocoder (a public government API) to determine their congressional, state house, and state senate districts. This filters the ballot to only races they can vote in."><strong>District lookup:</strong> Their address is sent to the U.S. Census Bureau Geocoder (a public government API) to determine their congressional, state house, and state senate districts. This filters the ballot to only races they can vote in.</li>
+      <li style="margin-bottom:0.5rem" data-t="Guide generation: The voter's profile is sent along with the full candidate data for their ballot to Claude (by Anthropic) with strict nonpartisan instructions. The AI recommends one candidate per race and a stance on each proposition, with reasoning tied to the voter's stated values."><strong>Guide generation:</strong> The voter's profile (issues, spectrum, stances) is sent along with the full candidate data for their ballot to Claude (by Anthropic) with strict nonpartisan instructions. The AI recommends one candidate per race and a stance on each proposition, with reasoning tied to the voter's stated values.</li>
+      <li style="margin-bottom:0.5rem" data-t="Local storage: The generated guide is stored only on the voter's device. Nothing is saved on our servers."><strong>Local storage:</strong> The generated guide is stored only on the voter's device. Nothing is saved on our servers.</li>
     </ol>
 
     <h2 data-t="Our Prompts">Our Prompts</h2>
     <p data-t="These are the exact AI prompts used in production. Nothing is paraphrased or summarized.">These are the exact AI prompts used in production. Nothing is paraphrased or summarized.</p>
 
     <details>
-      <summary>Guide Generation System Prompt</summary>
+      <summary data-t="Guide Generation System Prompt">Guide Generation System Prompt</summary>
       <div class="prompt-box">You are a non-partisan voting guide assistant for Texas elections. Your job is to make personalized recommendations based ONLY on the voter's stated values and the candidate data provided. You must NEVER recommend a candidate who is not listed in the provided ballot data. You must NEVER invent or hallucinate candidate information. VOICE: Always address the voter as "you" (second person). Never say "the voter" or use third person. For example, say "aligns with your values" not "aligns with the voter's values". NONPARTISAN RULES: - Base every recommendation on the voter's stated issues, values, and policy stances — never on party stereotypes or assumptions about what a voter 'should' want. - Use neutral, factual language in all reasoning. Avoid loaded terms, partisan framing, or editorial commentary. - Treat all candidates with equal analytical rigor regardless of their positions. - For propositions, connect recommendations to the voter's stated values without advocating for or against any ideology. Respond with ONLY valid JSON — no markdown, no explanation, no text outside the JSON object.</div>
     </details>
 
     <details>
-      <summary>Guide Generation User Prompt (Template)</summary>
+      <summary data-t="Guide Generation User Prompt (Template)">Guide Generation User Prompt (Template)</summary>
       <div class="prompt-box">Recommend ONE candidate per race and a stance on each proposition. Be concise.
 
 NONPARTISAN: All reasoning must be factual and issue-based. Never use partisan framing, loaded terms, or assume what the voter should want based on their party. Treat every candidate and proposition with equal analytical rigor. Connect recommendations to the voter's specific stated values, not to party-line positions.
@@ -1776,12 +1778,12 @@ Return ONLY this JSON:
     </details>
 
     <details>
-      <summary>Profile Summary System Prompt</summary>
+      <summary data-t="Profile Summary System Prompt">Profile Summary System Prompt</summary>
       <div class="prompt-box">You are a concise, non-partisan political analyst. Return only plain text, no formatting. Describe the voter's views using neutral, respectful language. Never use partisan labels, stereotypes, or loaded terms. Focus on their actual stated values and priorities.</div>
     </details>
 
     <details>
-      <summary>Candidate Research System Prompt (County Seeder)</summary>
+      <summary data-t="Candidate Research System Prompt (County Seeder)">Candidate Research System Prompt (County Seeder)</summary>
       <div class="prompt-box">You are a nonpartisan election data researcher for Texas. Use web_search to find verified, factual information about elections. Return ONLY valid JSON. Never fabricate information — if you cannot verify something, use null.
 
 SOURCE PRIORITY: When evaluating web_search results, prefer sources in this order:
@@ -1797,7 +1799,7 @@ CONFLICT RESOLUTION: If sources disagree, trust official filings over campaign c
     </details>
 
     <details>
-      <summary>Daily Updater System Prompt</summary>
+      <summary data-t="Daily Updater System Prompt">Daily Updater System Prompt</summary>
       <div class="prompt-box">You are a nonpartisan election data researcher. Use web_search to find verified, factual updates about candidates. Return ONLY valid JSON. Never fabricate information — if you cannot verify something, use null.
 
 SOURCE PRIORITY: When evaluating web_search results, prefer sources in this order:
@@ -1814,27 +1816,27 @@ CONFLICT RESOLUTION: If sources disagree, trust official filings over campaign c
 
     <h2 data-t="Data Sources">Data Sources</h2>
     <ul>
-      <li><strong>Candidate filings:</strong> Texas Secretary of State official filing lists</li>
-      <li><strong>Candidate profiles:</strong> Researched via Claude with web_search tool, cross-referenced against Ballotpedia, campaign websites, and local news. Each candidate gets the same fields: summary, background, key positions, endorsements, strengths (pros), and concerns (cons).</li>
-      <li><strong>District boundaries:</strong> U.S. Census Bureau Geocoder API (public government data)</li>
-      <li><strong>County voting info:</strong> County election office websites, verified via web search</li>
-      <li><strong>Propositions:</strong> Official ballot language from the Texas Secretary of State, with background, fiscal impact, supporters, and opponents researched from nonpartisan sources</li>
+      <li data-t="Candidate filings: Texas Secretary of State official filing lists"><strong>Candidate filings:</strong> Texas Secretary of State official filing lists</li>
+      <li data-t="Candidate profiles: Researched via Claude with web_search tool, cross-referenced against Ballotpedia, campaign websites, and local news. Each candidate gets the same fields: summary, background, key positions, endorsements, strengths (pros), and concerns (cons)."><strong>Candidate profiles:</strong> Researched via Claude with web_search tool, cross-referenced against Ballotpedia, campaign websites, and local news. Each candidate gets the same fields: summary, background, key positions, endorsements, strengths (pros), and concerns (cons).</li>
+      <li data-t="District boundaries: U.S. Census Bureau Geocoder API (public government data)"><strong>District boundaries:</strong> U.S. Census Bureau Geocoder API (public government data)</li>
+      <li data-t="County voting info: County election office websites, verified via web search"><strong>County voting info:</strong> County election office websites, verified via web search</li>
+      <li data-t="Propositions: Official ballot language from the Texas Secretary of State, with background, fiscal impact, supporters, and opponents researched from nonpartisan sources"><strong>Propositions:</strong> Official ballot language from the Texas Secretary of State, with background, fiscal impact, supporters, and opponents researched from nonpartisan sources</li>
     </ul>
-    <p class="note">All AI research prompts include a 7-tier source priority hierarchy: TX SOS filings &gt; county offices &gt; campaign sites &gt; nonpartisan references &gt; established news &gt; wire services &gt; avoid blogs/social. When sources conflict, official filings take precedence. See <a href="/api/audit/export">the methodology export</a> for full details.</p>
+    <p class="note" data-t="All AI research prompts include a 7-tier source priority hierarchy. When sources conflict, official filings take precedence.">All AI research prompts include a 7-tier source priority hierarchy: TX SOS filings &gt; county offices &gt; campaign sites &gt; nonpartisan references &gt; established news &gt; wire services &gt; avoid blogs/social. When sources conflict, official filings take precedence. See <a href="/api/audit/export">the methodology export</a> for full details.</p>
 
     <h2 data-t="Bias Safeguards">Bias Safeguards</h2>
-    <p>Every layer of the system includes explicit nonpartisan constraints:</p>
+    <p data-t="Every layer of the system includes explicit nonpartisan constraints:">Every layer of the system includes explicit nonpartisan constraints:</p>
     <ul>
-      <li><strong>Prompt-level:</strong> Every AI prompt includes a NONPARTISAN instruction block prohibiting partisan framing, loaded terms, and party-line assumptions</li>
-      <li><strong>Data-level:</strong> Both parties' ballots are generated with identical prompts and formatting. Every candidate gets the same structured fields (pros and cons, endorsements, key positions). Candidates with sparse data are labeled "Limited public info" so information gaps are transparent rather than misleading</li>
-      <li><strong>UI-level:</strong> Candidate order randomized on every page load. Party labels hidden from candidate cards. Interview answer options shuffled. Confidence levels prevent false certainty</li>
-      <li><strong>Validation-level:</strong> The daily updater validates that candidate counts and names don't change unexpectedly, endorsement lists can't shrink by more than 50%, and no empty fields are introduced</li>
-      <li><strong>Translation-level:</strong> Spanish translations use identical grammatical structures for both parties. Candidate names and data terms stay in English for accuracy</li>
-      <li><strong>Output constraints:</strong> The AI must return structured JSON with specific fields. It cannot recommend candidates not in the ballot data. It cannot invent candidate information. Reasoning must cite the voter's specific stated values.</li>
+      <li data-t="Prompt-level: Every AI prompt includes a NONPARTISAN instruction block prohibiting partisan framing, loaded terms, and party-line assumptions"><strong>Prompt-level:</strong> Every AI prompt includes a NONPARTISAN instruction block prohibiting partisan framing, loaded terms, and party-line assumptions</li>
+      <li data-t="Data-level: Both parties' ballots are generated with identical prompts and formatting. Every candidate gets the same structured fields. Candidates with sparse data are labeled transparently."><strong>Data-level:</strong> Both parties' ballots are generated with identical prompts and formatting. Every candidate gets the same structured fields (pros and cons, endorsements, key positions). Candidates with sparse data are labeled "Limited public info" so information gaps are transparent rather than misleading</li>
+      <li data-t="UI-level: Candidate order randomized on every page load. Party labels hidden from candidate cards. Interview answer options shuffled. Confidence levels prevent false certainty"><strong>UI-level:</strong> Candidate order randomized on every page load. Party labels hidden from candidate cards. Interview answer options shuffled. Confidence levels prevent false certainty</li>
+      <li data-t="Validation-level: The daily updater validates that candidate counts and names don't change unexpectedly, endorsement lists can't shrink by more than 50%, and no empty fields are introduced"><strong>Validation-level:</strong> The daily updater validates that candidate counts and names don't change unexpectedly, endorsement lists can't shrink by more than 50%, and no empty fields are introduced</li>
+      <li data-t="Translation-level: Spanish translations use identical grammatical structures for both parties. Candidate names and data terms stay in English for accuracy"><strong>Translation-level:</strong> Spanish translations use identical grammatical structures for both parties. Candidate names and data terms stay in English for accuracy</li>
+      <li data-t="Output constraints: The AI must return structured JSON with specific fields. It cannot recommend candidates not in the ballot data. It cannot invent candidate information."><strong>Output constraints:</strong> The AI must return structured JSON with specific fields. It cannot recommend candidates not in the ballot data. It cannot invent candidate information. Reasoning must cite the voter's specific stated values.</li>
     </ul>
 
     <h2 data-t="Sample Data Structure">Sample Data Structure</h2>
-    <p>Every candidate in our database has this structure (equal depth for all candidates):</p>
+    <p data-t="Every candidate in our database has this structure (equal depth for all candidates):">Every candidate in our database has this structure (equal depth for all candidates):</p>
     <div class="prompt-box">{
   "name": "Candidate Name",
   "isIncumbent": true,
@@ -1852,16 +1854,16 @@ CONFLICT RESOLUTION: If sources disagree, trust official filings over campaign c
 }</div>
 
     <h2 data-t="Why Four Different AIs?">Why Four Different AIs?</h2>
-    <p>Texas Votes uses Claude (by Anthropic) to generate recommendations. By asking four AI systems — ChatGPT, Gemini, Grok, and Claude itself — to review our methodology, we get a range of independent assessments. Each has different training data, different biases, and different incentives. Including Claude as an auditor of its own system adds a self-review dimension — it knows its own capabilities and limitations better than anyone, but may also have blind spots about its own biases. If all four find our process fair, that's meaningful. If any identifies bias, we'll address it and publish the fix.</p>
+    <p data-t="Texas Votes uses Claude (by Anthropic) to generate recommendations. By asking four AI systems to review our methodology, we get a range of independent assessments. Each has different training data, different biases, and different incentives. If all four find our process fair, that's meaningful. If any identifies bias, we'll address it and publish the fix.">Texas Votes uses Claude (by Anthropic) to generate recommendations. By asking four AI systems — ChatGPT, Gemini, Grok, and Claude itself — to review our methodology, we get a range of independent assessments. Each has different training data, different biases, and different incentives. Including Claude as an auditor of its own system adds a self-review dimension — it knows its own capabilities and limitations better than anyone, but may also have blind spots about its own biases. If all four find our process fair, that's meaningful. If any identifies bias, we'll address it and publish the fix.</p>
 
     <h2 data-t="Changes Made from Audit Findings">Changes Made from Audit Findings</h2>
     <ul>
-      <li><strong>County coverage labeling:</strong> Both ChatGPT and Gemini flagged that silently omitting local races when county data is unavailable could mislead voters about their ballot's completeness. We now display an in-product info banner — "Local races for [County] County are not yet available" — on both the ballot page and the printable cheat sheet whenever a voter's county lacks local race data. This ensures voters always understand the scope of their guide.</li>
-      <li><strong>Source ranking policy:</strong> ChatGPT's audit recommended documenting an explicit source priority hierarchy for AI web research. We now embed a 7-tier SOURCE PRIORITY block in every research prompt — ranking Texas SOS filings highest and blogs/social media lowest — along with a CONFLICT RESOLUTION rule: official filings override campaign claims, which override news reporting. Full details are in the <a href="/api/audit/export">methodology export</a> under <code>sourceRankingPolicy</code>.</li>
-      <li><strong>Automated balance checks:</strong> Added a <a href="/api/balance-check">/api/balance-check</a> endpoint that scores pros/cons symmetry across all races with critical/warning/info flags. Results are integrated into the <a href="/data-quality">Data Quality Dashboard</a> so imbalances are caught automatically.</li>
-      <li><strong>Bias reporting:</strong> Added a "Flag this info" button on candidate cards so voters can report potential bias or inaccuracy directly. Reports are sent to <a href="mailto:flagged@txvotes.app">flagged@txvotes.app</a> for review and correction.</li>
-      <li><strong>Pros/cons display on recommendations:</strong> Candidate strengths and concerns are now displayed directly on ballot recommendation cards using green and orange styled boxes, giving voters immediate visibility into balanced analysis.</li>
-      <li><strong>Per-candidate source validation:</strong> Each candidate profile now includes individually attributed source citations with URLs, titles, and access dates — not just per-race sources. The county seeder validates sources during data population.</li>
+      <li data-t="County coverage labeling: We now display an info banner when local races for a county are not yet available, so voters always understand the scope of their guide."><strong>County coverage labeling:</strong> Both ChatGPT and Gemini flagged that silently omitting local races when county data is unavailable could mislead voters about their ballot's completeness. We now display an in-product info banner — "Local races for [County] County are not yet available" — on both the ballot page and the printable cheat sheet whenever a voter's county lacks local race data. This ensures voters always understand the scope of their guide.</li>
+      <li data-t="Source ranking policy: We now embed a 7-tier source priority in every research prompt, ranking official filings highest and blogs/social media lowest."><strong>Source ranking policy:</strong> ChatGPT's audit recommended documenting an explicit source priority hierarchy for AI web research. We now embed a 7-tier SOURCE PRIORITY block in every research prompt — ranking Texas SOS filings highest and blogs/social media lowest — along with a CONFLICT RESOLUTION rule: official filings override campaign claims, which override news reporting. Full details are in the <a href="/api/audit/export">methodology export</a> under <code>sourceRankingPolicy</code>.</li>
+      <li data-t="Automated balance checks: Added an endpoint that scores pros/cons symmetry across all races with critical/warning/info flags, integrated into the Data Quality Dashboard."><strong>Automated balance checks:</strong> Added a <a href="/api/balance-check">/api/balance-check</a> endpoint that scores pros/cons symmetry across all races with critical/warning/info flags. Results are integrated into the <a href="/data-quality">Data Quality Dashboard</a> so imbalances are caught automatically.</li>
+      <li data-t="Bias reporting: Added a 'Flag this info' button on candidate cards so voters can report potential bias or inaccuracy directly."><strong>Bias reporting:</strong> Added a "Flag this info" button on candidate cards so voters can report potential bias or inaccuracy directly. Reports are sent to <a href="mailto:flagged@txvotes.app">flagged@txvotes.app</a> for review and correction.</li>
+      <li data-t="Pros/cons display on recommendations: Candidate strengths and concerns are now displayed directly on ballot recommendation cards, giving voters immediate visibility into balanced analysis."><strong>Pros/cons display on recommendations:</strong> Candidate strengths and concerns are now displayed directly on ballot recommendation cards using green and orange styled boxes, giving voters immediate visibility into balanced analysis.</li>
+      <li data-t="Per-candidate source validation: Each candidate profile now includes individually attributed source citations with URLs, titles, and access dates."><strong>Per-candidate source validation:</strong> Each candidate profile now includes individually attributed source citations with URLs, titles, and access dates — not just per-race sources. The county seeder validates sources during data population.</li>
     </ul>
 
     <h2 data-t="Ongoing Commitment">Ongoing Commitment</h2>
@@ -1883,17 +1885,72 @@ CONFLICT RESOLUTION: If sources disagree, trust official filings over campaign c
     'AI Audit': 'Auditor\u00EDa de IA',
     'Texas Votes uses AI to generate personalized voting guides. To prove our process is fair and nonpartisan, we publish our complete methodology.': 'Texas Votes usa IA para generar gu\u00EDas de votaci\u00F3n personalizadas. Para demostrar que nuestro proceso es justo y apartidista, publicamos nuestra metodolog\u00EDa completa.',
     'Independent AI Audit Scores': 'Puntuaciones Independientes de Auditor\u00EDa de IA',
+    'We submitted our complete methodology to four independent AI systems. Each scored our process across five dimensions: partisan bias, factual accuracy, fairness of framing, balance of pros/cons, and transparency.': 'Enviamos nuestra metodolog\u00EDa completa a cuatro sistemas de IA independientes. Cada uno calific\u00F3 nuestro proceso en cinco dimensiones: sesgo partidista, precisi\u00F3n factual, equidad en la presentaci\u00F3n, equilibrio de pros/contras y transparencia.',
+    'Each AI was given the same prompt with our full methodology export embedded. Scores are extracted automatically from structured JSON responses.': 'Cada IA recibi\u00F3 el mismo prompt con nuestra exportaci\u00F3n completa de metodolog\u00EDa incluida. Las puntuaciones se extraen autom\u00E1ticamente de respuestas JSON estructuradas.',
+    'Download Full Methodology Export (JSON)': 'Descargar Exportaci\u00F3n Completa de Metodolog\u00EDa (JSON)',
+    'This JSON file contains every prompt, safeguard, and data pipeline used in the app. You can paste it into any AI system to verify our claims.': 'Este archivo JSON contiene cada prompt, salvaguarda y pipeline de datos usado en la app. Puedes pegarlo en cualquier sistema de IA para verificar nuestras afirmaciones.',
+    'Run the Audit Yourself': 'Ejecuta la Auditor\u00EDa T\u00FA Mismo',
+    "Don't just take our word for it. Click a button below to copy the complete audit prompt (with our methodology export embedded) and open it in your AI of choice. Just paste and hit send.": 'No solo conf\u00EDes en nuestra palabra. Haz clic en un bot\u00F3n a continuaci\u00F3n para copiar el prompt completo de auditor\u00EDa (con nuestra exportaci\u00F3n de metodolog\u00EDa incluida) y \u00E1brelo en la IA de tu elecci\u00F3n. Solo pega y env\u00EDa.',
+    'Audit with ChatGPT': 'Auditar con ChatGPT',
+    'Audit with Gemini': 'Auditar con Gemini',
+    'Audit with Grok': 'Auditar con Grok',
+    'Audit with Claude': 'Auditar con Claude',
     'How We Generate Recommendations': 'C\u00F3mo Generamos Recomendaciones',
     'When a voter uses Texas Votes, the process works as follows:': 'Cuando un votante usa Texas Votes, el proceso funciona as\u00ED:',
+    'Interview: The voter answers questions about their top issues, political spectrum, policy stances, and what qualities they value in candidates. All questions are neutrally framed and answer options are shuffled.': 'Entrevista: El votante responde preguntas sobre sus temas prioritarios, espectro pol\u00EDtico, posturas pol\u00EDticas y qu\u00E9 cualidades valora en los candidatos. Todas las preguntas est\u00E1n formuladas de manera neutral y las opciones de respuesta se mezclan aleatoriamente.',
+    "District lookup: Their address is sent to the U.S. Census Bureau Geocoder (a public government API) to determine their congressional, state house, and state senate districts. This filters the ballot to only races they can vote in.": 'B\u00FAsqueda de distrito: Su direcci\u00F3n se env\u00EDa al Geocodificador de la Oficina del Censo de EE.UU. (una API p\u00FAblica del gobierno) para determinar sus distritos congresionales, de la c\u00E1mara estatal y del senado estatal. Esto filtra la boleta para mostrar solo las contiendas en las que pueden votar.',
+    "Guide generation: The voter's profile is sent along with the full candidate data for their ballot to Claude (by Anthropic) with strict nonpartisan instructions. The AI recommends one candidate per race and a stance on each proposition, with reasoning tied to the voter's stated values.": 'Generaci\u00F3n de gu\u00EDa: El perfil del votante se env\u00EDa junto con los datos completos de candidatos para su boleta a Claude (de Anthropic) con instrucciones estrictamente apartidistas. La IA recomienda un candidato por contienda y una postura sobre cada proposici\u00F3n, con razonamiento vinculado a los valores declarados del votante.',
+    'Local storage: The generated guide is stored only on the voter\'s device. Nothing is saved on our servers.': 'Almacenamiento local: La gu\u00EDa generada se almacena solo en el dispositivo del votante. Nada se guarda en nuestros servidores.',
     'Our Prompts': 'Nuestros Prompts',
     'These are the exact AI prompts used in production. Nothing is paraphrased or summarized.': 'Estos son los prompts exactos de IA usados en producci\u00F3n. Nada est\u00E1 parafraseado ni resumido.',
+    'Guide Generation System Prompt': 'Prompt del Sistema de Generaci\u00F3n de Gu\u00EDa',
+    'Guide Generation User Prompt (Template)': 'Prompt de Usuario de Generaci\u00F3n de Gu\u00EDa (Plantilla)',
+    'Profile Summary System Prompt': 'Prompt del Sistema de Resumen de Perfil',
+    'Candidate Research System Prompt (County Seeder)': 'Prompt del Sistema de Investigaci\u00F3n de Candidatos (Sembrador de Condados)',
+    'Daily Updater System Prompt': 'Prompt del Sistema de Actualizaci\u00F3n Diaria',
     'Data Sources': 'Fuentes de Datos',
+    'Candidate filings: Texas Secretary of State official filing lists': 'Registros de candidatos: Listas oficiales de registro del Secretario de Estado de Texas',
+    'Candidate profiles: Researched via Claude with web_search tool, cross-referenced against Ballotpedia, campaign websites, and local news. Each candidate gets the same fields: summary, background, key positions, endorsements, strengths (pros), and concerns (cons).': 'Perfiles de candidatos: Investigados a trav\u00E9s de Claude con la herramienta web_search, verificados contra Ballotpedia, sitios web de campa\u00F1a y noticias locales. Cada candidato recibe los mismos campos: resumen, trayectoria, posiciones clave, respaldos, fortalezas (pros) y preocupaciones (contras).',
+    'District boundaries: U.S. Census Bureau Geocoder API (public government data)': 'L\u00EDmites de distritos: API del Geocodificador de la Oficina del Censo de EE.UU. (datos p\u00FAblicos del gobierno)',
+    'County voting info: County election office websites, verified via web search': 'Info de votaci\u00F3n del condado: Sitios web de las oficinas electorales del condado, verificados por b\u00FAsqueda web',
+    'Propositions: Official ballot language from the Texas Secretary of State, with background, fiscal impact, supporters, and opponents researched from nonpartisan sources': 'Proposiciones: Lenguaje oficial de boleta del Secretario de Estado de Texas, con antecedentes, impacto fiscal, partidarios y opositores investigados de fuentes apartidistas',
+    'All AI research prompts include a 7-tier source priority hierarchy. When sources conflict, official filings take precedence.': 'Todos los prompts de investigaci\u00F3n de IA incluyen una jerarqu\u00EDa de prioridad de fuentes de 7 niveles. Cuando las fuentes entran en conflicto, los registros oficiales tienen prioridad.',
     'Bias Safeguards': 'Salvaguardas contra Sesgo',
+    'Every layer of the system includes explicit nonpartisan constraints:': 'Cada capa del sistema incluye restricciones apartidistas expl\u00EDcitas:',
+    'Prompt-level: Every AI prompt includes a NONPARTISAN instruction block prohibiting partisan framing, loaded terms, and party-line assumptions': 'Nivel de prompt: Cada prompt de IA incluye un bloque de instrucciones APARTIDISTAS que proh\u00EDbe encuadres partidistas, t\u00E9rminos tendenciosos y suposiciones de l\u00EDnea partidista',
+    "Data-level: Both parties' ballots are generated with identical prompts and formatting. Every candidate gets the same structured fields. Candidates with sparse data are labeled transparently.": 'Nivel de datos: Las boletas de ambos partidos se generan con prompts y formato id\u00E9nticos. Cada candidato recibe los mismos campos estructurados. Los candidatos con datos escasos se etiquetan de manera transparente.',
+    'UI-level: Candidate order randomized on every page load. Party labels hidden from candidate cards. Interview answer options shuffled. Confidence levels prevent false certainty': 'Nivel de interfaz: El orden de candidatos se aleatoriza en cada carga de p\u00E1gina. Las etiquetas de partido se ocultan de las tarjetas de candidatos. Las opciones de respuesta de la entrevista se mezclan. Los niveles de confianza previenen falsa certeza',
+    "Validation-level: The daily updater validates that candidate counts and names don't change unexpectedly, endorsement lists can't shrink by more than 50%, and no empty fields are introduced": 'Nivel de validaci\u00F3n: El actualizador diario valida que los conteos y nombres de candidatos no cambien inesperadamente, las listas de respaldos no puedan reducirse m\u00E1s del 50%, y no se introduzcan campos vac\u00EDos',
+    'Translation-level: Spanish translations use identical grammatical structures for both parties. Candidate names and data terms stay in English for accuracy': 'Nivel de traducci\u00F3n: Las traducciones al espa\u00F1ol usan estructuras gramaticales id\u00E9nticas para ambos partidos. Los nombres de candidatos y t\u00E9rminos de datos permanecen en ingl\u00E9s para mayor precisi\u00F3n',
+    'Output constraints: The AI must return structured JSON with specific fields. It cannot recommend candidates not in the ballot data. It cannot invent candidate information.': 'Restricciones de salida: La IA debe devolver JSON estructurado con campos espec\u00EDficos. No puede recomendar candidatos que no est\u00E9n en los datos de la boleta. No puede inventar informaci\u00F3n de candidatos.',
     'Sample Data Structure': 'Estructura de Datos de Ejemplo',
+    'Every candidate in our database has this structure (equal depth for all candidates):': 'Cada candidato en nuestra base de datos tiene esta estructura (misma profundidad para todos los candidatos):',
     'Why Four Different AIs?': '\u00BFPor Qu\u00E9 Cuatro IAs Diferentes?',
+    "Texas Votes uses Claude (by Anthropic) to generate recommendations. By asking four AI systems to review our methodology, we get a range of independent assessments. Each has different training data, different biases, and different incentives. If all four find our process fair, that's meaningful. If any identifies bias, we'll address it and publish the fix.": 'Texas Votes usa Claude (de Anthropic) para generar recomendaciones. Al pedir a cuatro sistemas de IA que revisen nuestra metodolog\u00EDa, obtenemos una variedad de evaluaciones independientes. Cada uno tiene diferentes datos de entrenamiento, diferentes sesgos y diferentes incentivos. Si los cuatro encuentran que nuestro proceso es justo, eso es significativo. Si alguno identifica sesgo, lo abordaremos y publicaremos la correcci\u00F3n.',
     'Changes Made from Audit Findings': 'Cambios Realizados por Hallazgos de Auditor\u00EDa',
+    'County coverage labeling: We now display an info banner when local races for a county are not yet available, so voters always understand the scope of their guide.': 'Etiquetado de cobertura del condado: Ahora mostramos un banner informativo cuando las contiendas locales de un condado a\u00FAn no est\u00E1n disponibles, para que los votantes siempre comprendan el alcance de su gu\u00EDa.',
+    'Source ranking policy: We now embed a 7-tier source priority in every research prompt, ranking official filings highest and blogs/social media lowest.': 'Pol\u00EDtica de clasificaci\u00F3n de fuentes: Ahora incluimos una prioridad de fuentes de 7 niveles en cada prompt de investigaci\u00F3n, clasificando los registros oficiales como m\u00E1xima prioridad y blogs/redes sociales como m\u00EDnima.',
+    'Automated balance checks: Added an endpoint that scores pros/cons symmetry across all races with critical/warning/info flags, integrated into the Data Quality Dashboard.': 'Verificaciones de equilibrio automatizadas: Se agreg\u00F3 un endpoint que califica la simetr\u00EDa de pros/contras en todas las contiendas con indicadores cr\u00EDticos/advertencia/info, integrado en el Panel de Calidad de Datos.',
+    "Bias reporting: Added a 'Flag this info' button on candidate cards so voters can report potential bias or inaccuracy directly.": 'Reporte de sesgo: Se agreg\u00F3 un bot\u00F3n "Marcar esta info" en las tarjetas de candidatos para que los votantes puedan reportar posible sesgo o inexactitud directamente.',
+    'Pros/cons display on recommendations: Candidate strengths and concerns are now displayed directly on ballot recommendation cards, giving voters immediate visibility into balanced analysis.': 'Visualizaci\u00F3n de pros/contras en recomendaciones: Las fortalezas y preocupaciones de los candidatos ahora se muestran directamente en las tarjetas de recomendaci\u00F3n de boleta, dando a los votantes visibilidad inmediata del an\u00E1lisis equilibrado.',
+    'Per-candidate source validation: Each candidate profile now includes individually attributed source citations with URLs, titles, and access dates.': 'Validaci\u00F3n de fuentes por candidato: Cada perfil de candidato ahora incluye citas de fuentes individualmente atribuidas con URLs, t\u00EDtulos y fechas de acceso.',
     'Ongoing Commitment': 'Compromiso Continuo',
     'This audit is not a one-time event.': 'Esta auditor\u00EDa no es un evento \u00FAnico.',
+    'Pending': 'Pendiente',
+    'Audit not yet run. Results will be published here when complete.': 'Auditor\u00EDa a\u00FAn no ejecutada. Los resultados se publicar\u00E1n aqu\u00ED cuando est\u00E9n completos.',
+    'Error': 'Error',
+    'Score Parse Failed': 'Fallo al Extraer Puntuaci\u00F3n',
+    'The AI returned a report but scores could not be extracted automatically.': 'La IA devolvi\u00F3 un informe pero las puntuaciones no se pudieron extraer autom\u00E1ticamente.',
+    'Strength:': 'Fortaleza:',
+    'Weakness:': 'Debilidad:',
+    'Last run:': '\u00DAltima ejecuci\u00F3n:',
+    'View Full Report': 'Ver Informe Completo',
+    'View Raw Response': 'Ver Respuesta Sin Procesar',
+    'Partisan Bias': 'Sesgo Partidista',
+    'Factual Accuracy': 'Precisi\u00F3n Factual',
+    'Fairness of Framing': 'Equidad en la Presentaci\u00F3n',
+    'Balance of Pros/Cons': 'Equilibrio de Pros/Contras',
+    'Transparency': 'Transparencia',
   })}
 </body>
 </html>`;
@@ -3423,11 +3480,19 @@ async function handleCandidateProfile(slug, env) {
 async function handleCandidatesIndex(env) {
   const allCandidates = await loadAllCandidates(env);
 
+  // Collect unique county names from candidates
+  const countySet = new Set();
+  for (const entry of allCandidates) {
+    if (entry.countyName) countySet.add(entry.countyName);
+  }
+  const countyNames = [...countySet].sort();
+
   // Group by race name, then by party within each race
-  const raceMap = new Map(); // raceLabel -> { republican: [], democrat: [] }
+  // Also track which county each race belongs to (null = statewide)
+  const raceMap = new Map(); // raceLabel -> { republican: [], democrat: [], countyName }
   for (const entry of allCandidates) {
     if (!raceMap.has(entry.race)) {
-      raceMap.set(entry.race, { republican: [], democrat: [] });
+      raceMap.set(entry.race, { republican: [], democrat: [], countyName: entry.countyName || null });
     }
     raceMap.get(entry.race)[entry.party].push(entry);
   }
@@ -3450,20 +3515,21 @@ async function handleCandidatesIndex(env) {
   }
 
   let raceSections = "";
-  for (const [raceName, parties] of raceMap) {
+  for (const [raceName, raceData] of raceMap) {
+    const dataCounty = raceData.countyName ? escapeHtml(raceData.countyName) : "statewide";
     raceSections += `
-    <div style="margin-bottom:2rem;border:1px solid var(--border);border-radius:12px;overflow:hidden">
+    <div class="race-section" data-county="${dataCounty}" style="margin-bottom:2rem;border:1px solid var(--border);border-radius:12px;overflow:hidden">
       <div style="background:var(--card);padding:0.75rem 1rem;border-bottom:1px solid var(--border)">
         <h2 style="margin:0;font-size:1.1rem">${escapeHtml(raceName)}</h2>
       </div>
       <div class="party-columns">
         <div class="party-col">
           <div style="font-weight:600;color:#c62626;margin-bottom:0.25rem;font-size:0.9rem">Republican</div>
-          ${renderCandidateList(parties.republican)}
+          ${renderCandidateList(raceData.republican)}
         </div>
         <div class="party-col">
           <div style="font-weight:600;color:#2563eb;margin-bottom:0.25rem;font-size:0.9rem">Democrat</div>
-          ${renderCandidateList(parties.democrat)}
+          ${renderCandidateList(raceData.democrat)}
         </div>
       </div>
     </div>`;
@@ -3471,6 +3537,22 @@ async function handleCandidatesIndex(env) {
 
   if (!raceSections) {
     raceSections = `<p class="subtitle">No candidate data is available yet. Check back soon.</p>`;
+  }
+
+  // Build county filter dropdown (only shown if there are county candidates)
+  let countyFilter = "";
+  if (countyNames.length > 0) {
+    const options = countyNames.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)} County</option>`).join("");
+    countyFilter = `
+    <div style="margin-bottom:1.5rem">
+      <label for="county-filter" style="font-size:0.9rem;color:var(--text2);margin-right:0.5rem" data-t="Filter by county:">Filter by county:</label>
+      <select id="county-filter" style="font-size:1rem;padding:0.4rem 0.75rem;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text);font-family:inherit;cursor:pointer">
+        <option value="all" data-t="All Counties">All Counties</option>
+        <option value="statewide" data-t="Statewide Only">Statewide Only</option>
+        ${options}
+      </select>
+      <span id="county-count" style="font-size:0.85rem;color:var(--text2);margin-left:0.75rem"></span>
+    </div>`;
   }
 
   const html = `<!DOCTYPE html>
@@ -3503,6 +3585,8 @@ async function handleCandidatesIndex(env) {
 
     <div class="cta-banner"><a class="cta-btn" href="/app?start=1" data-t="Build My Voting Guide">Build My Voting Guide</a><p class="cta-sub" data-t="5-minute personalized ballot">5-minute personalized ballot</p></div>
 
+    ${countyFilter}
+
     ${raceSections}
 
     <h2 data-t="Related">Related</h2>
@@ -3517,8 +3601,43 @@ async function handleCandidatesIndex(env) {
 
     <div class="page-footer"><a href="/" data-t="Texas Votes">Texas Votes</a> &middot; <a href="/how-it-works" data-t="How It Works">How It Works</a> &middot; <a href="/privacy" data-t="Privacy">Privacy</a><br><span style="color:var(--red)">&starf;</span> <span data-t="Built in Texas">Built in Texas</span> &middot; <a href="mailto:howdy@txvotes.app">howdy@txvotes.app</a></div>
   </div>
+  <script>
+  (function(){
+    var sel = document.getElementById('county-filter');
+    if (!sel) return;
+    var countEl = document.getElementById('county-count');
+    var sections = document.querySelectorAll('.race-section');
+    function update() {
+      var v = sel.value;
+      var shown = 0;
+      for (var i = 0; i < sections.length; i++) {
+        var s = sections[i];
+        var county = s.getAttribute('data-county');
+        var show = false;
+        if (v === 'all') {
+          show = true;
+        } else if (v === 'statewide') {
+          show = (county === 'statewide');
+        } else {
+          // Show statewide + selected county
+          show = (county === 'statewide' || county === v);
+        }
+        s.style.display = show ? '' : 'none';
+        if (show) shown++;
+      }
+      if (countEl) {
+        countEl.textContent = shown + (shown === 1 ? ' race' : ' races');
+      }
+    }
+    sel.addEventListener('change', update);
+    update();
+  })();
+  <\/script>
   ${pageI18n({
     '2026 Texas Primary Election \\u2014 March 3, 2026': 'Elecci\u00F3n Primaria de Texas 2026 \\u2014 3 de marzo, 2026',
+    'Filter by county:': 'Filtrar por condado:',
+    'All Counties': 'Todos los Condados',
+    'Statewide Only': 'Solo Estatales',
   })}
 </body>
 </html>`;
