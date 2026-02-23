@@ -47,7 +47,7 @@ li{font-size:1rem;color:var(--text);margin-bottom:0.75rem}
 .related-links{list-style:none;padding:0;margin:0}
 .related-links li{margin-bottom:0.75rem}
 .related-links a{font-weight:600;font-size:0.95rem}
-.cta-banner{text-align:center;margin:0.75rem 0 1rem;padding:0.75rem 1rem;background:rgba(33,89,143,.04);border-radius:var(--r)}
+.cta-banner{text-align:center;margin:12px 0 16px;padding:0.75rem 1rem;background:rgba(33,89,143,.04);border-radius:var(--r)}
 @media(prefers-color-scheme:dark){.cta-banner{background:rgba(102,153,217,.06)}}
 .cta-banner a.cta-btn{background:var(--blue);color:#fff;font-weight:600;padding:0.6rem 1.25rem;border-radius:var(--rs);text-decoration:none;display:inline-block;font-size:0.95rem;transition:opacity .15s}
 .cta-banner a.cta-btn:hover{opacity:0.9}
@@ -472,8 +472,9 @@ function handleLandingPage() {
       <div data-t="Print your cheat sheet for the booth"><span>🖨️</span> Print your cheat sheet for the booth</div>
       <div data-t="Find your polling location"><span>📍</span> Find your polling location</div>
       <div data-t="Nonpartisan and Open Source by design"><span>⚖️</span> <a href="/nonpartisan">Nonpartisan</a> and <a href="/open-source">Open Source</a> by design</div>
+      <div data-t="No personal data collected — everything stays on your device"><span>🔒</span> <strong>No personal data collected</strong> — everything stays on your device</div>
     </div>
-    <p class="note" data-t="Works on any device — phone, tablet, or computer. No app download needed. No personal data collected.">Works on any device — phone, tablet, or computer. No app download needed. No personal data collected.</p>
+    <p class="note" data-t="Works on any device — phone, tablet, or computer. No app download needed.">Works on any device — phone, tablet, or computer. No app download needed.</p>
   </div>
   <div style="text-align:center;margin-top:16px">
     <button id="lang-toggle" style="font-size:14px;color:var(--text2);background:none;border:none;cursor:pointer;font-family:inherit"></button>
@@ -497,7 +498,8 @@ function handleLandingPage() {
       'Print your cheat sheet for the booth':'Imprime tu gu\\u00EDa r\\u00E1pida para la casilla',
       'Find your polling location':'Encuentra tu lugar de votaci\\u00F3n',
       'Nonpartisan and Open Source by design':'Apartidista y c\\u00F3digo abierto por dise\\u00F1o',
-      'Works on any device \\u2014 phone, tablet, or computer. No app download needed. No personal data collected.':'Funciona en cualquier dispositivo \\u2014 tel\\u00E9fono, tableta o computadora. No necesitas descargar una app. No se recopilan datos personales.',
+      'No personal data collected \\u2014 everything stays on your device':'No se recopilan datos personales \\u2014 todo permanece en tu dispositivo',
+      'Works on any device \\u2014 phone, tablet, or computer. No app download needed.':'Funciona en cualquier dispositivo \\u2014 tel\\u00E9fono, tableta o computadora. No necesitas descargar una app.',
       'How It Works':'C\\u00F3mo Funciona',
       'Nonpartisan by Design':'Apartidista por Dise\\u00F1o',
       'AI Audit':'Auditor\\u00EDa de IA',
@@ -764,7 +766,7 @@ function handleSampleBallot() {
       </div>
     </div>
 
-    <div class="cta-banner"><a class="cta-btn" href="/app?start=1" data-t="Build My Voting Guide">Build My Voting Guide &rarr;</a><p class="cta-sub" data-t="5-minute personalized ballot">5-minute personalized ballot</p></div>
+    <div class="cta-banner"><a class="cta-btn" href="/app?start=1" data-t="Build My Voting Guide">Build My Voting Guide</a><p class="cta-sub" data-t="5-minute personalized ballot">5-minute personalized ballot</p></div>
 
     <!-- ==================== REPUBLICAN BALLOT ==================== -->
     <div data-party="republican">
@@ -1757,16 +1759,20 @@ async function handleAuditPage(env) {
     }
     async function runAudit(url){
       var t=document.getElementById('audit-toast');
-      var win=window.open(url,'_blank');
+      var win=window.open('','_blank');
       try{
         t.textContent='Loading methodology export...';t.style.display='block';t.style.background='var(--blue)';
+        window.focus();
         var r=await fetch('/api/audit/export');var json=await r.text();
         var prompt=${auditPromptTextJson}+json+${auditPromptSuffixJson};
         await copyText(prompt);
-        t.textContent='Prompt copied! Paste it into the chat.';t.style.background='#16a34a';
+        t.textContent='Prompt copied! Paste it into the AI chat.';t.style.background='#16a34a';
         setTimeout(function(){t.style.display='none'},8000);
+        if(win&&!win.closed){win.location.href=url;}
+        else{t.innerHTML='Prompt copied! <a href="'+url+'" target="_blank" style="color:#fff;text-decoration:underline">Open the AI chat</a> and paste it.';}
       }catch(e){
         t.textContent='Error: '+e.message;t.style.background='#dc2626';t.style.display='block';
+        if(win&&!win.closed)win.close();
       }
     }
     </script>

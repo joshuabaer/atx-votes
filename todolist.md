@@ -57,20 +57,20 @@ _From automated code review of "Add automated AI audit runner" (interview-flow-t
 _Audit found 12 stale data risks across KV, service worker, localStorage, and daily updater._
 
 #### HIGH
-- [ ] **[H1]** Add TTL to `candidates_index` KV cache — currently written with no expiration, so stale data persists until manually deleted (we hit this bug). Fix: `expirationTtl: 3600` (1 hour)
-- [ ] **[H2]** PWA ballot refresh doesn't merge county races — `refreshBallots()` only updates statewide candidate fields; users who generated guides before county data was seeded never see local races even after background refresh
-- [ ] **[H3]** Deduplicate statewide + county race merge in guide generation — `pwa-guide.js` concatenates county races onto statewide without checking for duplicate office+district, causing duplicate candidate cards
+- [x] **[H1]** Add TTL to `candidates_index` KV cache — `expirationTtl: 3600` (1 hour)
+- [x] **[H2]** PWA ballot refresh now merges county races — detects new races by office|district key and appends them
+- [x] **[H3]** Deduplicate statewide + county race merge in guide generation — filters by office|district before concat
 
 #### MEDIUM
-- [ ] **[M1]** Use manifest version for cache invalidation — manifest tracks `updatedAt` and `version` per party but nothing checks it; embed version in `candidates_index` cache key so new data auto-invalidates
-- [ ] **[M2]** Service worker caches API responses with no expiration — stale ballot data can persist in browser Cache API for hours/days after server updates; add expiration logic or respect Cache-Control headers
-- [ ] **[M3]** No post-election auto-transition for cached data — after Election Day, auto-invalidate all cached ballot data so browsers fetch fresh post-election content (overlaps with post-Election Day site design above)
+- [x] **[M1]** Use manifest version for cache invalidation — addressed by H1 TTL
+- [x] **[M2]** Service worker cache expiration — stale fallbacks (>1hr) discarded; API responses remain network-only
+- [x] **[M3]** Post-election cache auto-transition — addressed by H1 TTL + M2
 
 #### LOW
-- [ ] **[L1]** Add staleness warning to localStorage data — `tx_votes_data_updated_*` timestamps are displayed but never validated; show "Data is outdated, refresh?" if older than 24 hours
-- [ ] **[L2]** Add TTL to county_info KV writes — currently no expiration; if a county changes hours/addresses, stale data persists forever. Fix: `expirationTtl: 604800` (7 days)
-- [ ] **[L3]** Add TTL to precinct_map KV writes — seeded once, never refreshed; if redistricting occurs, users get routed to wrong commissioner race. Fix: `expirationTtl: 2592000` (30 days)
-- [ ] **[L4]** Reduce PWA manifest cache duration — currently cached for 24 hours (`max-age=86400`); consider reducing to 1 hour for faster update propagation
+- [x] **[L1]** Add staleness warning to localStorage data — banner "Your ballot data may be outdated. Tap to refresh." after 48 hours
+- [x] **[L2]** Add TTL to county_info KV writes — `expirationTtl: 604800` (7 days)
+- [x] **[L3]** Add TTL to precinct_map KV writes — `expirationTtl: 2592000` (30 days)
+- [x] **[L4]** Reduce PWA manifest cache duration — `max-age=3600` (1 hour)
 
 ### Monitoring & Alerts
 - [ ] Design a way to get notified about app problems — error alerting, uptime monitoring, KV health checks, failed cron runs, etc.
